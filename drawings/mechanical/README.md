@@ -17,12 +17,8 @@ CLKV2-DWG-11  | CLKV3-PC-04       | Front panel PCB
 CLKV3-DWG-12  | CLKV3-ML-08       | Front panel bracket
 CLKV3-DWG-13  | CLKV3-PC-05       | Motherboard PCB
 CLKV3-DWG-13  | CLKV3-PC-06       | Sound card PCB
-CLKV3-DWG-20  | CLKV3-AS-01       | Display panel ASSY
-CLKV3-DWG-21  | CLKV3-AS-02       | Motherboard ASSY
-CLKV3-DWG-22  | CLKV3-AS-03       | Speaker ASSY
-CLKV3-DWG-23  | CLKV3-AS-04       | Touch keypad ASSY
+CLKV3-DWG-20  | CLKV3-AS-01       | ASSY - Display panel
+CLKV3-DWG-21  | CLKV3-AS-02       | ASSY - Motherboard
+CLKV3-DWG-22  | CLKV3-AS-03       | ASSY - Speaker
+CLKV3-DWG-23  | CLKV3-AS-04       | ASSY - Touch keypad
 CLKV3-DWG-30  | CLKV3             | Final assembly
-
-
-72.2
-17.8
