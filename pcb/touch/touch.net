@@ -1,8 +1,8 @@
 (export (version D)
   (design
     (source /home/ben/Projects/alarm-clock-v3/pcb/touch/touch.sch)
-    (date "Wed 13 Apr 2016 04:22:09 AM EDT")
-    (tool "Eeschema (2016-03-01 BZR 6238)-product")
+    (date "Mon 11 Jul 2016 01:29:12 AM EDT")
+    (tool "Eeschema (2016-05-03 BZR 6266)-product")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title "Touch keypad")
@@ -17,7 +17,7 @@
   (components
     (comp (ref U1)
       (value AT42QT1070)
-      (footprint SMT-SOIC:14N)
+      (footprint SMT-SOIC:SOIC14N)
       (fields
         (field (name Family) IC))
       (libsource (lib ic-io) (part AT42QT1070))
@@ -34,7 +34,7 @@
       (tstamp 55D0001E))
     (comp (ref R4)
       (value 470)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -43,7 +43,7 @@
       (tstamp 55D0032C))
     (comp (ref R5)
       (value 470)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -52,7 +52,7 @@
       (tstamp 55D004C8))
     (comp (ref R6)
       (value 470)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -79,7 +79,7 @@
       (tstamp 55D00967))
     (comp (ref R2)
       (value 100k)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -114,7 +114,7 @@
       (tstamp 56E0D8E7))
     (comp (ref SW1)
       (value ALARM)
-      (footprint Conn-Wire-Pads:touchpad-600x500)
+      (footprint Conn-Wire-Pads:TouchPad-600x500)
       (fields
         (field (name Part) -)
         (field (name Family) Virtual))
@@ -123,7 +123,7 @@
       (tstamp 56E11BF8))
     (comp (ref SW2)
       (value MENU)
-      (footprint Conn-Wire-Pads:touchpad-600x500)
+      (footprint Conn-Wire-Pads:TouchPad-600x500)
       (fields
         (field (name Part) -)
         (field (name Family) Virtual))
@@ -132,7 +132,7 @@
       (tstamp 56E11C67))
     (comp (ref SW3)
       (value SET)
-      (footprint Conn-Wire-Pads:touchpad-800x500)
+      (footprint Conn-Wire-Pads:TouchPad-800x500)
       (fields
         (field (name Part) -)
         (field (name Family) Virtual))
@@ -143,14 +143,14 @@
       (value BSS138)
       (footprint SMT-SOT:SOT23)
       (fields
-        (field (name Part) -)
-        (field (name Family) Passive))
+        (field (name Part) BSS138)
+        (field (name Family) IC))
       (libsource (lib passive) (part N-MOSFET))
       (sheetpath (names /) (tstamps /))
       (tstamp 570DEA26))
     (comp (ref R7)
       (value 10k)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -159,7 +159,7 @@
       (tstamp 570E1C1B))
     (comp (ref R1)
       (value 10k)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -170,14 +170,14 @@
       (value BSS138)
       (footprint SMT-SOT:SOT23)
       (fields
-        (field (name Part) -)
-        (field (name Family) Passive))
+        (field (name Part) BSS138)
+        (field (name Family) IC))
       (libsource (lib passive) (part N-MOSFET))
       (sheetpath (names /) (tstamps /))
       (tstamp 570E2B01))
     (comp (ref R8)
       (value 10k)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -186,7 +186,7 @@
       (tstamp 570E2B0F))
     (comp (ref R3)
       (value 10k)
-      (footprint SMT:C-0603)
+      (footprint SMT:R-0603)
       (fields
         (field (name Part) -)
         (field (name Family) Passive))
@@ -197,6 +197,8 @@
     (libpart (lib ic-io) (part AT42QT1070)
       (description "7 channel QTouch Touch sensor IC")
       (docs http://ww1.microchip.com/downloads/en/DeviceDoc/22203b.pdf)
+      (footprints
+        (fp SOIC14N))
       (fields
         (field (name Reference) U)
         (field (name Value) AT42QT1070)
@@ -217,7 +219,9 @@
         (pin (num 13) (name KEY0) (type output))
         (pin (num 14) (name GND) (type power_in))))
     (libpart (lib passive) (part CAP)
-      (description capacitor)
+      (description Capacitor)
+      (footprints
+        (fp C-*))
       (fields
         (field (name Reference) C)
         (field (name Value) CAP)
@@ -228,6 +232,8 @@
         (pin (num 2) (name 2) (type passive))))
     (libpart (lib connectors) (part HEADER-1x05)
       (description "Header - Single Row - 5 Pos")
+      (footprints
+        (fp *1x05*))
       (fields
         (field (name Reference) J)
         (field (name Value) HEADER-1x05)
@@ -243,7 +249,7 @@
       (description "100 mA LDO Regulator w/ Shutdown")
       (docs http://www.ti.com/lit/ds/symlink/lp2981-33.pdf)
       (footprints
-        (fp SOIC16_N_EP))
+        (fp SOT23-5))
       (fields
         (field (name Reference) U)
         (field (name Value) LP2981)
@@ -256,11 +262,13 @@
         (pin (num 5) (name VOUT) (type power_out))))
     (libpart (lib passive) (part N-MOSFET)
       (description "N-Channel MOSFET")
+      (footprints
+        (fp SOT23))
       (fields
         (field (name Reference) Q)
         (field (name Value) N-MOSFET)
         (field (name Part) -)
-        (field (name Family) Passive))
+        (field (name Family) IC))
       (pins
         (pin (num 1) (name G) (type passive))
         (pin (num 2) (name S) (type passive))
@@ -268,10 +276,7 @@
     (libpart (lib passive) (part RESISTOR)
       (description Resistor)
       (footprints
-        (fp R-0603)
-        (fp R-0805)
-        (fp R-1206)
-        (fp R-1210))
+        (fp R-*))
       (fields
         (field (name Reference) R)
         (field (name Value) RESISTOR)
@@ -282,6 +287,8 @@
         (pin (num 2) (name 2) (type passive))))
     (libpart (lib switches) (part TOUCH-KEY)
       (description "Momentary SPST switch")
+      (footprints
+        (fp *touchpad*))
       (fields
         (field (name Reference) SW)
         (field (name Value) TOUCH-KEY)
@@ -292,14 +299,14 @@
   (libraries
     (library (logical ic-power)
       (uri /home/ben/Projects/tools/kicad/library/ic-power.lib))
-    (library (logical switches)
-      (uri /home/ben/Projects/tools/kicad/library/switches.lib))
-    (library (logical ic-io)
-      (uri /home/ben/Projects/tools/kicad/library/ic-io.lib))
     (library (logical connectors)
       (uri /home/ben/Projects/tools/kicad/library/connectors.lib))
+    (library (logical ic-io)
+      (uri /home/ben/Projects/tools/kicad/library/ic-io.lib))
     (library (logical passive)
-      (uri /home/ben/Projects/tools/kicad/library/passive.lib)))
+      (uri /home/ben/Projects/tools/kicad/library/passive.lib))
+    (library (logical switches)
+      (uri /home/ben/Projects/tools/kicad/library/switches.lib)))
   (nets
     (net (code 1) (name GND)
       (node (ref C2) (pin 2))

@@ -2,8 +2,8 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/touch/touch.sch</source>
-    <date>Wed 13 Apr 2016 04:30:03 AM EDT</date>
-    <tool>Eeschema (2016-03-01 BZR 6238)-product</tool>
+    <date>Mon 11 Jul 2016 04:25:27 AM EDT</date>
+    <tool>Eeschema (2016-05-03 BZR 6266)-product</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>Touch keypad</title>
@@ -21,7 +21,7 @@
   <components>
     <comp ref="U1">
       <value>AT42QT1070</value>
-      <footprint>SMT-SOIC:14N</footprint>
+      <footprint>SMT-SOIC:SOIC14N</footprint>
       <fields>
         <field name="Family">IC</field>
       </fields>
@@ -42,7 +42,7 @@
     </comp>
     <comp ref="R4">
       <value>470</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -53,7 +53,7 @@
     </comp>
     <comp ref="R5">
       <value>470</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -64,7 +64,7 @@
     </comp>
     <comp ref="R6">
       <value>470</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -97,7 +97,7 @@
     </comp>
     <comp ref="R2">
       <value>100k</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -107,7 +107,7 @@
       <tstamp>55D00CB7</tstamp>
     </comp>
     <comp ref="U2">
-      <value>LP2981</value>
+      <value>LP2981-33DBVT</value>
       <footprint>SMT-SOT:SOT23-5</footprint>
       <fields>
         <field name="Family">IC</field>
@@ -140,7 +140,7 @@
     </comp>
     <comp ref="SW1">
       <value>ALARM</value>
-      <footprint>Conn-Wire-Pads:touchpad-600x500</footprint>
+      <footprint>Conn-Wire-Pads:TouchPad-600x500</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Virtual</field>
@@ -151,7 +151,7 @@
     </comp>
     <comp ref="SW2">
       <value>MENU</value>
-      <footprint>Conn-Wire-Pads:touchpad-600x500</footprint>
+      <footprint>Conn-Wire-Pads:TouchPad-600x500</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Virtual</field>
@@ -162,7 +162,7 @@
     </comp>
     <comp ref="SW3">
       <value>SET</value>
-      <footprint>Conn-Wire-Pads:touchpad-800x500</footprint>
+      <footprint>Conn-Wire-Pads:TouchPad-800x500</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Virtual</field>
@@ -184,7 +184,7 @@
     </comp>
     <comp ref="R7">
       <value>10k</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -195,7 +195,7 @@
     </comp>
     <comp ref="R1">
       <value>10k</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -217,7 +217,7 @@
     </comp>
     <comp ref="R8">
       <value>10k</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -228,7 +228,7 @@
     </comp>
     <comp ref="R3">
       <value>10k</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>SMT:R-0603</footprint>
       <fields>
         <field name="Part">-</field>
         <field name="Family">Passive</field>
@@ -242,6 +242,9 @@
     <libpart lib="ic-io" part="AT42QT1070">
       <description>7 channel QTouch Touch sensor IC</description>
       <docs>http://ww1.microchip.com/downloads/en/DeviceDoc/22203b.pdf</docs>
+      <footprints>
+        <fp>SOIC14N</fp>
+      </footprints>
       <fields>
         <field name="Reference">U</field>
         <field name="Value">AT42QT1070</field>
@@ -266,6 +269,9 @@
     </libpart>
     <libpart lib="passive" part="CAP">
       <description>Capacitor</description>
+      <footprints>
+        <fp>C-*</fp>
+      </footprints>
       <fields>
         <field name="Reference">C</field>
         <field name="Value">CAP</field>
@@ -279,6 +285,9 @@
     </libpart>
     <libpart lib="connectors" part="HEADER-1x05">
       <description>Header - Single Row - 5 Pos</description>
+      <footprints>
+        <fp>*1x05*</fp>
+      </footprints>
       <fields>
         <field name="Reference">J</field>
         <field name="Value">HEADER-1x05</field>
@@ -297,12 +306,13 @@
       <description>100 mA LDO Regulator w/ Shutdown</description>
       <docs>http://www.ti.com/lit/ds/symlink/lp2981-33.pdf</docs>
       <footprints>
-        <fp>SOIC16_N_EP</fp>
+        <fp>SOT23-5</fp>
       </footprints>
       <fields>
         <field name="Reference">U</field>
         <field name="Value">LP2981</field>
         <field name="Family">IC</field>
+        <field name="Part">-</field>
       </fields>
       <pins>
         <pin num="1" name="VIN" type="power_in"/>
@@ -314,6 +324,9 @@
     </libpart>
     <libpart lib="passive" part="N-MOSFET">
       <description>N-Channel MOSFET</description>
+      <footprints>
+        <fp>SOT23</fp>
+      </footprints>
       <fields>
         <field name="Reference">Q</field>
         <field name="Value">N-MOSFET</field>
@@ -329,10 +342,7 @@
     <libpart lib="passive" part="RESISTOR">
       <description>Resistor</description>
       <footprints>
-        <fp>R-0603</fp>
-        <fp>R-0805</fp>
-        <fp>R-1206</fp>
-        <fp>R-1210</fp>
+        <fp>R-*</fp>
       </footprints>
       <fields>
         <field name="Reference">R</field>
@@ -347,6 +357,9 @@
     </libpart>
     <libpart lib="switches" part="TOUCH-KEY">
       <description>Momentary SPST switch</description>
+      <footprints>
+        <fp>*touchpad*</fp>
+      </footprints>
       <fields>
         <field name="Reference">SW</field>
         <field name="Value">TOUCH-KEY</field>
@@ -359,11 +372,11 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="ic-power">
-      <uri>/home/ben/Projects/tools/kicad/library/ic-power.lib</uri>
-    </library>
     <library logical="switches">
       <uri>/home/ben/Projects/tools/kicad/library/switches.lib</uri>
+    </library>
+    <library logical="passive">
+      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
     </library>
     <library logical="ic-io">
       <uri>/home/ben/Projects/tools/kicad/library/ic-io.lib</uri>
@@ -371,8 +384,8 @@
     <library logical="connectors">
       <uri>/home/ben/Projects/tools/kicad/library/connectors.lib</uri>
     </library>
-    <library logical="passive">
-      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
+    <library logical="ic-power">
+      <uri>/home/ben/Projects/tools/kicad/library/ic-power.lib</uri>
     </library>
   </libraries>
   <nets>
