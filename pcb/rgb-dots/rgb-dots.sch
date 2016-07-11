@@ -11,11 +11,11 @@ LIBS:opto
 LIBS:rgb-dots-cache
 EELAYER 25 0
 EELAYER END
-$Descr A4 11693 8268
+$Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Display - RGB dots"
-Date "2016-04-03"
+Date "2016-07-11"
 Rev "B"
 Comp ""
 Comment1 "CLKV3-PC-02"

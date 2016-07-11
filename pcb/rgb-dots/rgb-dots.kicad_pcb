@@ -12,7 +12,7 @@
     (nets 6)
   )
 
-  (page A4)
+  (page USLetter)
   (title_block
     (title "Display - RGB dots")
     (date 2016-03-23)

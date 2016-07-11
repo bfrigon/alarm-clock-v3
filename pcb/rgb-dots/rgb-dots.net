@@ -1,14 +1,14 @@
 (export (version D)
   (design
     (source /home/ben/Projects/alarm-clock-v3/pcb/rgb-dots/rgb-dots.sch)
-    (date "Sun 03 Apr 2016 01:30:40 AM EDT")
-    (tool "Eeschema (2016-03-01 BZR 6238)-product")
+    (date "Mon 11 Jul 2016 04:45:36 AM EDT")
+    (tool "Eeschema (2016-05-03 BZR 6266)-product")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title "Display - RGB dots")
         (company)
-        (rev A)
-        (date 2016-03-08)
+        (rev B)
+        (date 2016-04-03)
         (source rgb-dots.sch)
         (comment (number 1) (value CLKV3-PC-02))
         (comment (number 2) (value CLKV3-SCH-02))
@@ -113,7 +113,9 @@
       (tstamp 56E07857)))
   (libparts
     (libpart (lib passive) (part CAP)
-      (description capacitor)
+      (description Capacitor)
+      (footprints
+        (fp C-*))
       (fields
         (field (name Reference) C)
         (field (name Value) CAP)
@@ -124,6 +126,8 @@
         (pin (num 2) (name 2) (type passive))))
     (libpart (lib connectors) (part HEADER-1x01)
       (description "Header - Single Row - 1 Pos")
+      (footprints
+        (fp *1x01*))
       (fields
         (field (name Reference) J)
         (field (name Value) HEADER-1x01)
@@ -133,6 +137,8 @@
         (pin (num 1) (name P1) (type passive))))
     (libpart (lib connectors) (part Hole)
       (description "PCB Mounting Hole")
+      (footprints
+        (fp *Hole*))
       (fields
         (field (name Reference) H)
         (field (name Value) Hole)
@@ -141,6 +147,8 @@
         (pin (num P) (name P) (type passive))))
     (libpart (lib opto) (part WS2812B)
       (description "Digital 5050 RGB LED")
+      (footprints
+        (fp LED-5050))
       (fields
         (field (name Reference) U)
         (field (name Value) WS2812B)
@@ -151,12 +159,12 @@
         (pin (num 3) (name GND) (type power_in))
         (pin (num 4) (name DIN) (type input)))))
   (libraries
-    (library (logical opto)
-      (uri /home/ben/Projects/tools/kicad/library/opto.lib))
     (library (logical connectors)
       (uri /home/ben/Projects/tools/kicad/library/connectors.lib))
     (library (logical passive)
-      (uri /home/ben/Projects/tools/kicad/library/passive.lib)))
+      (uri /home/ben/Projects/tools/kicad/library/passive.lib))
+    (library (logical opto)
+      (uri /home/ben/Projects/tools/kicad/library/opto.lib)))
   (nets
     (net (code 1) (name "Net-(U1-Pad2)")
       (node (ref U2) (pin 4))

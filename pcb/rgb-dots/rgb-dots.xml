@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/rgb-dots/rgb-dots.sch</source>
-    <date>Wed 25 May 2016 12:23:28 PM EDT</date>
+    <date>Mon 11 Jul 2016 04:50:10 AM EDT</date>
     <tool>Eeschema (2016-05-03 BZR 6266)-product</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -141,6 +141,9 @@
   <libparts>
     <libpart lib="passive" part="CAP">
       <description>Capacitor</description>
+      <footprints>
+        <fp>C-*</fp>
+      </footprints>
       <fields>
         <field name="Reference">C</field>
         <field name="Value">CAP</field>
@@ -154,6 +157,9 @@
     </libpart>
     <libpart lib="connectors" part="HEADER-1x01">
       <description>Header - Single Row - 1 Pos</description>
+      <footprints>
+        <fp>*1x01*</fp>
+      </footprints>
       <fields>
         <field name="Reference">J</field>
         <field name="Value">HEADER-1x01</field>
@@ -166,6 +172,9 @@
     </libpart>
     <libpart lib="connectors" part="Hole">
       <description>PCB Mounting Hole</description>
+      <footprints>
+        <fp>*Hole*</fp>
+      </footprints>
       <fields>
         <field name="Reference">H</field>
         <field name="Value">Hole</field>
@@ -177,6 +186,9 @@
     </libpart>
     <libpart lib="opto" part="WS2812B">
       <description>Digital 5050 RGB LED</description>
+      <footprints>
+        <fp>LED-5050</fp>
+      </footprints>
       <fields>
         <field name="Reference">U</field>
         <field name="Value">WS2812B</field>
