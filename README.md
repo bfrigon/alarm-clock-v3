@@ -2,7 +2,8 @@ alarm-clock (V3)
 ================
 
 
-3D Model render:
+3D Model renders
+----------------
 
-![alt tag](/docs/model-render/front.jpg "Front view")
-![alt tag](/docs/model-render/front_dark.jpg "Front view (Dark)")
+![alt tag](/pictures/model-render/front.jpg "Front view")
+![alt tag](/pictures/model-render/front_dark.jpg "Front view (Dark)")
