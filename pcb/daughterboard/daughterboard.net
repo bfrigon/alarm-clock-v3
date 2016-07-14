@@ -1,6 +1,6 @@
 (export (version D)
   (design
-    (source /home/ben/Projects/alarm-clock-v3/pcb/soundcard/soundcard.sch)
+    (source /home/ben/Projects/alarm-clock-v3/pcb/daughterboard/daughterboard.sch)
     (date "Wed 30 Mar 2016 12:29:36 PM EDT")
     (tool "Eeschema (2016-03-01 BZR 6238)-product")
     (sheet (number 1) (name /) (tstamps /)
@@ -9,7 +9,7 @@
         (company)
         (rev)
         (date)
-        (source soundcard.sch)
+        (source daughterboard.sch)
         (comment (number 1) (value ""))
         (comment (number 2) (value ""))
         (comment (number 3) (value ""))

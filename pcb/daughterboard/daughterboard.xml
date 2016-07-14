@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/ben/Projects/alarm-clock-v3/pcb/daughterboard/daughterboard.sch</source>
+    <date>Wed 13 Jul 2016 09:44:21 PM EDT</date>
+    <tool>Eeschema (2016-05-03 BZR 6266)-product</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>Daughterboard</title>
+        <company/>
+        <rev>A</rev>
+        <date>2016-07-13</date>
+        <source>daughterboard.sch</source>
+        <comment number="1" value="CLKV3-PC-06"/>
+        <comment number="2" value="CLKV3-SCH-06"/>
+        <comment number="3" value="Alarm clock (V3)"/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components/>
+  <libparts/>
+  <libraries/>
+  <nets/>
+</export>
