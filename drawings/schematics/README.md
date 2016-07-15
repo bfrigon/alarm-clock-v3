@@ -8,5 +8,5 @@ CLKV3-SCH-02  | CLKV3-PC-02       | Display - RGB dots
 CLKV3-SCH-03  | CLKV3-PC-03       | Touch keypad
 CLKV3-SCH-04  | CLKV3-PC-04       | Front panel
 CLKV3-SCH-05  | CLKV3-PC-05       | Motherboard
-CLKV3-SCH-06  | CLKV3-PC-06       | Sound card
-
+CLKV3-SCH-06  | CLKV3-PC-06       | Daughterboard
+CLKV3-SCH-07  | CLKV3-PC-07       | Ambiant light sensor
