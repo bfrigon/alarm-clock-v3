@@ -1,7 +1,7 @@
 ### Bill of material ###
 
 ```
-Date    : 2016-03-09
+Date    : 2016-07-21
 Doc. ID : CLKV3-SCH-03
 Project : Alarm Clock (V3)
 Title   : Touch Keypad

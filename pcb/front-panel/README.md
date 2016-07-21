@@ -1,7 +1,7 @@
 ### Bill of material ###
 
 ```
-Date    : 2016-07-11
+Date    : 2016-07-21
 Doc. ID : CLKV2-SCH-04
 Project : Alarm Clock (V3)
 Title   : Front Panel

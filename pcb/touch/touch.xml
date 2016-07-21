@@ -2,14 +2,14 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/touch/touch.sch</source>
-    <date>Mon 11 Jul 2016 04:25:27 AM EDT</date>
+    <date>Thu 21 Jul 2016 03:12:29 AM EDT</date>
     <tool>Eeschema (2016-05-03 BZR 6266)-product</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>Touch keypad</title>
         <company/>
         <rev>A</rev>
-        <date>2016-03-09</date>
+        <date>2016-07-21</date>
         <source>touch.sch</source>
         <comment number="1" value="CLKV3-PC-03"/>
         <comment number="2" value="CLKV3-SCH-03"/>
@@ -375,17 +375,17 @@
     <library logical="switches">
       <uri>/home/ben/Projects/tools/kicad/library/switches.lib</uri>
     </library>
-    <library logical="passive">
-      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
-    </library>
-    <library logical="ic-io">
-      <uri>/home/ben/Projects/tools/kicad/library/ic-io.lib</uri>
-    </library>
     <library logical="connectors">
       <uri>/home/ben/Projects/tools/kicad/library/connectors.lib</uri>
     </library>
+    <library logical="passive">
+      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
+    </library>
     <library logical="ic-power">
       <uri>/home/ben/Projects/tools/kicad/library/ic-power.lib</uri>
+    </library>
+    <library logical="ic-io">
+      <uri>/home/ben/Projects/tools/kicad/library/ic-io.lib</uri>
     </library>
   </libraries>
   <nets>

@@ -15,7 +15,7 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Touch keypad"
-Date "2016-03-09"
+Date "2016-07-21"
 Rev "A"
 Comp ""
 Comment1 "CLKV3-PC-03"

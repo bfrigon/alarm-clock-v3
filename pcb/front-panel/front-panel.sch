@@ -15,7 +15,7 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Front panel"
-Date "2016-07-11"
+Date "2016-07-21"
 Rev "A"
 Comp ""
 Comment1 "CLKV2-PC-04"
