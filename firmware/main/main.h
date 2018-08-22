@@ -1,0 +1,303 @@
+//******************************************************************************
+//
+// Project : Alarm Clock V3
+// File    : main.h
+// Author  : Benoit Frigon <www.bfrigon.com>
+//
+// -----------------------------------------------------------------------------
+//
+// This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+// International License. To view a copy of this license, visit
+//
+// http://creativecommons.org/licenses/by-sa/4.0/
+//
+// or send a letter to Creative Commons,
+// PO Box 1866, Mountain View, CA 94042, USA.
+//
+//******************************************************************************
+
+#ifndef MAIN_H
+#define MAIN_H
+
+
+#include <avr/pgmspace.h>
+
+#include "resources.h"
+#include "time.h"
+#include "config.h"
+#include "alarm.h"
+#include "screen.h"
+
+
+
+
+/* Pins */
+
+#define PIN_INT_RTC         19
+#define PIN_INT_KEYPAD      18
+#define PIN_OLED_RESET      15
+#define PIN_OLED_VEN        14
+#define PIN_WIFI_CS         13
+#define PIN_WIFI_IRQ        2
+#define PIN_WIFI_RESET      11
+#define PIN_WIFI_ENABLE     12
+#define PIN_FACTORY_RESET   6
+#define PIN_NEOCLOCK        37
+#define PIN_PIX_LAMP        36
+#define PIN_PIX_SHDN        30
+
+#define PIN_ALARM_SW        43
+
+
+#define PIN_VS1053_RESET    9
+#define PIN_VS1053_DREQ     3
+#define PIN_VS1053_CS       16
+#define PIN_VS1053_SDCS     4
+#define PIN_VS1053_XDCS     8
+#define PIN_SD_DETECT       33
+#define PIN_AMP_SHDN        28
+
+
+
+#define I2C_ADDR_OLED       0x3c
+#define I2C_ADDR_TLS2561    0x29
+
+
+/* Set time screen */
+#define ID_SET_TIME         1
+#define ID_SET_DATE_DAY     2
+#define ID_SET_DATE_MONTH   3
+#define ID_SET_DATE_YEAR    4
+
+
+/* Set alarms screen */
+#define ID_ALARM_PROFILE_1  10
+#define ID_ALARM_PROFILE_2  11
+#define ID_ALARM_ON_1       12
+#define ID_ALARM_ON_2       13
+#define ID_ALARM_EDIT_1     14
+#define ID_ALARM_EDIT_2     15
+
+
+/* Display settings screen */
+#define ID_CLOCK_24H        20
+#define ID_CLOCK_COLOR      21
+#define ID_CLOCK_BRIGHTNESS 22
+#define ID_LCD_CONTRAST     23
+#define ID_DATE_FORMAT      24
+#define ID_TEMP_UNIT        25
+
+/* Network settings screen */
+#define ID_NETWORK_DHCP     30
+#define ID_NETWORK_IP       31
+#define ID_NETWORK_MASK     32
+#define ID_NETWORK_GATEWAY  33
+#define ID_NETWORK_DNS      34
+
+
+/* Edit profile screen / edit alarm screen */
+#define ID_PROFILE_NAME     40
+#define ID_PROFILE_FILENAME 41
+#define ID_PROFILE_TIME     42
+#define ID_PROFILE_SNOOZE   43
+#define ID_PROFILE_DOW      44
+#define ID_PROFILE_VOLUME   45
+#define ID_PROFILE_GRADUAL  46
+#define ID_PROFILE_VISUAL   47
+#define ID_PROFILE_MSG      48
+#define ID_PROFILE_TEST     49
+
+
+
+
+#define SCREEN_ID_ROOT              0
+#define SCREEN_ID_MAIN_MENU         1
+#define SCREEN_ID_SET_TIME          2
+#define SCREEN_ID_SET_ALARMS        3
+#define SCREEN_ID_EDIT_ALARM        4
+#define SCREEN_ID_SHOW_ALARMS       5
+#define SCREEN_ID_NETWORK           6
+#define SCREEN_ID_SETTINGS          7
+#define SCREEN_ID_LIST_PROFILES     8
+#define SCREEN_ID_EDIT_PROFILE      9
+
+
+
+
+extern Alarm g_alarm;
+extern struct Time adjTime;
+extern struct Date adjDate;
+extern uint8_t selectedProfile;
+extern uint8_t selectedAlarm;
+
+
+void initScreens();
+void configWiFi();
+
+void resetClockDisplay();
+bool checkFactoryResetBtn();
+
+bool root_eventDrawScreen( Screen *screen );
+bool root_eventKeypress( Screen *screen, uint8_t key );
+bool listprofiles_eventKeypress( Screen *screen, uint8_t key );
+bool listprofiles_eventDrawScreen( Screen *screen );
+bool enterScreen( Screen *screen );
+bool exitScreen( Screen *currentScreen, Screen *newScreen );
+bool eventValueChange( Screen *screen, Item *item);
+void eventSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fullscreen );
+bool eventDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col );
+
+bool set_alarms_eventKeypress( Screen *screen, uint8_t key );
+bool show_alarm_eventKeypress( Screen *screen, uint8_t key );
+bool show_alarm_eventDrawScreen( Screen *screen );
+
+void isr_rtc();
+
+
+
+
+//--------------------------------------------------------------------------
+//
+// Screen items
+//
+//--------------------------------------------------------------------------
+
+extern Screen screen_root;
+extern Screen screen_main_menu;
+extern Screen screen_display;
+extern Screen screen_network;
+extern Screen screen_set_time;
+extern Screen screen_set_alarms;
+extern Screen screen_edit_alarm;
+extern Screen screen_show_alarms;
+extern Screen screen_edit_profile;
+extern Screen screen_list_profiles;
+
+
+
+
+/* Display settings menu items */
+BEGIN_SCREEN_ITEMS( ITEMS_DISPLAY_SETTINGS )
+    ITEM_TOGGLE( ID_CLOCK_24H, 0, 0, S_MENU_SETTINGS_24H, &g_config.clock_24h, ITEM_COMPACT )
+
+    ITEM_LIST( ID_CLOCK_COLOR, 1, 0, S_MENU_SETTINGS_COLOR, &g_config.clock_color,
+               _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN )
+
+    ITEM_BAR( ID_CLOCK_BRIGHTNESS, 2, 0, S_MENU_SETTINGS_BRIGHT, &g_config.clock_brightness,
+              15, 80, 12, ITEM_EDIT_FULLSCREEN )
+
+    ITEM_BAR( ID_LCD_CONTRAST, 3, 0, S_MENU_SETTINGS_LCD_CTR, &g_config.lcd_contrast,
+              0, 100, 12, ITEM_EDIT_FULLSCREEN )
+
+    ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.date_format,
+               _DATE_FORMATS, 0, MAX_DATE_FORMATS - 1, DATE_FORMAT_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN )
+
+    ITEM_LIST( ID_TEMP_UNIT, 5, 0, S_MENU_SETTINGS_TEMPUNIT, &g_config.tempunit_c,
+              _TEMP_UNITS, 0, 1, 1, ITEM_LIST_PROGMEM_POINTER )
+
+END_SCREEN_ITEMS()
+
+
+/* Set time screen items */
+BEGIN_SCREEN_ITEMS( ITEMS_SET_TIME )
+    ITEM_TIME( ID_SET_TIME, 0, 0, NULL, &adjTime, ITEM_COMPACT)
+    ITEM_NUMBER( ID_SET_DATE_DAY, 1, 0, NULL, &adjDate.day, 1, 31, ITEM_COMPACT | ITEM_NUMBER_INC_WHOLE )
+    ITEM_MONTH( ID_SET_DATE_MONTH, 1, 3, NULL, &adjDate.month, ITEM_COMPACT )
+    ITEM_YEAR( ID_SET_DATE_YEAR, 1, 7, NULL, &adjDate.year, ITEM_COMPACT )
+END_SCREEN_ITEMS()
+
+
+/* Set alarm screen items */
+BEGIN_SCREEN_ITEMS( ITEMS_SET_ALARM )
+    // ----------------
+    // 1.[Profile #1 ]
+    //  >Off >12:00 am
+    // 2.[Profile #1 ]
+    //  >On  >12:00 am
+    // ----------------
+
+    /* Alarm 1 */
+    ITEM_STATIC( 0, 0, S_ALARM_NUM1, ITEM_NORMAL )
+    ITEM_LIST( ID_ALARM_PROFILE_1, 0, 2, NULL, &g_config.alarm_profile_id[ 0 ],
+               NULL, 0, MAX_ALARM_PROFILES - 1, ALARM_PROFILE_NAME_LENGTH,
+               ITEM_COMPACT )
+
+    ITEM_TOGGLE( ID_ALARM_ON_1, 1, 1, NULL, &g_config.alarm_on[ 0 ], ITEM_NORMAL )
+    ITEM_LINK( ID_ALARM_EDIT_1, 1, 6, NULL, &screen_edit_alarm, ITEM_NORMAL )
+
+    /* Alarm 2 */
+    ITEM_STATIC( 2, 0, S_ALARM_NUM2, ITEM_NORMAL )
+    ITEM_LIST( ID_ALARM_PROFILE_2, 2, 2, NULL, &g_config.alarm_profile_id[ 1 ],
+               NULL, 0, MAX_ALARM_PROFILES - 1, ALARM_PROFILE_NAME_LENGTH,
+               ITEM_COMPACT | ITEM_BREAK )
+
+    ITEM_TOGGLE( ID_ALARM_ON_2, 3, 1, NULL, &g_config.alarm_on[ 1 ], ITEM_NORMAL )
+    ITEM_LINK( ID_ALARM_EDIT_2, 3, 6, NULL, &screen_edit_alarm, ITEM_NORMAL )
+
+END_SCREEN_ITEMS()
+
+/* Edit alarm screen items */
+BEGIN_SCREEN_ITEMS( ITEMS_EDIT_ALARM )
+    // ----------------
+    //  12:00 am
+    //  S - - - T F S
+    // ----------------
+
+    ITEM_TIME( ID_PROFILE_TIME, 0, 0, NULL, &g_alarm.profile.time, ITEM_COMPACT )
+    ITEM_DOW( ID_PROFILE_DOW, 1, 0, NULL, &g_alarm.profile.dow, ITEM_NORMAL )
+
+END_SCREEN_ITEMS()
+
+
+
+
+
+/* Network menu items */
+BEGIN_SCREEN_ITEMS( ITEMS_NETWORK )
+    ITEM_TOGGLE( ID_NETWORK_DHCP, 0, 0, S_MENU_NETWORK_DHCP, &g_config.net_dhcp, ITEM_NORMAL )
+    ITEM_IP( ID_NETWORK_IP, 1, 0, S_MENU_NETWORK_IP, &g_config.net_ip, ITEM_EDIT_FULLSCREEN )
+    ITEM_IP( ID_NETWORK_MASK, 2, 0, S_MENU_NETWORK_MASK, &g_config.net_mask, ITEM_EDIT_FULLSCREEN )
+    ITEM_IP( ID_NETWORK_GATEWAY, 3, 0, S_MENU_NETWORK_GATEWAY, &g_config.net_gateway, ITEM_EDIT_FULLSCREEN )
+    ITEM_IP( ID_NETWORK_DNS, 4, 0, S_MENU_NETWORK_DNS, &g_config.net_dns, ITEM_EDIT_FULLSCREEN )
+END_SCREEN_ITEMS()
+
+
+/* Edit profile screen items */
+BEGIN_SCREEN_ITEMS( ITEMS_EDIT_PROFILE )
+    ITEM_TEXT( ID_PROFILE_NAME, 0, 0, S_EDIT_PROFILE_NAME, &g_alarm.profile.name, ALARM_PROFILE_NAME_LENGTH, ITEM_EDIT_FULLSCREEN )
+    ITEM_TIME( ID_PROFILE_TIME, 1, 0, S_EDIT_PROFILE_TIME, &g_alarm.profile.time, ITEM_EDIT_FULLSCREEN )
+    ITEM_DOW( ID_PROFILE_DOW, 2, 0, S_EDIT_PROFILE_DOW, &g_alarm.profile.dow, ITEM_EDIT_FULLSCREEN )
+    ITEM_NUMBER( ID_PROFILE_SNOOZE, 3, 0, S_EDIT_PROFILE_SNOOZE, &g_alarm.profile.snoozeDelay, 0, 30, ITEM_NUMBER_INC_WHOLE | ITEM_EDIT_FULLSCREEN | ITEM_NOCURSOR )
+    ITEM_LIST( ID_PROFILE_FILENAME, 4, 0, S_EDIT_PROFILE_FILENAME, NULL,
+               &g_alarm.profile.filename, 0, 0, 12,
+               ITEM_LIST_SRAM_POINTER | ITEM_EDIT_FULLSCREEN )
+
+    ITEM_BAR( ID_PROFILE_VOLUME, 5, 0, S_EDIT_PROFILE_VOLUME, &g_alarm.profile.volume,
+             20, 100, 10, ITEM_EDIT_FULLSCREEN )
+
+    ITEM_TOGGLE( ID_PROFILE_GRADUAL, 6, 0, S_EDIT_PROFILE_GRADUAL, &g_alarm.profile.gradual, ITEM_NORMAL )
+
+    ITEM_LIST( ID_PROFILE_VISUAL, 7, 0, S_EDIT_PROFILE_VISUAL, &g_alarm.profile.visualMode,
+               _ALARM_VISUAL, 0, MAX_ALARM_VISUALS - 1, ALARM_VISUAL_NAME_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN )
+
+    ITEM_TEXT( ID_PROFILE_MSG, 8, 0, S_EDIT_PROFILE_MESSAGE, &g_alarm.profile.message, ALARM_MESSAGE_LENGTH, ITEM_EDIT_FULLSCREEN )
+
+    ITEM_LINK( ID_PROFILE_TEST, 9, 0, S_EDIT_PROFILE_TEST, NULL, ITEM_NORMAL )
+
+END_SCREEN_ITEMS()
+
+
+/* Main menu items */
+BEGIN_SCREEN_ITEMS( ITEMS_MAIN_MENU )
+    ITEM_LINK( 0, 0, 0, S_MAIN_MENU_SET_ALARMS, &screen_set_alarms, ITEM_NORMAL )
+    ITEM_LINK( 0, 1, 0, S_MAIN_MENU_SET_TIME, &screen_set_time, ITEM_NORMAL )
+    ITEM_LINK( 0, 2, 0, S_MAIN_MENU_PROFILES, &screen_list_profiles, ITEM_NORMAL )
+    ITEM_LINK( 0, 3, 0, S_MAIN_MENU_DISPLAY, &screen_display, ITEM_NORMAL )
+    ITEM_LINK( 0, 4, 0, S_MAIN_MENU_NETWORK, &screen_network, ITEM_NORMAL )
+END_SCREEN_ITEMS()
+
+
+#endif /* MAIN_H */

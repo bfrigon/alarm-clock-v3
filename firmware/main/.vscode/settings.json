@@ -1,0 +1,19 @@
+{
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "C_Cpp.errorSquiggles": "Disabled",
+
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "build*": true
+    },
+    "files.associations": {
+        "*.tcc": "cpp",
+        "thread": "cpp"
+    },
+
+    
+}

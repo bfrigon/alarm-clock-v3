@@ -1,0 +1,59 @@
+{
+    "configurations": [
+        {
+            "name": "Arduino-mega",
+            "defines": [
+                "ARDUINO=100",
+                "UBRRH",
+                ""
+            ],
+            "includePath": [
+                "/opt/arduino/hardware/arduino/avr/cores/arduino/",
+                "/opt/arduino/hardware/arduino/avr/libraries/EEPROM/src/",
+                "/opt/arduino/hardware/arduino/avr/libraries/HID/src/",
+                "/opt/arduino/hardware/arduino/avr/libraries/SPI/src/",
+                "/opt/arduino/hardware/arduino/avr/libraries/SD/src/",
+                "/opt/arduino/hardware/arduino/avr/libraries/SoftwareSerial/src/",
+                "/opt/arduino/hardware/arduino/avr/libraries/Wire/src/",
+                "/opt/arduino/hardware/tools/avr/avr/include/",
+                "/opt/arduino/hardware/tools/avr/avr/include/avr/",
+                "/opt/arduino/hardware/tools/avr/avr/include/compat/",
+                "/opt/arduino/hardware/tools/avr/avr/include/sys/",
+                "/opt/arduino/hardware/tools/avr/avr/include/util/",
+                "/opt/arduino/hardware/tools/avr/lib/gcc/avr/4.*.*/include/",
+                "/opt/arduino/hardware/tools/avr/lib/gcc/avr/4.*.*/include-fixed/",
+                "/opt/arduino/hardware/tools/avr/lib/gcc/avr/4.*.*/include-fixed/",
+                "/opt/arduino/hardware/arduino/avr/variants/mega/",
+                "/home/ben/Projects/arduino/libraries/SD/src/",
+                "/home/ben/Projects/arduino/libraries/Sodaq_DS3231/src/",
+                "/home/ben/Projects/arduino/libraries/Adafruit_VS1053_Library/",
+                "/home/ben/Projects/arduino/libraries/winc1500_async/src/"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/opt/arduino/hardware/arduino/avr/cores/arduino/",
+                    "/opt/arduino/hardware/arduino/avr/libraries/",
+                    "/opt/arduino/hardware/tools/avr/avr/include/",
+                    "/opt/arduino/hardware/tools/avr/lib/gcc/avr/4.*.*/",
+                    "/opt/arduino/hardware/arduino/avr/variants/mega/",
+                    "/home/ben/Projects/arduino/libraries/"
+                ]
+            },
+            "intelliSenseMode": "clang-x64"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/opt/arduino/hardware/arduino/avr/cores/arduino"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "/opt/arduino/hardware/arduino/avr/cores/arduino"
+                ]
+            }
+        }
+    ],
+    "version": 4
+}

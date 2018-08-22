@@ -1,0 +1,21 @@
+build-mega-atmega2560/userlibs/winc1500_async/src/bus_wrapper/source/nm_bus_wrapper_samd21.cpp.o: \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/bus_wrapper/source/nm_bus_wrapper_samd21.cpp \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/binary.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/WCharacter.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/WString.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/HardwareSerial.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/Stream.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/Print.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/Printable.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/USBAPI.h \
+ /opt/arduino/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino/hardware/arduino/avr/variants/mega/pins_arduino.h \
+ /opt/arduino/hardware/arduino/avr/libraries/SPI/src/SPI.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/bsp/include/nm_bsp.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/bsp/include/nm_bsp_arduino.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/common/include/nm_common.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/common/include/nm_debug.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/bsp/include/nm_bsp_internal.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/bsp/include/nm_bsp_avr.h \
+ /home/ben/Projects/arduino/libraries/winc1500_async/src/bus_wrapper/include/nm_bus_wrapper.h
