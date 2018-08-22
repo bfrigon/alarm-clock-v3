@@ -1,6 +1,0 @@
-{
-    "port": "/dev/ttyACM1",
-    "board": "arduino:avr:mega",
-    "configuration": "cpu=atmega2560",
-    "sketch": "main.ino"
-}

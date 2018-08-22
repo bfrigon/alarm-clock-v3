@@ -8,37 +8,6 @@
 *.b#?
 *.l#?
 
-# Eagle project file
-# It contains a serial number and references to the file structure
-# on your computer.
-# comment the following line if you want to have your project file included.
-eagle.epf
-
-# CAM files
-*.$$$
-*.cmp
-*.ly2
-*.l15
-*.sol
-*.plc
-*.stc
-*.sts
-*.crc
-*.crs
-
-*.dri
-*.drl
-*.gpi
-*.pls
-
-*.drd
-*.drd.*
-
-*.info
-
-*.eps
-
-
 # Ignore compiled objects (GPASM) #
 *.o
 *.lst
@@ -55,3 +24,15 @@ eagle.epf
 *.kicad_pcb-bak
 *.bak
 *.pro
+
+
+# Arduino builds
+##########################
+build-*
+
+
+
+# Arduino builds
+##########################
+build-*
+.vscode
