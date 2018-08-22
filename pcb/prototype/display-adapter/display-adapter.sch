@@ -1,0 +1,201 @@
+EESchema Schematic File Version 2
+LIBS:connectors
+LIBS:ic-cpu
+LIBS:ic-power
+LIBS:ic-misc
+LIBS:ic-io
+LIBS:passive
+LIBS:power
+LIBS:switches
+LIBS:opto
+LIBS:display-adapter-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L HEADER-1x02 J2
+U 1 1 5B694A82
+P 7600 1400
+F 0 "J2" H 7550 1550 60  0000 L BNB
+F 1 "HEADER-1x02" V 7750 1400 40  0000 C CNN
+F 2 "conn-header:HDR-M-1x02" H 7600 1400 60  0001 C CNN
+F 3 "" H 7600 1400 60  0001 C CNN
+F 4 "-" H 7550 1650 40  0001 L BNN "Part"
+F 5 "Connector" H 7550 1750 40  0001 L BNN "Family"
+	1    7600 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L HEADER-1x02 J3
+U 1 1 5B694BA0
+P 7600 2100
+F 0 "J3" H 7550 2250 60  0000 L BNB
+F 1 "HEADER-1x02" V 7750 2100 40  0000 C CNN
+F 2 "conn-header:HDR-M-1x02" H 7600 2100 60  0001 C CNN
+F 3 "" H 7600 2100 60  0001 C CNN
+F 4 "-" H 7550 2350 40  0001 L BNN "Part"
+F 5 "Connector" H 7550 2450 40  0001 L BNN "Family"
+	1    7600 2100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5950 2550 6600 2550
+Wire Wire Line
+	6600 2550 6600 3150
+Wire Wire Line
+	6600 3150 7450 3150
+Wire Wire Line
+	5950 2450 6700 2450
+Wire Wire Line
+	6700 2450 6700 3050
+Wire Wire Line
+	6700 3050 7450 3050
+Wire Wire Line
+	5950 2350 6800 2350
+Wire Wire Line
+	6800 2350 6800 2950
+Wire Wire Line
+	6800 2950 7450 2950
+Wire Wire Line
+	5950 1950 6650 1950
+Wire Wire Line
+	6650 1950 6650 1350
+Wire Wire Line
+	6650 1350 7450 1350
+Wire Wire Line
+	5950 2050 7450 2050
+Wire Wire Line
+	5950 2150 6750 2150
+Wire Wire Line
+	6750 2150 6750 1450
+Wire Wire Line
+	6750 1450 7450 1450
+Wire Wire Line
+	6850 2250 5950 2250
+Wire Wire Line
+	6850 2150 7450 2150
+Wire Wire Line
+	7250 1150 7250 2050
+Connection ~ 7250 2050
+Connection ~ 7250 1350
+Wire Wire Line
+	7150 1450 7150 2350
+Connection ~ 7150 2150
+Connection ~ 7150 1450
+Wire Wire Line
+	6850 2150 6850 2250
+$Comp
+L SUP_+5V #PWR01
+U 1 1 5B69506D
+P 7250 1150
+F 0 "#PWR01" H 7250 1375 30  0001 C CNN
+F 1 "SUP_+5V" V 7175 1150 30  0001 C CNN
+F 2 "" H 7150 1275 60  0001 C CNN
+F 3 "" H 7250 1375 60  0001 C CNN
+	1    7250 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L SUP_GND #PWR02
+U 1 1 5B6950AB
+P 7150 2350
+F 0 "#PWR02" H 7150 2400 30  0001 C CNN
+F 1 "SUP_GND" H 7150 2225 30  0001 C CNN
+F 2 "" H 7150 2350 60  0000 C CNN
+F 3 "" H 7150 2350 60  0000 C CNN
+	1    7150 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L HEADER-1x08 J1
+U 1 1 5B6A5A69
+P 5800 2300
+F 0 "J1" H 5750 2750 60  0000 L BNB
+F 1 "HEADER-1x08" V 5950 2300 40  0000 C CNN
+F 2 "conn-header:DF3A-8P-2DSA" H 5800 2300 60  0001 C CNN
+F 3 "" H 5800 2300 60  0001 C CNN
+F 4 "-" H 5750 2850 40  0001 L BNN "Part"
+F 5 "Connector" H 5750 2950 40  0001 L BNN "Family"
+	1    5800 2300
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	7450 3250 6500 3250
+Wire Wire Line
+	6500 3250 6500 2650
+Wire Wire Line
+	6500 2650 5950 2650
+$Comp
+L HEADER-1x03 J4
+U 1 1 5B71D4DC
+P 5750 4150
+F 0 "J4" H 5700 4350 60  0000 L BNB
+F 1 "HEADER-1x03" V 5900 4150 40  0000 C CNN
+F 2 "conn-header:DF3A-3P-2DSA" H 5750 4150 60  0001 C CNN
+F 3 "" H 5750 4150 60  0001 C CNN
+F 4 "-" H 5700 4450 40  0001 L BNN "Part"
+F 5 "Connector" H 5700 4550 40  0001 L BNN "Family"
+	1    5750 4150
+	-1   0    0    -1  
+$EndComp
+$Comp
+L +5V #PWR03
+U 1 1 5B71DA45
+P 6150 3850
+F 0 "#PWR03" H 6150 4075 30  0001 C CNN
+F 1 "+5V" V 6075 3850 30  0001 C CNN
+F 2 "" H 6150 3850 60  0000 C CNN
+F 3 "" H 6150 3850 60  0000 C CNN
+	1    6150 3850
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR04
+U 1 1 5B71DA63
+P 6150 4450
+F 0 "#PWR04" H 6150 4500 30  0001 C CNN
+F 1 "GND" H 6150 4325 30  0001 C CNN
+F 2 "" H 6150 4450 60  0000 C CNN
+F 3 "" H 6150 4450 60  0000 C CNN
+	1    6150 4450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5900 4250 6150 4250
+Wire Wire Line
+	6150 4250 6150 4450
+Wire Wire Line
+	5900 4050 6150 4050
+Wire Wire Line
+	6150 4050 6150 3850
+$Comp
+L HEADER-1x05 J5
+U 1 1 5B71DB11
+P 7600 3150
+F 0 "J5" H 7550 3450 60  0000 L BNB
+F 1 "HEADER-1x05" V 7750 3150 40  0000 C CNN
+F 2 "conn-header:HDR-M-1x05" H 7600 3150 60  0001 C CNN
+F 3 "" H 7600 3150 60  0001 C CNN
+F 4 "-" H 7550 3550 40  0001 L BNN "Part"
+F 5 "Connector" H 7550 3650 40  0001 L BNN "Family"
+	1    7600 3150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7450 3350 6500 3350
+Wire Wire Line
+	6500 3350 6500 4150
+Wire Wire Line
+	6500 4150 5900 4150
+$EndSCHEMATC

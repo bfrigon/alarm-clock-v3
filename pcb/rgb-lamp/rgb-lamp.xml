@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/ben/Projects/alarm-clock-v3/pcb/rgb-lamp/rgb-lamp.sch</source>
+    <date>Wed 22 Aug 2018 03:10:22 AM EDT</date>
+    <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>RGB Lamp</title>
+        <company/>
+        <rev>A</rev>
+        <date>2018-08-13</date>
+        <source>rgb-lamp.sch</source>
+        <comment number="1" value="CLKV3-PC-08"/>
+        <comment number="2" value="CLKV3-SCH-08"/>
+        <comment number="3" value="Alarm clock (V3)"/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>WS2812B</value>
+      <footprint>smt:LED-5050</footprint>
+      <fields>
+        <field name="Family">IC</field>
+      </fields>
+      <libsource lib="opto" part="WS2812B" description="Digital 5050 RGB LED"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3F0FC4</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>WS2812B</value>
+      <footprint>smt:LED-5050</footprint>
+      <fields>
+        <field name="Family">IC</field>
+      </fields>
+      <libsource lib="opto" part="WS2812B" description="Digital 5050 RGB LED"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3F1066</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>WS2812B</value>
+      <footprint>smt:LED-5050</footprint>
+      <fields>
+        <field name="Family">IC</field>
+      </fields>
+      <libsource lib="opto" part="WS2812B" description="Digital 5050 RGB LED"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3F10EC</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>HEADER-1x03</value>
+      <footprint>conn-wire-pads:WP-75mil-1x03</footprint>
+      <fields>
+        <field name="Family">Virtual</field>
+        <field name="Part">-</field>
+      </fields>
+      <libsource lib="connectors" part="HEADER-1x03" description="Header - Single Row - 3 Pos"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3F11C0</tstamp>
+    </comp>
+    <comp ref="H1">
+      <value>Hole</value>
+      <footprint>conn-wire-pads:SM-Standoff-#2</footprint>
+      <fields>
+        <field name="Family">Virtual</field>
+      </fields>
+      <libsource lib="connectors" part="Hole" description="PCB Mounting Hole"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B419B2F</tstamp>
+    </comp>
+    <comp ref="H2">
+      <value>Hole</value>
+      <footprint>conn-wire-pads:SM-Standoff-#2</footprint>
+      <fields>
+        <field name="Family">Virtual</field>
+      </fields>
+      <libsource lib="connectors" part="Hole" description="PCB Mounting Hole"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B419BDD</tstamp>
+    </comp>
+    <comp ref="C3">
+      <value>100nF</value>
+      <footprint>smt:C-0603</footprint>
+      <fields>
+        <field name="Family">Passive</field>
+        <field name="Part">-</field>
+      </fields>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B46714E</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>100nF</value>
+      <footprint>smt:C-0603</footprint>
+      <fields>
+        <field name="Family">Passive</field>
+        <field name="Part">-</field>
+      </fields>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B467931</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>100nF</value>
+      <footprint>smt:C-0603</footprint>
+      <fields>
+        <field name="Family">Passive</field>
+        <field name="Part">-</field>
+      </fields>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B467B28</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>300</value>
+      <footprint>smt:R-0603</footprint>
+      <fields>
+        <field name="Family">Passive</field>
+        <field name="Part">-</field>
+      </fields>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B46806D</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="connectors" part="HEADER-1x03">
+      <description>Header - Single Row - 3 Pos</description>
+      <footprints>
+        <fp>*1x03*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">HEADER-1x03</field>
+        <field name="Part">-</field>
+        <field name="Family">Connector</field>
+      </fields>
+      <pins>
+        <pin num="1" name="P1" type="passive"/>
+        <pin num="2" name="P2" type="passive"/>
+        <pin num="3" name="P3" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="connectors" part="Hole">
+      <description>PCB Mounting Hole</description>
+      <footprints>
+        <fp>*Hole*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">H</field>
+        <field name="Value">Hole</field>
+        <field name="Family">Virtual</field>
+      </fields>
+      <pins>
+        <pin num="P" name="P" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="opto" part="WS2812B">
+      <description>Digital 5050 RGB LED</description>
+      <footprints>
+        <fp>LED-5050</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">WS2812B</field>
+        <field name="Family">IC</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VCC" type="power_in"/>
+        <pin num="2" name="DOUT" type="output"/>
+        <pin num="3" name="GND" type="power_in"/>
+        <pin num="4" name="DIN" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="passive" part="CAP">
+      <description>Capacitor</description>
+      <footprints>
+        <fp>C-*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">CAP</field>
+        <field name="Part">-</field>
+        <field name="Family">Passive</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="passive" part="RESISTOR">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R-*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">RESISTOR</field>
+        <field name="Part">-</field>
+        <field name="Family">Passive</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="connectors">
+      <uri>/home/ben/Projects/tools/kicad/library/connectors.lib</uri>
+    </library>
+    <library logical="opto">
+      <uri>/home/ben/Projects/tools/kicad/library/opto.lib</uri>
+    </library>
+    <library logical="passive">
+      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="GND">
+      <node ref="J1" pin="1"/>
+      <node ref="H2" pin="P"/>
+      <node ref="H1" pin="P"/>
+      <node ref="U3" pin="3"/>
+      <node ref="U2" pin="3"/>
+      <node ref="U1" pin="3"/>
+      <node ref="C2" pin="2"/>
+      <node ref="C3" pin="2"/>
+      <node ref="C1" pin="2"/>
+    </net>
+    <net code="2" name="+5V">
+      <node ref="C2" pin="1"/>
+      <node ref="U3" pin="1"/>
+      <node ref="U2" pin="1"/>
+      <node ref="C3" pin="1"/>
+      <node ref="C1" pin="1"/>
+      <node ref="J1" pin="3"/>
+      <node ref="U1" pin="1"/>
+    </net>
+    <net code="3" name="Net-(J1-Pad2)">
+      <node ref="J1" pin="2"/>
+      <node ref="R1" pin="1"/>
+    </net>
+    <net code="4" name="Net-(R1-Pad2)">
+      <node ref="U1" pin="4"/>
+      <node ref="R1" pin="2"/>
+    </net>
+    <net code="5" name="Net-(U2-Pad2)">
+      <node ref="U2" pin="2"/>
+      <node ref="U3" pin="4"/>
+    </net>
+    <net code="6" name="Net-(U1-Pad2)">
+      <node ref="U1" pin="2"/>
+      <node ref="U2" pin="4"/>
+    </net>
+    <net code="7" name="Net-(U3-Pad2)">
+      <node ref="U3" pin="2"/>
+    </net>
+  </nets>
+</export>

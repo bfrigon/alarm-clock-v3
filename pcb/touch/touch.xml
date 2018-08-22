@@ -2,14 +2,14 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/touch/touch.sch</source>
-    <date>Thu 21 Jul 2016 03:12:29 AM EDT</date>
-    <tool>Eeschema (2016-05-03 BZR 6266)-product</tool>
+    <date>Wed 22 Aug 2018 02:59:10 AM EDT</date>
+    <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>Touch keypad</title>
         <company/>
-        <rev>A</rev>
-        <date>2016-07-21</date>
+        <rev>B</rev>
+        <date>2018-07-05</date>
         <source>touch.sch</source>
         <comment number="1" value="CLKV3-PC-03"/>
         <comment number="2" value="CLKV3-SCH-03"/>
@@ -21,224 +21,243 @@
   <components>
     <comp ref="U1">
       <value>AT42QT1070</value>
-      <footprint>SMT-SOIC:SOIC14N</footprint>
+      <footprint>smt-soic:SOIC14N</footprint>
       <fields>
         <field name="Family">IC</field>
       </fields>
-      <libsource lib="ic-io" part="AT42QT1070"/>
+      <libsource lib="ic-io" part="AT42QT1070" description="7 channel QTouch Touch sensor IC"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55CFFE23</tstamp>
     </comp>
     <comp ref="J1">
       <value>HEADER-1x05</value>
-      <footprint>Conn-Wire-Pads:WP-50mil-1x05</footprint>
+      <footprint>conn-wire-pads:WP-50mil-1x05</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Virtual</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="connectors" part="HEADER-1x05"/>
+      <libsource lib="connectors" part="HEADER-1x05" description="Header - Single Row - 5 Pos"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D0001E</tstamp>
     </comp>
     <comp ref="R4">
       <value>470</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D0032C</tstamp>
     </comp>
     <comp ref="R5">
       <value>470</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D004C8</tstamp>
     </comp>
     <comp ref="R6">
       <value>470</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D00512</tstamp>
     </comp>
     <comp ref="C2">
       <value>100nF</value>
-      <footprint>SMT:C-0603</footprint>
+      <footprint>smt:C-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="CAP"/>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D0077D</tstamp>
     </comp>
     <comp ref="C1">
       <value>1uF</value>
-      <footprint>SMT:C-0805</footprint>
+      <footprint>smt:C-0805</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="CAP"/>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D00967</tstamp>
     </comp>
     <comp ref="R2">
       <value>100k</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>55D00CB7</tstamp>
     </comp>
     <comp ref="U2">
       <value>LP2981-33DBVT</value>
-      <footprint>SMT-SOT:SOT23-5</footprint>
+      <footprint>smt-sot:SOT23-5</footprint>
       <fields>
         <field name="Family">IC</field>
       </fields>
-      <libsource lib="ic-power" part="LP2981"/>
+      <libsource lib="ic-power" part="LP2981" description="100 mA LDO Regulator w/ Shutdown"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>56E0CA51</tstamp>
     </comp>
     <comp ref="C3">
       <value>1uF</value>
-      <footprint>SMT:C-0805</footprint>
+      <footprint>smt:C-0805</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="CAP"/>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>56E0D880</tstamp>
     </comp>
     <comp ref="C4">
       <value>3.3uF</value>
-      <footprint>SMT:C-0805</footprint>
+      <footprint>smt:C-0805</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="CAP"/>
+      <libsource lib="passive" part="CAP" description="Capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>56E0D8E7</tstamp>
     </comp>
     <comp ref="SW1">
       <value>ALARM</value>
-      <footprint>Conn-Wire-Pads:TouchPad-600x500</footprint>
+      <footprint>conn-wire-pads:TouchPad-700x600</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Virtual</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="switches" part="TOUCH-KEY"/>
+      <libsource lib="touch-rescue" part="TOUCH-KEY" description=""/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>56E11BF8</tstamp>
     </comp>
     <comp ref="SW2">
       <value>MENU</value>
-      <footprint>Conn-Wire-Pads:TouchPad-600x500</footprint>
+      <footprint>conn-wire-pads:TouchPad-700x600</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Virtual</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="switches" part="TOUCH-KEY"/>
+      <libsource lib="touch-rescue" part="TOUCH-KEY" description=""/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>56E11C67</tstamp>
     </comp>
     <comp ref="SW3">
       <value>SET</value>
-      <footprint>Conn-Wire-Pads:TouchPad-800x500</footprint>
+      <footprint>conn-wire-pads:TouchPad-800x600</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Virtual</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="switches" part="TOUCH-KEY"/>
+      <libsource lib="touch-rescue" part="TOUCH-KEY" description=""/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>56E11CB6</tstamp>
     </comp>
     <comp ref="Q1">
       <value>BSS138</value>
-      <footprint>SMT-SOT:SOT23</footprint>
+      <footprint>smt-sot:SOT23</footprint>
       <fields>
-        <field name="Part">BSS138</field>
         <field name="Family">IC</field>
+        <field name="Part">BSS138</field>
       </fields>
-      <libsource lib="passive" part="N-MOSFET"/>
+      <libsource lib="passive" part="N-MOSFET" description="N-Channel MOSFET"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>570DEA26</tstamp>
     </comp>
     <comp ref="R7">
       <value>10k</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>570E1C1B</tstamp>
     </comp>
     <comp ref="R1">
       <value>10k</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>570E1DB7</tstamp>
     </comp>
     <comp ref="Q2">
       <value>BSS138</value>
-      <footprint>SMT-SOT:SOT23</footprint>
+      <footprint>smt-sot:SOT23</footprint>
       <fields>
-        <field name="Part">BSS138</field>
         <field name="Family">IC</field>
+        <field name="Part">BSS138</field>
       </fields>
-      <libsource lib="passive" part="N-MOSFET"/>
+      <libsource lib="passive" part="N-MOSFET" description="N-Channel MOSFET"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>570E2B01</tstamp>
     </comp>
     <comp ref="R8">
       <value>10k</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>570E2B0F</tstamp>
     </comp>
     <comp ref="R3">
       <value>10k</value>
-      <footprint>SMT:R-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
-        <field name="Part">-</field>
         <field name="Family">Passive</field>
+        <field name="Part">-</field>
       </fields>
-      <libsource lib="passive" part="RESISTOR"/>
+      <libsource lib="passive" part="RESISTOR" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>570E2B19</tstamp>
     </comp>
   </components>
   <libparts>
+    <libpart lib="connectors" part="HEADER-1x05">
+      <description>Header - Single Row - 5 Pos</description>
+      <footprints>
+        <fp>*1x05*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">HEADER-1x05</field>
+        <field name="Part">-</field>
+        <field name="Family">Connector</field>
+      </fields>
+      <pins>
+        <pin num="1" name="P1" type="passive"/>
+        <pin num="2" name="P2" type="passive"/>
+        <pin num="3" name="P3" type="passive"/>
+        <pin num="4" name="P4" type="passive"/>
+        <pin num="5" name="P5" type="passive"/>
+      </pins>
+    </libpart>
     <libpart lib="ic-io" part="AT42QT1070">
       <description>7 channel QTouch Touch sensor IC</description>
       <docs>http://ww1.microchip.com/downloads/en/DeviceDoc/22203b.pdf</docs>
@@ -267,41 +286,6 @@
         <pin num="14" name="GND" type="power_in"/>
       </pins>
     </libpart>
-    <libpart lib="passive" part="CAP">
-      <description>Capacitor</description>
-      <footprints>
-        <fp>C-*</fp>
-      </footprints>
-      <fields>
-        <field name="Reference">C</field>
-        <field name="Value">CAP</field>
-        <field name="Part">-</field>
-        <field name="Family">Passive</field>
-      </fields>
-      <pins>
-        <pin num="1" name="1" type="passive"/>
-        <pin num="2" name="2" type="passive"/>
-      </pins>
-    </libpart>
-    <libpart lib="connectors" part="HEADER-1x05">
-      <description>Header - Single Row - 5 Pos</description>
-      <footprints>
-        <fp>*1x05*</fp>
-      </footprints>
-      <fields>
-        <field name="Reference">J</field>
-        <field name="Value">HEADER-1x05</field>
-        <field name="Part">-</field>
-        <field name="Family">Connector</field>
-      </fields>
-      <pins>
-        <pin num="1" name="P1" type="passive"/>
-        <pin num="2" name="P2" type="passive"/>
-        <pin num="3" name="P3" type="passive"/>
-        <pin num="4" name="P4" type="passive"/>
-        <pin num="5" name="P5" type="passive"/>
-      </pins>
-    </libpart>
     <libpart lib="ic-power" part="LP2981">
       <description>100 mA LDO Regulator w/ Shutdown</description>
       <docs>http://www.ti.com/lit/ds/symlink/lp2981-33.pdf</docs>
@@ -320,6 +304,22 @@
         <pin num="3" name="ON/~OFF" type="input"/>
         <pin num="4" name="NC" type="NotConnected"/>
         <pin num="5" name="VOUT" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="passive" part="CAP">
+      <description>Capacitor</description>
+      <footprints>
+        <fp>C-*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">CAP</field>
+        <field name="Part">-</field>
+        <field name="Family">Passive</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
       </pins>
     </libpart>
     <libpart lib="passive" part="N-MOSFET">
@@ -355,8 +355,7 @@
         <pin num="2" name="2" type="passive"/>
       </pins>
     </libpart>
-    <libpart lib="switches" part="TOUCH-KEY">
-      <description>Momentary SPST switch</description>
+    <libpart lib="touch-rescue" part="TOUCH-KEY">
       <footprints>
         <fp>*touchpad*</fp>
       </footprints>
@@ -372,119 +371,119 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="switches">
-      <uri>/home/ben/Projects/tools/kicad/library/switches.lib</uri>
-    </library>
     <library logical="connectors">
       <uri>/home/ben/Projects/tools/kicad/library/connectors.lib</uri>
-    </library>
-    <library logical="passive">
-      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
-    </library>
-    <library logical="ic-power">
-      <uri>/home/ben/Projects/tools/kicad/library/ic-power.lib</uri>
     </library>
     <library logical="ic-io">
       <uri>/home/ben/Projects/tools/kicad/library/ic-io.lib</uri>
     </library>
+    <library logical="ic-power">
+      <uri>/home/ben/Projects/tools/kicad/library/ic-power.lib</uri>
+    </library>
+    <library logical="passive">
+      <uri>/home/ben/Projects/tools/kicad/library/passive.lib</uri>
+    </library>
+    <library logical="touch-rescue">
+      <uri>/home/ben/Projects/alarm-clock-v3/pcb/touch/touch-rescue.lib</uri>
+    </library>
   </libraries>
   <nets>
-    <net code="1" name="GND">
-      <node ref="C2" pin="2"/>
-      <node ref="C3" pin="1"/>
-      <node ref="U2" pin="2"/>
-      <node ref="C4" pin="1"/>
-      <node ref="U1" pin="14"/>
-      <node ref="U1" pin="2"/>
-      <node ref="J1" pin="4"/>
-      <node ref="C1" pin="2"/>
+    <net code="1" name="/SCL_3V3">
+      <node ref="Q2" pin="2"/>
+      <node ref="R8" pin="1"/>
+      <node ref="U1" pin="6"/>
     </net>
-    <net code="2" name="/SCL_5V">
+    <net code="2" name="/SDA_3V3">
+      <node ref="R7" pin="1"/>
+      <node ref="Q1" pin="2"/>
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="3" name="+3V3">
+      <node ref="Q2" pin="1"/>
+      <node ref="C2" pin="1"/>
+      <node ref="C4" pin="2"/>
+      <node ref="R8" pin="2"/>
+      <node ref="Q1" pin="1"/>
+      <node ref="R2" pin="1"/>
+      <node ref="U1" pin="1"/>
+      <node ref="C1" pin="1"/>
+      <node ref="U2" pin="5"/>
+      <node ref="R7" pin="2"/>
+    </net>
+    <net code="4" name="+5V">
+      <node ref="R3" pin="2"/>
+      <node ref="U2" pin="1"/>
+      <node ref="J1" pin="5"/>
+      <node ref="U2" pin="3"/>
+      <node ref="R1" pin="2"/>
+      <node ref="C3" pin="2"/>
+    </net>
+    <net code="5" name="Net-(U1-Pad4)">
+      <node ref="U1" pin="4"/>
+    </net>
+    <net code="6" name="GND">
+      <node ref="U2" pin="2"/>
+      <node ref="U1" pin="14"/>
+      <node ref="C2" pin="2"/>
+      <node ref="U1" pin="2"/>
+      <node ref="C4" pin="1"/>
+      <node ref="C3" pin="1"/>
+      <node ref="C1" pin="2"/>
+      <node ref="J1" pin="4"/>
+    </net>
+    <net code="7" name="/SDA_5V">
+      <node ref="R1" pin="1"/>
+      <node ref="Q1" pin="3"/>
+      <node ref="J1" pin="1"/>
+    </net>
+    <net code="8" name="/SCL_5V">
       <node ref="J1" pin="2"/>
       <node ref="R3" pin="1"/>
       <node ref="Q2" pin="3"/>
     </net>
-    <net code="3" name="/SDA_5V">
-      <node ref="J1" pin="1"/>
-      <node ref="R1" pin="1"/>
-      <node ref="Q1" pin="3"/>
+    <net code="9" name="Net-(R6-Pad1)">
+      <node ref="R6" pin="1"/>
+      <node ref="U1" pin="12"/>
     </net>
-    <net code="4" name="/SDA_3V3">
-      <node ref="U1" pin="3"/>
-      <node ref="Q1" pin="2"/>
-      <node ref="R7" pin="1"/>
+    <net code="10" name="Net-(R4-Pad1)">
+      <node ref="R4" pin="1"/>
+      <node ref="U1" pin="11"/>
     </net>
-    <net code="5" name="/SCL_3V3">
-      <node ref="Q2" pin="2"/>
-      <node ref="U1" pin="6"/>
-      <node ref="R8" pin="1"/>
-    </net>
-    <net code="6" name="Net-(U1-Pad7)">
-      <node ref="U1" pin="7"/>
-    </net>
-    <net code="7" name="Net-(U1-Pad8)">
-      <node ref="U1" pin="8"/>
-    </net>
-    <net code="8" name="Net-(U1-Pad9)">
-      <node ref="U1" pin="9"/>
-    </net>
-    <net code="9" name="Net-(U1-Pad10)">
+    <net code="11" name="Net-(R5-Pad1)">
+      <node ref="R5" pin="1"/>
       <node ref="U1" pin="10"/>
     </net>
-    <net code="10" name="Net-(U1-Pad4)">
-      <node ref="U1" pin="4"/>
-    </net>
-    <net code="11" name="Net-(R6-Pad1)">
+    <net code="12" name="Net-(U1-Pad13)">
       <node ref="U1" pin="13"/>
-      <node ref="R6" pin="1"/>
     </net>
-    <net code="12" name="/E_LEFT">
+    <net code="13" name="Net-(U1-Pad9)">
+      <node ref="U1" pin="9"/>
+    </net>
+    <net code="14" name="Net-(U1-Pad8)">
+      <node ref="U1" pin="8"/>
+    </net>
+    <net code="15" name="/E_RIGHT">
       <node ref="R4" pin="2"/>
       <node ref="SW2" pin="1"/>
     </net>
-    <net code="13" name="/E_SET">
+    <net code="16" name="/E_SET">
       <node ref="R5" pin="2"/>
       <node ref="SW3" pin="1"/>
     </net>
-    <net code="14" name="/E_RIGHT">
-      <node ref="SW1" pin="1"/>
+    <net code="17" name="/E_LEFT">
       <node ref="R6" pin="2"/>
+      <node ref="SW1" pin="1"/>
     </net>
-    <net code="15" name="Net-(R4-Pad1)">
-      <node ref="R4" pin="1"/>
-      <node ref="U1" pin="12"/>
+    <net code="18" name="Net-(U1-Pad7)">
+      <node ref="U1" pin="7"/>
     </net>
-    <net code="16" name="Net-(R5-Pad1)">
-      <node ref="R5" pin="1"/>
-      <node ref="U1" pin="11"/>
-    </net>
-    <net code="17" name="+5V">
-      <node ref="U2" pin="1"/>
-      <node ref="C3" pin="2"/>
-      <node ref="U2" pin="3"/>
-      <node ref="R1" pin="2"/>
-      <node ref="R3" pin="2"/>
-      <node ref="J1" pin="5"/>
-    </net>
-    <net code="18" name="Net-(U2-Pad4)">
-      <node ref="U2" pin="4"/>
-    </net>
-    <net code="19" name="+3V3">
-      <node ref="R2" pin="1"/>
-      <node ref="U1" pin="1"/>
-      <node ref="C1" pin="1"/>
-      <node ref="Q1" pin="1"/>
-      <node ref="Q2" pin="1"/>
-      <node ref="R8" pin="2"/>
-      <node ref="U2" pin="5"/>
-      <node ref="C4" pin="2"/>
-      <node ref="R7" pin="2"/>
-      <node ref="C2" pin="1"/>
-    </net>
-    <net code="20" name="/~CHANGE">
-      <node ref="J1" pin="3"/>
-      <node ref="R2" pin="2"/>
+    <net code="19" name="/~CHANGE">
       <node ref="U1" pin="5"/>
+      <node ref="R2" pin="2"/>
+      <node ref="J1" pin="3"/>
+    </net>
+    <net code="20" name="Net-(U2-Pad4)">
+      <node ref="U2" pin="4"/>
     </net>
   </nets>
 </export>

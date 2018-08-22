@@ -1,0 +1,158 @@
+EESchema Schematic File Version 4
+LIBS:connectors
+LIBS:ic-cpu
+LIBS:ic-power
+LIBS:ic-misc
+LIBS:ic-io
+LIBS:passive
+LIBS:power
+LIBS:switches
+LIBS:opto
+LIBS:psu-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L connectors:HEADER-2x03 J1
+U 1 1 5CA32E71
+P 2700 3800
+F 0 "J1" H 2600 4000 60  0000 L BNB
+F 1 "VIN" H 2650 3600 40  0000 L TNN
+F 2 "conn-header:HDR-M-2x03" H 2700 2600 60  0001 C CNN
+F 3 "" H 2700 2600 60  0001 C CNN
+F 4 "-" H 2600 4100 40  0001 L BNN "Part"
+F 5 "Virtual" H 2600 4200 40  0001 L BNN "Family"
+	1    2700 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x02 J4
+U 1 1 5CA32EF2
+P 2850 5750
+F 0 "J4" H 2800 5900 60  0000 L BNB
+F 1 "SIGNAL" V 3000 5750 40  0000 C CNN
+F 2 "conn-header:HDR-M-1x02" H 2850 5750 60  0001 C CNN
+F 3 "" H 2850 5750 60  0001 C CNN
+F 4 "-" H 2800 6000 40  0001 L BNN "Part"
+F 5 "Virtual" H 2800 6100 40  0001 L BNN "Family"
+	1    2850 5750
+	1    0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x01 J2
+U 1 1 5CA32FAE
+P 2850 6450
+F 0 "J2" H 2800 6550 60  0000 L BNB
+F 1 "HEADER-1x01" V 3000 6450 40  0001 C CNN
+F 2 "conn-header:HDR-M-1x01" H 2700 6425 60  0001 C CNN
+F 3 "" H 2800 6525 60  0001 C CNN
+F 4 "-" H 2800 6650 40  0001 L BNN "Part"
+F 5 "Virtual" H 2800 6750 40  0001 L BNN "Family"
+	1    2850 6450
+	1    0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x01 J3
+U 1 1 5CA3303F
+P 2850 6800
+F 0 "J3" H 2800 6900 60  0000 L BNB
+F 1 "HEADER-1x01" V 3000 6800 40  0001 C CNN
+F 2 "conn-header:HDR-M-1x01" H 2700 6775 60  0001 C CNN
+F 3 "" H 2800 6875 60  0001 C CNN
+F 4 "-" H 2800 7000 40  0001 L BNN "Part"
+F 5 "Virtual" H 2800 7100 40  0001 L BNN "Family"
+	1    2850 6800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0101
+U 1 1 5CA3342F
+P 2600 7000
+F 0 "#PWR0101" H 2600 7050 30  0001 C CNN
+F 1 "GND" H 2600 6875 30  0001 C CNN
+F 2 "" H 2600 7000 60  0000 C CNN
+F 3 "" H 2600 7000 60  0000 C CNN
+	1    2600 7000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2700 6800 2600 6800
+Wire Wire Line
+	2600 6800 2600 7000
+Wire Wire Line
+	2700 6450 2600 6450
+Wire Wire Line
+	2600 6450 2600 6800
+Connection ~ 2600 6800
+$Comp
+L power:GND #PWR0102
+U 1 1 5CA3375C
+P 3000 4050
+F 0 "#PWR0102" H 3000 4100 30  0001 C CNN
+F 1 "GND" H 3000 3925 30  0001 C CNN
+F 2 "" H 3000 4050 60  0000 C CNN
+F 3 "" H 3000 4050 60  0000 C CNN
+	1    3000 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2900 3900 3000 3900
+Wire Wire Line
+	3000 3900 3000 4050
+$Comp
+L power:GND #PWR0103
+U 1 1 5CA3378E
+P 2400 4050
+F 0 "#PWR0103" H 2400 4100 30  0001 C CNN
+F 1 "GND" H 2400 3925 30  0001 C CNN
+F 2 "" H 2400 4050 60  0000 C CNN
+F 3 "" H 2400 4050 60  0000 C CNN
+	1    2400 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2500 3900 2400 3900
+Wire Wire Line
+	2400 3900 2400 4050
+$Comp
+L power:+5V #PWR0104
+U 1 1 5CA3381B
+P 3250 3550
+F 0 "#PWR0104" H 3250 3775 30  0001 C CNN
+F 1 "+5V" V 3175 3550 30  0001 C CNN
+F 2 "" H 3250 3550 60  0000 C CNN
+F 3 "" H 3250 3550 60  0000 C CNN
+	1    3250 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0105
+U 1 1 5CA33835
+P 2150 3550
+F 0 "#PWR0105" H 2150 3775 30  0001 C CNN
+F 1 "+5V" V 2075 3550 30  0001 C CNN
+F 2 "" H 2150 3550 60  0000 C CNN
+F 3 "" H 2150 3550 60  0000 C CNN
+	1    2150 3550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2500 3800 2150 3800
+Wire Wire Line
+	2150 3800 2150 3550
+Wire Wire Line
+	2900 3800 3250 3800
+Wire Wire Line
+	3250 3800 3250 3550
+$EndSCHEMATC

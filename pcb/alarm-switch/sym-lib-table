@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name alarm-switch-rescue)(type Legacy)(uri ${KIPRJMOD}/alarm-switch-rescue.lib)(options "")(descr ""))
+)

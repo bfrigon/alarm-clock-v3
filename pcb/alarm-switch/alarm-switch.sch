@@ -1,0 +1,115 @@
+EESchema Schematic File Version 4
+LIBS:alarm-switch-cache
+EELAYER 26 0
+EELAYER END
+$Descr USLetter 11000 8500
+encoding utf-8
+Sheet 1 1
+Title "Alarm Switch PCB"
+Date "2018-08-14"
+Rev "A"
+Comp ""
+Comment1 "CLKV3-PC-09"
+Comment2 "CLKV3-SCH-09"
+Comment3 "Alarm Clock V3"
+Comment4 ""
+$EndDescr
+$Comp
+L connectors:Hole H1
+U 1 1 5B7295E9
+P 3900 3750
+F 0 "H1" H 3850 3850 60  0000 L BNB
+F 1 "Hole" H 3950 3650 40  0001 L TNN
+F 2 "conn-wire-pads:Hole-Screw-#4" H 3950 3575 40  0001 L TNN
+F 3 "" H 3850 3825 60  0001 C CNN
+F 4 "Virtual" H 3850 3975 40  0001 L BNN "Family"
+	1    3900 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L connectors:Hole H2
+U 1 1 5B729665
+P 4200 3750
+F 0 "H2" H 4150 3850 60  0000 L BNB
+F 1 "Hole" H 4250 3650 40  0001 L TNN
+F 2 "conn-wire-pads:Hole-Screw-#4" H 4250 3575 40  0001 L TNN
+F 3 "" H 4150 3825 60  0001 C CNN
+F 4 "Virtual" H 4150 3975 40  0001 L BNN "Family"
+	1    4200 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR01
+U 1 1 5B7296B6
+P 3900 4050
+F 0 "#PWR01" H 3900 4100 30  0001 C CNN
+F 1 "GND" H 3900 3925 30  0001 C CNN
+F 2 "" H 3900 4050 60  0000 C CNN
+F 3 "" H 3900 4050 60  0000 C CNN
+	1    3900 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR02
+U 1 1 5B7296D2
+P 4200 4050
+F 0 "#PWR02" H 4200 4100 30  0001 C CNN
+F 1 "GND" H 4200 3925 30  0001 C CNN
+F 2 "" H 4200 4050 60  0000 C CNN
+F 3 "" H 4200 4050 60  0000 C CNN
+	1    4200 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4200 3900 4200 4050
+Wire Wire Line
+	3900 3900 3900 4050
+$Comp
+L alarm-switch-rescue:SPDT SW1
+U 1 1 5B72A22A
+P 6900 4000
+F 0 "SW1" H 6800 4150 60  0000 L BNB
+F 1 "L102011ML04Q" H 6800 3850 40  0000 L TNN
+F 2 "switches:CK_L102XXXML04" H 6975 3825 40  0001 L TNN
+F 3 "" H 6800 3950 60  0001 C CNN
+F 4 "-" H 6975 4200 40  0001 L BNN "Part"
+F 5 "Switch" H 6975 4300 40  0001 L BNN "Family"
+	1    6900 4000
+	-1   0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x03 J1
+U 1 1 5B72A473
+P 5700 4000
+F 0 "J1" H 5650 4200 60  0000 L BNB
+F 1 "HEADER-1x03" V 5850 4000 40  0000 C CNN
+F 2 "conn-header:HDR-M-1x03" H 5700 4000 60  0001 C CNN
+F 3 "" H 5700 4000 60  0001 C CNN
+F 4 "-" H 5650 4300 40  0001 L BNN "Part"
+F 5 "Virtual" H 5650 4400 40  0001 L BNN "Family"
+	1    5700 4000
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	6800 4000 5850 4000
+Wire Wire Line
+	5850 3900 6200 3900
+Wire Wire Line
+	6200 3900 6200 3550
+Wire Wire Line
+	6200 3550 7200 3550
+Wire Wire Line
+	7200 3550 7200 3950
+Wire Wire Line
+	7200 3950 7000 3950
+Wire Wire Line
+	5850 4100 6200 4100
+Wire Wire Line
+	6200 4100 6200 4400
+Wire Wire Line
+	6200 4400 7200 4400
+Wire Wire Line
+	7200 4400 7200 4050
+Wire Wire Line
+	7200 4050 7000 4050
+$EndSCHEMATC

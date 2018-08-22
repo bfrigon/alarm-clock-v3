@@ -1,32 +1,36 @@
 ### Bill of material ###
 
 ```
-Date    : 2016-07-21
-Doc. ID : CLKV2-SCH-04
+Date    : 2018-08-13
+Doc. ID : CLKV3-SCH-03
 Project : Alarm Clock (V3)
-Title   : Front Panel
+Title   : Touch Keypad
 
-Part #  : CLKV2-PC-04
-REV.    : A
+Part #  : CLKV3-PC-03
+REV.    : B
 
-Components : 17
+Components : 23
 ```
 
 ------------------------------------------------------------------------------------------------------------------------
 
 
-| Qty | Ref.      | Description                 | Value | Part #         | Footprint            |
-|-----|-----------|-----------------------------|-------|----------------|----------------------|
-| 1   | U2        | DC/DC Converter             | -     | LT1109CS8-12   | SOIC-8               |
-| 1   | U1        | 16x2 character OLED display | -     | ER-OLED1602-4W | Misc:LCD-ER-OLED1602 |
-| 3   | R3-R4, R7 | Resistor                    | 0     | -              | SMT-0603             |
-| 2   | C3, C6    | Capacitor                   | 100nF | -              | SMT-0603             |
-| 2   | R8, R12   | Resistor                    | 10k   | -              | SMT-0603             |
-| 1   | C4        | Electrolytic capacitor      | 10uF  | -              | SMT-0805             |
-| 1   | C1        | Capacitor                   | 1uF   | -              | SMT-0805             |
-| 1   | C7        | Electrolytic capacitor      | 22uF  | -              | SMT-2312             |
-| 1   | C5        | Electrolytic capacitor      | 4.7uF | -              | SMT-0805             |
-| 1   | C2        | Electrolytic capacitor      | 4.7uF | -              | SMT-1206             |
-| 1   | R1        | Resistor                    | 470k  | -              | SMT-0603             |
-| 1   | L1        | Inductor                    | 33uH  | CR54NP-330LC   | SMT:IND-CD54         |
-| 1   | D1        | Schottky Diode              | -     | MBRS120T3      | SMT:DO-214-AA        |
+| Qty | Ref.       | Description                      | Value | Part #         | Footprint            |
+|-----|------------|----------------------------------|-------|----------------|----------------------|
+| 2   | Q1-Q2      | N-Channel MOSFET                 | -     | BSS138         | smt-sot:SOT23        |
+| 1   | U4         | 100 mA LDO Regulator w/ Shutdown | -     | LP2981-33DBVT  | smt-sot:SOT23-5      |
+| 1   | U2         | DC/DC Converter                  | -     | LT1109CS8-12   | smt-soic:SOIC8       |
+| 1   | U3         | Light To Digital Converter (I2C) | -     | TSL2561        | smt-dfn:DFN6         |
+| 1   | U1         | 16x2 character OLED display      | -     | ER-OLED1602-4W | misc:LCD-ER-OLED1602 |
+| 3   | C3, C6, C8 | Capacitor                        | 100nF | -              | smt:C-0603           |
+| 2   | R2, R8     | Resistor                         | 10k   | -              | smt:R-0603           |
+| 1   | C4         | Electrolytic capacitor           | 10uF  | -              | smt:CPL-0805         |
+| 2   | C1, C9     | Capacitor                        | 1uF   | -              | smt:C-0805           |
+| 1   | C7         | Electrolytic capacitor           | 22uF  | -              | smt:CPL-2312         |
+| 1   | C10        | Capacitor                        | 3.3uF | -              | smt:C-0805           |
+| 2   | R4-R5      | Resistor                         | 4.7k  | -              | smt:R-0603           |
+| 1   | C5         | Electrolytic capacitor           | 4.7uF | -              | smt:CPL-0805         |
+| 1   | C2         | Electrolytic capacitor           | 4.7uF | -              | smt:CPL-1206         |
+| 1   | R1         | Resistor                         | 500k  | -              | smt:R-0603           |
+| 1   | L1         | Inductor                         | 33uH  | CR54NP-330LC   | smt:IND-CD54         |
+| 1   | D1         | Schottky Diode                   | -     | MBRS120T3      | smt:DO-214-AA        |

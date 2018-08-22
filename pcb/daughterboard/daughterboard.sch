@@ -1,15 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:connectors
-LIBS:ic-cpu
-LIBS:ic-power
-LIBS:ic-misc
-LIBS:ic-io
-LIBS:passive
-LIBS:power
-LIBS:switches
-LIBS:opto
+EESchema Schematic File Version 4
 LIBS:daughterboard-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -23,4 +14,317 @@ Comment2 "CLKV3-SCH-06"
 Comment3 "Alarm clock (V3)"
 Comment4 ""
 $EndDescr
+$Comp
+L connectors:HEADER-1x08 J2
+U 1 1 5B751D54
+P 5350 6950
+F 0 "J2" H 5300 7400 60  0000 L BNB
+F 1 "DISPLAY" V 5500 6950 40  0000 C CNN
+F 2 "conn-header:DF3A-8P-2DSA" H 5350 6950 60  0001 C CNN
+F 3 "" H 5350 6950 60  0001 C CNN
+F 4 "-" H 5300 7500 40  0001 L BNN "Part"
+F 5 "Connector" H 5300 7600 40  0001 L BNN "Family"
+	1    5350 6950
+	-1   0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x03 J1
+U 1 1 5B751D9D
+P 7800 7050
+F 0 "J1" H 7750 7250 60  0000 L BNB
+F 1 "LAMP" V 7950 7050 40  0000 C CNN
+F 2 "conn-header:DF3A-3P-2DSA" H 7800 7050 60  0001 C CNN
+F 3 "" H 7800 7050 60  0001 C CNN
+F 4 "-" H 7750 7350 40  0001 L BNN "Part"
+F 5 "Connector" H 7750 7450 40  0001 L BNN "Family"
+	1    7800 7050
+	-1   0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x04 J3
+U 1 1 5B751E1A
+P 10450 4700
+F 0 "J3" H 10400 4950 60  0000 L BNB
+F 1 "SPKR" V 10600 4700 40  0000 C CNN
+F 2 "conn-header:DF3A-4P-2DSA" H 10450 4700 60  0001 C CNN
+F 3 "" H 10450 4700 60  0001 C CNN
+F 4 "-" H 10400 5050 40  0001 L BNN "Part"
+F 5 "Connector" H 10400 5150 40  0001 L BNN "Family"
+	1    10450 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x04 J5
+U 1 1 5B7521B2
+P 4300 7050
+F 0 "J5" H 4250 7300 60  0000 L BNB
+F 1 "PWR" V 4450 7050 40  0000 C CNN
+F 2 "conn-header:HDR-M-1x04" H 4300 7050 60  0001 C CNN
+F 3 "" H 4300 7050 60  0001 C CNN
+F 4 "-" H 4250 7400 40  0001 L BNN "Part"
+F 5 "Connector" H 4250 7500 40  0001 L BNN "Family"
+	1    4300 7050
+	-1   0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x01 H1
+U 1 1 5B75428D
+P 950 6550
+F 0 "H1" H 900 6650 60  0000 L BNB
+F 1 "HEADER-1x01" V 1100 6550 40  0000 C CNN
+F 2 "conn-wire-pads:SolderPad-100x500" H 800 6525 60  0001 C CNN
+F 3 "" H 900 6625 60  0001 C CNN
+F 4 "-" H 900 6750 40  0001 L BNN "Part"
+F 5 "Connector" H 900 6850 40  0001 L BNN "Family"
+	1    950  6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L connectors:HEADER-1x01 H2
+U 1 1 5B754368
+P 950 7150
+F 0 "H2" H 900 7250 60  0000 L BNB
+F 1 "HEADER-1x01" V 1100 7150 40  0000 C CNN
+F 2 "conn-wire-pads:SolderPad-100x200" H 800 7125 60  0001 C CNN
+F 3 "" H 900 7225 60  0001 C CNN
+F 4 "-" H 900 7350 40  0001 L BNN "Part"
+F 5 "Connector" H 900 7450 40  0001 L BNN "Family"
+	1    950  7150
+	1    0    0    -1  
+$EndComp
+NoConn ~ 800  6550
+NoConn ~ 800  7150
+$Comp
+L power:SUP_+5V #PWR1
+U 1 1 5B7548DE
+P 4550 6750
+F 0 "#PWR1" H 4550 6975 30  0001 C CNN
+F 1 "SUP_+5V" V 4475 6750 30  0001 C CNN
+F 2 "" H 4450 6875 60  0001 C CNN
+F 3 "" H 4550 6975 60  0001 C CNN
+	1    4550 6750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4550 7000 4450 7000
+Wire Wire Line
+	4550 6750 4550 6900
+Wire Wire Line
+	4450 6900 4550 6900
+Connection ~ 4550 6900
+$Comp
+L power:SUP_GND #PWR2
+U 1 1 5B754915
+P 4550 7350
+F 0 "#PWR2" H 4550 7400 30  0001 C CNN
+F 1 "SUP_GND" H 4550 7225 30  0001 C CNN
+F 2 "" H 4550 7350 60  0000 C CNN
+F 3 "" H 4550 7350 60  0000 C CNN
+	1    4550 7350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4450 7100 4550 7100
+Wire Wire Line
+	4550 7100 4550 7200
+Wire Wire Line
+	4450 7200 4550 7200
+Connection ~ 4550 7200
+$Comp
+L connectors:HEADER-2x08 J4
+U 1 1 5B75E691
+P 2450 6800
+F 0 "J4" H 2300 7250 60  0000 L BNB
+F 1 "MB I/O" V 2450 6800 40  0000 C CNN
+F 2 "conn-header:HDR-M-2x08" H 2450 5600 60  0001 C CNN
+F 3 "" H 2450 5600 60  0001 C CNN
+F 4 "-" H 2300 7350 40  0001 L BNN "Part"
+F 5 "Connector" H 2300 7450 40  0001 L BNN "Family"
+	1    2450 6800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 6450 1700 6450
+Wire Wire Line
+	2200 6550 1700 6550
+Wire Wire Line
+	2200 6650 1700 6650
+Wire Wire Line
+	2200 6750 1700 6750
+Wire Wire Line
+	2200 6850 1700 6850
+Wire Wire Line
+	2200 6950 1700 6950
+Wire Wire Line
+	2200 7050 1700 7050
+Wire Wire Line
+	2700 6450 3300 6450
+Wire Wire Line
+	2700 6550 3300 6550
+Wire Wire Line
+	2700 6650 3300 6650
+Wire Wire Line
+	2700 6750 3300 6750
+Wire Wire Line
+	2700 6850 3300 6850
+Wire Wire Line
+	2700 6950 3300 6950
+Text Label 1700 6450 0    60   ~ 0
+MISO
+Text Label 3300 6450 2    60   ~ 0
+MOSI
+Text Label 1700 6550 0    60   ~ 0
+SCLK
+Text Label 3300 6550 2    60   ~ 0
+CD_XDCS
+Text Label 1700 6650 0    60   ~ 0
+DREQ
+Text Label 1700 6750 0    60   ~ 0
+SDA_5V
+Text Label 3300 6750 2    60   ~ 0
+SCL_5V
+Text Label 1700 6850 0    60   ~ 0
+KPD_CHG
+Text Label 3300 6850 2    60   ~ 0
+LED0
+Text Label 1700 6950 0    60   ~ 0
+LED1
+Text Label 3300 6950 2    60   ~ 0
+CD_RST
+Text Label 1700 7050 0    60   ~ 0
+A_SHDN
+Text Label 3300 6650 2    60   ~ 0
+CD_CS
+$Comp
+L power:+5V #PWR5
+U 1 1 5B75EDD2
+P 8100 6800
+F 0 "#PWR5" H 8100 7025 30  0001 C CNN
+F 1 "+5V" V 8025 6800 30  0001 C CNN
+F 2 "" H 8100 6800 60  0000 C CNN
+F 3 "" H 8100 6800 60  0000 C CNN
+	1    8100 6800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR6
+U 1 1 5B75EDF4
+P 8100 7350
+F 0 "#PWR6" H 8100 7400 30  0001 C CNN
+F 1 "GND" H 8100 7225 30  0001 C CNN
+F 2 "" H 8100 7350 60  0000 C CNN
+F 3 "" H 8100 7350 60  0000 C CNN
+	1    8100 7350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7950 7150 8100 7150
+Wire Wire Line
+	8100 7150 8100 7350
+Wire Wire Line
+	7950 6950 8100 6950
+Wire Wire Line
+	8100 6950 8100 6800
+Wire Wire Line
+	7950 7050 8400 7050
+Text Label 8400 7050 2    60   ~ 0
+LED1
+$Comp
+L power:+5V #PWR3
+U 1 1 5B75F55D
+P 5600 6450
+F 0 "#PWR3" H 5600 6675 30  0001 C CNN
+F 1 "+5V" V 5525 6450 30  0001 C CNN
+F 2 "" H 5600 6450 60  0000 C CNN
+F 3 "" H 5600 6450 60  0000 C CNN
+	1    5600 6450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5600 6450 5600 6600
+Wire Wire Line
+	5600 6600 5500 6600
+Wire Wire Line
+	5600 6700 5500 6700
+Connection ~ 5600 6600
+$Comp
+L power:GND #PWR4
+U 1 1 5B75F5DF
+P 5600 7400
+F 0 "#PWR4" H 5600 7450 30  0001 C CNN
+F 1 "GND" H 5600 7275 30  0001 C CNN
+F 2 "" H 5600 7400 60  0000 C CNN
+F 3 "" H 5600 7400 60  0000 C CNN
+	1    5600 7400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5500 6800 5600 6800
+Wire Wire Line
+	5600 6800 5600 6900
+Wire Wire Line
+	5500 6900 5600 6900
+Connection ~ 5600 6900
+Wire Wire Line
+	5500 7100 6300 7100
+Wire Wire Line
+	5500 7200 6300 7200
+Wire Wire Line
+	5500 7300 6300 7300
+Text Label 6300 7100 2    60   ~ 0
+K_CHG
+Text Label 6300 7200 2    60   ~ 0
+SCL_5V
+Text Label 6300 7300 2    60   ~ 0
+SDA_5V
+$Comp
+L passive:RESISTOR R1
+U 1 1 5B75F929
+P 6500 7000
+F 0 "R1" H 6500 7085 60  0000 C CNB
+F 1 "300" H 6500 6925 40  0000 C CNN
+F 2 "smt:R-0603" H 6500 6860 40  0001 C CNN
+F 3 "" H 6500 7100 60  0000 C CNN
+F 4 "-" H 6500 7160 45  0001 C CNN "Part"
+F 5 "Passive" H 6730 7290 50  0001 C CNN "Family"
+	1    6500 7000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6400 7000 5500 7000
+Wire Wire Line
+	6600 7000 7100 7000
+Text Label 7100 7000 2    60   ~ 0
+LED0
+Wire Wire Line
+	3300 7150 2700 7150
+Wire Wire Line
+	2700 7050 3300 7050
+Text Label 3300 7050 2    60   ~ 0
+LED_SHDN
+Text Label 3300 7150 2    60   ~ 0
+RESET
+$Comp
+L power:+3V3 #PWR?
+U 1 1 5B790AAF
+P 1450 6900
+F 0 "#PWR?" H 1450 7125 30  0001 C CNN
+F 1 "+3V3" V 1375 6900 30  0001 C CNN
+F 2 "" H 1450 6900 60  0000 C CNN
+F 3 "" H 1450 6900 60  0000 C CNN
+	1    1450 6900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1450 6900 1450 7150
+Wire Wire Line
+	1450 7150 2200 7150
+Wire Wire Line
+	4550 6900 4550 7000
+Wire Wire Line
+	4550 7200 4550 7350
+Wire Wire Line
+	5600 6600 5600 6700
+Wire Wire Line
+	5600 6900 5600 7400
 $EndSCHEMATC
