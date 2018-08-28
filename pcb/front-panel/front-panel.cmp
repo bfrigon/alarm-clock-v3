@@ -1,0 +1,11 @@
+Cmp-Mod V01 Created by PcbNew   date = Tue 27 Oct 2015 11:24:53 PM EDT
+
+BeginCmp
+TimeStamp = 56304497
+Path = /562D37B8
+Reference = U1;
+ValeurCmp = ER-OLED1602-4W;
+IdModule  = Misc:LCD-ER-OLED1602;
+EndCmp
+
+EndListe

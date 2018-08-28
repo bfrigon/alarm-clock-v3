@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name touch-rescue)(type Legacy)(uri ${KIPRJMOD}/touch-rescue.lib)(options "")(descr ""))
-)

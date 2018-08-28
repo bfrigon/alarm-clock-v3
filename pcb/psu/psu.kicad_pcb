@@ -177,8 +177,8 @@
     )
   )
 
-  (module conn-header:HDR-M-1x01 (layer F.Cu) (tedit 55027B60) (tstamp 5B80EF79)
-    (at 154.305 89.535)
+  (module conn-header:HDR-M-1x01 (layer F.Cu) (tedit 55027B60) (tstamp 5B80D096)
+    (at 154.94 89.535)
     (descr "Header - 100mil pitch - Male - Single Row, Vertical, 1 pos.")
     (path /5CA3303F)
     (fp_text reference J3 (at -1.524 -1.905) (layer F.SilkS)
