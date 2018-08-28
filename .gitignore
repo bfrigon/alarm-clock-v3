@@ -24,6 +24,7 @@
 *.kicad_pcb-bak
 *.bak
 *.pro
+_autosave-*
 
 
 # Arduino builds
