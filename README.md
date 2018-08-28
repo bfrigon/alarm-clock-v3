@@ -6,4 +6,4 @@ alarm-clock (V3)
 ----------------
 
 ![alt tag](/pictures/model-render/front.jpg "Front view")
-![alt tag](/pictures/model-render/front_dark.jpg "Front view (Dark)")
+![alt tag](/pictures/model-render/back.jpg "Back view")
