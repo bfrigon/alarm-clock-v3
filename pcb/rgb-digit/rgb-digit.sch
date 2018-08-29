@@ -1,21 +1,12 @@
-EESchema Schematic File Version 2
-LIBS:connectors
-LIBS:ic-cpu
-LIBS:ic-power
-LIBS:ic-misc
-LIBS:ic-io
-LIBS:passive
-LIBS:power
-LIBS:switches
-LIBS:opto
+EESchema Schematic File Version 4
 LIBS:rgb-digit-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Display - RGB Seven Seg. Digit"
-Date "2016-04-03"
+Date "2018-08-29"
 Rev "A"
 Comp ""
 Comment1 "CLKV3-PC-01"
@@ -24,11 +15,11 @@ Comment3 "Alarm clock (V3)"
 Comment4 "test"
 $EndDescr
 $Comp
-L WS2812B U1
+L opto:WS2812B U1
 U 1 1 56D7995E
 P 1600 3200
 F 0 "U1" H 1250 3500 60  0000 L BNB
-F 1 "WS2812B" H 1250 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 1250 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 1250 2825 40  0001 L TNN
 F 3 "" H 1250 3500 50  0000 C CNN
 F 4 "IC" H 1250 3600 40  0001 L BNN "Family"
@@ -36,11 +27,11 @@ F 4 "IC" H 1250 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L WS2812B U2
+L opto:WS2812B U2
 U 1 1 56D79A4A
 P 2950 3200
 F 0 "U2" H 2600 3500 60  0000 L BNB
-F 1 "WS2812B" H 2600 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 2600 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 2600 2825 40  0001 L TNN
 F 3 "" H 2600 3500 50  0000 C CNN
 F 4 "IC" H 2600 3600 40  0001 L BNN "Family"
@@ -48,11 +39,11 @@ F 4 "IC" H 2600 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L WS2812B U3
+L opto:WS2812B U3
 U 1 1 56D79AAC
 P 4300 3200
 F 0 "U3" H 3950 3500 60  0000 L BNB
-F 1 "WS2812B" H 3950 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 3950 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 3950 2825 40  0001 L TNN
 F 3 "" H 3950 3500 50  0000 C CNN
 F 4 "IC" H 3950 3600 40  0001 L BNN "Family"
@@ -60,11 +51,11 @@ F 4 "IC" H 3950 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L WS2812B U4
+L opto:WS2812B U4
 U 1 1 56D79D9A
 P 5650 3200
 F 0 "U4" H 5300 3500 60  0000 L BNB
-F 1 "WS2812B" H 5300 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 5300 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 5300 2825 40  0001 L TNN
 F 3 "" H 5300 3500 50  0000 C CNN
 F 4 "IC" H 5300 3600 40  0001 L BNN "Family"
@@ -72,11 +63,11 @@ F 4 "IC" H 5300 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L WS2812B U5
+L opto:WS2812B U5
 U 1 1 56D79ECB
 P 7000 3200
 F 0 "U5" H 6650 3500 60  0000 L BNB
-F 1 "WS2812B" H 6650 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 6650 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 6650 2825 40  0001 L TNN
 F 3 "" H 6650 3500 50  0000 C CNN
 F 4 "IC" H 6650 3600 40  0001 L BNN "Family"
@@ -84,11 +75,11 @@ F 4 "IC" H 6650 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L WS2812B U6
+L opto:WS2812B U6
 U 1 1 56D79FFD
 P 8350 3200
 F 0 "U6" H 8000 3500 60  0000 L BNB
-F 1 "WS2812B" H 8000 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 8000 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 8000 2825 40  0001 L TNN
 F 3 "" H 8000 3500 50  0000 C CNN
 F 4 "IC" H 8000 3600 40  0001 L BNN "Family"
@@ -96,11 +87,11 @@ F 4 "IC" H 8000 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L WS2812B U7
+L opto:WS2812B U7
 U 1 1 56D7A278
 P 9700 3200
 F 0 "U7" H 9350 3500 60  0000 L BNB
-F 1 "WS2812B" H 9350 2900 40  0000 L TNN
+F 1 "IN-PI554FCH" H 9350 2900 40  0000 L TNN
 F 2 "SMT:LED-5050" H 9350 2825 40  0001 L TNN
 F 3 "" H 9350 3500 50  0000 C CNN
 F 4 "IC" H 9350 3600 40  0001 L BNN "Family"
@@ -108,7 +99,7 @@ F 4 "IC" H 9350 3600 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR01
+L power:GND #PWR01
 U 1 1 56D7B26C
 P 2100 3500
 F 0 "#PWR01" H 2100 3550 30  0001 C CNN
@@ -119,7 +110,7 @@ F 3 "" H 2100 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR02
+L power:GND #PWR02
 U 1 1 56D7B293
 P 3450 3500
 F 0 "#PWR02" H 3450 3550 30  0001 C CNN
@@ -130,7 +121,7 @@ F 3 "" H 3450 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR03
+L power:GND #PWR03
 U 1 1 56D7B2B3
 P 4800 3500
 F 0 "#PWR03" H 4800 3550 30  0001 C CNN
@@ -141,7 +132,7 @@ F 3 "" H 4800 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR04
+L power:GND #PWR04
 U 1 1 56D7B43F
 P 6150 3500
 F 0 "#PWR04" H 6150 3550 30  0001 C CNN
@@ -152,7 +143,7 @@ F 3 "" H 6150 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR05
+L power:GND #PWR05
 U 1 1 56D7B60A
 P 7500 3500
 F 0 "#PWR05" H 7500 3550 30  0001 C CNN
@@ -163,7 +154,7 @@ F 3 "" H 7500 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L power:GND #PWR06
 U 1 1 56D7B62A
 P 8850 3500
 F 0 "#PWR06" H 8850 3550 30  0001 C CNN
@@ -174,7 +165,7 @@ F 3 "" H 8850 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR07
+L power:GND #PWR07
 U 1 1 56D7B7C7
 P 10200 3500
 F 0 "#PWR07" H 10200 3550 30  0001 C CNN
@@ -185,7 +176,7 @@ F 3 "" H 10200 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR08
+L power:+5V #PWR08
 U 1 1 56D7BDC0
 P 2400 2450
 F 0 "#PWR08" H 2400 2675 30  0001 C CNN
@@ -196,7 +187,7 @@ F 3 "" H 2400 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C2
+L passive:CAP C2
 U 1 1 56D7BDDB
 P 2250 2550
 F 0 "C2" H 2280 2640 60  0000 L CNB
@@ -209,7 +200,7 @@ F 5 "Passive" H 2480 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR09
+L power:GND #PWR09
 U 1 1 56D7BFB9
 P 2050 2650
 F 0 "#PWR09" H 2050 2700 30  0001 C CNN
@@ -220,7 +211,7 @@ F 3 "" H 2050 2650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR010
+L power:+5V #PWR010
 U 1 1 56D7C1DF
 P 1050 2450
 F 0 "#PWR010" H 1050 2675 30  0001 C CNN
@@ -231,7 +222,7 @@ F 3 "" H 1050 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C1
+L passive:CAP C1
 U 1 1 56D7C1E7
 P 900 2550
 F 0 "C1" H 930 2640 60  0000 L CNB
@@ -244,7 +235,7 @@ F 5 "Passive" H 1130 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR011
+L power:GND #PWR011
 U 1 1 56D7C1F1
 P 700 2650
 F 0 "#PWR011" H 700 2700 30  0001 C CNN
@@ -255,7 +246,7 @@ F 3 "" H 700 2650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR012
+L power:+5V #PWR012
 U 1 1 56D7C288
 P 3750 2450
 F 0 "#PWR012" H 3750 2675 30  0001 C CNN
@@ -266,7 +257,7 @@ F 3 "" H 3750 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C3
+L passive:CAP C3
 U 1 1 56D7C290
 P 3600 2550
 F 0 "C3" H 3630 2640 60  0000 L CNB
@@ -279,7 +270,7 @@ F 5 "Passive" H 3830 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR013
+L power:GND #PWR013
 U 1 1 56D7C29A
 P 3400 2650
 F 0 "#PWR013" H 3400 2700 30  0001 C CNN
@@ -290,7 +281,7 @@ F 3 "" H 3400 2650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR014
+L power:+5V #PWR014
 U 1 1 56D7C344
 P 5100 2450
 F 0 "#PWR014" H 5100 2675 30  0001 C CNN
@@ -301,7 +292,7 @@ F 3 "" H 5100 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C4
+L passive:CAP C4
 U 1 1 56D7C34C
 P 4950 2550
 F 0 "C4" H 4980 2640 60  0000 L CNB
@@ -314,7 +305,7 @@ F 5 "Passive" H 5180 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR015
+L power:GND #PWR015
 U 1 1 56D7C356
 P 4750 2650
 F 0 "#PWR015" H 4750 2700 30  0001 C CNN
@@ -325,7 +316,7 @@ F 3 "" H 4750 2650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR016
+L power:+5V #PWR016
 U 1 1 56D7C4F6
 P 6450 2450
 F 0 "#PWR016" H 6450 2675 30  0001 C CNN
@@ -336,7 +327,7 @@ F 3 "" H 6450 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C5
+L passive:CAP C5
 U 1 1 56D7C4FE
 P 6300 2550
 F 0 "C5" H 6330 2640 60  0000 L CNB
@@ -349,7 +340,7 @@ F 5 "Passive" H 6530 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR017
+L power:GND #PWR017
 U 1 1 56D7C508
 P 6100 2650
 F 0 "#PWR017" H 6100 2700 30  0001 C CNN
@@ -360,7 +351,7 @@ F 3 "" H 6100 2650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR018
+L power:+5V #PWR018
 U 1 1 56D7C86C
 P 7800 2450
 F 0 "#PWR018" H 7800 2675 30  0001 C CNN
@@ -371,7 +362,7 @@ F 3 "" H 7800 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C6
+L passive:CAP C6
 U 1 1 56D7C874
 P 7650 2550
 F 0 "C6" H 7680 2640 60  0000 L CNB
@@ -384,7 +375,7 @@ F 5 "Passive" H 7880 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR019
+L power:GND #PWR019
 U 1 1 56D7C87E
 P 7450 2650
 F 0 "#PWR019" H 7450 2700 30  0001 C CNN
@@ -395,7 +386,7 @@ F 3 "" H 7450 2650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR020
+L power:+5V #PWR020
 U 1 1 56D7CE35
 P 9150 2450
 F 0 "#PWR020" H 9150 2675 30  0001 C CNN
@@ -406,7 +397,7 @@ F 3 "" H 9150 2450 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP C7
+L passive:CAP C7
 U 1 1 56D7CE3D
 P 9000 2550
 F 0 "C7" H 9030 2640 60  0000 L CNB
@@ -419,7 +410,7 @@ F 5 "Passive" H 9230 2840 50  0001 C CNN "Family"
 	0    -1   1    0   
 $EndComp
 $Comp
-L GND #PWR021
+L power:GND #PWR021
 U 1 1 56D7CE47
 P 8800 2650
 F 0 "#PWR021" H 8800 2700 30  0001 C CNN
@@ -434,7 +425,7 @@ DIN
 Text Label 10450 3100 2    60   ~ 0
 DOUT
 $Comp
-L Hole H1
+L connectors:Hole H1
 U 1 1 56D81D00
 P 3400 6900
 F 0 "H1" H 3350 7000 60  0000 L BNB
@@ -446,7 +437,7 @@ F 4 "Virtual" H 3350 7125 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Hole H2
+L connectors:Hole H2
 U 1 1 56D81E39
 P 3750 6900
 F 0 "H2" H 3700 7000 60  0000 L BNB
@@ -458,7 +449,7 @@ F 4 "Virtual" H 3700 7125 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR022
+L power:GND #PWR022
 U 1 1 56D81E88
 P 3400 7150
 F 0 "#PWR022" H 3400 7200 30  0001 C CNN
@@ -469,7 +460,7 @@ F 3 "" H 3400 7150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR023
+L power:GND #PWR023
 U 1 1 56D81EC3
 P 3750 7150
 F 0 "#PWR023" H 3750 7200 30  0001 C CNN
@@ -480,7 +471,7 @@ F 3 "" H 3750 7150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L HEADER-1x01 J1
+L connectors:HEADER-1x01 J1
 U 1 1 56D8223E
 P 1800 5150
 F 0 "J1" H 1750 5250 60  0000 L BNB
@@ -493,7 +484,7 @@ F 5 "Virtual" H 1750 5450 40  0001 L BNN "Family"
 	-1   0    0    -1  
 $EndComp
 $Comp
-L HEADER-1x01 J2
+L connectors:HEADER-1x01 J2
 U 1 1 56D82327
 P 1800 5750
 F 0 "J2" H 1750 5850 60  0000 L BNB
@@ -506,7 +497,7 @@ F 5 "Virtual" H 1750 6050 40  0001 L BNN "Family"
 	-1   0    0    -1  
 $EndComp
 $Comp
-L HEADER-1x01 J3
+L connectors:HEADER-1x01 J3
 U 1 1 56D82B53
 P 2900 5150
 F 0 "J3" H 2850 5250 60  0000 L BNB
@@ -519,7 +510,7 @@ F 5 "Virtual" H 2850 5450 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L HEADER-1x01 J4
+L connectors:HEADER-1x01 J4
 U 1 1 56D82BCC
 P 2900 5750
 F 0 "J4" H 2850 5850 60  0000 L BNB
@@ -532,7 +523,7 @@ F 5 "Virtual" H 2850 6050 40  0001 L BNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L HEADER-1x01 J5
+L connectors:HEADER-1x01 J5
 U 1 1 56D7BDE3
 P 4400 5150
 F 0 "J5" H 4350 5250 60  0000 L BNB
@@ -545,7 +536,7 @@ F 5 "Virtual" H 4350 5450 40  0001 L BNN "Family"
 	-1   0    0    -1  
 $EndComp
 $Comp
-L HEADER-1x01 J6
+L connectors:HEADER-1x01 J6
 U 1 1 56D7BF9A
 P 4400 5750
 F 0 "J6" H 4350 5850 60  0000 L BNB
@@ -590,7 +581,7 @@ F
 Text Notes 7950 5450 0    100  ~ 20
 G
 $Comp
-L SUP_+5V #PWR024
+L power:SUP_+5V #PWR024
 U 1 1 56D8D7E9
 P 2350 4900
 F 0 "#PWR024" H 2350 5125 30  0001 C CNN
@@ -601,7 +592,7 @@ F 3 "" H 2350 5125 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L SUP_GND #PWR025
+L power:SUP_GND #PWR025
 U 1 1 56D8D8DB
 P 2350 6000
 F 0 "#PWR025" H 2350 6050 30  0001 C CNN
@@ -612,7 +603,7 @@ F 3 "" H 2350 6000 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP-E C8
+L passive:CAP-E C8
 U 1 1 57009CCB
 P 2100 5450
 F 0 "C8" H 2130 5540 60  0000 L CNB
@@ -625,7 +616,7 @@ F 5 "Passive" H 2330 5740 50  0001 C CNN "Family"
 	1    0    0    -1  
 $EndComp
 $Comp
-L CAP-E C9
+L passive:CAP-E C9
 U 1 1 5700A44E
 P 2600 5450
 F 0 "C9" H 2630 5540 60  0000 L CNB
@@ -704,7 +695,7 @@ Wire Wire Line
 Wire Wire Line
 	2400 3100 2500 3100
 Wire Wire Line
-	2400 2450 2400 3100
+	2400 2450 2400 2550
 Wire Wire Line
 	2400 2550 2350 2550
 Connection ~ 2400 2550
@@ -713,7 +704,7 @@ Wire Wire Line
 Wire Wire Line
 	2050 2550 2050 2650
 Wire Wire Line
-	1050 2450 1050 3100
+	1050 2450 1050 2550
 Wire Wire Line
 	1050 2550 1000 2550
 Connection ~ 1050 2550
@@ -722,7 +713,7 @@ Wire Wire Line
 Wire Wire Line
 	700  2550 700  2650
 Wire Wire Line
-	3750 2450 3750 3100
+	3750 2450 3750 2550
 Wire Wire Line
 	3750 2550 3700 2550
 Connection ~ 3750 2550
@@ -731,7 +722,7 @@ Wire Wire Line
 Wire Wire Line
 	3400 2550 3400 2650
 Wire Wire Line
-	5100 2450 5100 3100
+	5100 2450 5100 2550
 Wire Wire Line
 	5100 2550 5050 2550
 Connection ~ 5100 2550
@@ -740,7 +731,7 @@ Wire Wire Line
 Wire Wire Line
 	4750 2550 4750 2650
 Wire Wire Line
-	6450 2450 6450 3100
+	6450 2450 6450 2550
 Wire Wire Line
 	6450 2550 6400 2550
 Connection ~ 6450 2550
@@ -749,7 +740,7 @@ Wire Wire Line
 Wire Wire Line
 	6100 2550 6100 2650
 Wire Wire Line
-	7800 2450 7800 3100
+	7800 2450 7800 2550
 Wire Wire Line
 	7800 2550 7750 2550
 Connection ~ 7800 2550
@@ -758,7 +749,7 @@ Wire Wire Line
 Wire Wire Line
 	7450 2550 7450 2650
 Wire Wire Line
-	9150 2450 9150 3100
+	9150 2450 9150 2550
 Wire Wire Line
 	9150 2550 9100 2550
 Connection ~ 9150 2550
@@ -787,9 +778,9 @@ Wire Wire Line
 Wire Wire Line
 	3750 7050 3750 7150
 Wire Wire Line
-	1950 5150 2750 5150
+	1950 5150 2100 5150
 Wire Wire Line
-	1950 5750 2750 5750
+	1950 5750 2100 5750
 Connection ~ 2350 5150
 Connection ~ 2350 5750
 Wire Wire Line
@@ -896,4 +887,30 @@ Wire Wire Line
 Connection ~ 2600 5750
 Wire Wire Line
 	2600 5550 2600 5750
+Wire Wire Line
+	2400 2550 2400 3100
+Wire Wire Line
+	1050 2550 1050 3100
+Wire Wire Line
+	3750 2550 3750 3100
+Wire Wire Line
+	5100 2550 5100 3100
+Wire Wire Line
+	6450 2550 6450 3100
+Wire Wire Line
+	7800 2550 7800 3100
+Wire Wire Line
+	9150 2550 9150 3100
+Wire Wire Line
+	2350 5150 2600 5150
+Wire Wire Line
+	2350 5750 2600 5750
+Wire Wire Line
+	2100 5750 2350 5750
+Wire Wire Line
+	2100 5150 2350 5150
+Wire Wire Line
+	2600 5150 2750 5150
+Wire Wire Line
+	2600 5750 2750 5750
 $EndSCHEMATC

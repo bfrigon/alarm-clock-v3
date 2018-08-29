@@ -2,14 +2,14 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/rgb-lamp/rgb-lamp.sch</source>
-    <date>Wed 22 Aug 2018 03:10:22 AM EDT</date>
+    <date>Wed 29 Aug 2018 12:10:41 AM EDT</date>
     <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>RGB Lamp</title>
         <company/>
         <rev>A</rev>
-        <date>2018-08-13</date>
+        <date>2018-08-29</date>
         <source>rgb-lamp.sch</source>
         <comment number="1" value="CLKV3-PC-08"/>
         <comment number="2" value="CLKV3-SCH-08"/>
@@ -20,7 +20,7 @@
   </design>
   <components>
     <comp ref="U1">
-      <value>WS2812B</value>
+      <value>IN-PI554FCH</value>
       <footprint>smt:LED-5050</footprint>
       <fields>
         <field name="Family">IC</field>
@@ -30,7 +30,7 @@
       <tstamp>5B3F0FC4</tstamp>
     </comp>
     <comp ref="U2">
-      <value>WS2812B</value>
+      <value>IN-PI554FCH</value>
       <footprint>smt:LED-5050</footprint>
       <fields>
         <field name="Family">IC</field>
@@ -40,7 +40,7 @@
       <tstamp>5B3F1066</tstamp>
     </comp>
     <comp ref="U3">
-      <value>WS2812B</value>
+      <value>IN-PI554FCH</value>
       <footprint>smt:LED-5050</footprint>
       <fields>
         <field name="Family">IC</field>
