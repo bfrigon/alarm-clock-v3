@@ -34,31 +34,31 @@ Pin | Name
 
 
 
-J9 : Daughter board I/O
+J9 : Daughter board (DB-A)
 -----------------------
 
-Pin | Name                   | Pin | Name
-----|------------------------|-----|---------------------------
-1   | MISO                   | 2   | CMOSI (3.3v)
-3   | CSCK (3.3v)            | 4   | XDCS (3.3v)
-5   | DREQ                   | 6   | CCS (3.3v)
-7   | SDA                    | 8   | SCL
-9   | Keypad interrupt       | 10  | RGB pixels data (clock)
-11  | RGB pixels data (lamp) | 12  | Codec reset (3.3v)
-13  | Amplifier shutdown     | 14  | RGB pixels shutdown
-15  | DVDD (3.3v LDO)        | 16  | Alarm switch
+Pin | Name                    | Pin | Name
+----|-------------------------|-----|---------------------------
+1   | +5V                     | 2   | +5V
+3   | GND                     | 4   | GND
+5   | RGB pixels data (clock) | 6   | RGB pixels data (lamp)
+7   | CCS (3.3v)              | 8   | RGB pixels shutdonw
+9   | Codec reset (3.3v)      | 10  | DREQ
+11  | MOSI (3.3v)             | 12  | SCLK (3.3v)
+13  | MISO                    | 14  | XDCS (3.3v)
+15  | DVDD (3.3v LDO)         | 16  | Alarm switch
 
 
 
-J3 : Daughter board power
+J3 : Daughter board (DB-B)
 -------------------------
 
 Pin | Name
 ----|------------------------
-1   | +5V
-2   | +5V
-3   | GND
-4   | GND
+1   | SDA
+2   | SCL
+3   | Amplifier shutdown
+4   | Keypad INT
 
 
 
