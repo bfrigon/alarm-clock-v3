@@ -1,7 +1,7 @@
 ### Bill of material ###
 
 ```
-Date    : 2016-07-11
+Date    : 2018-08-29
 Doc. ID : CLKV3-SCH-02
 Project : Alarm Clock (V3)
 Title   : Display - Rgb Dots

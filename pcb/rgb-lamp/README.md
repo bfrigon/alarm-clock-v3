@@ -1,15 +1,15 @@
 ### Bill of material ###
 
 ```
-Date    : 2018-08-29
+Date    : 2018-09-19
 Doc. ID : CLKV3-SCH-08
 Project : Alarm Clock (V3)
 Title   : Rgb Lamp
 
 Part #  : CLKV3-PC-08
-REV.    : A
+REV.    : B
 
-Components : 7
+Components : 6
 ```
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -19,4 +19,3 @@ Components : 7
 |-----|-------|----------------------|-------|-------------|--------------|
 | 3   | U1-U3 | Digital 5050 RGB LED | -     | IN-PI554FCH | smt:LED-5050 |
 | 3   | C1-C3 | Capacitor            | 100nF | -           | smt:C-0603   |
-| 1   | R1    | Resistor             | 300   | -           | smt:R-0603   |

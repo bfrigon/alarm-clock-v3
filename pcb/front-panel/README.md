@@ -1,12 +1,12 @@
 ### Bill of material ###
 
 ```
-Date    : 2018-08-13
-Doc. ID : CLKV3-SCH-03
+Date    : 2018-08-22
+Doc. ID : CLKV3-SCH-04
 Project : Alarm Clock (V3)
-Title   : Touch Keypad
+Title   : Front Panel
 
-Part #  : CLKV3-PC-03
+Part #  : CLKV3-PC-04
 REV.    : B
 
 Components : 23
@@ -20,10 +20,10 @@ Components : 23
 | 2   | Q1-Q2      | N-Channel MOSFET                 | -     | BSS138         | smt-sot:SOT23        |
 | 1   | U4         | 100 mA LDO Regulator w/ Shutdown | -     | LP2981-33DBVT  | smt-sot:SOT23-5      |
 | 1   | U2         | DC/DC Converter                  | -     | LT1109CS8-12   | smt-soic:SOIC8       |
-| 1   | U3         | Light To Digital Converter (I2C) | -     | TSL2561        | smt-dfn:DFN6         |
+| 1   | U3         | Light To Digital Converter (I2C) | -     | TSL2591        | smt-dfn:DFN6         |
 | 1   | U1         | 16x2 character OLED display      | -     | ER-OLED1602-4W | misc:LCD-ER-OLED1602 |
 | 3   | C3, C6, C8 | Capacitor                        | 100nF | -              | smt:C-0603           |
-| 2   | R2, R8     | Resistor                         | 10k   | -              | smt:R-0603           |
+| 2   | R2-R3      | Resistor                         | 10k   | -              | smt:R-0603           |
 | 1   | C4         | Electrolytic capacitor           | 10uF  | -              | smt:CPL-0805         |
 | 2   | C1, C9     | Capacitor                        | 1uF   | -              | smt:C-0805           |
 | 1   | C7         | Electrolytic capacitor           | 22uF  | -              | smt:CPL-2312         |

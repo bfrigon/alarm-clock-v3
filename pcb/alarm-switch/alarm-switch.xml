@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/alarm-switch/alarm-switch.sch</source>
-    <date>Wed 22 Aug 2018 03:13:23 AM EDT</date>
+    <date>Tue 18 Sep 2018 11:24:54 PM EDT</date>
     <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -46,12 +46,12 @@
         <field name="Family">Switch</field>
         <field name="Part">-</field>
       </fields>
-      <libsource lib="alarm-switch-rescue" part="SPDT" description=""/>
+      <libsource lib="switches" part="SPDT" description="Momentary SPST switch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5B72A22A</tstamp>
     </comp>
     <comp ref="J1">
-      <value>HEADER-1x03</value>
+      <value>ALARM SW</value>
       <footprint>conn-header:HDR-M-1x03</footprint>
       <fields>
         <field name="Family">Virtual</field>
@@ -63,19 +63,6 @@
     </comp>
   </components>
   <libparts>
-    <libpart lib="alarm-switch-rescue" part="SPDT">
-      <fields>
-        <field name="Reference">SW</field>
-        <field name="Value">SPDT</field>
-        <field name="Part">-</field>
-        <field name="Family">Switch</field>
-      </fields>
-      <pins>
-        <pin num="1" name="1" type="openCol"/>
-        <pin num="2" name="2" type="openCol"/>
-        <pin num="3" name="3" type="openCol"/>
-      </pins>
-    </libpart>
     <libpart lib="connectors" part="HEADER-1x03">
       <description>Header - Single Row - 3 Pos</description>
       <footprints>
@@ -107,13 +94,27 @@
         <pin num="P" name="P" type="passive"/>
       </pins>
     </libpart>
+    <libpart lib="switches" part="SPDT">
+      <description>Momentary SPST switch</description>
+      <fields>
+        <field name="Reference">SW</field>
+        <field name="Value">SPDT</field>
+        <field name="Part">-</field>
+        <field name="Family">Switch</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+      </pins>
+    </libpart>
   </libparts>
   <libraries>
-    <library logical="alarm-switch-rescue">
-      <uri>/home/ben/Projects/alarm-clock-v3/pcb/alarm-switch/alarm-switch-rescue.lib</uri>
-    </library>
     <library logical="connectors">
       <uri>/home/ben/Projects/tools/kicad/library/connectors.lib</uri>
+    </library>
+    <library logical="switches">
+      <uri>/home/ben/Projects/tools/kicad/library/switches.lib</uri>
     </library>
   </libraries>
   <nets>
