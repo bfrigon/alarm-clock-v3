@@ -37,7 +37,7 @@ Components : 86
 | 1   | U2                           | I2C Real-Time Clock                        | -          | DS3231MZ           | smt-soic:SOIC8                  |
 | 2   | R24, R26                     | Resistor                                   | 0          | -                  | smt:R-0805                      |
 | 10  | R2, R10, R12-R18, R31        | Resistor                                   | 100k       | -                  | smt:R-0603                      |
-| 14  | C5-C6, C9-C11, C13, C22-C29  | Capacitor                                  | 100nF      | -                  | smt:C-0603                      |
+| 13  | C5-C6, C9-C11, C22-C29       | Capacitor                                  | 100nF      | -                  | smt:C-0603                      |
 | 1   | C14                          | Capacitor                                  | 100nF      | -                  | smt:R-0603                      |
 | 3   | R20-R22                      | Resistor                                   | 10k        | -                  | smt:C-0603                      |
 | 7   | R1, R5-R6, R9, R11, R27, R30 | Resistor                                   | 10k        | -                  | smt:R-0603                      |
@@ -45,6 +45,7 @@ Components : 86
 | 4   | C16-C18, C21                 | Capacitor                                  | 10uF       | -                  | smt:C-0805                      |
 | 3   | R19, R23, R33                | Resistor                                   | 1k         | -                  | smt:R-0603                      |
 | 2   | R7-R8                        | Resistor                                   | 1M         | -                  | smt:R-0603                      |
+| 1   | C13                          | Capacitor                                  | 1uF        | -                  | smt:C-0603                      |
 | 3   | C4, C19-C20                  | Capacitor                                  | 1uF        | -                  | smt:C-0805                      |
 | 4   | C1-C2, C7-C8                 | Capacitor                                  | 20pF       | -                  | smt:C-0603                      |
 | 1   | C12                          | Capacitor                                  | 22pF       | -                  | smt:C-0603                      |
