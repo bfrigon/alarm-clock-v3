@@ -1419,4 +1419,73 @@ Wire Wire Line
 	6250 6200 6250 6300
 Text Notes 1650 7700 0    60   ~ 0
 I2C Addr. : 0xD0
+$Comp
+L connectors:HEADER-1x06 J?
+U 1 1 5BBB9765
+P 5300 7300
+AR Path="/5BBB9765" Ref="J?"  Part="1" 
+AR Path="/579732DD/5BBB9765" Ref="J8"  Part="1" 
+F 0 "J8" H 5250 7650 60  0000 L BNB
+F 1 "FRONT PANEL" V 5450 7300 40  0000 C CNN
+F 2 "conn-wire-pads:WP-EDGE-RL-50mil-1x06" H 5300 7300 60  0001 C CNN
+F 3 "" H 5300 7300 60  0001 C CNN
+F 4 "-" H 5250 7750 40  0001 L BNN "Part"
+F 5 "Virtual" H 5250 7850 40  0001 L BNN "Family"
+	1    5300 7300
+	-1   0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5BBB976C
+P 5650 7000
+AR Path="/5BBB976C" Ref="#PWR?"  Part="1" 
+AR Path="/579732DD/5BBB976C" Ref="#PWR0131"  Part="1" 
+F 0 "#PWR0131" H 5650 7225 30  0001 C CNN
+F 1 "+5V" V 5575 7000 30  0001 C CNN
+F 2 "" H 5650 7000 60  0000 C CNN
+F 3 "" H 5650 7000 60  0000 C CNN
+	1    5650 7000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5650 7000 5650 7050
+Wire Wire Line
+	5650 7050 5450 7050
+$Comp
+L power:GND #PWR?
+U 1 1 5BBB9774
+P 5650 7650
+AR Path="/5BBB9774" Ref="#PWR?"  Part="1" 
+AR Path="/579732DD/5BBB9774" Ref="#PWR0132"  Part="1" 
+F 0 "#PWR0132" H 5650 7700 30  0001 C CNN
+F 1 "GND" H 5650 7525 30  0001 C CNN
+F 2 "" H 5650 7650 60  0000 C CNN
+F 3 "" H 5650 7650 60  0000 C CNN
+	1    5650 7650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 7550 5650 7550
+Wire Wire Line
+	5650 7550 5650 7650
+Wire Wire Line
+	5450 7150 5950 7150
+Wire Wire Line
+	5450 7250 5950 7250
+Text Label 5950 7150 2    60   ~ 0
+SDA
+Text Label 5950 7250 2    60   ~ 0
+SCL
+Text Label 5950 7350 2    60   ~ 0
+OLRST
+Text Label 5950 7450 2    60   ~ 0
+ALS_INT
+Text HLabel 6350 7350 2    60   Input ~ 0
+OLRST
+Text HLabel 6350 7450 2    60   Output ~ 0
+ALS_INT
+Wire Wire Line
+	5450 7350 6350 7350
+Wire Wire Line
+	5450 7450 6350 7450
 $EndSCHEMATC
