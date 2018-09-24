@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/motherboard/motherboard.sch</source>
-    <date>Sun 23 Sep 2018 03:32:52 AM EDT</date>
+    <date>Mon 24 Sep 2018 01:23:16 AM EDT</date>
     <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -707,7 +707,7 @@
       <fields>
         <field name="Family">IC</field>
       </fields>
-      <libsource lib="ic-logic" part="74?1G126" description="Octal Bus Transceiver With 3-State Outputs"/>
+      <libsource lib="ic-logic" part="74?1G126" description="Single Buffer Gate With 3-State Output"/>
       <sheetpath names="/USB Serial/" tstamps="/578C5B51/"/>
       <tstamp>5E85A109</tstamp>
     </comp>
@@ -1617,7 +1617,7 @@
       </pins>
     </libpart>
     <libpart lib="ic-logic" part="74?1G126">
-      <description>Octal Bus Transceiver With 3-State Outputs</description>
+      <description>Single Buffer Gate With 3-State Output</description>
       <footprints>
         <fp>SSOP20</fp>
         <fp>SOIC20</fp>
