@@ -1,14 +1,14 @@
 (export (version D)
   (design
     (source /home/ben/Projects/alarm-clock-v3/pcb/motherboard/motherboard.sch)
-    (date "Sun 23 Sep 2018 02:18:12 AM EDT")
+    (date "Mon 24 Sep 2018 03:46:06 AM EDT")
     (tool "Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title Motherboard)
         (company)
         (rev A)
-        (date 2018-09-19)
+        (date 2018-09-23)
         (source motherboard.sch)
         (comment (number 1) (value CLKV3-PC-05))
         (comment (number 2) (value CLKV3-SCH-05))
@@ -219,7 +219,7 @@
       (tstamp 5B7CBD5F))
     (comp (ref R20)
       (value 10k)
-      (footprint smt:C-0603)
+      (footprint smt:R-0603)
       (fields
         (field (name Family) Passive)
         (field (name Part) -))
@@ -228,7 +228,7 @@
       (tstamp 5BC4AFBA))
     (comp (ref R21)
       (value 10k)
-      (footprint smt:C-0603)
+      (footprint smt:R-0603)
       (fields
         (field (name Family) Passive)
         (field (name Part) -))
@@ -578,7 +578,7 @@
       (footprint smt-sot:SOT-353)
       (fields
         (field (name Family) IC))
-      (libsource (lib ic-logic) (part 74?1G126) (description "Octal Bus Transceiver With 3-State Outputs"))
+      (libsource (lib ic-logic) (part 74?1G126) (description "Single Buffer Gate With 3-State Output"))
       (sheetpath (names "/USB Serial/") (tstamps /578C5B51/))
       (tstamp 5E85A109))
     (comp (ref R30)
@@ -717,7 +717,7 @@
       (tstamp 5B7B6E17))
     (comp (ref C14)
       (value 100nF)
-      (footprint smt:R-0603)
+      (footprint smt:C-0603)
       (fields
         (field (name Family) Passive)
         (field (name Part) -))
@@ -914,7 +914,7 @@
       (tstamp 5B7F83DE))
     (comp (ref R22)
       (value 10k)
-      (footprint smt:C-0603)
+      (footprint smt:R-0603)
       (fields
         (field (name Family) Passive)
         (field (name Part) -))
@@ -1336,7 +1336,7 @@
         (pin (num 7) (name SDA) (type BiDi))
         (pin (num 8) (name SCL) (type input))))
     (libpart (lib ic-logic) (part 74?1G126)
-      (description "Octal Bus Transceiver With 3-State Outputs")
+      (description "Single Buffer Gate With 3-State Output")
       (footprints
         (fp SSOP20)
         (fp SOIC20)

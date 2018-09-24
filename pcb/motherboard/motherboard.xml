@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/motherboard/motherboard.sch</source>
-    <date>Mon 24 Sep 2018 01:23:16 AM EDT</date>
+    <date>Mon 24 Sep 2018 05:22:54 AM EDT</date>
     <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -46,7 +46,7 @@
   </design>
   <components>
     <comp ref="J7">
-      <value>ICSP-1</value>
+      <value>ICSP</value>
       <footprint>conn-header:HDR-M-2x03</footprint>
       <fields>
         <field name="Family">Connector</field>
@@ -267,7 +267,7 @@
     </comp>
     <comp ref="R20">
       <value>10k</value>
-      <footprint>smt:C-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
         <field name="Family">Passive</field>
         <field name="Part">-</field>
@@ -278,7 +278,7 @@
     </comp>
     <comp ref="R21">
       <value>10k</value>
-      <footprint>smt:C-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
         <field name="Family">Passive</field>
         <field name="Part">-</field>
@@ -472,7 +472,7 @@
       <tstamp>578C6E49</tstamp>
     </comp>
     <comp ref="J4">
-      <value>ICSP-0</value>
+      <value>ICSP</value>
       <footprint>conn-header:HDR-M-2x03</footprint>
       <fields>
         <field name="Family">Connector</field>
@@ -877,7 +877,7 @@
     </comp>
     <comp ref="C14">
       <value>100nF</value>
-      <footprint>smt:R-0603</footprint>
+      <footprint>smt:C-0603</footprint>
       <fields>
         <field name="Family">Passive</field>
         <field name="Part">-</field>
@@ -1118,7 +1118,7 @@
     </comp>
     <comp ref="R22">
       <value>10k</value>
-      <footprint>smt:C-0603</footprint>
+      <footprint>smt:R-0603</footprint>
       <fields>
         <field name="Family">Passive</field>
         <field name="Part">-</field>
