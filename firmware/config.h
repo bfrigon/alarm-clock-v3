@@ -21,6 +21,8 @@
 
 #include "time.h"
 #include "alarm.h"
+#include "lamp.h"
+#include "resources.h"
 
 #define EEPROM_ADDR_MAGIC           0
 #define EEPROM_ADDR_FIRMWARE_VER    4
@@ -28,11 +30,12 @@
 #define EEPROM_ADDR_PROFILES        EEPROM_ADDR_CONFIG + ( sizeof( Config ) )
 
 
+
+
+
 struct Config {
     bool clock_24h = false;
     bool alarm_on[2] = { false, false };
-    uint8_t alarm_profile_id[2] = { 0, 0 };
-
 
     bool net_dhcp = true;
     uint8_t net_ip[4] = { 10, 0, 0, 125 };
@@ -44,7 +47,9 @@ struct Config {
     uint8_t clock_brightness = 40;
     uint8_t lcd_contrast = 50;
     uint8_t date_format = 0;
-    bool tempunit_c = true;
+    
+
+    NightLampSettings lamp;
 
     char ssid[32];
     char wkey[63];

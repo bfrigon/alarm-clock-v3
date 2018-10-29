@@ -27,22 +27,26 @@
 #include "neoclock.h"
 #include "tpa2016.h"
 #include "qt1070.h"
-
+#include "lamp.h"
 
 
 Screen _screen_alarm( SCREEN_ID_ALARM );
 
 bool _showHelpMsg = false;
 
+uint8_t vs1053_buffer[ VS1053_DATABUFFERLEN ];
 
 
-
-Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect ) : Adafruit_VS1053( pin_reset, pin_cs, pin_xdcs, pin_dreq ) {
+Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect, int8_t pin_alarm_sw ) 
+    : Adafruit_VS1053( pin_reset, pin_cs, pin_xdcs, pin_dreq ) {
 
     this->_pin_sd_cs = pin_sd_cs;
-    this->_pin_sd_detect = pin_sd_detect;
 
+    this->_pin_sd_detect = pin_sd_detect;
     pinMode( pin_sd_detect, INPUT );
+
+    this->_pin_alarm_sw = pin_alarm_sw;
+    pinMode( pin_alarm_sw, INPUT );
 }
 
 void Alarm::begin() {
@@ -50,6 +54,12 @@ void Alarm::begin() {
     Adafruit_VS1053::begin();
 
     this->setVolume( 0 );
+
+
+
+    this->sciWrite( VS1053_REG_BASS, 0 );
+
+
 
     _screen_alarm.eventDrawScreen = &alarmScreen_eventDrawScreen;
     _screen_alarm.eventKeypress = &alarmScreen_eventKeypress;
@@ -67,7 +77,7 @@ bool Alarm::isSDCardPresent() {
 bool Alarm::DetectSDCard() {
 
 
-    if ( digitalRead( this->_pin_sd_detect ) == HIGH ) {
+    if ( digitalRead( this->_pin_sd_detect ) == LOW ) {
 
 
         /* Already detected, no need to re-initialize */
@@ -228,33 +238,6 @@ bool Alarm::openFile( char *name ) {
 }
 
 
-
-
-uint8_t Alarm::readProfileName( uint8_t id, char *buffer ) {
-    uint8_t length;
-    uint8_t byte;
-
-    if ( id > MAX_ALARM_PROFILES - 1 ) {
-        return 0;
-    }
-
-
-
-
-    for ( uint8_t i = 0; i < ALARM_PROFILE_NAME_LENGTH; i++ ) {
-
-        byte = EEPROM.read( EEPROM_ADDR_PROFILES + ( id * sizeof( AlarmProfile )) + i );
-        *( buffer + i ) = byte;
-
-        if ( *( buffer + i ) == 0 ) {
-            length = i;
-            break;
-        }
-    }
-
-    return length;
-}
-
 bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow ) {
     uint8_t i;
     uint8_t byte;
@@ -290,7 +273,7 @@ bool Alarm::loadProfile( uint8_t id ) {
 
 bool Alarm::loadProfile( AlarmProfile *profile, uint8_t id ) {
 
-    if ( id > MAX_ALARM_PROFILES ) {
+    if ( id > MAX_ALARM_PROFILES - 1 ) {
         return false;
     }
 
@@ -312,7 +295,7 @@ void Alarm::saveProfile( uint8_t id ) {
 }
 
 void Alarm::saveProfile( AlarmProfile *profile, uint8_t id ) {
-    if ( id > MAX_ALARM_PROFILES ) {
+    if ( id > MAX_ALARM_PROFILES - 1 ) {
         return;
     }
 
@@ -343,32 +326,42 @@ void Alarm::play( uint8_t mode ) {
         this->stop();
     }
 
+    this->detectAlarmSwitchState();
+    if ( this->_alarm_sw_on == false && (( mode & ALARM_MODE_TEST ) == 0 )) {
+        return;
+    }
+
     this->_playMode = mode;
     this->_timerStart = 0;
     this->_playDelay = 0;
     this->_snoozeStart = 0;
 
+
+    if ( mode & ALARM_MODE_SCREEN ) {
+        gotoScreen( &_screen_alarm, true, g_currentScreen );
+    }
+
     if ( mode & ALARM_MODE_AUDIO ) {
         this->audioStart();
     }
 
-    if ( mode & ALARM_MODE_VISUAL ) {
+    if ( mode & ALARM_MODE_VISUAL || mode & ALARM_MODE_LAMP ) {
         this->visualStart();
-    }
-
-    if ( mode & ALARM_MODE_SCREEN ) {
-        gotoScreen( &_screen_alarm, true, g_currentScreen );
     }
 }
 
 
 void Alarm::stop() {
 
+    if ( this->_playMode == ALARM_MODE_OFF ) {
+        return;
+    }
+
     if ( this->_playMode & ALARM_MODE_AUDIO ) {
         this->audioStop();
     }
 
-    if ( this->_playMode & ALARM_MODE_VISUAL ) {
+    if ( this->_playMode & ALARM_MODE_VISUAL || this->_playMode & ALARM_MODE_LAMP  ) {
         this->visualStop();
     }
 
@@ -439,6 +432,7 @@ void Alarm::snooze() {
         
     this->audioStop();
     this->visualStop();
+    
 
     g_screenClear = true;
     g_screenUpdate = true;
@@ -512,36 +506,65 @@ uint16_t Alarm::getSnoozeTimeRemaining() {
 
 void Alarm::visualStart() {
 
-    if ( this->profile.visualMode == ALARM_VISUAL_NONE ) {
+    /* Turn on lamp if option enabled */
+    if( this->_playMode & ALARM_MODE_LAMP && profile.lamp.mode != LAMP_MODE_OFF ) {
+
+        this->profile.lamp.delay_off = 0;
+        g_lamp.activate( &this->profile.lamp );
+    }
+
+    /* Visual mode not enabled */
+    if (( this->_playMode & ALARM_MODE_VISUAL ) == 0 || this->profile.visualMode == ALARM_VISUAL_NONE ) {
         return;
     }
 
     this->_visualStepReverse = false;
-    this->_visualStepDelay = 400;
-    this->_visualStepValue = 0;
 
     switch ( this->profile.visualMode ) {
 
         case ALARM_VISUAL_FADING:
-            this->_visualStepDelay = 40;
             this->_visualStepValue = g_config.clock_brightness;
             break;
 
-        case ALARM_VISUAL_RAINBOW:
-            this->_visualStepDelay = 40;
+        default:
             this->_visualStepValue = 0;
             break;
-
     }
+
+    this->updateVisualStepDelay();
 }
 
 
-void Alarm::visualStep() {
+inline void Alarm::updateVisualStepDelay() {
+    switch ( this->profile.visualMode ) {
+        case ALARM_VISUAL_FADING:
+        case ALARM_VISUAL_RAINBOW:
+            this->_visualStepDelay = 250 / this->profile.effectSpeed;
+            break;
+
+        case ALARM_VISUAL_NONE:
+            this->_visualStepDelay = 0;
+            break;
+
+
+        default:
+            this->_visualStepDelay = 2000 / this->profile.effectSpeed;
+            break;        
+    }
+}
+
+inline void Alarm::visualStep() {
 
     if ( this->profile.visualMode == ALARM_VISUAL_NONE ) {
         return;
     }
 
+    /* Check if visual effect is enabled */
+    if ( this->_visualStepDelay == 0 ) {
+        return; 
+    }
+
+    /* Check if the effect next step delay is elapsed */
     if (( millis() - this->_timerStart) < this->_visualStepDelay ) {
         return;
     }
@@ -610,9 +633,14 @@ void Alarm::visualStep() {
     g_clock.update();
 
     this->_timerStart = millis();
+    
+    this->updateVisualStepDelay();
 }
 
-void Alarm::visualStop() {
+inline void Alarm::visualStop() {
+
+    /* Turn off lamp if active */
+    g_lamp.deactivate();
 
     /* Restore clock settings */
     g_clock.setColorFromTable( g_config.clock_color );
@@ -623,7 +651,12 @@ void Alarm::visualStop() {
 
 
 
-void Alarm::processAlarm() {
+void Alarm::processAlarmEvents() {
+
+    if ( this->_alarm_sw_on == false && (( this->_playMode & ALARM_MODE_TEST ) == 0 )) {
+        this->stop();
+        return;
+    }
 
     if ( this->_playMode & ALARM_MODE_SNOOZE ) {
 
@@ -638,10 +671,14 @@ void Alarm::processAlarm() {
         return;
     }
 
+    
+
     if ( this->_playDelay > 0 ) {
+
         if ( millis() - this->_timerStart < this->_playDelay ) {
             return;
         }
+        
 
         this->play( this->_playMode );
     }
@@ -655,7 +692,7 @@ void Alarm::processAlarm() {
     }
 }
 
-void Alarm::feedBuffer() {
+inline void Alarm::feedBuffer() {
 
     if ( this->_playMode & ALARM_MODE_SNOOZE ) {
         return;
@@ -665,7 +702,7 @@ void Alarm::feedBuffer() {
         return;
     }
 
-    uint8_t buffer[ VS1053_DATABUFFERLEN ];
+    
     uint8_t bytesRead;
 
     /* Playback from program memory space */
@@ -674,14 +711,14 @@ void Alarm::feedBuffer() {
         if ( this->_pgm_audio_ptr + VS1053_DATABUFFERLEN > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
 
             bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - this->_pgm_audio_ptr;
-            memcpy_P( &buffer, &_DEFAULT_ALARMSOUND_DATA[ this->_pgm_audio_ptr ], bytesRead );
+            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[ this->_pgm_audio_ptr ], bytesRead );
 
             this->_pgm_audio_ptr = 0;
 
         } else {
 
             bytesRead = VS1053_DATABUFFERLEN;
-            memcpy_P( &buffer, &_DEFAULT_ALARMSOUND_DATA[ this->_pgm_audio_ptr ], VS1053_DATABUFFERLEN );
+            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[ this->_pgm_audio_ptr ], VS1053_DATABUFFERLEN );
 
             this->_pgm_audio_ptr += VS1053_DATABUFFERLEN;
         }
@@ -689,7 +726,7 @@ void Alarm::feedBuffer() {
     /* Playback from file on SD card */
     } else {
 
-        bytesRead = this->currentFile.read( buffer, VS1053_DATABUFFERLEN );
+        bytesRead = this->currentFile.read( vs1053_buffer, VS1053_DATABUFFERLEN );
 
         if (bytesRead == 0 ) {
             /* Play the file in loop */
@@ -697,11 +734,26 @@ void Alarm::feedBuffer() {
         }
     }
 
-    Adafruit_VS1053::playData( buffer, bytesRead );
+    Adafruit_VS1053::playData( vs1053_buffer, bytesRead );
 }
 
 
+bool Alarm::isAlarmSwitchOn() {
+    return this->_alarm_sw_on;
+}
+
+bool Alarm::detectAlarmSwitchState() {
+
+    this->_alarm_sw_on = ( digitalRead( this->_pin_alarm_sw ) == HIGH );
+    return this->_alarm_sw_on;
+}
+
 bool Alarm::isAlarmEnabled() {
+
+    if ( this->_alarm_sw_on == false ) {
+        return false;
+    }
+
     return (( g_config.alarm_on[ 0 ] == true ) || ( g_config.alarm_on[ 1 ] == true ));
 }
 
@@ -718,7 +770,7 @@ bool Alarm::checkForAlarms( DateTime *now ) {
         return false;
     }
 
-    this->loadProfile( g_config.alarm_profile_id[ alarm_id ] );
+    this->loadProfile( alarm_id );
     this->play( ALARM_MODE_NORMAL );
 
     return true;
@@ -755,18 +807,14 @@ int8_t Alarm::getNextAlarmID( DateTime *currentTime, bool matchNow ) {
 
 int16_t Alarm::getNextAlarmOffset( int8_t alarm_id, DateTime *currentTime, bool matchNow ) {
 
-    if ( alarm_id > 1 || alarm_id < 0 ) {
+    if ( alarm_id > MAX_ALARM_PROFILES - 1 ) {
         return -1;
     }
 
     Time profile_time;
     uint8_t profile_dow;
-    uint8_t profile_id;
 
-    /* Get the profile id in use by the specified alarm */
-    profile_id = g_config.alarm_profile_id[ alarm_id ];
-
-    if ( g_alarm.readProfileAlarmTime( profile_id, &profile_time, &profile_dow ) == false ) {
+    if ( g_alarm.readProfileAlarmTime( alarm_id, &profile_time, &profile_dow ) == false ) {
         return -1;
     }
 
@@ -864,19 +912,12 @@ bool alarmScreen_eventKeypress( Screen *screen, uint8_t key ) {
 bool alarmScreen_eventDrawScreen( Screen *screen ) {
     uint8_t mode = g_alarm.getPlayMode();
 
-    if ( mode & ALARM_MODE_TEST ) {
-        g_lcd.print_P( S_TEST_ALARM );
+    
 
-        g_lcd.setPosition( 1, 0 );
-        g_lcd.print( g_alarm.profile.name );
-
-        return true;
-    }
-
-    if ( g_alarm.isSnoozing() ) {
+    if ( g_alarm.isSnoozing() && (( mode & ALARM_MODE_TEST ) == 0 )) {
         if ( _showHelpMsg == true ) {
 
-            g_lcd.print_P( S_INSTR_CANCEL_ALARM_1 );
+            g_lcd.print_P( S_INSTR_CANCEL_ALARM_1);
             g_lcd.setPosition( 1, 0 );
             g_lcd.print_P( S_INSTR_CANCEL_ALARM_2 );
 
@@ -887,18 +928,29 @@ bool alarmScreen_eventDrawScreen( Screen *screen ) {
         remaining = g_alarm.getSnoozeTimeRemaining();
 
         g_lcd.setPosition( 0, 0 );
-        g_lcd.print_P( S_SNOOZE );
+        g_lcd.print_P( S_SNOOZE, 16, TEXT_ALIGN_CENTER );
 
-        g_lcd.setPosition( 1, 0 );
+        g_lcd.setPosition( 1, 5 );
         g_lcd.printf_P( S_SNOOZE_TIME, remaining / 60, remaining % 60 );
-        
+
+        return true;
+    }
+    
+
+    g_lcd.setPosition( 1, 0 );
+    if ( strlen( g_alarm.profile.message ) > 0 ) {
+        g_lcd.print( g_alarm.profile.message, 16, TEXT_ALIGN_CENTER );
 
     } else {
 
-        if ( strlen( g_alarm.profile.message ) > 0 ) {
-            g_lcd.print( g_alarm.profile.message );
+        if ( g_alarm.profile.time.hour < 12 ) {
+            g_lcd.print_P( S_ALARM_MSG_MORNING, 16, TEXT_ALIGN_CENTER );
+            
+        } else if ( g_alarm.profile.time.hour < 18 ) {
+            g_lcd.print_P( S_ALARM_MSG_AFTERNOON, 16, TEXT_ALIGN_CENTER );
+
         } else {
-            g_lcd.print_P( S_ALARM_DEF_MESSAGE );
+            g_lcd.print_P( S_ALARM_MSG_EVENING, 16, TEXT_ALIGN_CENTER );
         }
     }
 

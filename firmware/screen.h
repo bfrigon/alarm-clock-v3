@@ -30,7 +30,7 @@
 /* Characters : Menus */
 #define CHAR_BRACE_OPEN         0xFA
 #define CHAR_BRACE_CLOSE        0xFC
-#define CHAR_SPACE              0x20
+
 #define CHAR_PAGE_UP            0x1A
 #define CHAR_PAGE_DOWN          0x1B
 #define CHAR_BAR_FULL           0xD1
@@ -137,7 +137,7 @@
         { ITEM_TYPE_MONTH, id, row, col, caption, value, 1, 12, 0, options },
 
 #define ITEM_YEAR( id, row, col, caption, value, options ) \
-    { ITEM_TYPE_YEAR, id, row, col, caption, value, 0, 255, 0, options },
+    { ITEM_TYPE_YEAR, id, row, col, caption, value, 0, 99, 0, options },
 
 #define ITEM_STATIC( row, col, caption, options ) \
     { ITEM_TYPE_STATIC, 0, row, col, caption, NULL, 0, 0, 0, options },

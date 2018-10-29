@@ -21,8 +21,12 @@
 #include "resources.h"
 
 
+
+
+
 const char* getMonthName(uint8_t month, bool shortName) {
 
+    /* Validate input */
     if ( month < 1 )  month = 1;
     if ( month > 12 ) month = 12;
 
@@ -36,8 +40,13 @@ const char* getMonthName(uint8_t month, bool shortName) {
     }
 }
 
+
 const char* getDayName( uint8_t day, bool shortName ) {
 
+    /* Validate input */
+    if ( day < 1 ) day = 1;
+    if ( day > 7 ) day = 7;
+ 
     if ( shortName ) {
 
         return &_DAYS_SHORT[ day - 1 ][0];
@@ -49,18 +58,62 @@ const char* getDayName( uint8_t day, bool shortName ) {
 }
 
 
-uint8_t getDayOfWeek(uint16_t year, uint8_t month, uint8_t day) {
+uint8_t getMonthNumDays( uint8_t month, uint8_t year ) {
 
-    /* TODO */
+    if ( month == 0 ) month = 1;
+    if ( month > 12 ) month = 12;
 
-    return 0;
+    const uint8_t month_days[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+    if ( year % 4 == 0 && month == 2 ) {
+        return 29;
+    } else {
+        return month_days[ month - 1 ];
+    }
 }
 
-int8_t datecmp( DateTime *d1, DateTime *d2 ) {
+uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
+    
+    /*
+    Key value method implementation. 
+    (http://mathforum.org/dr.math/faq/faq.calendar.html)
+
+    Calculation : 
+    ((year / 4) + day + [month key] + [year key] + year - [ 1 if leap year ] ) % 7
+    
+    Assume year is 2000 to 2099. Year key for 2000 is 6
+    2000=6, 2100=4, 2200=2, 2300=0, 2400=6...
+    */
 
 
+   /* Validate input */
+   if ( year > 99 ) year = year % 100;
+   if ( month == 0 ) month = 1;
+   if ( month > 12 ) month = 12;
+   if ( day > 31 ) day = 31;
+   if ( day == 0 ) day = 1;
+    
+    uint8_t months_key[] = {
+        1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6
+    };
 
-    return 0;
+    uint8_t days;
+    days = ( year / 4 ) + day + months_key[ month - 1 ] + 6 + year;
+
+    /* If leap year and month is january or febuary, subtract 1 day */
+    if (( year % 4 ) == 0 && month <= 2 ) {
+        days--;
+    }
+
+    /* day 0-6 : 0=Saturday, 6=Friday, etc. */
+    days = (days % 7);
+
+    /* Return a value from 1 to 7 : 1=Sunday, 7=Saturday */
+    if ( days == 0 ) {
+        days = 7;
+    }
+
+    return days;
 }
 
 

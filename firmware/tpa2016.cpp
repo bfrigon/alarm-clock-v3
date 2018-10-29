@@ -18,7 +18,7 @@ void TPA2016::begin() {
     pinMode( this->_pin_shutdown, OUTPUT );
 
     /* Disable shutdown mode */
-    digitalWrite( this->_pin_shutdown, HIGH );
+    digitalWrite( this->_pin_shutdown, LOW );
     delay( 10 );
 
 
@@ -28,7 +28,7 @@ void TPA2016::begin() {
     this->write( 0x04, 0 );
     this->write( 0x06, 0b00110101 );
     this->write( 0x07, 0b11000000 );
-    
+
 
 }
 
@@ -78,7 +78,7 @@ void TPA2016::enableAGC( bool enabled ) {
 }
 
 void TPA2016::setMaxGain( int8_t db) {
-    
+
 }
 
 void TPA2016::setCompression( uint8_t compression ) {
@@ -89,7 +89,7 @@ void TPA2016::setCompression( uint8_t compression ) {
 void TPA2016::dumpRegs() {
 
      for ( uint8_t i = 1; i < 8l;  i++ ) {
-        
+
         Wire.beginTransmission( TPA2016_I2C_ADDR );
         Wire.write( i );
         Wire.endTransmission();
@@ -109,11 +109,11 @@ void TPA2016::dumpRegs() {
 
 
 void TPA2016::write( uint8_t reg, uint8_t data ) {
-    
+
     Wire.beginTransmission( TPA2016_I2C_ADDR );
 
     Wire.write( reg );
-    Wire.write( data );  
+    Wire.write( data );
 
     Wire.endTransmission();
 }

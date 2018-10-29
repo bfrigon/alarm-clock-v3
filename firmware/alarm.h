@@ -21,12 +21,12 @@
 
 #include <Adafruit_VS1053.h>
 #include "time.h"
+#include "lamp.h"
 #include "screen.h"
 
 
 
-#define MAX_ALARM_PROFILES          10
-#define ALARM_PROFILE_NAME_LENGTH   11
+#define MAX_ALARM_PROFILES          2
 #define ALARM_FILENAME_LENGTH       40
 #define ALARM_MESSAGE_LENGTH        16
 
@@ -36,14 +36,16 @@
 #define ALARM_MODE_OFF              0x00
 #define ALARM_MODE_AUDIO            0x01
 #define ALARM_MODE_VISUAL           0x02
-#define ALARM_MODE_TEST             0x04
-#define ALARM_MODE_SCREEN           0x08
-#define ALARM_MODE_SNOOZE           0x10
+#define ALARM_MODE_SCREEN           0x04
+#define ALARM_MODE_SNOOZE           0x08
+#define ALARM_MODE_LAMP             0x10
+#define ALARM_MODE_TEST             0x80
 
-#define ALARM_MODE_NORMAL           ALARM_MODE_AUDIO | ALARM_MODE_VISUAL | ALARM_MODE_SCREEN
-#define ALARM_MODE_TEST_AUDIO       ALARM_MODE_AUDIO | ALARM_MODE_TEST
-#define ALARM_MODE_TEST_VISUAL      ALARM_MODE_VISUAL | ALARM_MODE_TEST
-#define ALARM_MODE_TEST_PROFILE     ALARM_MODE_NORMAL | ALARM_MODE_TEST
+#define ALARM_MODE_NORMAL           ALARM_MODE_AUDIO | ALARM_MODE_VISUAL | ALARM_MODE_LAMP | ALARM_MODE_SCREEN
+#define ALARM_MODE_TEST_AUDIO       ALARM_MODE_TEST | ALARM_MODE_AUDIO
+#define ALARM_MODE_TEST_VISUAL      ALARM_MODE_TEST | ALARM_MODE_VISUAL
+#define ALARM_MODE_TEST_LAMP        ALARM_MODE_TEST | ALARM_MODE_LAMP
+#define ALARM_MODE_TEST_PROFILE     ALARM_MODE_TEST | ALARM_MODE_NORMAL
 
 #define ALARM_VISUAL_NONE           0
 #define ALARM_VISUAL_FLASHING       1
@@ -64,15 +66,16 @@ bool alarmScreen_eventDrawScreen( Screen *screen );
 void alarmScreen_eventTimeout( Screen *screen );
 
 struct AlarmProfile {
-    char name[ ALARM_PROFILE_NAME_LENGTH + 1 ];
     char filename[ ALARM_FILENAME_LENGTH + 1 ];
     char message[ ALARM_MESSAGE_LENGTH + 1 ];
     uint8_t snoozeDelay;
     uint8_t volume;
     bool gradual;
     uint8_t visualMode;
+    uint8_t effectSpeed = 5;
     Time time;
     uint8_t dow = 0x7F;
+    NightLampSettings lamp;
 };
 
 
@@ -81,14 +84,13 @@ class Alarm : private Adafruit_VS1053 {
   public:
 
 
-    Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect );
+    Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect, int8_t pin_alarm_sw );
 
     void begin();
     bool loadProfile( AlarmProfile *profile, uint8_t id );
     bool loadProfile( uint8_t id );
     void saveProfile( AlarmProfile *profile, uint8_t id );
     void saveProfile( uint8_t id );
-    uint8_t readProfileName( uint8_t id, char *buffer );
     bool readProfileAlarmTime( uint8_t id, Time *time, uint8_t *dow );
     
     bool DetectSDCard();
@@ -105,7 +107,10 @@ class Alarm : private Adafruit_VS1053 {
     uint16_t getSnoozeTimeRemaining();
     void resume();
 
-    void processAlarm();
+    bool isAlarmSwitchOn();
+    bool detectAlarmSwitchState();
+
+    void processAlarmEvents();
     bool checkForAlarms( DateTime *now );
     int8_t getNextAlarmID( DateTime *currentTime, bool matchNow );
     int16_t getNextAlarmOffset( int8_t profile_id, DateTime *currentTime, bool matchNow );
@@ -125,9 +130,12 @@ class Alarm : private Adafruit_VS1053 {
     void visualStop();
     void audioStop();
     void audioStart();
+    inline void Alarm::updateVisualStepDelay();
 
     uint8_t _pin_sd_detect;
     uint8_t _pin_sd_cs;
+    uint8_t _pin_alarm_sw;
+
 
     unsigned long _timerStart = 0;
     unsigned long _snoozeStart = 0;
@@ -137,7 +145,8 @@ class Alarm : private Adafruit_VS1053 {
     bool _visualStepReverse = false;
 
     bool _sd_present = false;
-    uint8_t _playMode = 0;
+    bool _alarm_sw_on = false;
+    uint8_t _playMode = ALARM_MODE_OFF;
 
     uint16_t _pgm_audio_ptr = 0;
     File _sd_root;

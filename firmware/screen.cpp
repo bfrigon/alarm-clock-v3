@@ -251,7 +251,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
 
             if ( this->eventSelectionChanged != NULL ) {
-                this->eventSelectionChanged( this, &g_currentItem, this->fieldPos, false );
+                this->eventSelectionChanged( this, &g_currentItem, this->fieldPos, this->_itemFullscreen );
             }
 
             g_screenUpdate = true;
@@ -299,8 +299,7 @@ void Screen::exitScreen() {
 void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
     uint8_t value;
-    uint8_t nchr;
-    int8_t npadding;
+    
 
     g_lcd.setPosition( row, col );
 
@@ -313,7 +312,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
             if ( item->caption != NULL ) {
                 this->printItemCaption( item );
-                g_lcd.print_P( PSTR( " :" ) );
+                g_lcd.print_P( S_SEPARATOR );
 
                 g_lcd.setPosition( row + 1, col );
             }
@@ -346,7 +345,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
                 case ITEM_TYPE_TIME:
                     this->printItemCaption( item );
-                    g_lcd.print_P( PSTR( ": " ));
+                    g_lcd.print_P( S_SEPARATOR );
 
                     break;
 
@@ -355,7 +354,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
                         g_lcd.print( isSelected ? CHAR_SELECT : CHAR_SPACE );
 
                         this->printItemCaption( item );
-                        g_lcd.print_P( PSTR( ": " ));
+                        g_lcd.print_P( S_SEPARATOR );
                     }
                     break;
             }
@@ -377,6 +376,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
             uint8_t nbars;
             nbars = this->itemValueToBars( item );
 
+            uint8_t npadding;
             npadding = item->length - ( nbars / 2 );
 
             g_lcd.print( CHAR_FIELD_BEGIN );
@@ -404,15 +404,12 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
                 uint8_t offset;
                 offset = this->fieldPos > ( maxWidth - 1 ) ? this->fieldPos - maxWidth + 1 : 0;
 
-                nchr = g_lcd.nprint( ( char* )item->value + offset, maxWidth );
-                npadding = maxWidth - nchr;
-
+                g_lcd.print( ( char* )item->value + offset, maxWidth, TEXT_ALIGN_LEFT );
             } else {
-                nchr = g_lcd.print( (char*)item->value );
-                npadding = item->length - nchr;
+                g_lcd.print( (char*)item->value, maxWidth, TEXT_ALIGN_LEFT );
+                
             }
             
-            g_lcd.fill( CHAR_SPACE, ( npadding > 0 ) ? npadding : 0 );
             g_lcd.print( CHAR_FIELD_END );
             
 
@@ -426,7 +423,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
             }
 
 
-            nchr = 0;
+            
             if ( item->list != NULL ) {
 
                 uint8_t offset = 0;
@@ -435,15 +432,13 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
                 }
 
                 if ( item->options & ITEM_LIST_SRAM_POINTER ) {
-                    nchr = g_lcd.print((( const char* )item->list ) + offset );
+                    g_lcd.print((( const char* )item->list ) + offset, item->length, TEXT_ALIGN_LEFT );
                 } else {
-                    nchr = g_lcd.print_P((( const char* )item->list ) + offset );
+                    g_lcd.print_P((( const char* )item->list ) + offset, item->length, TEXT_ALIGN_LEFT );
                 }
-            }
-
-            npadding = ( item->length - nchr );
-            while ( npadding-- > 0 ) {
-                g_lcd.print( CHAR_SPACE );
+                
+            } else {
+                g_lcd.fill( CHAR_SPACE, item->length );
             }
 
             if ( item->options & ITEM_COMPACT || item->options & ITEM_EDIT_FULLSCREEN ) {
@@ -485,10 +480,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
                     g_lcd.print( isSelected ? CHAR_SELECT : CHAR_SPACE );
                 }
 
-                npadding = 3;
-                npadding -= g_lcd.print_P( *(( bool* )item->value ) == true ? S_ON : S_OFF );
-
-                g_lcd.fill( CHAR_SPACE, ( npadding > 0 ) ? npadding : 0 );
+                g_lcd.print_P( *(( bool* )item->value ) == true ? S_ON : S_OFF, 3, TEXT_ALIGN_LEFT );
             }
 
             break;
@@ -497,13 +489,9 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
         case ITEM_TYPE_NUMBER:
             value = *(( uint8_t* )item->value);
 
-            /* Calculate the required left padding. */
-            npadding = numDigits( item->max ) - numDigits( value );
-
-            while ( npadding-- > 0 ) {
-                g_lcd.print( CHAR_SPACE );
-            }
-
+            /* Left padding */
+            g_lcd.fill( CHAR_SPACE, numDigits( item->max ) - numDigits( value ));
+            
             g_lcd.printf( "%d", *(uint8_t*)item->value );
 
             break;
@@ -535,7 +523,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
             uint8_t year;
             year = *(( uint8_t* )item->value );
 
-            g_lcd.printf("2%03d", year);
+            g_lcd.printf("20%02d", year);
 
             break;
 
@@ -782,7 +770,7 @@ uint8_t Screen::calcFieldLength( Item *item ) {
             break;
 
         case ITEM_TYPE_YEAR:
-            length = 3;
+            length = 2;
             break;
 
         case ITEM_TYPE_DOW:
@@ -866,7 +854,7 @@ void Screen::updateCursorPosition() {
             break;
 
         case ITEM_TYPE_YEAR:
-            g_lcd.setPosition( row, col + this->fieldPos + 1 );
+            g_lcd.setPosition( row, col + this->fieldPos + 2 );
             break;
 
         case ITEM_TYPE_MONTH:
@@ -913,10 +901,12 @@ void Screen::clearItemValue( Item *item ) {
     switch ( item->type ) {
 
         case ITEM_TYPE_TEXT:
-            (( char* )item->value )[ this->fieldPos ] = 0x00;
+
+            for( uint8_t i = this->fieldPos; i < item->length; i++ ) {
+                (( char* )item->value )[ i ] = 0x00;
+            }
 
             this->upperCase = false;
-
             break;
 
         case ITEM_TYPE_NUMBER:
@@ -1003,12 +993,24 @@ void Screen::incrementItemValue( Item *item, bool shift ) {
             uint8_t nbars;
             nbars = this->itemValueToBars( item );
 
-            nbars++;
-            if (nbars > ( item->length * 2 )) {
-                nbars = 0;
+            if ( ( item->max - item->min ) / ( item->length * 2 ) > 0 ) {
+
+                nbars++;
+                if (nbars > ( item->length * 2 )) {
+                    nbars = 0;
+                }
+
+                (*(( uint8_t* )item->value )) = item->min + nbars * ( item->max - item->min ) / ( item->length * 2 );
+
+            } else {
+
+                (*(( uint8_t* )item->value ))++;
+
+                if ( *(( uint8_t* )item->value ) > item->max ) {
+                    *(( uint8_t* )item->value ) = item->min;
+                }
             }
 
-            (*(( uint8_t* )item->value )) = item->min + ( nbars * ( item->max - item->min ) / ( item->length * 2 ));
             break;
 
 
@@ -1155,7 +1157,7 @@ void Screen::incrementItemValue( Item *item, bool shift ) {
         this->eventValueChange( this, item );
 }
 
-char Screen::nextValidCharacter( char current ) {
+inline char Screen::nextValidCharacter( char current ) {
 
     /* Sequence : space => [a-z] => [0-9] => symbols => space */
 

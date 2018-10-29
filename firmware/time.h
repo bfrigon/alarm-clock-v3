@@ -44,14 +44,14 @@ struct Date {
 #define DATE_FORMAT_WDMMMDDYYYY    7
 
 
-
+#define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))
 
 
 
 const char* getMonthName(uint8_t month, bool shortName);
 const char* getDayName(uint8_t day, bool shortName);
-uint8_t getDayOfWeek(uint16_t year, uint8_t month, uint8_t day);
-int8_t datecmp( DateTime *d1, DateTime *d2 );
+uint8_t getDayOfWeek(uint8_t year, uint8_t month, uint8_t day);
+uint8_t getMonthNumDays( uint8_t month, uint8_t year );
 
 uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date );
 uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date );

@@ -54,21 +54,15 @@ void US2066::begin() {
 
     this->_init = true;
 
-    delay(1);
-
+    delay( 1 );
     pinMode( this->_pin_reset, OUTPUT );
-    pinMode( this->_pin_ven, OUTPUT );
 
     /* Assert the reset pin the LCD module */
     digitalWrite( this->_pin_reset, LOW );
-    digitalWrite( this->_pin_ven, LOW );
     delay( 1 );
     digitalWrite( this->_pin_reset, HIGH );
     delay( 1 );
-
-    /* Enable the 12v regulator */
-    digitalWrite( this->_pin_ven, HIGH );
-    delay( 1 );
+   
 
     /* Setup stream for printf function */
     fdev_setup_stream( &this->_lcdout, this->_putchar, NULL, _FDEV_SETUP_WRITE );
@@ -448,71 +442,7 @@ void US2066::updateDisplayState() {
 
 
 /*--------------------------------------------------------------------------
- * US2066::pnrint( string, uint8_t )
- *
- * Prints a string on the LCD module at the current coordinates.
- *
- * Arguments
- * ---------
- *  - string    : Pointer to the string to print.
- *  - maxLength : Maximum number of characters to print.
- *
- * Returns : Number of characters written
- */
-uint8_t US2066::nprint( const char *str, uint8_t maxLength ) {
-    uint8_t res;
-    uint8_t num = 0;
-
-    if ( this->_init == false ) {
-        this->begin();
-    }
-
-    while ( *str != 0 && num < maxLength ) {
-
-        res = this->print( *str++ );
-        if ( res != 0 )
-            return num;
-
-        num++;
-    }
-
-    return num;
-}
-
-/*--------------------------------------------------------------------------
- * US2066::print(string)
- *
- * Prints a string on the LCD module at the current coordinates.
- *
- * Arguments
- * ---------
- *  - string : Pointer to the string to print.
- *
- * Returns : Number of characters written
- */
-uint8_t US2066::print( const char *str ) {
-    uint8_t res;
-    uint8_t num = 0;
-
-    if ( this->_init == false ) {
-        this->begin();
-    }
-
-    while ( *str != 0 ) {
-
-        res = this->print( *str++ );
-        if ( res != 0 )
-            return num;
-
-        num++;
-    }
-
-    return num;
-}
-
-
-/*--------------------------------------------------------------------------
- * US2066::print(c)
+ * US2066::fill(c, num)
  *
  * Fills the LCD with the specified number of characters
  *
@@ -529,6 +459,10 @@ uint8_t US2066::print( const char *str ) {
  *   4: Other error
  */
 void US2066::fill( char c, uint8_t num ) {
+
+    if ( num == 0 ) {
+        return;
+    }
 
     if ( this->_init == false ) {
         this->begin();
@@ -571,37 +505,149 @@ uint8_t US2066::print( char c ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::print_P( string )
+ * US2066::print(string)
  *
- * Prints a string stored in the program memory tn the LCD module
- * at the current coordinates.
+ * Prints a string on the LCD module at the current coordinates.
  *
  * Arguments
  * ---------
- *  - string : Pointer to the string to print.
+ *  - str           : Pointer to the string to print.
+ *  - ptr_pgm_space : True if 'str' points to a program memory location, false otherwize
  *
  * Returns : Number of characters written
  */
-uint8_t US2066::print_P( const char *str ) {
+uint8_t US2066::print( const char *str, bool ptr_pgm_space = false ) {
     uint8_t num = 0;
-    uint8_t res;
 
     if ( this->_init == false ) {
         this->begin();
     }
 
-    uint8_t c;
-    for (c = 0; ( c = pgm_read_byte( str )); str++ ) {
+    
+    while( true ) {
 
-        res = this->print( c );
-        if ( res != 0 )
+        char c;
+        if ( ptr_pgm_space == true ) {
+            c = pgm_read_byte( str++ );
+        } else {
+            c = *str++;
+        }
+
+        if ( c == 0x00 ) {
+            break;
+        }
+
+        if ( this->print( c ) != 0 ) {
             return num;
+        }
 
         num++;
     }
 
     return num;
 }
+
+
+/*--------------------------------------------------------------------------
+ * US2066::print( str, length, align, ptr_pgm_space )
+ *
+ * Prints a string with padding on the LCD module at the current coordinates.
+ *
+ * Arguments
+ * ---------
+ *  - str           : Pointer to the string to print.
+ *  - length        : Maximum number of characters to print, including padding
+ *  - align         : Text alignment ( TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT )
+ *  - ptr_pgm_space : True if 'str' points to a program memory location, false otherwize
+ *
+ * Returns : Number of characters written
+ */
+uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false ) {
+    uint8_t res;
+    uint8_t num = 0;
+    uint8_t slen;
+    uint8_t pre_padding;
+    uint8_t post_padding;
+
+    if ( ptr_pgm_space == true ) {
+        slen = strlen_P( str );
+    } else {
+        slen = strlen( str );
+    }
+
+    
+
+    if ( slen < length ) {
+        switch ( align ) {
+            case TEXT_ALIGN_CENTER:
+                pre_padding = ( length - slen ) / 2 ;
+                post_padding = length - slen - pre_padding;
+                break;
+
+            case TEXT_ALIGN_RIGHT:
+                pre_padding = length - slen;
+                post_padding = 0;
+                break;
+
+            /* TEXT_ALIGN_LEFT */
+            default:
+                pre_padding = 0;
+                post_padding = length - slen;
+                break;
+        }        
+    } else {
+        pre_padding = 0;
+        post_padding = 0;
+    }
+
+
+    uint8_t i;
+    for ( i = 0; i < length; i++ ) {
+
+        if ( pre_padding > 0 ) {
+            if ( this->print( CHAR_SPACE ) != 0 ) {
+                return num;
+            }
+
+            pre_padding--;
+            num++;
+            continue;
+        }
+
+        if ( slen > 0 ) {
+
+            if ( ptr_pgm_space == true ) {
+                res = this->print( pgm_read_byte( str++ ));
+            } else {
+                res = this->print( *str++ );
+            }
+            
+
+            if ( res != 0 ) {
+                return num;
+            }
+            
+            slen--;
+            num++;
+            continue;
+        }
+
+        if ( post_padding > 0 ) {
+            if ( this->print( CHAR_SPACE ) != 0 ) {
+                return num;
+            }
+
+            post_padding--;
+            num++;
+            continue;
+        }
+    }
+
+    return num;
+}
+
+
+
 
 
 /*--------------------------------------------------------------------------
@@ -632,6 +678,8 @@ uint8_t US2066::printf( const char *format, ... ) {
 
     return length;
 }
+
+
 
 
 /*--------------------------------------------------------------------------

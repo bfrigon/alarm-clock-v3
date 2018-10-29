@@ -21,12 +21,7 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-
-
-
-/* TODO: Could not figure out a way to pass pin number to inline asm */
-#define NEOCLOCK_PORT   PORTC
-#define NEOCLOCK_PIN    0
+#include "neopixel.h"
 
 
 
@@ -56,53 +51,32 @@ static const uint8_t PROGMEM _charmap[ 12 ] = {
 
 
 
-class NeoClock {
+class NeoClock : public NeoPixel {
   public:
 
     uint8_t hour = 0xFF;
     uint8_t minute = 0xFF;
     uint8_t flashRate = 20;
     bool status_set = false;
-    uint8_t pixmap[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
-
+    
     bool hourFlashing = false;
     bool minutesFlashing = false;
-
     
-
 
 
     /* Constructor */
     NeoClock( uint8_t pin_leds );
 
-    void begin();
     void update();
-
-    void setColorRGB( uint8_t r, uint8_t g, uint8_t b );
-    void setColorFromTable( uint8_t id );
-    void setBrightness( uint8_t id );
-
+    void setTestMode( bool testMode );
     void processUpdateEvents();
 
 
-
   private:
-    bool _init = false;
-
-    uint8_t _pin_leds;
-    uint8_t _brightness = 10;
-    uint8_t _g = 0x00;
-    uint8_t _b = 0x00;
-    uint8_t _r = 0xFF;
-
     uint32_t _flashTimerStart = 0;
     bool     _flashState = false;
-
+    bool     _testMode = false;
     
-    
-
-    void show( uint8_t *pixmap, uint8_t *colors );
-    void setPixel( uint8_t *pixmap, uint8_t id, bool state );
     void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
 
 };

@@ -74,82 +74,91 @@ const uint8_t CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 //
 //--------------------------------------------------------------------------
 
-PROG_STR( S_FACTORY_RESET,          "*Factory reset!*" );
 
 /* Dialog strings */
-PROG_STR( S_QUESTION_SAVE,          "Apply ?" );
-PROG_STR( S_YES,                    "Yes" );
-PROG_STR( S_NO,                     "No" );
+PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
+PROG_STR( S_YES,                        "Yes" );
+PROG_STR( S_NO,                         "No" );
+PROG_STR( S_SEPARATOR,                  ": ");
+
+PROG_STR( S_ON,                         "On" );
+PROG_STR( S_OFF,                        "Off" );
+PROG_STR( S_AM,                         "am" );
+PROG_STR( S_PM,                         "pm" );
+PROG_STR( S_DOW,                        "SMTWTFS" );
+PROG_STR( S_ALARMS_OFF,                 "Alarms off" );
+PROG_STR( S_ALARM_IN,                   "Alarm #%d in" );
+PROG_STR( S_NEXT_ALARM_DHM,             "%dd, %dh. %d min." );
+PROG_STR( S_NEXT_ALARM_HM,              "%dh. %d min." );
+PROG_STR( S_NEXT_ALARM_M,               "%d minutes" );
+PROG_STR( S_NEXT_ALARM_1MIN,            "1 minute" );
+PROG_STR( S_NEXT_ALARM_1DAY,            "24 hours" );
+PROG_STR( S_NEXT_ALARM_DAYS,            "%d day" );
+PROG_STR( S_ALARM_NUM1,                 "1." );
+PROG_STR( S_ALARM_NUM2,                 "2." );
 
 
-PROG_STR( S_ON,                     "On" );
-PROG_STR( S_OFF,                    "Off" );
-PROG_STR( S_AM,                     "am" );
-PROG_STR( S_PM,                     "pm" );
-PROG_STR( S_DOW,                    "SMTWTFS" );
-PROG_STR( S_ALARMS_OFF,             "Alarms off" );
-PROG_STR( S_ALARM_IN,               "Alarm #%d in" );
-PROG_STR( S_NEXT_ALARM_DHM,         "%dd, %dh. %d min." );
-PROG_STR( S_NEXT_ALARM_HM,          "%dh. %d min." );
-PROG_STR( S_NEXT_ALARM_M,           "%d minutes" );
-PROG_STR( S_NEXT_ALARM_1MIN,        "1 minute" );
-PROG_STR( S_NEXT_ALARM_1DAY,        "24 hours" );
-PROG_STR( S_NEXT_ALARM_DAYS,        "%d day" );
-PROG_STR( S_ALARM_NUM1,             "1." );
-PROG_STR( S_ALARM_NUM2,             "2." );
-
-
-PROG_STR( S_PROFILE_PREFIX,         "Profile #" );
-PROG_STR( S_PROFILE_DEF_FILENAME,   "*Default*" );
+PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
 
 
 
 /* Main menu strings */
-PROG_STR( S_MAIN_MENU_ALARM_1,      "Alarm 1" );
-PROG_STR( S_MAIN_MENU_ALARM_2,      "Alarm 2" );
-PROG_STR( S_MAIN_MENU_SET_ALARMS,   "Set alarms" );
-PROG_STR( S_MAIN_MENU_SET_TIME,     "Set time" );
-PROG_STR( S_MAIN_MENU_DISPLAY,      "Display" );
-PROG_STR( S_MAIN_MENU_NETWORK,      "Network" );
-PROG_STR( S_MAIN_MENU_PROFILES,     "Profiles" );
+PROG_STR( S_MAIN_MENU_SET_ALARMS,       "Set alarms" );
+PROG_STR( S_MAIN_MENU_SET_TIME,         "Set time" );
+PROG_STR( S_MAIN_MENU_DISPLAY,          "Display" );
+PROG_STR( S_MAIN_MENU_NETWORK,          "Network" );
+PROG_STR( S_MAIN_MENU_LAMP,             "Night lamp" );
+PROG_STR( S_MAIN_MENU_PROFILES,         "Profiles" );
 
 /* Network menu srings */
-PROG_STR( S_MENU_NETWORK_DHCP,      "DHCP" );
-PROG_STR( S_MENU_NETWORK_IP,        "IP Address" );
-PROG_STR( S_MENU_NETWORK_MASK,      "Mask" );
-PROG_STR( S_MENU_NETWORK_GATEWAY,   "Gateway" );
-PROG_STR( S_MENU_NETWORK_DNS,       "DNS" );
+PROG_STR( S_MENU_NETWORK_DHCP,          "DHCP" );
+PROG_STR( S_MENU_NETWORK_IP,            "IP Address" );
+PROG_STR( S_MENU_NETWORK_MASK,          "Mask" );
+PROG_STR( S_MENU_NETWORK_GATEWAY,       "Gateway" );
+PROG_STR( S_MENU_NETWORK_DNS,           "DNS" );
 
 
 /* Settings menu strings */
-PROG_STR( S_MENU_SETTINGS_24H,      "24H format" );
-PROG_STR( S_MENU_SETTINGS_COLOR,    "Color" );
-PROG_STR( S_MENU_SETTINGS_BRIGHT,   "Brightness" );
-PROG_STR( S_MENU_SETTINGS_LCD_CTR,  "LCD contrast" );
-PROG_STR( S_MENU_SETTINGS_DATE_FMT, "Date format" );
-PROG_STR( S_MENU_SETTINGS_TEMPUNIT, "Temp unit" );
+PROG_STR( S_MENU_SETTINGS_24H,          "24H format" );
+PROG_STR( S_MENU_SETTINGS_COLOR,        "Color" );
+PROG_STR( S_MENU_SETTINGS_BRIGHT,       "Brightness" );
+PROG_STR( S_MENU_SETTINGS_LCD_CTR,      "LCD contrast" );
+PROG_STR( S_MENU_SETTINGS_DATE_FMT,     "Date format" );
+
+/* List profile screen */
+PROG_STR( S_EDIT_ALARM_1,               "Alarm #1..." );
+PROG_STR( S_EDIT_ALARM_2,               "Alarm #2..." );
 
 
-PROG_STR( S_EDIT_PROFILE_NAME,      "Profile name" );
-PROG_STR( S_EDIT_PROFILE_FILENAME,  "Sound file" );
-PROG_STR( S_EDIT_PROFILE_TIME,      "Alarm time" );
-PROG_STR( S_EDIT_PROFILE_DOW,       "Repeat" );
-PROG_STR( S_EDIT_PROFILE_SNOOZE,    "Snooze delay" );
-PROG_STR( S_EDIT_PROFILE_VOLUME,    "Volume" );
-PROG_STR( S_EDIT_PROFILE_GRADUAL,   "Gradual" );
-PROG_STR( S_EDIT_PROFILE_VISUAL,    "Visual effect" );
-PROG_STR( S_EDIT_PROFILE_MESSAGE,   "Message" );
-PROG_STR( S_EDIT_PROFILE_TEST,      "Test..." );
+PROG_STR( S_EDIT_PROFILE_FILENAME,      "Sound file" );
+PROG_STR( S_EDIT_PROFILE_SNOOZE,        "Snooze delay" );
+PROG_STR( S_EDIT_PROFILE_VOLUME,        "Volume" );
+PROG_STR( S_EDIT_PROFILE_GRADUAL,       "Gradual" );
+PROG_STR( S_EDIT_PROFILE_VISUAL,        "Visual effect" );
+PROG_STR( S_EDIT_PROFILE_LAMP,          "Night lamp" );
+PROG_STR( S_EDIT_PROFILE_MESSAGE,       "Message" );
+PROG_STR( S_EDIT_PROFILE_TEST,          "Test..." );
+
+PROG_STR( S_EDIT_PROFILE_VISUAL_MODE,   "Effect type" );
+PROG_STR( S_EDIT_PROFILE_VISUAL_SPEED,  "Speed" );
+
+PROG_STR( S_NIGHT_LAMP_COLOR,           "Color" );
+PROG_STR( S_NIGHT_LAMP_BRIGHTNESS,      "Brightness" );
+PROG_STR( S_NIGHT_LAMP_EFFECT,          "Mode" );
+PROG_STR( S_NIGHT_LAMP_SPEED,           "Effect speed" );
+PROG_STR( S_NIGHT_LAMP_DELAY,           "Delay" );
 
 
+PROG_STR( S_TEST_ALARM,                 "Alarm test..." );
+PROG_STR( S_ALARM_MSG_MORNING,          "Good morning");
+PROG_STR( S_ALARM_MSG_AFTERNOON,        "Good afternoon");
+PROG_STR( S_ALARM_MSG_EVENING,          "Good evening");
 
-PROG_STR( S_TEST_ALARM,             "Test:" );
-PROG_STR( S_ALARM_DEF_MESSAGE,      "    Wake up!" );
-PROG_STR( S_SNOOZE,                 "     Snooze" );
-PROG_STR( S_SNOOZE_TIME,            "     %2d:%02d " );
+PROG_STR( S_SNOOZE,                     "Snooze" );
+PROG_STR( S_SNOOZE_TIME,                "%2d:%02d" );
 
-PROG_STR( S_INSTR_CANCEL_ALARM_1,   "Hold <Alarm> to" );
-PROG_STR( S_INSTR_CANCEL_ALARM_2,   "cancel..." );
+PROG_STR( S_INSTR_CANCEL_ALARM_1,       "Hold <Alarm> to" );
+PROG_STR( S_INSTR_CANCEL_ALARM_2,       "cancel..." );
 
 
 //--------------------------------------------------------------------------
@@ -205,6 +214,15 @@ const char _ALARM_VISUAL[ MAX_ALARM_VISUALS ][ ALARM_VISUAL_NAME_LENGTH + 1 ] PR
 };
 
 
+#define MAX_ALARM_LAMP_MODES            5
+#define ALARM_LAMP_MODES_NAME_LENGTH    8
+const char _ALARM_LAMP_MODES[ MAX_ALARM_LAMP_MODES ][ ALARM_LAMP_MODES_NAME_LENGTH + 1 ] PROGMEM = {
+    "OFF",
+    "ON",
+    "Flashing",
+    "Fading",
+    "Rainbow"
+};
 
 
 //--------------------------------------------------------------------------

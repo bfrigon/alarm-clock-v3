@@ -23,9 +23,14 @@
 #include <Wire.h>
 
 
+
+#define CHAR_SPACE              0x20
+
+
+
 /* LCD properties */
 #ifndef US2066_DISPLAY_LINES
-    #define US2066_DISPLAY_LINES  2
+    #define US2066_DISPLAY_LINES    2
 #endif
 
 
@@ -138,6 +143,10 @@
 #endif
 
 
+#define TEXT_ALIGN_LEFT     0
+#define TEXT_ALIGN_CENTER   1
+#define TEXT_ALIGN_RIGHT    2
+
 
 
 typedef struct {
@@ -170,15 +179,22 @@ class US2066 {
     void setDisplay(bool on, bool reverse );
     uint8_t setCustomCharacters(const uint8_t *pchrmap);
 
-    uint8_t print( const char *str );
-    uint8_t nprint( const char *str, uint8_t maxLength );
+    
     uint8_t print( char c );
-    uint8_t print_P( const char *str );
+    uint8_t print( const char *str, bool ptr_pgm_space = false );
+    uint8_t print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
+    inline uint8_t print_P( const char *str )
+        { return this->print( str, true ); }
+
+    inline uint8_t print_P( const char *str, uint8_t length, uint8_t align ) 
+        { return this->print( str, length, align, true ); }
+    
 
     uint8_t printf(const char *format, ...);
     uint8_t printf_P( const char *format, ... );
 
     void fill( char c, uint8_t num );
+    
 
 
   private:

@@ -26,6 +26,7 @@
 #include <avr/wdt.h>
 
 #include "main.h"
+#include "lamp.h"
 #include "alarm.h"
 #include "resources.h"
 #include "screen.h"
@@ -36,9 +37,10 @@
 #include "tpa2016.h"
 
 
-Alarm g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ, PIN_VS1053_SDCS, PIN_SD_DETECT );
+Alarm g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ, PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW );
 TPA2016 g_amplifier( PIN_AMP_SHDN );
 NeoClock g_clock( PIN_NEOCLOCK );
+Lamp g_lamp( PIN_PIX_LAMP );
 QT1070 g_keypad( PIN_INT_KEYPAD );
 US2066 g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET, PIN_OLED_VEN );
 
@@ -47,6 +49,7 @@ uint8_t test = 0;
 bool g_clockUpdate = true;
 uint8_t selectedProfile = 0;
 uint8_t selectedAlarm = 0;
+bool edit_alarm_lamp_settings = false;
 
 volatile bool rtc_event = false;
 
@@ -63,8 +66,10 @@ Screen screen_set_alarms( SCREEN_ID_SET_ALARMS, ITEMS_SET_ALARM, &eventValueChan
 Screen screen_edit_alarm( SCREEN_ID_EDIT_ALARM, ITEMS_EDIT_ALARM, &eventValueChange, &enterScreen, &exitScreen );
 Screen screen_show_alarms( SCREEN_ID_SHOW_ALARMS, NULL, NULL, &enterScreen, &exitScreen );
 Screen screen_edit_profile( SCREEN_ID_EDIT_PROFILE, ITEMS_EDIT_PROFILE, &eventValueChange, &enterScreen, &exitScreen );
-Screen screen_list_profiles( SCREEN_ID_LIST_PROFILES, NULL, NULL, &enterScreen, &exitScreen );
-
+Screen screen_list_profiles( SCREEN_ID_LIST_PROFILES, ITEMS_LIST_PROFILES, &eventValueChange, &enterScreen, &exitScreen );
+Screen screen_edit_night_lamp( SCREEN_ID_EDIT_NIGHT_LAMP, ITEMS_EDIT_NIGHT_LAMP, &eventValueChange, &enterScreen, &exitScreen );
+Screen screen_edit_alarm_lamp( SCREEN_ID_EDIT_ALARM_LAMP, ITEMS_EDIT_ALARM_LAMP, &eventValueChange, &enterScreen, &exitScreen );
+Screen screen_edit_alarm_visual( SCREEN_ID_EDIT_ALARM_VISUAL, ITEMS_EDIT_PROFILE_VISUAL, &eventValueChange, &enterScreen, &exitScreen );
 
 void initScreens() {
 
@@ -76,11 +81,8 @@ void initScreens() {
     screen_set_time.confirmChanges = true;
     screen_set_time.eventSelectionChanged = &eventSelectionChange;
 
-
+    /* Set alarm screen */
     screen_set_alarms.eventDrawItem = &eventDrawItem;
-    screen_set_alarms.eventKeypress = &set_alarms_eventKeypress;
-
-
 
     /* Show alarms screen */
     screen_show_alarms.timeout = 3000;
@@ -91,16 +93,20 @@ void initScreens() {
     screen_network.confirmChanges = true;
 
     /* List profile screen */
-    screen_list_profiles.eventDrawScreen = &listprofiles_eventDrawScreen;
-    screen_list_profiles.eventKeypress = &listprofiles_eventKeypress;
-
     screen_edit_profile.eventSelectionChanged = &eventSelectionChange;
     screen_edit_profile.eventDrawItem = &eventDrawItem;
 
+    /* Edit alarm lamp settings */
+    screen_edit_alarm_lamp.eventSelectionChanged = &eventSelectionChange;
 
+    /* Edit night lamp settings */
+    screen_edit_night_lamp.eventSelectionChanged = &eventSelectionChange;
+    screen_edit_night_lamp.eventDrawItem = &eventDrawItem;
 
-
+    /* Edit alarm lamp settings */
+    screen_edit_alarm_visual.eventSelectionChanged = &eventSelectionChange;
 }
+
 
 void configWiFi() {
 
@@ -117,11 +123,13 @@ void configWiFi() {
 
 void setup() {
 
-    Serial.begin( 115200 );
+    pinMode( PIN_PIX_SHDN, OUTPUT );
+    digitalWrite( PIN_PIX_SHDN, LOW );
 
     /* Initialize clock display */
     g_clock.begin();
-    
+
+    g_lamp.begin();
 
 
     /* Check for factory reset sequence */
@@ -140,6 +148,9 @@ void setup() {
     /* Enable watchdog timer, 4 seconds timeout */
     wdt_enable(WDTO_4S);
 
+    /* Setup serial */
+    Serial.begin( 115200 );
+
 
     /* Setup audio codec */
     g_alarm.begin();
@@ -153,6 +164,8 @@ void setup() {
     rtc.enableInterrupts(EveryMinute);
 
     rtc_event = true;   /* Force rtc event to update clock display */
+
+    Wire.setClock(100000);
 
 
     /* Initialize OLED display */
@@ -168,7 +181,7 @@ void setup() {
 
     /* Init wifi module */
     WiFi.setPins( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
-    WiFi.init();
+    WiFi.init(); 
 
     configWiFi();
 
@@ -177,7 +190,7 @@ void setup() {
 
     /* Configure audio amp */
     g_amplifier.begin();
-    g_amplifier.setFixedGain( 25 );    
+    g_amplifier.setFixedGain( 25 );  
 }
 
 
@@ -201,6 +214,7 @@ void loop() {
 
     /* Process RTC event if available */
     if ( rtc_event == true ) {
+        
         rtc_event = false;
         rtc.clearINTStatus();
 
@@ -222,8 +236,18 @@ void loop() {
     }
 
 
-    /* Feed alarm audio buffer and process clock visual effect */
-    g_alarm.processAlarm();
+    /* Detect if the SD card is present, if so, initialize it */
+    if ( g_alarm.isSDCardPresent() != g_alarm.DetectSDCard() ) {
+        g_screenUpdate = true;
+    }
+
+    /* Detect alarm switch state */
+    if ( g_alarm.isAlarmSwitchOn() != g_alarm.detectAlarmSwitchState()) {
+        g_clockUpdate = true;
+    }
+
+    /* Feed alarm audio buffer and process visual effect */
+    g_alarm.processAlarmEvents();
 
 
     /* Exit the current screen if it has reached its timeout value */
@@ -250,6 +274,9 @@ void loop() {
     /* Update the Clock display if requested */
     g_clock.processUpdateEvents();
 
+    /* Process lamp effect if lamp is active */
+    g_lamp.processEvents();
+
 
     /* Handle pending WiFi module events */
     WiFi.handleEvents();
@@ -262,12 +289,7 @@ void loop() {
     }
 
 
-    /* Detect if the SD card is present, if so, initialize it */
-    bool sd_present = g_alarm.isSDCardPresent();
-
-    if ( sd_present != g_alarm.DetectSDCard() ) {
-        g_screenUpdate = true;
-    }
+    
 }
 
 
@@ -284,6 +306,7 @@ void isr_rtc() {
 
 
 
+
 bool checkFactoryResetBtn() {
     unsigned long start = millis();
     bool resetConfig = false;
@@ -297,6 +320,7 @@ bool checkFactoryResetBtn() {
 
             g_clock.setColorFromTable( COLOR_RED );
             g_clock.setBrightness( 60 );
+            g_clock.setTestMode( true );
 
             g_clock.status_set = true;
             g_clock.update();
@@ -317,6 +341,7 @@ bool checkFactoryResetBtn() {
     }
 
     g_clock.status_set = false;
+    g_clock.setTestMode( false );
     g_clock.update();
 
     return resetConfig;
@@ -349,21 +374,6 @@ bool eventDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, ui
     uint8_t length;
 
     switch ( item->id ) {
-        case ID_ALARM_PROFILE_1:
-        case ID_ALARM_PROFILE_2:
-
-            char buffer[ ALARM_PROFILE_NAME_LENGTH + 1 ];
-            g_alarm.readProfileName( *(( uint8_t* )item->value ), buffer );
-
-            g_lcd.print( isSelected ? CHAR_SELECT : CHAR_FIELD_BEGIN );
-
-            length = g_lcd.print( buffer );
-
-            g_lcd.fill ( CHAR_SPACE, item->length - length );
-            g_lcd.print( isSelected ? CHAR_SELECT_REV : CHAR_FIELD_END );
-
-            return false;
-
         case ID_PROFILE_FILENAME:
 
             g_lcd.print( isSelected ? CHAR_SELECT : CHAR_FIELD_BEGIN );
@@ -377,8 +387,6 @@ bool eventDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, ui
             g_lcd.fill ( CHAR_SPACE, item->length - length );
             g_lcd.print( isSelected ? CHAR_SELECT_REV : CHAR_FIELD_END );
 
-
-
             return false;
 
         case ID_ALARM_EDIT_1:
@@ -387,7 +395,7 @@ bool eventDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, ui
             alarm_id = item->id - ID_ALARM_EDIT_1;
 
             Time time;
-            g_alarm.readProfileAlarmTime( g_config.alarm_profile_id[ alarm_id ], &time, NULL );
+            g_alarm.readProfileAlarmTime( alarm_id , &time, NULL );
 
             char bufTime[9];
             length = timeToBuf( bufTime, g_config.clock_24h, &time);
@@ -399,14 +407,15 @@ bool eventDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, ui
 
             return false;
 
+        case ID_LAMP_DELAY:
         case ID_PROFILE_SNOOZE:
 
-            uint8_t snooze;
-            snooze = *(( uint8_t* )item->value );
+            uint8_t minutes;
+            minutes = *(( uint8_t* )item->value );
 
-            if (snooze > 1 ) {
-                length = g_lcd.printf_P( S_NEXT_ALARM_M, snooze);
-            } else if (snooze == 1 ) {
+            if (minutes > 1 ) {
+                length = g_lcd.printf_P( S_NEXT_ALARM_M, minutes);
+            } else if (minutes == 1 ) {
                 length = g_lcd.print_P( S_NEXT_ALARM_1MIN );
 
             } else {
@@ -436,7 +445,8 @@ void eventSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fu
 
             break;
 
-        case ID_PROFILE_VISUAL:
+        case ID_PROFILE_VISUAL_SPEED:
+        case ID_PROFILE_VISUAL_MODE:
 
             if ( fullscreen ) {
                 g_alarm.play( ALARM_MODE_TEST_VISUAL );
@@ -445,6 +455,32 @@ void eventSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fu
             }
 
             break;
+
+        case ID_LAMP_MODE:
+            if ( g_alarm.profile.lamp.mode == LAMP_MODE_OFF ) {
+                g_lamp.deactivate();
+                break;
+            }
+
+            /* Fall through */
+
+        case ID_LAMP_EFFECT_SPEED:
+        case ID_LAMP_COLOR:
+        case ID_LAMP_BRIGHTNESS:
+
+            NightLampSettings *settings;
+            settings = edit_alarm_lamp_settings ? &g_alarm.profile.lamp : &g_config.lamp;
+        
+        
+            if ( fullscreen ) {
+                g_lamp.activate( settings, ( item->id != ID_LAMP_EFFECT_SPEED ));
+            } else {
+                g_lamp.deactivate();
+            }
+            break;
+
+        
+
 
         case ID_SET_TIME:
 
@@ -502,19 +538,40 @@ bool eventValueChange( Screen *screen, Item *item ) {
 
             break;
 
+        case ID_SET_DATE_DAY:
+        case ID_SET_DATE_YEAR:
+        case ID_SET_DATE_MONTH:
+
+            uint8_t month_days;
+            month_days = getMonthNumDays( adjDate.month, adjDate.year );
+
+            if ( adjDate.day > month_days ) {
+
+                if ( item->id == ID_SET_DATE_DAY) {
+                    adjDate.day = 1;
+                } else {
+                    adjDate.day = month_days;
+                }
+            }
+            break;            
+
         case ID_PROFILE_VOLUME:
             g_alarm.setVolume( g_alarm.profile.volume );
 
             if ( g_alarm.isPlaying() == false ) {
+                
                 g_alarm.play( ALARM_MODE_TEST_AUDIO, SELECT_FILE_PLAY_DELAY );
             }
+
             break;
+
 
         case ID_PROFILE_TEST:
             g_alarm.play( ALARM_MODE_TEST_PROFILE );
             break;
 
-        case ID_PROFILE_VISUAL:
+        
+        case ID_PROFILE_VISUAL_MODE:
             g_alarm.play( ALARM_MODE_TEST_VISUAL );
             break;
 
@@ -525,10 +582,7 @@ bool eventValueChange( Screen *screen, Item *item ) {
 
         case ID_ALARM_EDIT_1:
         case ID_ALARM_EDIT_2:
-            uint8_t alarm_id;
-            alarm_id = item->id - ID_ALARM_EDIT_1;
-
-            selectedProfile = g_config.alarm_profile_id[ alarm_id ];
+            selectedProfile = item->id - ID_ALARM_EDIT_1;
 
             g_alarm.loadProfile( selectedProfile );
             break;
@@ -540,18 +594,42 @@ bool eventValueChange( Screen *screen, Item *item ) {
             g_clockUpdate = true;
             break;
 
+        case ID_LAMP_DELAY:
         case ID_PROFILE_SNOOZE:
-            uint8_t snooze;
-            snooze = *(( uint8_t* )item->value );
+            uint8_t minutes;
+            minutes = *(( uint8_t* )item->value );
 
-            if ( snooze > 10 ) {
-                snooze = ( snooze % 5 ) ? (( snooze / 5 ) * 5 ) + 5  : snooze;
+            if ( minutes > 10 ) {
+                minutes = ( minutes % 5 ) ? (( minutes / 5 ) * 5 ) + 5  : minutes;
             }
 
-            *(( uint8_t* )item->value ) = snooze;
+            if ( minutes > 30 ) {
+                minutes = ( minutes % 10 ) ? (( minutes / 10 ) * 10 ) + 10  : minutes;
+            }
 
+            *(( uint8_t* )item->value ) = minutes;
             break;
 
+
+        case ID_LAMP_MODE:
+            if (( uint8_t* )item->value == LAMP_MODE_OFF ) {
+                g_lamp.deactivate();
+            } else {
+                g_lamp.activate( edit_alarm_lamp_settings == true ? &g_alarm.profile.lamp : &g_config.lamp );
+            }
+            break;
+
+        case ID_LAMP_COLOR:
+            g_lamp.setColorFromTable( *(( uint8_t* )item->value ));
+            break;
+
+        case ID_LAMP_BRIGHTNESS:
+            g_lamp.setBrightness( *(( uint8_t* )item->value ));
+            break;
+
+        case ID_LAMP_EFFECT_SPEED:
+            g_lamp.setEffectSpeed( *(( uint8_t* )item->value ));
+            break;
     }
 
     return true;
@@ -586,7 +664,7 @@ bool enterScreen( Screen *screen ) {
             alarm_id = g_alarm.getNextAlarmID( &now, false );
 
             Time time;
-            g_alarm.readProfileAlarmTime( g_config.alarm_profile_id[ alarm_id ], &time, NULL );
+            g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );
 
             if ( alarm_id != -1 ) {
 
@@ -596,9 +674,19 @@ bool enterScreen( Screen *screen ) {
                 g_clockUpdate = true;
             }
 
+        case SCREEN_ID_EDIT_ALARM_LAMP:
+            edit_alarm_lamp_settings = true;
+            break;
+
+        case SCREEN_ID_EDIT_NIGHT_LAMP:
+            edit_alarm_lamp_settings = false;
+            break;
+
         case SCREEN_ID_ROOT:
             g_lcd.setCustomCharacters( CUSTOM_CHARACTERS_ROOT );
             break;
+
+        
 
     }
 
@@ -625,13 +713,17 @@ bool exitScreen( Screen *currentScreen, Screen *newScreen ) {
 
             if ( save == true ) {
 
+                uint8_t dow;
+                dow = getDayOfWeek( adjDate.year, adjDate.month, adjDate.day );
+                
+
                 DateTime nDate( 2000 + adjDate.year,
                                 adjDate.month,
                                 adjDate.day,
                                 adjTime.hour,
                                 adjTime.minute,
                                 0,
-                                getDayOfWeek( 2000 + adjDate.year, adjDate.month, adjDate.day ));
+                                dow );
 
                 /* Update the RTC */
                 rtc.setDateTime( nDate );
@@ -651,6 +743,17 @@ bool exitScreen( Screen *currentScreen, Screen *newScreen ) {
             }
             break;
 
+        case SCREEN_ID_EDIT_NIGHT_LAMP:
+            if ( save == true ) {
+                saveConfig();
+            } else {
+                loadConfig();
+            }
+
+            g_lamp.deactivate();
+            break;
+
+        case SCREEN_ID_EDIT_ALARM_LAMP:
         case SCREEN_ID_EDIT_ALARM:
         case SCREEN_ID_EDIT_PROFILE:
             if ( save == true ) {
@@ -677,6 +780,8 @@ bool exitScreen( Screen *currentScreen, Screen *newScreen ) {
             break;
 
         case SCREEN_ID_ROOT:
+            g_lamp.deactivate();
+
             g_lcd.setCustomCharacters( CUSTOM_CHARACTERS_MENUS );
             break;
     }
@@ -712,9 +817,18 @@ bool root_eventKeypress( Screen *screen, uint8_t key ) {
             gotoScreen( &screen_show_alarms, true, &screen_root );
             break;
 
+        case KEY_SWIPE | KEY_RIGHT:
+            g_config.lamp.mode = LAMP_MODE_ON;
+            g_lamp.activate( &g_config.lamp );
+            break;
+
+        case KEY_SWIPE | KEY_LEFT:
+            g_lamp.deactivate();
+            break;
+
         case KEY_SET:
             /* temporary */
-            g_alarm.loadProfile( g_config.alarm_profile_id[ 0 ]);
+            g_alarm.loadProfile( 0 );
             g_alarm.play( ALARM_MODE_NORMAL );
 
             break;
@@ -727,19 +841,6 @@ bool root_eventDrawScreen( Screen *screen ) {
 
     char buffer[16];
     DateTime now = rtc.now();
-    double temperature = rtc.getTemperature();
-
-    /* Print temperature from DS3231 */
-    if ( g_config.tempunit_c == false ) {
-        temperature = ( temperature * 1.8 ) + 32;
-    }
-
-    dtostrf( temperature, 3, 1, buffer );
-
-    g_lcd.setPosition( 0, 0 );
-    g_lcd.print( buffer );
-    g_lcd.print( CHAR_DEGREE );
-    g_lcd.print( g_config.tempunit_c == true ? CHAR_CELCIUS : CHAR_FARENHEIGHT );
 
 
     /* Print status icons */
@@ -810,101 +911,6 @@ bool show_alarm_eventDrawScreen( Screen *screen ) {
 
     } else {
         g_lcd.print_P( S_NEXT_ALARM_1MIN );
-    }
-
-    return false;
-}
-
-
-
-//--------------------------------------------------------------------------
-//
-// Set alarms screen events
-//
-//--------------------------------------------------------------------------
-
-bool set_alarms_eventKeypress( Screen *screen, uint8_t key ) {
-
-    switch ( key ) {
-        case KEY_SET | KEY_SHIFT:
-
-            if ( g_currentItem.id == ID_ALARM_PROFILE_1 ) {
-                selectedProfile = g_config.alarm_profile_id[ 0 ];
-
-            } else if ( g_currentItem.id == ID_ALARM_PROFILE_2 ) {
-                selectedProfile = g_config.alarm_profile_id[ 1 ];
-
-            } else {
-                return true;
-            }
-
-            g_alarm.loadProfile( selectedProfile );
-            gotoScreen( &screen_edit_profile, true, &screen_set_alarms );
-            return false;
-    }
-
-    return true;
-}
-
-
-
-
-
-//--------------------------------------------------------------------------
-//
-// List profiles screen events
-//
-//--------------------------------------------------------------------------
-
-bool listprofiles_eventKeypress( Screen *screen, uint8_t key ) {
-
-    switch ( key ) {
-        case KEY_SET:
-
-            selectedProfile = screen->selected;
-            g_alarm.loadProfile( selectedProfile );
-
-            gotoScreen( &screen_edit_profile, true, &screen_list_profiles );
-            break;
-
-        case KEY_NEXT:
-            screen->selected++;
-
-            g_screenUpdate = true;
-            g_screenClear = ( screen->selected > DISPLAY_HEIGHT - 1 );
-
-            if ( screen->selected > MAX_ALARM_PROFILES - 1 ) {
-                screen->selected = 0;
-            }
-            break;
-
-        default:
-
-            /* Continue to process event for other keys */
-            return true;
-    }
-
-    return false;
-}
-
-
-bool listprofiles_eventDrawScreen( Screen *screen ) {
-    uint8_t scroll = ( screen->selected > 1 ) ? screen->selected - 1 : 0;
-
-    char buffer[ ALARM_PROFILE_NAME_LENGTH + 1 ];
-
-    for ( uint8_t i = 0; i < DISPLAY_HEIGHT; i++ ) {
-        g_lcd.setPosition( i, 0 );
-
-        itoa( scroll + i + 1, buffer, 10 );
-
-        g_lcd.print(( ( scroll + i) == screen->selected ) ? CHAR_SELECT : CHAR_SPACE );
-        g_lcd.print( buffer );
-        g_lcd.print( "." );
-
-        g_alarm.readProfileName( scroll + i, buffer );
-        g_lcd.print( buffer);
-
     }
 
     return false;

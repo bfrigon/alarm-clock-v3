@@ -41,9 +41,9 @@
 
 
 #define KEY_NONE                0x00
-#define KEY_LEFT                0x04
-#define KEY_RIGHT               0x01
-#define KEY_CENTER              0x02
+#define KEY_LEFT                0x01
+#define KEY_RIGHT               0x02
+#define KEY_CENTER              0x04
 
 #define KEY_SHIFT               0x80
 #define KEY_SWIPE               0x40

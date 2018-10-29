@@ -31,8 +31,7 @@ void loadConfig() {
     uint8_t c;
     uint8_t byte;
 
-    strcpy( g_config.ssid, "287744230" );
-    strcpy( g_config.wkey, "75fvcx-46820ab+vx12kc" );
+    
 
 
     uint16_t magic;
@@ -48,6 +47,9 @@ void loadConfig() {
 
         *((( uint8_t* )&g_config ) + c ) = byte;
     }
+
+
+    
 
 }
 
@@ -72,10 +74,20 @@ void saveConfig() {
 
 void restoreDefaultConfig() {
 
-    initAlarmProfiles();
+    strcpy( g_config.ssid, "287744230" );
+    strcpy( g_config.wkey, "75fvcx-46820ab+vx12kc" );
+
+    g_config.lamp.brightness = 60;
+    g_config.lamp.mode = LAMP_MODE_ON;
+    g_config.lamp.color = COLOR_WHITE;
+
 
     /* Store default config */
     saveConfig();
+
+    initAlarmProfiles();
+
+    
 }
 
 
@@ -85,16 +97,21 @@ void initAlarmProfiles() {
     AlarmProfile profile;
 
     profile.snoozeDelay = 10;
-    profile.volume = 70;
+    profile.volume = 30;
     profile.filename[0] = 0;
+    profile.time.hour = 0;
+    profile.time.minute = 0;
+    profile.visualMode = ALARM_VISUAL_NONE;
+    profile.effectSpeed = 5;
+    profile.gradual = false;
+    profile.dow = 0x7F;
+
+    profile.lamp.brightness = 60;
+    profile.lamp.color = COLOR_WHITE;
+    profile.lamp.mode = LAMP_MODE_OFF;
+    profile.lamp.speed= 5;
 
     for ( uint8_t i = 0; i < MAX_ALARM_PROFILES; i++ ) {
-
-        strcpy_P( profile.name, S_PROFILE_PREFIX );
-
-        char cnum[3];
-        itoa( i + 1, cnum, 10 );
-        strcat( profile.name, cnum );
 
         g_alarm.saveProfile( &profile, i );
     }
