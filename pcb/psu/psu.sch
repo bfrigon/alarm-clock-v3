@@ -11,16 +11,16 @@ LIBS:opto
 LIBS:psu-cache
 EELAYER 26 0
 EELAYER END
-$Descr A4 11693 8268
+$Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
-Title ""
+Title "Power supply"
 Date ""
-Rev ""
+Rev "A"
 Comp ""
-Comment1 ""
-Comment2 ""
-Comment3 ""
+Comment1 "CLKV3-PC-07"
+Comment2 "CLKV3-SCH-07"
+Comment3 "Alarm Clock (V3)"
 Comment4 ""
 $EndDescr
 $Comp
