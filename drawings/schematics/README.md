@@ -9,5 +9,8 @@ CLKV3-SCH-03  | CLKV3-PC-03       | Touch keypad
 CLKV3-SCH-04  | CLKV3-PC-04       | Front panel
 CLKV3-SCH-05  | CLKV3-PC-05       | Motherboard
 CLKV3-SCH-06  | CLKV3-PC-06       | Daughterboard
+CLKV3-SCH-07  | CLKV3-PC-07       | PSU PCB
 CLKV3-SCH-08  | CLKV3-PC-08       | RGB Lamp
 CLKV3-SCH-09  | CLKV3-PC-09       | Alarm Swtich PCB
+
+
