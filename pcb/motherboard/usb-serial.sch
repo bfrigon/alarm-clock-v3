@@ -325,7 +325,7 @@ NoConn ~ 7700 3200
 NoConn ~ 7700 3300
 NoConn ~ 7700 3400
 NoConn ~ 7700 3900
-NoConn ~ 7700 4100
+NoConn ~ 7700 3500
 NoConn ~ 7700 4200
 NoConn ~ 7700 4300
 NoConn ~ 7700 4400
@@ -688,10 +688,6 @@ Wire Wire Line
 Text Label 3900 2550 2    60   ~ 0
 VUSB-DET
 Wire Wire Line
-	7700 3500 7950 3500
-Wire Wire Line
-	7950 3500 7950 2550
-Wire Wire Line
 	3200 2550 7950 2550
 Text Label 7850 5100 0    60   ~ 0
 UTXD
@@ -725,4 +721,8 @@ Wire Wire Line
 	8900 6400 8800 6400
 Wire Wire Line
 	8800 6400 8800 6550
+Wire Wire Line
+	7950 4100 7700 4100
+Wire Wire Line
+	7950 2550 7950 4100
 $EndSCHEMATC

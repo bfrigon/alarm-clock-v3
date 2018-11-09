@@ -4,6 +4,9 @@ LTC4367
 SI9926CDY-T1-GE3
 
 
+Step-up DC-DC:
+LM2621
+
 
 
 
