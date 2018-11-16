@@ -4,8 +4,14 @@ LTC4367
 SI9926CDY-T1-GE3
 
 
-Step-up DC-DC:
-LM2621
+Battery charger w/ power path :
+BQ24075
+
+Fuel gauge IC:
+BQ27441-G1A
+
+Step-up/Step-down:
+tps63070
 
 
 

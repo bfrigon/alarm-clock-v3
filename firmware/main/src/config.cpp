@@ -16,12 +16,9 @@
 //
 //******************************************************************************
 
-#include <Arduino.h>
-#include <EEPROM.h>
-#include <avr/pgmspace.h>
-
 #include "config.h"
-#include "resources.h"
+#include "drivers/lamp.h"
+
 
 
 struct Config g_config;
@@ -31,25 +28,25 @@ void loadConfig() {
     uint8_t c;
     uint8_t byte;
 
-    
+
 
 
     uint16_t magic;
-    EEPROM.get( EEPROM_ADDR_MAGIC, magic);
+    EEPROM.get( EEPROM_ADDR_MAGIC, magic );
 
-    if (magic != 0xBEEF) {
+    if( magic != 0xBEEF ) {
         restoreDefaultConfig();
         return;
     }
 
-    for ( c = 0; c < sizeof( Config ); c++ ) {
+    for( c = 0; c < sizeof( Config ); c++ ) {
         byte = EEPROM.read( EEPROM_ADDR_CONFIG + c );
 
-        *((( uint8_t* )&g_config ) + c ) = byte;
+        *( ( ( uint8_t * )&g_config ) + c ) = byte;
     }
 
 
-    
+
 
 }
 
@@ -63,18 +60,18 @@ void saveConfig() {
     EEPROM.update( EEPROM_ADDR_MAGIC + 1, 0xBE );
 
 
-    for ( c = 0; c < sizeof( Config ); c++ ) {
-        byte = *((( uint8_t* )&g_config) + c );
+    for( c = 0; c < sizeof( Config ); c++ ) {
+        byte = *( ( ( uint8_t * )&g_config ) + c );
 
         EEPROM.update( EEPROM_ADDR_CONFIG + c, byte );
     }
 
-    Serial.println("Written EEPROM");
+    Serial.println( "Written EEPROM" );
 }
 
 void restoreDefaultConfig() {
 
-    strcpy( g_config.ssid, "287744230" );
+    strcpy( g_config.ssid, "f287744230" );
     strcpy( g_config.wkey, "75fvcx-46820ab+vx12kc" );
 
     g_config.lamp.brightness = 60;
@@ -87,7 +84,7 @@ void restoreDefaultConfig() {
 
     initAlarmProfiles();
 
-    
+
 }
 
 
@@ -109,9 +106,9 @@ void initAlarmProfiles() {
     profile.lamp.brightness = 60;
     profile.lamp.color = COLOR_WHITE;
     profile.lamp.mode = LAMP_MODE_OFF;
-    profile.lamp.speed= 5;
+    profile.lamp.speed = 5;
 
-    for ( uint8_t i = 0; i < MAX_ALARM_PROFILES; i++ ) {
+    for( uint8_t i = 0; i < MAX_ALARM_PROFILES; i++ ) {
 
         g_alarm.saveProfile( &profile, i );
     }

@@ -21,6 +21,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include "power.h"
 
 /* --- I2C address --- */
 #define I2C_ADDR_AT42QT1070     0x1B
@@ -60,10 +61,10 @@
 
 typedef struct {
     /* Address 2 */
-    bool touch:1;           /* Key detected flag */
-    uint8_t unused:5;       /* (Bit 1-5 unused) */
-    bool overflow:1;        /* Time to acquire all key signals exceeded 8ms */
-    bool calibrating:1;     /* Calibration sequence */
+    bool touch: 1;          /* Key detected flag */
+    uint8_t unused: 5;      /* (Bit 1-5 unused) */
+    bool overflow: 1;       /* Time to acquire all key signals exceeded 8ms */
+    bool calibrating: 1;    /* Calibration sequence */
 
     /* Address 3 */
     uint8_t keys;           /* Key status (bit 0-6, bit 7 is not used) */
@@ -76,18 +77,18 @@ struct configBlock {
 
     /* Address 39-45 */
     struct {
-        uint8_t group:2;
-        uint8_t factor:6;
+        uint8_t group: 2;
+        uint8_t factor: 6;
     } aks[7];
 
     /* Address 46-52 */
     uint8_t di[7];
 
     /* Address 53 */
-    uint8_t guardChannel:4;
-    bool maxCal:1;
-    bool fastOut:1;
-    uint8_t unused1:2;
+    uint8_t guardChannel: 4;
+    bool maxCal: 1;
+    bool fastOut: 1;
+    uint8_t unused1: 2;
 
     /* Address 54 */
     uint8_t lowPower;
@@ -108,11 +109,14 @@ class QT1070 {
     QT1070( uint8_t pin_irq );
 
     void begin();
+    void enableInterrupt();
+    void disableInterrupt();
     bool readStatus();
     bool writeConfig();
     uint8_t processEvents();
 
-    uint16_t longKeyDelay = 1200;    
+
+    uint16_t longKeyDelay = 1200;
     uint16_t repeatDelay = 750;
     uint16_t repeatRate = 125;
     uint16_t repeatCount = 0;
@@ -120,18 +124,18 @@ class QT1070 {
 
 
   private:
-    uint8_t write(uint8_t reg, void *data, uint8_t size);
-    uint8_t read(uint8_t reg, void *data, uint8_t size);
-    
+    uint8_t write( uint8_t reg, void *data, uint8_t size );
+    uint8_t read( uint8_t reg, void *data, uint8_t size );
+
     uint8_t processKeyStandardMode( uint8_t key, uint16_t lastEventDelay );
     uint8_t processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay );
 
     bool _init = false;
     uint8_t _pin_irq;
-
     uint8_t firstKeyState = 0;
     uint8_t lastKeyState = 0;
     unsigned long lastEventStart = 0;
+
 
 };
 

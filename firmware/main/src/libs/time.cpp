@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : time.cpp
+// File    : src/libs/time.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -16,21 +16,73 @@
 //
 //******************************************************************************
 
-
 #include "time.h"
-#include "resources.h"
 
 
 
+DateTime::DateTime() {
+
+}
+
+DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec, uint8_t dow ) {
+    if( month == 0 ) {
+        month = 1;
+    }
+
+    if( month > 12 ) {
+        month = 12;
+    }
+
+    if( date == 0 ) {
+        date = 1;
+    }
+
+    if( year < 2000 ) {
+        year = 2000;
+    }
+    if( year > 2199 ) {
+        year = 2199;
+    }
+
+    this->_year = year - 2000;
+    this->_m = month;
+    this->_d = date;
+    this->_hh = hour;
+    this->_mm = min;
+    this->_ss = sec;
+    this->_dow = dow;
+}
+
+unsigned long DateTime::getEpoch() {
+    uint16_t days = this->_d - 1;
+
+    if( this->_year > 0 ) {
+        days += ( this->_year * 365 ) + ( ( this->_year - 1 ) / 4 ) + 1;
+    }
+
+    uint8_t i;
+
+    for( i = 1; i <= this->_m - 1; i++ ) {
+        days += getMonthNumDays( i, this->_year );
+    }
+
+    return EPOCH_Y2K_OFFSET + ( days * 86400L ) + ( this->_hh * 3600L ) + ( this->_mm * 60L ) + this->_ss;
+}
 
 
-const char* getMonthName(uint8_t month, bool shortName) {
+
+const char *getMonthName( uint8_t month, bool shortName ) {
 
     /* Validate input */
-    if ( month < 1 )  month = 1;
-    if ( month > 12 ) month = 12;
+    if( month < 1 ) {
+        month = 1;
+    }
 
-    if ( shortName ) {
+    if( month > 12 ) {
+        month = 12;
+    }
+
+    if( shortName ) {
 
         return &_MONTHS_SHORT[ month - 1 ][0];
 
@@ -41,13 +93,18 @@ const char* getMonthName(uint8_t month, bool shortName) {
 }
 
 
-const char* getDayName( uint8_t day, bool shortName ) {
+const char *getDayName( uint8_t day, bool shortName ) {
 
     /* Validate input */
-    if ( day < 1 ) day = 1;
-    if ( day > 7 ) day = 7;
- 
-    if ( shortName ) {
+    if( day < 1 ) {
+        day = 1;
+    }
+
+    if( day > 7 ) {
+        day = 7;
+    }
+
+    if( shortName ) {
 
         return &_DAYS_SHORT[ day - 1 ][0];
 
@@ -60,39 +117,59 @@ const char* getDayName( uint8_t day, bool shortName ) {
 
 uint8_t getMonthNumDays( uint8_t month, uint8_t year ) {
 
-    if ( month == 0 ) month = 1;
-    if ( month > 12 ) month = 12;
+    if( month == 0 ) {
+        month = 1;
+    }
+
+    if( month > 12 ) {
+        month = 12;
+    }
 
     const uint8_t month_days[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    if ( year % 4 == 0 && month == 2 ) {
+    if( year % 4 == 0 && month == 2 ) {
         return 29;
+
     } else {
         return month_days[ month - 1 ];
     }
 }
 
 uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
-    
+
     /*
-    Key value method implementation. 
+    Key value method implementation.
     (http://mathforum.org/dr.math/faq/faq.calendar.html)
 
-    Calculation : 
+    Calculation :
     ((year / 4) + day + [month key] + [year key] + year - [ 1 if leap year ] ) % 7
-    
+
     Assume year is 2000 to 2099. Year key for 2000 is 6
     2000=6, 2100=4, 2200=2, 2300=0, 2400=6...
     */
 
 
-   /* Validate input */
-   if ( year > 99 ) year = year % 100;
-   if ( month == 0 ) month = 1;
-   if ( month > 12 ) month = 12;
-   if ( day > 31 ) day = 31;
-   if ( day == 0 ) day = 1;
-    
+    /* Validate input */
+    if( year > 99 ) {
+        year = year % 100;
+    }
+
+    if( month == 0 ) {
+        month = 1;
+    }
+
+    if( month > 12 ) {
+        month = 12;
+    }
+
+    if( day > 31 ) {
+        day = 31;
+    }
+
+    if( day == 0 ) {
+        day = 1;
+    }
+
     uint8_t months_key[] = {
         1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6
     };
@@ -101,15 +178,15 @@ uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
     days = ( year / 4 ) + day + months_key[ month - 1 ] + 6 + year;
 
     /* If leap year and month is january or febuary, subtract 1 day */
-    if (( year % 4 ) == 0 && month <= 2 ) {
+    if( ( year % 4 ) == 0 && month <= 2 ) {
         days--;
     }
 
     /* day 0-6 : 0=Saturday, 6=Friday, etc. */
-    days = (days % 7);
+    days = ( days % 7 );
 
     /* Return a value from 1 to 7 : 1=Sunday, 7=Saturday */
-    if ( days == 0 ) {
+    if( days == 0 ) {
         days = 7;
     }
 
@@ -129,28 +206,28 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
 uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
     uint8_t length;
 
-    if ( fmt_24h == false ) {
+    if( fmt_24h == false ) {
         bool is_pm = ( time->hour >= 12 );
         uint8_t hour = time->hour % 12;
 
-        if ( hour == 0 ) {
+        if( hour == 0 ) {
             hour = 12;
         }
 
-        length = sprintf_P( buffer, PSTR( "%d:%02d %S" ), hour, time->minute, ( is_pm ? S_PM : S_AM ));
+        length = sprintf_P( buffer, PSTR( "%d:%02d %S" ), hour, time->minute, ( is_pm ? S_PM : S_AM ) );
 
     } else {
         length = sprintf_P( buffer, PSTR( "%d:%02d" ), time->hour, time->minute );
     }
 
-    return length; 
+    return length;
 }
 
 uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 
     uint8_t length;
 
-    switch ( format ) {
+    switch( format ) {
 
         case DATE_FORMAT_MMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%02d/%02d/%d" ),
@@ -188,15 +265,15 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
             break;
 
         case DATE_FORMAT_WDMMMDD:
-            length = sprintf_P( buffer, PSTR( "%S, %S %d"),
-                                getDayName( date->dayOfWeek(), true ),
+            length = sprintf_P( buffer, PSTR( "%S, %S %d" ),
+                                getDayName( date->dow(), true ),
                                 getMonthName( date->month(), true ),
                                 date->date() );
             break;
 
         case DATE_FORMAT_WDMMMDDYYYY:
-            length = sprintf_P( buffer, PSTR( "%S, %S %d %d"),
-                                getDayName( date->dayOfWeek(), true ),
+            length = sprintf_P( buffer, PSTR( "%S, %S %d %d" ),
+                                getDayName( date->dow(), true ),
                                 getMonthName( date->month(), true ),
                                 date->date(),
                                 date->year() );

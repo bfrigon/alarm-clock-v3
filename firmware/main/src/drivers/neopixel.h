@@ -21,18 +21,22 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "resources.h"
+
 
 class NeoPixel {
   public:
 
     /* Constructor */
-    NeoPixel( uint8_t pin_leds );
+    NeoPixel( int8_t pin_leds, int8_t pin_shdn );
 
     void begin();
+    void end();
+    void updatePowerState();
     void setColorRGB( uint8_t r, uint8_t g, uint8_t b );
     void setColorFromTable( uint8_t id );
     void setBrightness( uint8_t brightness );
+
+    virtual void update();
 
   protected:
 
@@ -40,13 +44,16 @@ class NeoPixel {
     void setPixel( uint8_t *pixmap, uint8_t id, bool state );
     inline uint8_t getColorBrigthness( uint8_t color );
 
-    bool _init = false;
+
     bool _gammaCorrection = true;
-    uint8_t _pin_leds;
+    int8_t _pin_leds;
+    int8_t _pin_shdn;
     uint8_t _brightness = 10;
     uint8_t _g = 0x00;
     uint8_t _b = 0x00;
     uint8_t _r = 0xFF;
+    bool _init = false;
+
 };
 
-#endif /* NEOPIXRL_H */
+#endif /* NEOPIXEL_H */

@@ -21,8 +21,12 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "neopixel.h"
 
+#include "neopixel.h"
+#include "../config.h"
+#include "../alarm.h"
+#include "../libs/time.h"
+#include "../resources.h"
 
 
 
@@ -58,14 +62,14 @@ class NeoClock : public NeoPixel {
     uint8_t minute = 0xFF;
     uint8_t flashRate = 20;
     bool status_set = false;
-    
+
     bool hourFlashing = false;
     bool minutesFlashing = false;
-    
+
 
 
     /* Constructor */
-    NeoClock( uint8_t pin_leds );
+    NeoClock( int8_t pin_leds, int8_t pin_shdn );
 
     void update();
     void setTestMode( bool testMode );
@@ -74,9 +78,9 @@ class NeoClock : public NeoPixel {
 
   private:
     uint32_t _flashTimerStart = 0;
-    bool     _flashState = false;
-    bool     _testMode = false;
-    
+    bool _flashState = false;
+    bool _testMode = false;
+
     void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
 
 };

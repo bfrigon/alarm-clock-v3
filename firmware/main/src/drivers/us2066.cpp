@@ -15,16 +15,13 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
-#include <avr/pgmspace.h>
 #include "us2066.h"
-#include "resources.h"
-
-
+#include "stdio.h"
 
 
 /*--------------------------------------------------------------------------
- * US2066::US2066() : Class constructor
+ *
+ * Class constructor
  *
  * Arguments
  * ---------
@@ -40,7 +37,6 @@ US2066::US2066( uint8_t address, uint8_t pin_reset, uint8_t pin_ven ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::begin(address, pin_reset, pin_ven)
  *
  * Perform proper power-up sequence and initialize the LCD module.
  *
@@ -51,6 +47,9 @@ US2066::US2066( uint8_t address, uint8_t pin_reset, uint8_t pin_ven ) {
  * Returns : Nothing
  */
 void US2066::begin() {
+    if( this->_init == true ) {
+        return;
+    }
 
     this->_init = true;
 
@@ -62,11 +61,11 @@ void US2066::begin() {
     delay( 1 );
     digitalWrite( this->_pin_reset, HIGH );
     delay( 1 );
-   
+
 
     /* Setup stream for printf function */
     fdev_setup_stream( &this->_lcdout, this->_putchar, NULL, _FDEV_SETUP_WRITE );
-    fdev_set_udata( &this->_lcdout, this->_address );
+    fdev_set_udata( &this->_lcdout, ( void * )this->_address );
 
 
     /* Disable internal regulator */
@@ -95,7 +94,7 @@ void US2066::begin() {
     this->selectInstructions( US2066_ISET_OLED );       /* RE=1, SD=1 */
     this->sendCommand( US2066_CMD_SEG_HW, US2066_SEG_ALT | US2066_LR_DISABLED );
 
-    
+
 
     /* Set contrast */
     this->sendCommand( US2066_CMD_CONTRAST, 128 );
@@ -113,7 +112,7 @@ void US2066::begin() {
     this->clear();
 
     /* Set cursor home */
-    this->setPosition( 0,0 );
+    this->setPosition( 0, 0 );
 
     /* Turn display ON */
     this->setDisplay( true, false );
@@ -125,7 +124,32 @@ void US2066::begin() {
 
 
 /*--------------------------------------------------------------------------
- * US2066::selectInstructions(iset) : Select instruction set.
+ *
+ * Shutdown LCD module.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void US2066::end() {
+    if( this->_init == false ) {
+        return;
+    }
+
+    this->_init = false;
+
+    pinMode( this->_pin_reset, OUTPUT );
+    digitalWrite( this->_pin_reset, LOW );
+
+
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Selects instruction set.
  *
  * Arguments
  * ---------
@@ -137,36 +161,36 @@ void US2066::begin() {
 void US2066::selectInstructions( uint8_t iset ) {
     uint8_t fset;
 
-    switch ( iset ) {
+    switch( iset ) {
 
 
         /* RE=1, IS=X, SD=0 */
         case US2066_ISET_EXTENDED:
 
             /* If current set is oled, go back to extended set */
-            if ( this->_current_iset == US2066_ISET_OLED ) {
+            if( this->_current_iset == US2066_ISET_OLED ) {
                 this->sendCommand( US2066_CMD_OLED_CHAR );
             }
 
-            /* Fall through */
+        /* Fall through */
 
         /* RE=1, IS=X, SD=1 */
         case US2066_ISET_OLED:
 
             fset = US2066_DEF_FSET | US2066_FUNC_BE;
 
-            if ( this->_state.cgramBlink == true ) {
+            if( this->_state.cgramBlink == true ) {
                 fset |= US2066_FUNC_BE;
             }
 
-            if ( this->_state.reverseDisplay == true ) {
+            if( this->_state.reverseDisplay == true ) {
                 fset |= US2066_FUNC_REV;
-            }            
+            }
 
             this->sendCommand( US2066_CMD_FUNCTSET | US2066_OP_RE | fset );
 
 
-            if ( iset == US2066_ISET_OLED ) {
+            if( iset == US2066_ISET_OLED ) {
                 this->sendCommand( US2066_CMD_OLED_CHAR | US2066_OP_SD );
             }
 
@@ -178,11 +202,11 @@ void US2066::selectInstructions( uint8_t iset ) {
         default:
 
             /* If current set is oled, go back to extended set first */
-            if ( this->_current_iset == US2066_ISET_OLED ) {
+            if( this->_current_iset == US2066_ISET_OLED ) {
                 this->sendCommand( US2066_CMD_OLED_CHAR );
             }
 
-            fset = US2066_DEF_FSET | (( iset == US2066_ISET_SPECIAL ) ? US2066_OP_IS : 0x00 );
+            fset = US2066_DEF_FSET | ( ( iset == US2066_ISET_SPECIAL ) ? US2066_OP_IS : 0x00 );
             this->sendCommand( US2066_CMD_FUNCTSET | fset );
             break;
     }
@@ -192,9 +216,8 @@ void US2066::selectInstructions( uint8_t iset ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::sendCommand(cmd)
  *
- * Send a single byte command to the LCD module.
+ * Sends a single byte command to the LCD module.
  *
  * Arguments
  * ---------
@@ -208,7 +231,7 @@ void US2066::selectInstructions( uint8_t iset ) {
  *   4: Other error
  */
 uint8_t US2066::sendCommand( uint8_t cmd ) {
-    
+
 
     Wire.beginTransmission( this->_address );
 
@@ -220,7 +243,6 @@ uint8_t US2066::sendCommand( uint8_t cmd ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::sendCommand(cmd, data)
  *
  * Send a two bytes command to the LCD module (cmd + data)
  *
@@ -251,7 +273,6 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::sendCustomCharacters(pchrmap)
  *
  * Write custom characters to the LCD CGRAM.
  *
@@ -266,29 +287,36 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
  *   3: Received NACK on transmit of data
  *   4: Other error
  */
-uint8_t US2066::setCustomCharacters( const uint8_t *pchrmap ) {
+uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
+
+    if( this->_init == false ) {
+        this->begin();
+    }
 
     this->selectInstructions( US2066_ISET_STANDARD ); /* RE=0, SD=0, SI=0 */
 
     uint8_t ch;
-    for ( ch = 0; ch < 8; ch++ ) {
+
+    for( ch = 0; ch < 8; ch++ ) {
 
         Wire.beginTransmission( this->_address );
         Wire.write( US2066_MODE_CMD | US2066_MODE_CONTINUE );
-        Wire.write( US2066_CMD_CGRAM | ( ch << 3 ));
+        Wire.write( US2066_CMD_CGRAM | ( ch << 3 ) );
 
         uint8_t i;
-        for ( i = 0; i < 8; i++ ) {
+
+        for( i = 0; i < 8; i++ ) {
 
             Wire.write( US2066_MODE_DATA | US2066_MODE_CONTINUE );
-            Wire.write( pgm_read_byte( pchrmap++ ));
+            Wire.write( pgm_read_byte( pchrmap++ ) );
         }
 
         uint8_t res;
         res = Wire.endTransmission();
 
-        if ( res != 0 )
+        if( res != 0 ) {
             return res;
+        }
     }
 
     return 0;
@@ -296,7 +324,6 @@ uint8_t US2066::setCustomCharacters( const uint8_t *pchrmap ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::setPosition(row, col)
  *
  * Set the DDRAM address corresponding to the specified row and column.
  *
@@ -308,14 +335,17 @@ uint8_t US2066::setCustomCharacters( const uint8_t *pchrmap ) {
  * Returns : Nothing
  */
 void US2066::setPosition( uint8_t row, uint8_t col ) {
-    uint8_t dram_address = ( col + (row * 0x40));
+    if( this->_init == false ) {
+        this->begin();
+    }
 
-    this->sendCommand( US2066_CMD_DDRAM | ( dram_address & 0x7F ));
+    uint8_t dram_address = ( col + ( row * 0x40 ) );
+
+    this->sendCommand( US2066_CMD_DDRAM | ( dram_address & 0x7F ) );
 }
 
 
 /*--------------------------------------------------------------------------
- * US2066::clear() : Clears the display DDRAM.
  *
  * Arguments
  * ---------
@@ -324,16 +354,15 @@ void US2066::setPosition( uint8_t row, uint8_t col ) {
  * Returns : Nothing
  */
 void US2066::clear() {
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
-    
+
     this->sendCommand( US2066_CMD_CLEAR );
 }
 
 
 /*--------------------------------------------------------------------------
- * US2066::setContrast(contrast) : Sets the LCD module contrast.
  *
  * Arguments
  * ---------
@@ -342,11 +371,11 @@ void US2066::clear() {
  * Returns : Nothing
  */
 void US2066::setContrast( uint8_t contrast ) {
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
-    contrast = pgm_read_byte( &_GAMMA_TABLE[ 255 * contrast / 100 ]),
+    contrast = pgm_read_byte( &_GAMMA_TABLE[ 255 * contrast / 100 ] ),
 
 
     /* Select OLED instruction set */
@@ -360,7 +389,6 @@ void US2066::setContrast( uint8_t contrast ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::setCursor(on, blinking)
  *
  * Sets the cursor state of the LCD module.
  *
@@ -371,21 +399,21 @@ void US2066::setContrast( uint8_t contrast ) {
  *
  * Returns : Nothing
  */
-void US2066::setCursor( bool underline, bool blinking )
-{
-    if ( this->_init == false ) {
+void US2066::setCursor( bool underline, bool blinking ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
     this->_state.cursor = underline;
-    this->_state.blink = blinking;    
+    this->_state.blink = blinking;
 
     this->updateDisplayState();
 }
 
 
 /*--------------------------------------------------------------------------
- * US2066::setDisplay(on) : Turn the display ON or OFF.
+ *
+ * Turn the display ON or OFF.
  *
  * Arguments
  * ---------
@@ -394,12 +422,11 @@ void US2066::setCursor( bool underline, bool blinking )
  *
  * Returns : Nothing
  */
-void US2066::setDisplay( bool on, bool reverse )
-{
-    if ( this->_init == false ) {
+void US2066::setDisplay( bool on, bool reverse ) {
+    if( this->_init == false ) {
         this->begin();
     }
-    
+
     this->_state.display = on;
     this->_state.reverseDisplay = reverse;
 
@@ -409,7 +436,6 @@ void US2066::setDisplay( bool on, bool reverse )
 
 
 /*--------------------------------------------------------------------------
- * US2066::updateDisplayState()
  *
  * Update the display control register on the LCD. (display ON/OFF, cursor)
  *
@@ -429,7 +455,7 @@ void US2066::updateDisplayState() {
 
     /* Select extended instruction set, reverse display is set while
        selecting instruction set */
-    this->selectInstructions( US2066_ISET_EXTENDED ); /* RE=1, SD=0 */  
+    this->selectInstructions( US2066_ISET_EXTENDED ); /* RE=1, SD=0 */
 
 
     /* Return to standard instruction set */
@@ -438,11 +464,7 @@ void US2066::updateDisplayState() {
 }
 
 
-
-
-
 /*--------------------------------------------------------------------------
- * US2066::fill(c, num)
  *
  * Fills the LCD with the specified number of characters
  *
@@ -459,23 +481,25 @@ void US2066::updateDisplayState() {
  *   4: Other error
  */
 void US2066::fill( char c, uint8_t num ) {
-
-    if ( num == 0 ) {
-        return;
-    }
-
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
-    while ( num-- ) {
+    if( num == 0 ) {
+        return;
+    }
+
+    if( this->_init == false ) {
+        this->begin();
+    }
+
+    while( num-- ) {
         this->print( c );
     }
 }
 
 
 /*--------------------------------------------------------------------------
- * US2066::print(c)
  *
  * Prints a single character on the LCD module at the current coordinates.
  *
@@ -491,21 +515,20 @@ void US2066::fill( char c, uint8_t num ) {
  *   4: Other error
  */
 uint8_t US2066::print( char c ) {
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
     Wire.beginTransmission( this->_address );
 
-    Wire.write(US2066_MODE_DATA);
-    Wire.write(c);
+    Wire.write( US2066_MODE_DATA );
+    Wire.write( c );
 
     return Wire.endTransmission();
 }
 
 
 /*--------------------------------------------------------------------------
- * US2066::print(string)
  *
  * Prints a string on the LCD module at the current coordinates.
  *
@@ -517,27 +540,33 @@ uint8_t US2066::print( char c ) {
  * Returns : Number of characters written
  */
 uint8_t US2066::print( const char *str, bool ptr_pgm_space = false ) {
-    uint8_t num = 0;
-
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
-    
+    uint8_t num = 0;
+
+    if( this->_init == false ) {
+        this->begin();
+    }
+
+
     while( true ) {
 
         char c;
-        if ( ptr_pgm_space == true ) {
+
+        if( ptr_pgm_space == true ) {
             c = pgm_read_byte( str++ );
+
         } else {
             c = *str++;
         }
 
-        if ( c == 0x00 ) {
+        if( c == 0x00 ) {
             break;
         }
 
-        if ( this->print( c ) != 0 ) {
+        if( this->print( c ) != 0 ) {
             return num;
         }
 
@@ -549,7 +578,6 @@ uint8_t US2066::print( const char *str, bool ptr_pgm_space = false ) {
 
 
 /*--------------------------------------------------------------------------
- * US2066::print( str, length, align, ptr_pgm_space )
  *
  * Prints a string with padding on the LCD module at the current coordinates.
  *
@@ -569,16 +597,19 @@ uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_
     uint8_t pre_padding;
     uint8_t post_padding;
 
-    if ( ptr_pgm_space == true ) {
+    if( this->_init == false ) {
+        this->begin();
+    }
+
+    if( ptr_pgm_space == true ) {
         slen = strlen_P( str );
+
     } else {
         slen = strlen( str );
     }
 
-    
-
-    if ( slen < length ) {
-        switch ( align ) {
+    if( slen < length ) {
+        switch( align ) {
             case TEXT_ALIGN_CENTER:
                 pre_padding = ( length - slen ) / 2 ;
                 post_padding = length - slen - pre_padding;
@@ -594,7 +625,8 @@ uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_
                 pre_padding = 0;
                 post_padding = length - slen;
                 break;
-        }        
+        }
+
     } else {
         pre_padding = 0;
         post_padding = 0;
@@ -602,10 +634,11 @@ uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_
 
 
     uint8_t i;
-    for ( i = 0; i < length; i++ ) {
 
-        if ( pre_padding > 0 ) {
-            if ( this->print( CHAR_SPACE ) != 0 ) {
+    for( i = 0; i < length; i++ ) {
+
+        if( pre_padding > 0 ) {
+            if( this->print( CHAR_SPACE ) != 0 ) {
                 return num;
             }
 
@@ -614,26 +647,27 @@ uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_
             continue;
         }
 
-        if ( slen > 0 ) {
+        if( slen > 0 ) {
 
-            if ( ptr_pgm_space == true ) {
-                res = this->print( pgm_read_byte( str++ ));
+            if( ptr_pgm_space == true ) {
+                res = this->print( pgm_read_byte( str++ ) );
+
             } else {
                 res = this->print( *str++ );
             }
-            
 
-            if ( res != 0 ) {
+
+            if( res != 0 ) {
                 return num;
             }
-            
+
             slen--;
             num++;
             continue;
         }
 
-        if ( post_padding > 0 ) {
-            if ( this->print( CHAR_SPACE ) != 0 ) {
+        if( post_padding > 0 ) {
+            if( this->print( CHAR_SPACE ) != 0 ) {
                 return num;
             }
 
@@ -647,11 +681,7 @@ uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_
 }
 
 
-
-
-
 /*--------------------------------------------------------------------------
- * US2066::printf(format, ...)
  *
  * Prints a formated string on the LCD module at the current coordinates.
  *
@@ -664,7 +694,7 @@ uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_
  */
 uint8_t US2066::printf( const char *format, ... ) {
 
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
@@ -674,16 +704,13 @@ uint8_t US2066::printf( const char *format, ... ) {
     uint8_t length;
     length = vfprintf( &this->_lcdout, format, args );
 
-    va_end(args);
+    va_end( args );
 
     return length;
 }
 
 
-
-
 /*--------------------------------------------------------------------------
- * US2066::printf(format, ...)
  *
  * Prints a formated string on the LCD module at the current coordinates
  * using format string stored in program memory.
@@ -697,7 +724,7 @@ uint8_t US2066::printf( const char *format, ... ) {
  */
 uint8_t US2066::printf_P( const char *format, ... ) {
 
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
@@ -707,14 +734,13 @@ uint8_t US2066::printf_P( const char *format, ... ) {
     uint8_t length;
     length = vfprintf_P( &this->_lcdout, format, args );
 
-    va_end(args);
+    va_end( args );
 
     return length;
 }
 
 
 /*--------------------------------------------------------------------------
- * US2066::_putchar(ch, stream)
  *
  * Write callback function for the output stream.
  *
@@ -725,7 +751,7 @@ uint8_t US2066::printf_P( const char *format, ... ) {
  *
  * Returns : Number of characters printed.
  */
-int US2066::_putchar( char ch, FILE* stream ) {
+int US2066::_putchar( char ch, FILE *stream ) {
 
     uint8_t address;
     address = ( uint8_t )fdev_get_udata( stream );

@@ -20,7 +20,14 @@
 #define LAMP_H
 
 #include <Arduino.h>
+
+#include "../config.h"
 #include "neopixel.h"
+#include "power.h"
+
+
+
+
 
 
 
@@ -35,27 +42,21 @@
 #define LAMP_MIMIMUM_FADING_BRIGHTNESS  20
 
 
-struct NightLampSettings {
-    uint8_t color;
-    uint8_t brightness;
-    uint8_t delay_off;
-    uint8_t speed;
-    uint8_t mode;
-};
+
 
 
 class Lamp : public NeoPixel {
   public:
 
     /* Constructor */
-    Lamp( uint8_t pin_leds );
-    
-    
+    Lamp( int8_t pin_leds );
+
+
     void setBrightness( uint8_t brightness );
     void setColorFromTable( uint8_t id );
     void setColorRGB( uint8_t r, uint8_t g, uint8_t b );
     void setEffectSpeed( uint8_t speed );
-    void activate( NightLampSettings *settings, bool test_mode = false );
+    void activate( struct NightLampSettings *settings, bool test_mode = false );
     void deactivate();
     void processEvents();
     void update();
@@ -71,7 +72,7 @@ class Lamp : public NeoPixel {
     uint8_t _visualStepSpeed = 5;
     bool _visualStepReverse = false;
 
-    NightLampSettings *_settings;
+    struct NightLampSettings *_settings;
 
 
     void updateVisualStepDelay();

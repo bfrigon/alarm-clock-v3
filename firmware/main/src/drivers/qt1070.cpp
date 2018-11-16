@@ -35,10 +35,10 @@ volatile bool qt1070_event = false;
 QT1070::QT1070( uint8_t pin_irq ) {
 
 
-    this->_pin_irq = pin_irq;  
+    this->_pin_irq = pin_irq;
 
 
-    for (uint8_t i=0; i<7; i++) {
+    for( uint8_t i = 0; i < 7; i++ ) {
         this->config.nthr[i] = 0x14;
         this->config.di[i] = 0x04;
         this->config.aks[i] = {
@@ -84,20 +84,25 @@ void QT1070::begin() {
     this->_init = true;
 
 
-    pinMode( this->_pin_irq, INPUT_PULLUP );
-    attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_qt1070, FALLING );
-
-
     /* Write default config */
     this->writeConfig();
 
     /* Clear pending interrupt */
     this->readStatus();
 
-    
+
+    this->enableInterrupt();
 }
 
 
+void QT1070::enableInterrupt() {
+    pinMode( this->_pin_irq, INPUT_PULLUP );
+    attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_qt1070, LOW );
+}
+
+void QT1070::disableInterrupt() {
+    detachInterrupt( digitalPinToInterrupt( this->_pin_irq ) );
+}
 
 /*--------------------------------------------------------------------------
  * QT1070::readStatus() : Read the two status bytes from the touch IC.
@@ -110,11 +115,11 @@ void QT1070::begin() {
  */
 bool QT1070::readStatus() {
 
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
-    return (this->read(QT1070_REG_STATUSBLOCK, ( void* )&this->status, sizeof( statusBlock )) != 0);
+    return ( this->read( QT1070_REG_STATUSBLOCK, ( void * )&this->status, sizeof( statusBlock ) ) != 0 );
 }
 
 
@@ -129,12 +134,15 @@ bool QT1070::readStatus() {
  */
 bool QT1070::writeConfig() {
 
-    if ( this->_init == false ) {
+    if( this->_init == false ) {
         this->begin();
     }
 
-    return (this->write(QT1070_REG_CONFIGBLOCK, ( void* )&this->config, sizeof( configBlock )) == 0);
+    return ( this->write( QT1070_REG_CONFIGBLOCK, ( void * )&this->config, sizeof( configBlock ) ) == 0 );
 }
+
+
+
 
 
 /*--------------------------------------------------------------------------
@@ -151,7 +159,7 @@ bool QT1070::writeConfig() {
  */
 
 uint8_t QT1070::processEvents() {
-    
+
     uint8_t key = 0;
     int16_t strongestSignal;
     unsigned long lastEventDelay;
@@ -159,31 +167,51 @@ uint8_t QT1070::processEvents() {
     /* Calculate the elapsed time since the last event */
     lastEventDelay = this->lastEventStart > 0 ? millis() - this->lastEventStart : 0;
 
-    if ( qt1070_event == true ) {
+    if( qt1070_event == true ) {
 
         qt1070_event = false;
 
         /* Read the status bytes (2-3) to reset the interrupt */
-        if (this->readStatus() == false)
+        if( this->readStatus() == false ) {
             return KEY_NONE;
+        }
 
         /* Ignore event if the touch IC is calibrating */
-        if (this->status.calibrating == true)
+        if( this->status.calibrating == true ) {
+            return KEY_NONE;
+        }
+
+        this->enableInterrupt();
+
+        if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
+
+            g_power.setPowerMode( POWER_MODE_LOW_POWER );
+
+            this->firstKeyState = 0;
+            this->lastKeyState = 0;
+            this->repeatCount = 0;
+
             return KEY_NONE;
 
-        uint8_t i;       
-        for ( i = 1; i < 7; i++ ) {
+        } else if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
+            g_power.resetSuspendDelay();
+        }
 
-            if ( this->status.keys & ( 1 << i )) {
+
+        uint8_t i;
+
+        for( i = 1; i < 7; i++ ) {
+
+            if( this->status.keys & ( 1 << i ) ) {
 
                 /* Read the signal level and reference level of the current detected key */
                 int16_t keySignal;
                 int16_t keyRef;
-                this->read( QT1070_REG_KEYSIGNAL + ( i * 2 ), &keySignal, sizeof( keySignal ));
-                this->read( QT1070_REG_KEYREF + ( i * 2 ), &keyRef, sizeof( keyRef ));
+                this->read( QT1070_REG_KEYSIGNAL + ( i * 2 ), &keySignal, sizeof( keySignal ) );
+                this->read( QT1070_REG_KEYREF + ( i * 2 ), &keyRef, sizeof( keyRef ) );
 
-                if (( keySignal - keyRef ) > strongestSignal ) {
-                    key = ( 1 << ( i - 1 ));
+                if( ( keySignal - keyRef ) > strongestSignal ) {
+                    key = ( 1 << ( i - 1 ) );
                     strongestSignal = ( keySignal - keyRef );
                 }
             }
@@ -196,17 +224,17 @@ uint8_t QT1070::processEvents() {
         key = this->lastKeyState;
     }
 
-    if ( ( this->firstKeyState != 0 ? this->firstKeyState : key ) & this->repeatMask ) {
+    if( ( this->firstKeyState != 0 ? this->firstKeyState : key ) & this->repeatMask ) {
         return this->processKeyRepeatMode( key, lastEventDelay );
-    } 
+    }
 
     return this->processKeyStandardMode( key, lastEventDelay );
-}    
+}
 
 
 uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 
-    if ( key != 0 && key == this->firstKeyState && lastEventDelay > this->longKeyDelay ) {
+    if( key != 0 && key == this->firstKeyState && lastEventDelay > this->longKeyDelay ) {
 
         key |= KEY_SHIFT;
 
@@ -220,18 +248,18 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 
 
     /* Key up */
-    if ( key == 0 && this->lastKeyState != 0 ) {
+    if( key == 0 && this->lastKeyState != 0 ) {
 
-        if ( this->firstKeyState == KEY_LEFT && this->lastKeyState == KEY_RIGHT ) {
+        if( this->firstKeyState == KEY_LEFT && this->lastKeyState == KEY_RIGHT ) {
             key = KEY_RIGHT | KEY_SWIPE;
 
-        } else if ( this->firstKeyState == KEY_RIGHT && this->lastKeyState == KEY_LEFT ) {
+        } else if( this->firstKeyState == KEY_RIGHT && this->lastKeyState == KEY_LEFT ) {
             key = KEY_LEFT | KEY_SWIPE;
 
         } else {
             key = this->firstKeyState;
         }
-        
+
         /* Reset the states */
         this->firstKeyState = 0;
         this->lastKeyState = 0;
@@ -241,17 +269,17 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
     }
 
     /* Key down */
-    if ( key != 0 ) {
+    if( key != 0 ) {
 
         this->lastKeyState = key;
 
-        if ( this->firstKeyState == 0 ) {
+        if( this->firstKeyState == 0 ) {
             this->firstKeyState = key;
         }
 
         return KEY_NONE;
     }
-    
+
 
 
 
@@ -261,11 +289,11 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 
     /* Key down */
-    if ( key != 0 ) {
+    if( key != 0 ) {
 
         this->lastKeyState = key;
 
-        if ( this->firstKeyState == 0 ) {
+        if( this->firstKeyState == 0 ) {
             this->repeatCount = 1;
             this->firstKeyState = key;
 
@@ -274,14 +302,14 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
     }
 
     /* Key down, moved to a different key */
-    if ( key != 0 && key != this->firstKeyState ) {
+    if( key != 0 && key != this->firstKeyState ) {
 
         /* Ignore the key until the user move back to the current key or release the key */
         return KEY_NONE;
     }
 
     /* Key up */
-    if ( key == 0 ) {
+    if( key == 0 ) {
 
         /* Reset the states, but return nothing */
         this->firstKeyState = 0;
@@ -294,12 +322,12 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 
 
     /* Key down, first repeat : Check if the minimum repeat delay elapsed */
-    if ( this->repeatCount == 1 && lastEventDelay < this->repeatDelay ) {
+    if( this->repeatCount == 1 && lastEventDelay < this->repeatDelay ) {
         return KEY_NONE;
     }
 
     /* Key down, subsequent repeats : Check if the rate delay elapsed */
-    if ( this->repeatCount > 1 && lastEventDelay < this->repeatRate ) {
+    if( this->repeatCount > 1 && lastEventDelay < this->repeatRate ) {
         return KEY_NONE;
     }
 
@@ -330,12 +358,12 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
  *   3: Received NACK on transmit of data
  *   4: Other error
  */
-uint8_t QT1070::write(uint8_t reg, void *data, uint8_t size) {
+uint8_t QT1070::write( uint8_t reg, void *data, uint8_t size ) {
     uint8_t res;
 
     Wire.beginTransmission( I2C_ADDR_AT42QT1070 );
-    Wire.write( reg);
-    Wire.write( ( char* )data, size );
+    Wire.write( reg );
+    Wire.write( ( char * )data, size );
     res = Wire.endTransmission( true );
 
     delay( 1 );
@@ -357,7 +385,7 @@ uint8_t QT1070::write(uint8_t reg, void *data, uint8_t size) {
  *
  * Returns : The number of bytes read.
  */
-uint8_t QT1070::read(uint8_t reg, void *data, uint8_t size) {
+uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
     uint8_t length = 0;
 
     Wire.beginTransmission( I2C_ADDR_AT42QT1070 );
@@ -365,10 +393,10 @@ uint8_t QT1070::read(uint8_t reg, void *data, uint8_t size) {
     Wire.endTransmission( true );
 
 
-    Wire.requestFrom(I2C_ADDR_AT42QT1070, (int)size, true );
+    Wire.requestFrom( I2C_ADDR_AT42QT1070, ( int )size, true );
 
-    while (Wire.available()) {
-        *( ( char* )data + length ) = Wire.read();
+    while( Wire.available() ) {
+        *( ( char * )data + length ) = Wire.read();
         length++;
     }
 
@@ -377,6 +405,10 @@ uint8_t QT1070::read(uint8_t reg, void *data, uint8_t size) {
 
 
 
-void isr_qt1070()   { qt1070_event = true; }
+void isr_qt1070() {
+    qt1070_event = true;
+
+    g_keypad.disableInterrupt();
+}
 
 

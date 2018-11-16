@@ -14,7 +14,7 @@
 #define TPA2016_REG_AGC_HOLD    0x04
 #define TPA2016_REG_FIXED_GAIN  0x05
 #define TPA2016_REG_AGC_CTRL1   0x06
-#define TPA2016_REG_AGC_CTRL2   0x07     
+#define TPA2016_REG_AGC_CTRL2   0x07
 
 
 
@@ -30,15 +30,17 @@
 
 
 
-class TPA2016 
-{
+class TPA2016 {
 
   public:
 
-    TPA2016( uint8_t pin_shutdown );
+    TPA2016();
 
     void begin();
-    
+    void end();
+
+    void setPins( int8_t pin_shutdown );
+
     void enableOutputs();
     void disableOutputs();
 
@@ -47,7 +49,7 @@ class TPA2016
     void setReleaseTime( int8_t time );
     void setHoldTime( int8_t time );
     void enableAGC( bool enabled );
-    void setMaxGain( int8_t db);
+    void setMaxGain( int8_t db );
     void setCompression( uint8_t compression );
 
     void dumpRegs();
@@ -57,17 +59,12 @@ class TPA2016
     void write( uint8_t reg, uint8_t data );
 
     bool _init = false;
-    uint8_t _pin_shutdown;
+    int8_t _pin_shutdown = -1;
     uint8_t _control;
 
     uint8_t _compression;
 
-    
+
 };
-
-
-
-extern TPA2016 g_amplifier ;
-
 
 #endif /* _TPA2016_H */

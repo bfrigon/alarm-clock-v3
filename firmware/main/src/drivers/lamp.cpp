@@ -16,11 +16,11 @@
 //
 //******************************************************************************
 #include "lamp.h"
-#include "config.h"
 
 
-Lamp::Lamp( uint8_t pin_leds ) : NeoPixel( pin_leds ) {  
-    //this->_gammaCorrection = false;
+
+Lamp::Lamp( int8_t pin_leds ) : NeoPixel( pin_leds, -1 ) {
+
 }
 
 
@@ -28,12 +28,12 @@ Lamp::Lamp( uint8_t pin_leds ) : NeoPixel( pin_leds ) {
 void Lamp::setBrightness( uint8_t brightness ) {
 
     /* Need to update the fading speed accordingly if the brightness changes. */
-    if ( this->_mode == LAMP_MODE_FADING ) {
+    if( this->_mode == LAMP_MODE_FADING ) {
         this->updateVisualStepDelay();
         return;
     }
 
-    if ( this->_mode == LAMP_MODE_FLASHING && this->_brightness == 0 ) {
+    if( this->_mode == LAMP_MODE_FLASHING && this->_brightness == 0 ) {
         return;
     }
 
@@ -43,7 +43,7 @@ void Lamp::setBrightness( uint8_t brightness ) {
 
 void Lamp::setColorFromTable( uint8_t id ) {
 
-    if ( this->_mode == LAMP_MODE_RAINBOW ) {
+    if( this->_mode == LAMP_MODE_RAINBOW ) {
         return;
     }
 
@@ -52,7 +52,7 @@ void Lamp::setColorFromTable( uint8_t id ) {
 }
 
 void Lamp::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
-    if ( this->_mode == LAMP_MODE_RAINBOW ) {
+    if( this->_mode == LAMP_MODE_RAINBOW ) {
         return;
     }
 
@@ -72,11 +72,11 @@ void Lamp::activate( NightLampSettings *settings, bool test_mode = false ) {
     uint8_t mode;
     mode = settings->mode;
 
-    if ( test_mode == true && mode == LAMP_MODE_OFF ) {
+    if( test_mode == true && mode == LAMP_MODE_OFF ) {
         mode = LAMP_MODE_ON;
     }
 
-    if ( mode == this->_mode ) {
+    if( mode == this->_mode ) {
         /* Already active */
         return;
     }
@@ -87,16 +87,17 @@ void Lamp::activate( NightLampSettings *settings, bool test_mode = false ) {
     this->setBrightness( settings->brightness );
     this->_delay_off = ( test_mode == true ) ? 0 : settings->delay_off;
     this->_visualStepSpeed = settings->speed;
-    this->_visualStepReverse = false;    
+    this->_visualStepReverse = false;
     this->_timerStart = millis();
 
     this->update();
 
-    switch ( this->_mode ) {
+    switch( this->_mode ) {
         case LAMP_MODE_OFF:
-            if ( test_mode == true ) {
-                this->_mode = LAMP_MODE_ON; 
+            if( test_mode == true ) {
+                this->_mode = LAMP_MODE_ON;
             }
+
             break;
 
         case LAMP_MODE_FADING:
@@ -112,7 +113,7 @@ void Lamp::activate( NightLampSettings *settings, bool test_mode = false ) {
 }
 
 void Lamp::updateVisualStepDelay() {
-    switch ( this->_mode ) {
+    switch( this->_mode ) {
         case LAMP_MODE_OFF:
         case LAMP_MODE_ON:
             this->_visualStepDelay = 0;
@@ -123,7 +124,8 @@ void Lamp::updateVisualStepDelay() {
             break;
 
         case LAMP_MODE_FADING:
-            this->_visualStepDelay = ( 25000 / this->_visualStepSpeed ) / max( this->_settings->brightness, LAMP_MIMIMUM_FADING_BRIGHTNESS );
+            this->_visualStepDelay = ( 25000 / this->_visualStepSpeed ) / max( this->_settings->brightness,
+                                     LAMP_MIMIMUM_FADING_BRIGHTNESS );
             break;
 
         case LAMP_MODE_RAINBOW:
@@ -135,7 +137,7 @@ void Lamp::updateVisualStepDelay() {
 
 void Lamp::deactivate() {
 
-    if ( this->_mode == LAMP_MODE_OFF ) {
+    if( this->_mode == LAMP_MODE_OFF ) {
         /* Alread off */
         return;
     }
@@ -146,27 +148,27 @@ void Lamp::deactivate() {
 
 
 void Lamp::processEvents() {
-    
+
     if( this->_mode == LAMP_MODE_OFF ) {
         return;
     }
 
     /* Check if the OFF delay is elapsed */
-    if ( this->_delay_off > 0 ) {
-        
-        if( millis() >= this->_timerStart + ( this->_delay_off * 60000 )) {
+    if( this->_delay_off > 0 ) {
+
+        if( millis() >= this->_timerStart + ( this->_delay_off * 60000 ) ) {
             this->deactivate();
             return;
         }
     }
 
     /* Check if lamp effect is enabled */
-    if ( this->_visualStepDelay == 0 ) {
+    if( this->_visualStepDelay == 0 ) {
         return;
     }
 
     /* Check if the effect next step delay is elapsed */
-    if (( millis() - this->_timerStart) < this->_visualStepDelay ) {
+    if( ( millis() - this->_timerStart ) < this->_visualStepDelay ) {
         return;
     }
 
@@ -185,11 +187,12 @@ void Lamp::processEvents() {
             uint8_t maxStepValue;
             maxStepValue = max( this->_settings->brightness, LAMP_MIMIMUM_FADING_BRIGHTNESS );
 
-            if ( this->_visualStepValue >= maxStepValue ) {
+            if( this->_visualStepValue >= maxStepValue ) {
                 this->_visualStepValue = maxStepValue;
                 this->_visualStepReverse = true;
             }
-            if ( this->_visualStepValue <= 5 ) {
+
+            if( this->_visualStepValue <= 5 ) {
                 this->_visualStepReverse = false;
             }
 
@@ -201,8 +204,8 @@ void Lamp::processEvents() {
         case LAMP_MODE_RAINBOW:
             this->_visualStepValue += 5;
 
-            if( this->_visualStepValue < 85) {
-                
+            if( this->_visualStepValue < 85 ) {
+
                 this->_r = this->_visualStepValue * 3;
                 this->_g = 255 - this->_visualStepValue * 3;
                 this->_b = 0;
@@ -216,7 +219,7 @@ void Lamp::processEvents() {
             } else {
 
                 this->_r = 0;
-                this->_g = (this->_visualStepValue - 170 ) * 3;
+                this->_g = ( this->_visualStepValue - 170 ) * 3;
                 this->_b = 255 - ( this->_visualStepValue - 170 ) * 3;
             }
 
@@ -230,7 +233,9 @@ void Lamp::processEvents() {
 
 
 void Lamp::update() {
+    uint8_t pixmap[] = {
+        ( ( this->_mode == LAMP_MODE_OFF || g_power.getPowerMode() != POWER_MODE_NORMAL ) ? 0x00 : 0xFF )
+    };
 
-    uint8_t pixmap[] = { ( this->_mode == LAMP_MODE_OFF ? 0x00 : 0xFF ) };
     this->show( pixmap, 3 );
 }

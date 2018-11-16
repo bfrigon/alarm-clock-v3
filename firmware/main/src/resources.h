@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : resources.h
+// File    : src/resources.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -34,15 +34,12 @@
 
 
 
-
-
 //--------------------------------------------------------------------------
 //
 // Custom character sets
 //
 //--------------------------------------------------------------------------
-
-const uint8_t CUSTOM_CHARACTERS_MENUS[] PROGMEM = {
+const char CUSTOM_CHARACTERS_DEFAULT[] PROGMEM = {
 
     0x00, 0x00, 0x04, 0x0A, 0x04, 0x00, 0x00, 0x00,     /* unchecked */
     0x00, 0x01, 0x03, 0x16, 0x1C, 0x08, 0x00, 0x00,     /* checked */
@@ -54,14 +51,14 @@ const uint8_t CUSTOM_CHARACTERS_MENUS[] PROGMEM = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,     /* --Unused-- */
 };
 
-const uint8_t CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
-    0x04, 0x02, 0x0A, 0x02, 0x04, 0x00, 0x00, 0x00,     /* Wifi connected */
+const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
+    0x00, 0x01, 0x01, 0x05, 0x05, 0x15, 0x00, 0x00,     /* Wifi connected */
     0x04, 0x0E, 0x0E, 0x04, 0x00, 0x04, 0x00, 0x00,     /* NO SD Card */
-    0x0E, 0x11, 0x17, 0x15, 0x0E, 0x00, 0x00, 0x00,     /* Snooze */
+    0x04, 0x0E, 0x0E, 0x0E, 0x1F, 0x04, 0x00, 0x00,     /* Snooze */
     0x02, 0x05, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,     /* Degree */
     0x06, 0x08, 0x08, 0x08, 0x06, 0x00, 0x00, 0x00,     /* Celcius */
     0x0E, 0x08, 0x0C, 0x08, 0x08, 0x00, 0x00, 0x00,     /* Farenheight */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,     /* --Unused-- */
+    0x04, 0x0E, 0x0A, 0x0A, 0x0A, 0x0E, 0x00, 0x00,     /* On battery */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,     /* --Unused-- */
 };
 
@@ -74,12 +71,20 @@ const uint8_t CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 //
 //--------------------------------------------------------------------------
 
+PROG_STR( S_DATETIME_DHM,               "%dd, %dh. %d min." );
+PROG_STR( S_DATETIME_HM,                "%dh. %d min." );
+PROG_STR( S_DATETIME_MS,                "%d min. %d sec." );
+PROG_STR( S_DATETIME_M,                 "%d minutes" );
+PROG_STR( S_DATETIME_1M,                "1 minute" );
+PROG_STR( S_DATETIME_1D,                "24 hours" );
+PROG_STR( S_DATETIME_D,                 "%d days" );
+PROG_STR( S_DATETIME_S,                 "%d seconds" );
 
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
 PROG_STR( S_YES,                        "Yes" );
 PROG_STR( S_NO,                         "No" );
-PROG_STR( S_SEPARATOR,                  ": ");
+PROG_STR( S_SEPARATOR,                  ": " );
 
 PROG_STR( S_ON,                         "On" );
 PROG_STR( S_OFF,                        "Off" );
@@ -88,12 +93,6 @@ PROG_STR( S_PM,                         "pm" );
 PROG_STR( S_DOW,                        "SMTWTFS" );
 PROG_STR( S_ALARMS_OFF,                 "Alarms off" );
 PROG_STR( S_ALARM_IN,                   "Alarm #%d in" );
-PROG_STR( S_NEXT_ALARM_DHM,             "%dd, %dh. %d min." );
-PROG_STR( S_NEXT_ALARM_HM,              "%dh. %d min." );
-PROG_STR( S_NEXT_ALARM_M,               "%d minutes" );
-PROG_STR( S_NEXT_ALARM_1MIN,            "1 minute" );
-PROG_STR( S_NEXT_ALARM_1DAY,            "24 hours" );
-PROG_STR( S_NEXT_ALARM_DAYS,            "%d day" );
 PROG_STR( S_ALARM_NUM1,                 "1." );
 PROG_STR( S_ALARM_NUM2,                 "2." );
 
@@ -150,12 +149,12 @@ PROG_STR( S_NIGHT_LAMP_DELAY,           "Delay" );
 
 
 PROG_STR( S_TEST_ALARM,                 "Alarm test..." );
-PROG_STR( S_ALARM_MSG_MORNING,          "Good morning");
-PROG_STR( S_ALARM_MSG_AFTERNOON,        "Good afternoon");
-PROG_STR( S_ALARM_MSG_EVENING,          "Good evening");
+PROG_STR( S_ALARM_MSG_MORNING,          "Good morning" );
+PROG_STR( S_ALARM_MSG_AFTERNOON,        "Good afternoon" );
+PROG_STR( S_ALARM_MSG_EVENING,          "Good evening" );
 
 PROG_STR( S_SNOOZE,                     "Snooze" );
-PROG_STR( S_SNOOZE_TIME,                "%2d:%02d" );
+
 
 PROG_STR( S_INSTR_CANCEL_ALARM_1,       "Hold <Alarm> to" );
 PROG_STR( S_INSTR_CANCEL_ALARM_2,       "cancel..." );
@@ -173,11 +172,13 @@ const char _TEMP_UNITS[ 2 ][ 2 ] PROGMEM = {
 
 const char _MONTHS_SHORT[ 12 ][ 4 ] PROGMEM = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
 
 const char _MONTHS[ 12 ][ 10 ] PROGMEM = {
     "January", "Febuary", "March", "April", "May", "June"
-    "July", "August", "September", "October", "November", "December" };
+    "July", "August", "September", "October", "November", "December"
+};
 
 const char _DAYS_SHORT[ 12 ][ 4 ] PROGMEM = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
@@ -288,18 +289,18 @@ const uint8_t PROGMEM _GAMMA_TABLE[] = {
     1,   1,   1,   1,   1,   1,   1,   1,   1,   2,   2,   2,   2,   2,   2,   2,
     3,   3,   3,   3,   3,   4,   4,   4,   4,   5,   5,   5,   5,   6,   6,   6,
     6,   7,   7,   7,   8,   8,   8,   9,   9,   9,  10,  10,  11,  11,  11,  12,
-   12,  13,  13,  13,  14,  14,  15,  15,  16,  16,  17,  17,  18,  18,  19,  19,
-   20,  20,  21,  22,  22,  23,  23,  24,  25,  25,  26,  26,  27,  28,  28,  29,
-   30,  30,  31,  32,  33,  33,  34,  35,  35,  36,  37,  38,  39,  39,  40,  41,
-   42,  43,  43,  44,  45,  46,  47,  48,  49,  49,  50,  51,  52,  53,  54,  55,
-   56,  57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,
-   73,  74,  75,  76,  77,  78,  79,  81,  82,  83,  84,  85,  87,  88,  89,  90,
-   91,  93,  94,  95,  97,  98,  99, 100, 102, 103, 105, 106, 107, 109, 110, 111,
-  113, 114, 116, 117, 119, 120, 121, 123, 124, 126, 127, 129, 130, 132, 133, 135,
-  137, 138, 140, 141, 143, 145, 146, 148, 149, 151, 153, 154, 156, 158, 159, 161,
-  163, 165, 166, 168, 170, 172, 173, 175, 177, 179, 181, 182, 184, 186, 188, 190,
-  192, 194, 196, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221,
-  223, 225, 227, 229, 231, 234, 236, 238, 240, 242, 244, 246, 248, 251, 253, 255,
+    12,  13,  13,  13,  14,  14,  15,  15,  16,  16,  17,  17,  18,  18,  19,  19,
+    20,  20,  21,  22,  22,  23,  23,  24,  25,  25,  26,  26,  27,  28,  28,  29,
+    30,  30,  31,  32,  33,  33,  34,  35,  35,  36,  37,  38,  39,  39,  40,  41,
+    42,  43,  43,  44,  45,  46,  47,  48,  49,  49,  50,  51,  52,  53,  54,  55,
+    56,  57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,
+    73,  74,  75,  76,  77,  78,  79,  81,  82,  83,  84,  85,  87,  88,  89,  90,
+    91,  93,  94,  95,  97,  98,  99, 100, 102, 103, 105, 106, 107, 109, 110, 111,
+    113, 114, 116, 117, 119, 120, 121, 123, 124, 126, 127, 129, 130, 132, 133, 135,
+    137, 138, 140, 141, 143, 145, 146, 148, 149, 151, 153, 154, 156, 158, 159, 161,
+    163, 165, 166, 168, 170, 172, 173, 175, 177, 179, 181, 182, 184, 186, 188, 190,
+    192, 194, 196, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221,
+    223, 225, 227, 229, 231, 234, 236, 238, 240, 242, 244, 246, 248, 251, 253, 255,
 
 };
 

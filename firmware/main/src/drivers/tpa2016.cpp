@@ -1,25 +1,27 @@
 #include "tpa2016.h"
 
 
-TPA2016::TPA2016( uint8_t pin_shutdown ) {
-
-    this->_pin_shutdown = pin_shutdown;
-
+TPA2016::TPA2016() {
     this->_control = TPA2016_CTRL_NG;
+}
 
-
+void TPA2016::setPins( int8_t pin_shutdown ) {
+    this->_pin_shutdown = pin_shutdown;
 }
 
 void TPA2016::begin() {
+    if( this->_init == true ) {
+        return;
+    }
 
     this->_init = true;
 
-
-    pinMode( this->_pin_shutdown, OUTPUT );
-
     /* Disable shutdown mode */
-    digitalWrite( this->_pin_shutdown, LOW );
-    delay( 10 );
+    if( this->_pin_shutdown >= 0 ) {
+        pinMode( this->_pin_shutdown, OUTPUT );
+
+        digitalWrite( this->_pin_shutdown, LOW );
+    }
 
 
     this->write( 0x01, 0b00000000 );
@@ -28,9 +30,22 @@ void TPA2016::begin() {
     this->write( 0x04, 0 );
     this->write( 0x06, 0b00110101 );
     this->write( 0x07, 0b11000000 );
-
-
 }
+
+void TPA2016::end() {
+
+    if( this->_init == false ) {
+        return;
+    }
+
+    this->_init = false;
+
+    /* Shutdown mode */
+    if( this->_pin_shutdown >= 0 ) {
+        digitalWrite( this->_pin_shutdown, HIGH );
+    }
+}
+
 
 
 void TPA2016::enableOutputs() {
@@ -54,10 +69,15 @@ void TPA2016::disableOutputs() {
 
 void TPA2016::setFixedGain( int8_t db ) {
 
-    if ( db < -28 ) db = -28;
-    if ( db > 30 ) db = 30;
+    if( db < -28 ) {
+        db = -28;
+    }
 
-    this->write( TPA2016_REG_FIXED_GAIN , db );
+    if( db > 30 ) {
+        db = 30;
+    }
+
+    this->write( TPA2016_REG_FIXED_GAIN, db );
 }
 
 void TPA2016::setAttackTime( int8_t time ) {
@@ -77,7 +97,7 @@ void TPA2016::enableAGC( bool enabled ) {
 
 }
 
-void TPA2016::setMaxGain( int8_t db) {
+void TPA2016::setMaxGain( int8_t db ) {
 
 }
 
@@ -88,23 +108,22 @@ void TPA2016::setCompression( uint8_t compression ) {
 
 void TPA2016::dumpRegs() {
 
-     for ( uint8_t i = 1; i < 8l;  i++ ) {
+    for( uint8_t i = 1; i < 8l;  i++ ) {
 
         Wire.beginTransmission( TPA2016_I2C_ADDR );
         Wire.write( i );
         Wire.endTransmission();
 
         Wire.requestFrom( TPA2016_I2C_ADDR, true );
+
         while( Wire.available() == false );
 
-        Serial.print("REG: 0x");
+        Serial.print( "REG: 0x" );
         Serial.print( i, HEX );
-        Serial.print(" = 0x");
+        Serial.print( " = 0x" );
         Serial.println( Wire.read(), HEX );
     }
-
 }
-
 
 
 

@@ -19,16 +19,20 @@
 #ifndef ALARM_H
 #define ALARM_H
 
-#include <Adafruit_VS1053.h>
-#include "time.h"
-#include "lamp.h"
+
+#include <Arduino.h>
+#include <SPI.h>
+#include <EEPROM.h>
+#include <SdFat.h>
+#include <avr/pgmspace.h>
+
+
+#include "libs/time.h"
+#include "hardware.h"
+#include "resources.h"
 #include "screen.h"
+#include "config.h"
 
-
-
-#define MAX_ALARM_PROFILES          2
-#define ALARM_FILENAME_LENGTH       40
-#define ALARM_MESSAGE_LENGTH        16
 
 
 #define SELECT_FILE_PLAY_DELAY      750 /* ms */
@@ -56,49 +60,29 @@
 
 
 
-#define SCREEN_ID_ALARM             15
 
-
-bool alarmScreen_eventEnterScreen( Screen *currentScreen );
-bool alarmScreen_eventExitScreen( Screen *currentScreen, Screen *newScreen );
-bool alarmScreen_eventKeypress( Screen *screen, uint8_t key );
-bool alarmScreen_eventDrawScreen( Screen *screen );
-void alarmScreen_eventTimeout( Screen *screen );
-
-struct AlarmProfile {
-    char filename[ ALARM_FILENAME_LENGTH + 1 ];
-    char message[ ALARM_MESSAGE_LENGTH + 1 ];
-    uint8_t snoozeDelay;
-    uint8_t volume;
-    bool gradual;
-    uint8_t visualMode;
-    uint8_t effectSpeed = 5;
-    Time time;
-    uint8_t dow = 0x7F;
-    NightLampSettings lamp;
-};
-
-
-class Alarm : private Adafruit_VS1053 {
+class Alarm : private VS1053 {
 
   public:
 
+    Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect,
+           int8_t pin_alarm_sw, int8_t pin_amp_shdn );
 
-    Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect, int8_t pin_alarm_sw );
+    uint8_t begin();
+    void end();
+    void updatePowerState();
 
-    void begin();
-    bool loadProfile( AlarmProfile *profile, uint8_t id );
+    bool loadProfile( struct AlarmProfile *profile, uint8_t id );
     bool loadProfile( uint8_t id );
-    void saveProfile( AlarmProfile *profile, uint8_t id );
+    void saveProfile( struct AlarmProfile *profile, uint8_t id );
     void saveProfile( uint8_t id );
     bool readProfileAlarmTime( uint8_t id, Time *time, uint8_t *dow );
-    
+
     bool DetectSDCard();
     bool isSDCardPresent();
-    bool initSDCard();
     bool openNextFile();
     bool openFile( char *name );
-    
+
     void setVolume( uint8_t vol );
     void play( uint8_t mode );
     void play( uint8_t mode, uint16_t delay );
@@ -119,8 +103,8 @@ class Alarm : private Adafruit_VS1053 {
     bool isPlaying();
     uint8_t getPlayMode();
     bool isAlarmEnabled();
-    AlarmProfile profile;
-    File currentFile;
+    struct AlarmProfile profile;
+    struct File currentFile;
 
   private:
 
@@ -135,6 +119,8 @@ class Alarm : private Adafruit_VS1053 {
     uint8_t _pin_sd_detect;
     uint8_t _pin_sd_cs;
     uint8_t _pin_alarm_sw;
+    bool _init = false;
+
 
 
     unsigned long _timerStart = 0;
@@ -149,7 +135,9 @@ class Alarm : private Adafruit_VS1053 {
     uint8_t _playMode = ALARM_MODE_OFF;
 
     uint16_t _pgm_audio_ptr = 0;
-    File _sd_root;
+
+    SdFat _sd;
+    TPA2016 _amplifier;
 };
 
 extern Alarm g_alarm;

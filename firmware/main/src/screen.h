@@ -20,7 +20,15 @@
 #define SCREEN_H
 
 #include <Arduino.h>
-#include "us2066.h"
+
+#include "libs/time.h"
+
+#include "drivers/qt1070.h"
+#include "drivers/us2066.h"
+
+
+
+
 
 
 #define DISPLAY_HEIGHT      2
@@ -56,6 +64,7 @@
 #define CHAR_DEGREE             0x03
 #define CHAR_CELCIUS            0x04
 #define CHAR_FARENHEIGHT        0x05
+#define CHAR_BATTERY            0x06
 
 
 
@@ -192,7 +201,8 @@ extern unsigned long g_enterScreenTime;
 
 extern bool g_screenUpdate;
 extern bool g_screenClear;
-extern US2066 g_lcd;
+extern const char *g_currentCustomCharacterSet;
+
 
 
 //--------------------------------------------------------------------------
@@ -208,8 +218,8 @@ typedef void ( *pfEventSelectionChanged )( Screen *screen, Item *item, uint8_t f
 typedef bool ( *pfEventDrawScreen )( Screen *screen );
 typedef bool ( *pfEventExitScreen )( Screen *currentScreen, Screen *newScreen );
 typedef bool ( *pfEventEnterScreen )( Screen *screen );
-typedef bool ( *pfEventDrawItem ) ( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col );
-typedef void ( *pfEventTimeout ) ( Screen *screen );
+typedef bool ( *pfEventDrawItem )( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col );
+typedef void ( *pfEventTimeout )( Screen *screen );
 
 
 //--------------------------------------------------------------------------
@@ -248,9 +258,11 @@ class Screen {
     uint8_t returnValue = 0;
     bool upperCase = false;
     uint16_t timeout = 0;
+    const char *customCharacterSet = CUSTOM_CHARACTERS_DEFAULT;
+
 
     void init( bool selectFirstItem );
-    void update();
+    void update( bool force = false );
     void selectFirstItem();
     void clearSelection();
     void processKeypadEvent( uint8_t key );
@@ -276,7 +288,7 @@ class Screen {
     bool isItemFullScreenEditable( Item *item );
     void updateKeypadRepeatMode();
 
-    void incDigit(uint8_t *value, uint8_t pos, uint8_t max, uint8_t min);
+    void incDigit( uint8_t *value, uint8_t pos, uint8_t max, uint8_t min );
     uint8_t calcFieldLength( Item *item );
     char nextValidCharacter( char current );
     uint8_t itemValueToBars( Item *item );

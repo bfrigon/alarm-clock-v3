@@ -20,8 +20,10 @@
 #define US2066_H
 
 #include <Arduino.h>
+#include <avr/pgmspace.h>
 #include <Wire.h>
-
+#include "../resources.h"
+#include "power.h"
 
 
 #define CHAR_SPACE              0x20
@@ -73,10 +75,6 @@
 #define US2066_CMD_SEG_HW       0xDA
 #define US2066_CMD_PHASE        0xD9
 #define US2066_CMD_VCOMH        0xDB
-
-
-
-
 
 
 
@@ -171,40 +169,43 @@ class US2066 {
     US2066( uint8_t address, uint8_t pin_reset, uint8_t pin_ven );
 
     void begin();
+    void end();
 
     void clear();
-    void setPosition(uint8_t row, uint8_t col);
-    void setContrast(uint8_t contrast);
+    void setPosition( uint8_t row, uint8_t col );
+    void setContrast( uint8_t contrast );
     void setCursor( bool underline, bool blinking );
-    void setDisplay(bool on, bool reverse );
-    uint8_t setCustomCharacters(const uint8_t *pchrmap);
+    void setDisplay( bool on, bool reverse );
+    uint8_t setCustomCharacters( const char *pchrmap );
 
-    
+
     uint8_t print( char c );
     uint8_t print( const char *str, bool ptr_pgm_space = false );
     uint8_t print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
-    inline uint8_t print_P( const char *str )
-        { return this->print( str, true ); }
+    inline uint8_t print_P( const char *str ) {
+        return this->print( str, true );
+    }
 
-    inline uint8_t print_P( const char *str, uint8_t length, uint8_t align ) 
-        { return this->print( str, length, align, true ); }
-    
+    inline uint8_t print_P( const char *str, uint8_t length, uint8_t align ) {
+        return this->print( str, length, align, true );
+    }
 
-    uint8_t printf(const char *format, ...);
+
+    uint8_t printf( const char *format, ... );
     uint8_t printf_P( const char *format, ... );
 
     void fill( char c, uint8_t num );
-    
+
 
 
   private:
 
-    static int _putchar(char ch, FILE* stream);
+    static int _putchar( char ch, FILE *stream );
 
-    void selectInstructions(uint8_t iset);
+    void selectInstructions( uint8_t iset );
     void updateDisplayState();
-    uint8_t sendCommand(uint8_t cmd);
-    uint8_t sendCommand(uint8_t cmd, uint8_t data);
+    uint8_t sendCommand( uint8_t cmd );
+    uint8_t sendCommand( uint8_t cmd, uint8_t data );
 
     bool _init = false;
     uint8_t _address = US2066_DEF_I2C_ADDR;
@@ -214,9 +215,6 @@ class US2066 {
     uint8_t _current_iset = US2066_ISET_STANDARD;
     FILE _lcdout = {0};
     US2066_STATE _state;
-
- 
-
 };
 
 extern US2066 g_lcd ;

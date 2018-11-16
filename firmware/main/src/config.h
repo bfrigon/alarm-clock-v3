@@ -19,10 +19,17 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "time.h"
-#include "alarm.h"
-#include "lamp.h"
+#include <Arduino.h>
+#include <EEPROM.h>
+#include <avr/pgmspace.h>
+
+#include "libs/time.h"
 #include "resources.h"
+
+#define MAX_ALARM_PROFILES          2
+#define ALARM_FILENAME_LENGTH       40
+#define ALARM_MESSAGE_LENGTH        16
+
 
 #define EEPROM_ADDR_MAGIC           0
 #define EEPROM_ADDR_FIRMWARE_VER    4
@@ -30,8 +37,26 @@
 #define EEPROM_ADDR_PROFILES        EEPROM_ADDR_CONFIG + ( sizeof( Config ) )
 
 
+struct NightLampSettings {
+    uint8_t color;
+    uint8_t brightness;
+    uint8_t delay_off;
+    uint8_t speed;
+    uint8_t mode;
+};
 
-
+struct AlarmProfile {
+    char filename[ ALARM_FILENAME_LENGTH + 1 ];
+    char message[ ALARM_MESSAGE_LENGTH + 1 ];
+    uint8_t snoozeDelay;
+    uint8_t volume;
+    bool gradual;
+    uint8_t visualMode;
+    uint8_t effectSpeed = 5;
+    struct Time time;
+    uint8_t dow = 0x7F;
+    struct NightLampSettings lamp;
+};
 
 struct Config {
     bool clock_24h = false;
@@ -47,9 +72,9 @@ struct Config {
     uint8_t clock_brightness = 40;
     uint8_t lcd_contrast = 50;
     uint8_t date_format = 0;
-    
 
-    NightLampSettings lamp;
+
+    struct NightLampSettings lamp;
 
     char ssid[32];
     char wkey[63];
