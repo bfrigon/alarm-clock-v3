@@ -135,8 +135,8 @@ void initScreens() {
  *  - screen     : Pointer to the screen where the event occured.
  *  - item       : Item being drawn.
  *  - isSelected : TRUE if the item is currently selectedor False otherwise.
- *  - row        : Zero based Y position where the item is located.
- *  - col        : Zero based X position where the item is located.
+ *  - row        :  Zero-based Y position where the item is located.
+ *  - col        :  Zero-based X position where the item is located.
  *
  * Returns : TRUE to allow default item drawingor False to override.
  */

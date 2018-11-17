@@ -113,7 +113,7 @@ unsigned long DateTime::getEpoch() {
  * Arguments
  * ---------
  *  - month     : The month (1-12)
- *  - shortName : TRUE to get the abreviationor False for the full name.
+ *  - shortName : TRUE to get the abreviation or False for the full name.
  *
  * Returns : The pointer to the month name string.
  */
@@ -147,7 +147,7 @@ const char *getMonthName( uint8_t month, bool shortName ) {
  * Arguments
  * ---------
  *  - day       : The day of week (1-7)
- *  - shortName : TRUE to get the abreviationor False for the full name.
+ *  - shortName : TRUE to get the abreviation or False for the full name.
  *
  * Returns : The pointer to the day of week name string.
  */
@@ -284,7 +284,7 @@ uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
  * Arguments
  * ---------
  *  - buffer  : Pointer to the string to write to.
- *  - fmt_24h : TRUE for 24H time formator False for am/pm.
+ *  - fmt_24h : TRUE for 24H time format or False for am/pm.
  *  - date    : Structure containing the date and time to print.
  *
  * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
@@ -306,7 +306,7 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
  * Arguments
  * ---------
  *  - buffer  : Pointer to the string to write to.
- *  - fmt_24h : TRUE for 24H time formator False for am/pm.
+ *  - fmt_24h : TRUE for 24H time format or False for am/pm.
  *  - time    : Structure containing the time to print.
  *
  * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)

@@ -403,8 +403,8 @@ void Screen::exitScreen() {
  * ---------
  *  - item       : Pointer to a screen item.
  *  - isSelected : TRUE if item is currently selectedor False otherwise.
- *  - row        : Zero based Y position where the item is located on the LCD.
- *  - col        : Zero based X position where the item is located on the LCD.
+ *  - row        :  Zero-based Y position where the item is located on the LCD.
+ *  - col        :  Zero-based X position where the item is located on the LCD.
  *
  * Returns : Nothing
  */

@@ -225,7 +225,7 @@ void loop() {
  * ---------
  *  None
  *
- * Returns : TRUE if settings were reset to defaultor False
+ * Returns : TRUE if settings were reset to default or False
  */
 bool checkFactoryResetBtn() {
     unsigned long start = millis();
