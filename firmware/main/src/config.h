@@ -15,7 +15,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -83,7 +82,6 @@ struct Config {
 
 void loadConfig();
 void saveConfig();
-void initAlarmProfiles();
 bool loadAlarmProfile( uint8_t id, AlarmProfile &profile );
 void saveAlarmProfile( uint8_t id, AlarmProfile &profile );
 void restoreDefaultConfig();

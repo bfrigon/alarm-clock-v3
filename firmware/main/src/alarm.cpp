@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : alarm.cpp
+// File    : src/alarm.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,31 +15,54 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "alarm.h"
 #include "screen.h"
 #include "ui/ui.h"
 
 
-
 uint8_t vs1053_buffer[VS1053_DATABUFFERLEN];
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  - pin_cs        : Codec chip select pin
+ *  - pin_xdcs      : Codec data select pin
+ *  - pin_dreq      : Codec data request pin.
+ *  - pin_reset     : Codec reset pin.
+ *  - pin_sd_cs     : SD card chip select pin.
+ *  - pin_sd_detect : SD card detect pin.
+ *  - pin_alarm_sw  : Pin connected to the alarm switch.
+ *  - pin_amp_shdn  : Amplifier shutdown pin.
+ */
 Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect,
               int8_t pin_alarm_sw, int8_t pin_amp_shdn ) : VS1053( pin_cs, pin_xdcs, pin_dreq, pin_reset ) {
 
     this->_pin_sd_cs = pin_sd_cs;
+
     this->_pin_sd_detect = pin_sd_detect;
-
-
     pinMode( pin_sd_detect, INPUT );
+
     this->_pin_alarm_sw = pin_alarm_sw;
-
-
     pinMode( pin_alarm_sw, INPUT );
+
     this->_amplifier.setPins( pin_amp_shdn );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Initialize the codec and amplifier.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 uint8_t Alarm::begin() {
     if( this->_init == true ) {
         return;
@@ -47,9 +70,21 @@ uint8_t Alarm::begin() {
 
     this->_init = true;
     this->_volume = 0;
+
     this->updatePowerState();
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Power down the amplifier and codec.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::end() {
     if( this->_init == false ) {
         return;
@@ -63,6 +98,17 @@ void Alarm::end() {
     VS1053::end();
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Power up or down the codec and amplifier based on the current power mode
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::updatePowerState() {
 
     if( this->_init == false ) {
@@ -86,10 +132,32 @@ void Alarm::updatePowerState() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Return whether the SD card was detected or not.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if detectedor False otherwise.
+ */
 bool Alarm::isSDCardPresent() {
     return this->_sd_present;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Check the current state of the SD card detect pin. If a card is found,
+ * initialize the SdFat library.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if detectedor False otherwise.
+ */
 bool Alarm::DetectSDCard() {
     if( digitalRead( this->_pin_sd_detect ) == LOW ) {
 
@@ -166,6 +234,23 @@ bool Alarm::DetectSDCard() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Open the next music file in the SD card root directory. If the end of
+ * the directory was reached, it will select the fallback file stored
+ * in program memory. The next time openNextFile is called, it will select the
+ * first file.
+ *
+ * If the card was removed or a read error occurs, it will use the fallback
+ * file instead.
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successfulor False otherwise.
+ */
 bool Alarm::openNextFile() {
     if( this->_playMode != ALARM_MODE_OFF ) {
         this->stop();
@@ -179,6 +264,20 @@ bool Alarm::openNextFile() {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Open a specific music file on the SD card located in the root directory.
+ *
+ * If the file is not found or card was removed, it will use the fallback
+ * file instead.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successfulor False otherwise.
+ */
 bool Alarm::openFile( char *name ) {
     if( this->_sd.vwd()->isOpen() == false ) {
         return false;
@@ -244,6 +343,20 @@ bool Alarm::openFile( char *name ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Read the alarm time for a given profile ID
+ *
+ * Arguments
+ * ---------
+ *  - profile_id : Profile to read the time from.
+ *  - time       : Pointer to a Time structure where the alarm time will be
+ *                 written.
+ *  - dow        : Pointer to a unsigned integer where the day of week mask
+ *                 will be copied.
+ *
+ * Returns : TRUE if successfulor False otherwise.
+ */
 bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow ) {
     uint8_t i;
     uint8_t byte;
@@ -256,6 +369,8 @@ bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow )
         for( i = 0; i < sizeof( Time ); i++ ) {
             byte = EEPROM.read( EEPROM_ADDR_PROFILES + ( profile_id * sizeof( AlarmProfile ) ) + i
                                 + offsetof( struct AlarmProfile, time ) );
+
+
             * ( ( ( uint8_t * ) time ) + i ) = byte;
         }
     }
@@ -263,16 +378,40 @@ bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow )
     if( dow != NULL ) {
         byte = EEPROM.read( EEPROM_ADDR_PROFILES + ( profile_id * sizeof( AlarmProfile ) )
                             + offsetof( struct AlarmProfile, dow ) );
+
+
         *dow = byte;
     }
 
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Load the given alarm profile from EEPROM
+ *
+ * Arguments
+ * ---------
+ *  - id : Alarm profile ID to load.
+ *
+ * Returns : TRUE if successfulor False otherwise.
+ */
 bool Alarm::loadProfile( uint8_t id ) {
     return this->loadProfile( &this->profile, id );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Load the given alarm profile from EEPROM into an AlarmProfile structure.
+ *
+ * Arguments
+ * ---------
+ *  - id : Alarm profile ID to load.
+ *
+ * Returns : TRUE if successfulor False otherwise.
+ */
 bool Alarm::loadProfile( AlarmProfile *profile, uint8_t id ) {
     if( id > MAX_ALARM_PROFILES - 1 ) {
         return false;
@@ -286,10 +425,34 @@ bool Alarm::loadProfile( AlarmProfile *profile, uint8_t id ) {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Store the current profile settings in EEPROM.
+ *
+ * Arguments
+ * ---------
+ *  - id : Alarm profile ID to load.
+ *
+ * Returns :
+ */
 void Alarm::saveProfile( uint8_t id ) {
     this->saveProfile( &this->profile, id );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Store alarm profile settings contained in a given AlarmProfile structure
+ * to EEPROM
+ *
+ * Arguments
+ * ---------
+ *  - profile : AlarmProfile structure containing the settings.
+ *  - id      : Profile ID to save the settings to.
+ *
+ * Returns :
+ */
 void Alarm::saveProfile( AlarmProfile *profile, uint8_t id ) {
     if( id > MAX_ALARM_PROFILES - 1 ) {
         return;
@@ -301,6 +464,18 @@ void Alarm::saveProfile( AlarmProfile *profile, uint8_t id ) {
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Activate the alarm with a start delay.
+ *
+ * Arguments
+ * ---------
+ *  - mode  : Alarm play mode.
+ *  - delay : Delay in ms to wait before activating alarm.
+ *
+ * Returns : Nothing
+ */
 void Alarm::play( uint8_t mode, uint16_t delay ) {
     if( this->_playMode != ALARM_MODE_OFF ) {
         this->stop();
@@ -312,6 +487,17 @@ void Alarm::play( uint8_t mode, uint16_t delay ) {
     this->_snoozeStart = 0;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Activate the alarm immediately.
+ *
+ * Arguments
+ * ---------
+ *  - mode  : Alarm play mode.
+ *
+ * Returns : Nothing
+ */
 void Alarm::play( uint8_t mode ) {
     if( this->_playMode != ALARM_MODE_OFF ) {
         this->stop();
@@ -343,6 +529,16 @@ void Alarm::play( uint8_t mode ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Stops the alarm.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::stop() {
     if( this->_playMode == ALARM_MODE_OFF ) {
         return;
@@ -365,6 +561,17 @@ void Alarm::stop() {
     this->_snoozeStart = 0;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Stop the audio element of the alarm.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::audioStop() {
     this->_amplifier.disableOutputs();
 
@@ -375,6 +582,17 @@ void Alarm::audioStop() {
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Start the audio element of the alarm.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::audioStart() {
     if( ( this->_playMode & ALARM_MODE_AUDIO ) == 0 ) {
         return;
@@ -397,14 +615,16 @@ void Alarm::audioStart() {
         this->_pgm_audio_ptr = 0;
 
     } else {
-        this->currentFile.seekSet( 0 );
+        this->currentFile.rewind();
     }
 
     /* reset playback */
     this->sciWrite( VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW );
+
     /* resync */
     this->sciWrite( VS1053_REG_WRAMADDR, 0x1e29 );
     this->sciWrite( VS1053_REG_WRAM, 0 );
+
     /* As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0 */
     sciWrite( VS1053_REG_DECODETIME, 0x00 );
     sciWrite( VS1053_REG_DECODETIME, 0x00 );
@@ -412,6 +632,17 @@ void Alarm::audioStart() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Pause the alarm playback and snooze for the given amount of time in the
+ * profile settings. If the snooze delay is set to 0, the alarm will stop.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::snooze() {
     if( ( this->_playMode == ALARM_MODE_OFF ) || ( this->_playMode & ALARM_MODE_SNOOZE ) ) {
         return;
@@ -435,6 +666,17 @@ void Alarm::snooze() {
     screen_alarm.timeout = 1000;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Resume the alarm playback from a snooze state.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::resume() {
     if( this->_playMode == ALARM_MODE_OFF || ( ( this->_playMode & ALARM_MODE_SNOOZE ) == 0 ) ) {
         return;
@@ -454,30 +696,84 @@ void Alarm::resume() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Set the codec volume.
+ *
+ * Arguments
+ * ---------
+ *  vol : 0-100%. 0 represents a 50 dB attenuation, 100 is 0 dB
+ *
+ * Returns : Nothing
+ */
 void Alarm::setVolume( uint8_t vol ) {
+    /* 0: 50 dB attenuation, 100: Full volume */
+
     if( vol > 100 ) {
         vol = 100;
     }
 
     this->_volume = vol;
 
-
-    vol = 100 - ( vol * 100 / 100 );
-    VS1053::setVolume( vol, vol );
+    VS1053::setVolume( 100 - vol, 100 - vol );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Returns whether or not the current alarm state is snoozing.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if currently snoozingor False otherwise.
+ */
 bool Alarm::isSnoozing() {
     return this->_playMode & ALARM_MODE_SNOOZE;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Return whether or the the alarm is currently playing.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if currently playingor False otherwise.
+ */
 bool Alarm::isPlaying() {
     return this->_playMode != ALARM_MODE_OFF && ( ( this->_playMode & ALARM_MODE_SNOOZE ) == 0 );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Get the current alarm play mode
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Alarm play mode.
+ */
 uint8_t Alarm::getPlayMode() {
     return this->_playMode;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Get the time remaining before the alarm playback is resumed.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : The time remaining in seconds.
+ */
 uint16_t Alarm::getSnoozeTimeRemaining() {
     if( ( this->_playMode & ALARM_MODE_SNOOZE ) == 0 ) {
         return 0;
@@ -491,6 +787,16 @@ uint16_t Alarm::getSnoozeTimeRemaining() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Starts the visual element of the alarm playback.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Alarm::visualStart() {
     /* Turn on lamp if option enabled */
     if( this->_playMode & ALARM_MODE_LAMP && profile.lamp.mode != LAMP_MODE_OFF ) {
@@ -507,6 +813,7 @@ void Alarm::visualStart() {
     this->_visualStepReverse = false;
 
     switch( this->profile.visualMode ) {
+
         case ALARM_VISUAL_FADING:
             this->_visualStepValue = g_config.clock_brightness;
             break;
@@ -520,8 +827,21 @@ void Alarm::visualStart() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Update the visual effect animation next step delay when speed settings
+ * changes.
+ *
+ * Arguments
+ * ---------
+ *  None
+  *
+ * Returns : Nothing
+ */
 inline void Alarm::updateVisualStepDelay() {
+
     switch( this->profile.visualMode ) {
+
         case ALARM_VISUAL_FADING:
         case ALARM_VISUAL_RAINBOW:
             this->_visualStepDelay = 250 / this->profile.effectSpeed;
@@ -537,6 +857,17 @@ inline void Alarm::updateVisualStepDelay() {
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Process the next step of the visual effect animation.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 inline void Alarm::visualStep() {
     if( this->profile.visualMode == ALARM_VISUAL_NONE ) {
         return;
@@ -555,7 +886,9 @@ inline void Alarm::visualStep() {
     switch( this->profile.visualMode ) {
         case ALARM_VISUAL_FLASHING:
         case ALARM_VISUAL_RED_FLASH:
+
             this->_visualStepReverse = !this->_visualStepReverse;
+
             g_clock.setBrightness( this->_visualStepReverse ? 0 : ( g_config.clock_brightness + 25 ) );
 
             if( this->profile.visualMode == ALARM_VISUAL_RED_FLASH ) {
@@ -566,6 +899,7 @@ inline void Alarm::visualStep() {
 
         case ALARM_VISUAL_WHITE_FLASH:
             this->_visualStepReverse = !this->_visualStepReverse;
+
             g_clock.setBrightness( g_config.clock_brightness + 25 );
             g_clock.setColorFromTable( this->_visualStepReverse ? COLOR_WHITE : g_config.clock_color );
             break;
@@ -586,6 +920,7 @@ inline void Alarm::visualStep() {
 
         case ALARM_VISUAL_RAINBOW:
             g_clock.setBrightness( g_config.clock_brightness + 25 );
+
             this->_visualStepValue += 5;
 
             if( this->_visualStepValue < 85 ) {
@@ -604,10 +939,22 @@ inline void Alarm::visualStep() {
     }
 
     g_clock.update();
+
     this->_timerStart = millis();
     this->updateVisualStepDelay();
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Stops the visual element of the alarm playback.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 inline void Alarm::visualStop() {
 
     /* Turn off lamp if active */
@@ -620,6 +967,16 @@ inline void Alarm::visualStop() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Feed alarm audio buffer and process visual effect animation
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 void Alarm::processAlarmEvents() {
     if( this->_playMode == ALARM_MODE_OFF ) {
         return;
@@ -670,6 +1027,17 @@ void Alarm::processAlarmEvents() {
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Send data to the codec when it is ready to receive data.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 inline void Alarm::feedBuffer() {
     if( this->_playMode & ALARM_MODE_SNOOZE ) {
         return;
@@ -685,15 +1053,20 @@ inline void Alarm::feedBuffer() {
 
         /* Playback from program memory space */
         if( this->_pgm_audio_ptr + VS1053_DATABUFFERLEN > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
+
             bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - this->_pgm_audio_ptr;
+
             memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[this->_pgm_audio_ptr], bytesRead );
+
             this->_pgm_audio_ptr = 0;
 
         } else {
 
             bytesRead = VS1053_DATABUFFERLEN;
+
             memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[this->_pgm_audio_ptr],
                       VS1053_DATABUFFERLEN );
+
             this->_pgm_audio_ptr += VS1053_DATABUFFERLEN;
         }
 
@@ -713,15 +1086,48 @@ inline void Alarm::feedBuffer() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Returns whether or not the alarm switch was ON.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if alarm switch is ONor False otherwise.
+ */
 bool Alarm::isAlarmSwitchOn() {
     return this->_alarm_sw_on;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Checks the current state of the alarm switch pin.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if alarm switch is ONor False otherwise.
+ */
 bool Alarm::detectAlarmSwitchState() {
+
     this->_alarm_sw_on = ( digitalRead( this->_pin_alarm_sw ) == HIGH );
     return this->_alarm_sw_on;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Returns wether or not an alarm is set and that the alarm switch is ON.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 bool Alarm::isAlarmEnabled() {
     if( this->_alarm_sw_on == false ) {
         return false;
@@ -730,6 +1136,18 @@ bool Alarm::isAlarmEnabled() {
     return ( ( g_config.alarm_on[0] == true ) || ( g_config.alarm_on[1] == true ) );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Checks if the given time match an alarm. If so, load it's profile and start
+ * playback.
+ *
+ * Arguments
+ * ---------
+ *  - now : Current date/time
+ *
+ * Returns : TRUE if an alarm matchor False otherwise
+ */
 bool Alarm::checkForAlarms( DateTime *now ) {
     if( this->isAlarmEnabled() == false ) {
         return false;
@@ -751,6 +1169,19 @@ bool Alarm::checkForAlarms( DateTime *now ) {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Get the alarm profile ID which is set to occur next.
+ *
+ * Arguments
+ * ---------
+ *  - currentTime : DateTime structure containing the current time.
+ *  - matchNow    : TRUE to include alarm which match the current time 
+ *                  or FALSE to ignore 
+ *
+ * Returns : The next alarm ID or -1 if no alarm are set.
+ */
 int8_t Alarm::getNextAlarmID( DateTime *currentTime, bool matchNow ) {
     if( this->isAlarmEnabled() == false ) {
         /* All alarms off */
@@ -759,6 +1190,7 @@ int8_t Alarm::getNextAlarmID( DateTime *currentTime, bool matchNow ) {
 
     if( g_config.alarm_on[1] == true ) {
         if( g_config.alarm_on[0] == false ) {
+
             /* Alarm 0 is not active, so alarm 1 is always next */
             return 1;
         }
@@ -776,6 +1208,18 @@ int8_t Alarm::getNextAlarmID( DateTime *currentTime, bool matchNow ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Get the delay in minutes until the next alarm is set to occur.
+ *
+ * Arguments
+ * ---------
+ *  - currentTime : DateTime structure containing the current time.
+ *  - matchNow    : TRUE to include alarm which match the current time 
+ *                  or FALSE to ignore 
+ *
+ * Returns : The delay in minutes or -1 if no alarm is set.
+ */
 int16_t Alarm::getNextAlarmOffset( int8_t alarm_id, DateTime *currentTime, bool matchNow ) {
     if( alarm_id > MAX_ALARM_PROFILES - 1 ) {
         return -1;

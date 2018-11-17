@@ -29,8 +29,6 @@
  *  - pin_xdcs  : Chip data select pin
  *  - pin_dreq  : Data request pin.
  *  - pin_reset : Chip reset pin.
- *
- * Returns : Nothing
  */
 VS1053::VS1053( int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_reset ) {
 
@@ -113,7 +111,7 @@ void VS1053::end() {
  * ---------
  *  None
  *
- * Returns : TRUE if ready, FALSE otherwise.
+ * Returns : TRUE if readyor False otherwise.
  */
 bool VS1053::readyForData() {
 

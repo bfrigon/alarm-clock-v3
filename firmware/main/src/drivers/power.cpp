@@ -30,8 +30,6 @@
  *  - pin_onbatt  : Pin ID which detect when the system is running 
  *                  on battery power.
  *  - pin_lowbatt : Pin ID which detect the battery voltage.
- *
- * Returns : Nothing
  */
 Power::Power( uint8_t pin_onbatt, uint8_t pin_lowbatt ) {
 

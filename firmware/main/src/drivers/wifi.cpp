@@ -1,7 +1,35 @@
+//******************************************************************************
+//
+// Project : Alarm Clock V3
+// File    : src/drivers/wifi.cpp
+// Author  : Benoit Frigon <www.bfrigon.com>
+//
+// -----------------------------------------------------------------------------
+//
+// This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+// International License. To view a copy of this license, visit
+//
+// http://creativecommons.org/licenses/by-sa/4.0/
+//
+// or send a letter to Creative Commons,
+// PO Box 1866, Mountain View, CA 94042, USA.
+//
+//******************************************************************************
 #include "wifi.h"
 #include "../hardware.h"
 #include "../config.h"
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void updateWifiConfig() {
 
     IPAddress net_ip( &g_config.net_ip[0] );
@@ -13,6 +41,17 @@ void updateWifiConfig() {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void enableWifi() {
 
     digitalWrite( PIN_WIFI_RESET, HIGH );
@@ -28,6 +67,16 @@ void enableWifi() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void disableWifi() {
 
     g_wifi.end();

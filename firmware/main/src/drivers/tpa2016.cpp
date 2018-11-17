@@ -18,14 +18,45 @@
 #include "tpa2016.h"
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ */
 TPA2016::TPA2016() {
     this->_control = TPA2016_CTRL_NG;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setPins( int8_t pin_shutdown ) {
     this->_pin_shutdown = pin_shutdown;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::begin() {
     if( this->_init == true ) {
         return;
@@ -49,6 +80,17 @@ void TPA2016::begin() {
     this->write( 0x07, 0b11000000 );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::end() {
 
     if( this->_init == false ) {
@@ -64,7 +106,16 @@ void TPA2016::end() {
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::enableOutputs() {
 
     this->_control |= TPA2016_CTRL_LSPK;
@@ -75,6 +126,17 @@ void TPA2016::enableOutputs() {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::disableOutputs() {
 
     this->_control &= ~TPA2016_CTRL_LSPK;
@@ -84,6 +146,16 @@ void TPA2016::disableOutputs() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setFixedGain( int8_t db ) {
 
     if( db < -28 ) {
@@ -97,32 +169,109 @@ void TPA2016::setFixedGain( int8_t db ) {
     this->write( TPA2016_REG_FIXED_GAIN, db );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setAttackTime( int8_t time ) {
 
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setReleaseTime( int8_t time ) {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setHoldTime( int8_t time ) {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::enableAGC( bool enabled ) {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setMaxGain( int8_t db ) {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::setCompression( uint8_t compression ) {
 
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::dumpRegs() {
 
     for( uint8_t i = 1; i < 8l;  i++ ) {
@@ -143,7 +292,16 @@ void TPA2016::dumpRegs() {
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ *
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void TPA2016::write( uint8_t reg, uint8_t data ) {
 
     Wire.beginTransmission( TPA2016_I2C_ADDR );

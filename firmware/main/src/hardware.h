@@ -39,15 +39,12 @@
 #include "drivers/power.h"
 
 
-
-
 // ----------------------------------------
 // Pins
 // ----------------------------------------
 #define PIN_INT_RTC         2
 #define PIN_INT_KEYPAD      3
 #define PIN_OLED_RESET      5
-#define PIN_OLED_VEN        14
 #define PIN_WIFI_CS         13
 #define PIN_WIFI_IRQ        19
 #define PIN_WIFI_RESET      11
@@ -66,8 +63,6 @@
 #define PIN_AMP_SHDN        28
 #define PIN_ON_BATTERY      A14
 #define PIN_LOW_BATTERY     A8
-
-
 
 
 // ----------------------------------------

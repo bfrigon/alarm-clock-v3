@@ -26,8 +26,6 @@
  * Arguments
  * ---------
  *  - pin_leds : Pin ID connected to the nepoxel data line.
- *
- * Returns : Nothing
  */
 Lamp::Lamp( int8_t pin_leds ) : NeoPixel( pin_leds, -1 ) {
 

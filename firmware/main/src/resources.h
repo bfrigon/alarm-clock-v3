@@ -15,7 +15,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
@@ -32,13 +31,12 @@
     static const char name[] PROGMEM = value
 
 
-
-
 //--------------------------------------------------------------------------
 //
 // Custom character sets
 //
 //--------------------------------------------------------------------------
+
 const char CUSTOM_CHARACTERS_DEFAULT[] PROGMEM = {
 
     0x00, 0x00, 0x04, 0x0A, 0x04, 0x00, 0x00, 0x00,     /* unchecked */

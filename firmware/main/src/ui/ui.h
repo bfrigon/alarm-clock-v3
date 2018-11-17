@@ -125,7 +125,7 @@ bool checkFactoryResetBtn();
 
 bool onEnterScreen( Screen *screen );
 bool onExitScreen( Screen *currentScreen, Screen *newScreen );
-bool onValueChange( Screen *screen, Item *item );
+void onValueChange( Screen *screen, Item *item );
 void onSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fullscreen );
 bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col );
 

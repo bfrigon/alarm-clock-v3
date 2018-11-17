@@ -166,7 +166,7 @@ class US2066 {
 
   public:
 
-    US2066( uint8_t address, uint8_t pin_reset, uint8_t pin_ven );
+    US2066( uint8_t address, uint8_t pin_reset );
 
     void begin();
     void end();
@@ -210,7 +210,6 @@ class US2066 {
     bool _init = false;
     uint8_t _address = US2066_DEF_I2C_ADDR;
     uint8_t _pin_reset;
-    uint8_t _pin_ven;
 
     uint8_t _current_iset = US2066_ISET_STANDARD;
     FILE _lcdout = {0};

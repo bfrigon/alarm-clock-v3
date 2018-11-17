@@ -21,6 +21,16 @@ bool showHelpMsg = false;
 
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when entering the screen
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : TRUE to continue loading the screenor False otherwise
+ */
 bool alarmScreen_onEnterScreen( Screen *screen ) {
 
     showHelpMsg = false;
@@ -28,6 +38,18 @@ bool alarmScreen_onEnterScreen( Screen *screen ) {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when a key press occurs
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *  - key    : Detected key press.
+ *
+ * Returns : TRUE to allow default key press processingor False to override.
+ */
 bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
     uint8_t mode = g_alarm.getPlayMode();
 
@@ -66,6 +88,17 @@ bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
     return false;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when updating the screen.
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : TRUE to allow default screen updateor False to override.
+ */
 bool alarmScreen_onDrawScreen( Screen *screen ) {
     uint8_t mode = g_alarm.getPlayMode();
 
@@ -130,6 +163,17 @@ bool alarmScreen_onDrawScreen( Screen *screen ) {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when the exit screen timeout delay has elapsed.
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : Nothing
+ */
 void alarmScreen_onTimeout( Screen *screen ) {
     if( showHelpMsg == true ) {
         showHelpMsg = false;

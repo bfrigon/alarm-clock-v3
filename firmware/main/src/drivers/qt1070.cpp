@@ -29,8 +29,6 @@ volatile bool qt1070_event = false;
  * Arguments
  * ---------
  *  - pin_irq : QT1070 interrupt pin
- *
- * Returns : Nothing
  */
 QT1070::QT1070( uint8_t pin_irq ) {
 

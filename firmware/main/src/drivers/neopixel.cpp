@@ -28,8 +28,6 @@
  * ---------
  *  - pin_leds : Pin ID connected to the neopixel data line.
  *  - pin_shdn : Pin ID connected to the neopixel power MOSFET.
- *
- * Returns : Nothing
  */
 NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
     this->_pin_leds = pin_leds;

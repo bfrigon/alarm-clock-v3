@@ -31,8 +31,6 @@ volatile bool rtc_event = false;
  * Arguments
  * ---------
  *  - pin_irq : DS3231 interrupt pin
- *
- * Returns : Nothing
  */
 DS3231::DS3231( int8_t pin_irq ) {
     this->_pin_irq = pin_irq;
@@ -174,7 +172,7 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
  * ---------
  *  None
  *
- * Returns : TRUE if an alarm event occured, FALSE otherwise.
+ * Returns : TRUE if an alarm event occuredor False otherwise.
  */
 bool DS3231::processEvents() {
 

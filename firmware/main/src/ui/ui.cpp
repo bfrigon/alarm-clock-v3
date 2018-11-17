@@ -71,6 +71,16 @@ Screen screen_edit_alarm_visual( SCREEN_ID_EDIT_ALARM_VISUAL, ITEMS_EDIT_PROFILE
 
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Initialize screens settings.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void initScreens() {
 
     screen_alarm.eventDrawScreen = &alarmScreen_onDrawScreen;
@@ -115,12 +125,21 @@ void initScreens() {
     screen_edit_alarm_visual.eventSelectionChanged = &onSelectionChange;
 }
 
-//--------------------------------------------------------------------------
-//
-// Screen events
-//
-//--------------------------------------------------------------------------
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when drawing an item.
+ *
+ * Arguments
+ * ---------
+ *  - screen     : Pointer to the screen where the event occured.
+ *  - item       : Item being drawn.
+ *  - isSelected : TRUE if the item is currently selectedor False otherwise.
+ *  - row        : Zero based Y position where the item is located.
+ *  - col        : Zero based X position where the item is located.
+ *
+ * Returns : TRUE to allow default item drawingor False to override.
+ */
 bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col ) {
     uint8_t length;
 
@@ -186,6 +205,20 @@ bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when the cursor on the currently selected item has changed 
+ * position or when another item is selected.
+ *
+ * Arguments
+ * ---------
+ *  - screen     : Pointer to the screen where the event occured.
+ *  - item       : Item currently selected.
+ *  - fieldPos   : Cursor position within the selected item.
+ *  - fullscreen : TRUE if the item is shown full screenor False otherwise.
+ * 
+ * Returns : Nothing
+ */
 void onSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fullscreen ) {
 
     switch( item->id ) {
@@ -265,7 +298,19 @@ void onSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fulls
     }
 }
 
-bool onValueChange( Screen *screen, Item *item ) {
+
+/*--------------------------------------------------------------------------
+ *
+ * Raised when a screen item value changes.
+ *
+ * Arguments
+ * ---------
+ *  - screen     : Pointer to the screen where the event occured.
+ *  - item       : Item currently selected.
+ *
+ * Returns : Nothing
+ */
+void onValueChange( Screen *screen, Item *item ) {
 
     switch( item->id ) {
 
@@ -394,11 +439,19 @@ bool onValueChange( Screen *screen, Item *item ) {
             g_lamp.setEffectSpeed( *( ( uint8_t * )item->value ) );
             break;
     }
-
-    return true;
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when entering the screen
+ *
+ * Arguments
+ * ---------
+ *  - screen     : Pointer to the new screen.
+ *
+ * Returns : TRUE to allow loading the screenor False to override.
+ */
 bool onEnterScreen( Screen *screen ) {
 
     DateTime now;
@@ -449,6 +502,18 @@ bool onEnterScreen( Screen *screen ) {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when leaving the screen
+ *
+ * Arguments
+ * ---------
+ *  - currentScreen : Current screen.
+ *  - newScreen     : The new screen to be loaded.
+ *
+ * Returns : TRUE to allow leaving the screenor False to override.
+ */
 bool onExitScreen( Screen *currentScreen, Screen *newScreen ) {
 
     bool save;

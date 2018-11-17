@@ -15,7 +15,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef SCREEN_H
 #define SCREEN_H
 
@@ -213,7 +212,7 @@ extern const char *g_currentCustomCharacterSet;
 
 
 typedef bool ( *pfEventKeypress )( Screen *screen, uint8_t key ) ;
-typedef bool ( *pfEventValueChange )( Screen *screen, Item *item );
+typedef void ( *pfEventValueChange )( Screen *screen, Item *item );
 typedef void ( *pfEventSelectionChanged )( Screen *screen, Item *item, uint8_t fieldPos, bool fullscreen );
 typedef bool ( *pfEventDrawScreen )( Screen *screen );
 typedef bool ( *pfEventExitScreen )( Screen *currentScreen, Screen *newScreen );

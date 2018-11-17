@@ -15,15 +15,37 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "time.h"
 
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  None
+ */
 DateTime::DateTime() {
 
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor. Initialize the class with a specific date/time
+ *
+ * Arguments
+ * ---------
+ *  - year  : Year (0-99, assumes 2000)
+ *  - month : Month (1-12)
+ *  - date  : date (1-31)
+ *  - hour  : hour (0-23)
+ *  - min   : Minutes (0-59)
+ *  - sec   : Seconds (0-59)
+ *  - dow   : Day of week (1-7 : 1=Sunday, 7=Saturday)
+ */
 DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec, uint8_t dow ) {
     if( month == 0 ) {
         month = 1;
@@ -53,6 +75,19 @@ DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, ui
     this->_dow = dow;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * This function interpolate the unix time based on the date and time stored 
+ * in the DateTime structure. It accounts for leap year but Ignores
+ * time zone. It always assume it is UTC.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : The unix time.
+ */
 unsigned long DateTime::getEpoch() {
     uint16_t days = this->_d - 1;
 
@@ -70,7 +105,18 @@ unsigned long DateTime::getEpoch() {
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Get the pointer to the string stored in program memory which represents 
+ * the given month.
+ *
+ * Arguments
+ * ---------
+ *  - month     : The month (1-12)
+ *  - shortName : TRUE to get the abreviationor False for the full name.
+ *
+ * Returns : The pointer to the month name string.
+ */
 const char *getMonthName( uint8_t month, bool shortName ) {
 
     /* Validate input */
@@ -93,6 +139,18 @@ const char *getMonthName( uint8_t month, bool shortName ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Get the pointer to the string stored in program memory which represents 
+ * the given day of week.
+ *
+ * Arguments
+ * ---------
+ *  - day       : The day of week (1-7)
+ *  - shortName : TRUE to get the abreviationor False for the full name.
+ *
+ * Returns : The pointer to the day of week name string.
+ */
 const char *getDayName( uint8_t day, bool shortName ) {
 
     /* Validate input */
@@ -115,6 +173,17 @@ const char *getDayName( uint8_t day, bool shortName ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Get the number of day in a given month
+ *
+ * Arguments
+ * ---------
+ *  - month : Month (1-12) 
+ *  - year  : year (0-99, assume year 2000)
+ *
+ * Returns : The number of days
+ */
 uint8_t getMonthNumDays( uint8_t month, uint8_t year ) {
 
     if( month == 0 ) {
@@ -135,6 +204,19 @@ uint8_t getMonthNumDays( uint8_t month, uint8_t year ) {
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Get the day of week from a given date. 
+ *
+ * Arguments
+ * ---------
+ *  - year  : year (0-99, assume year 2000)
+ *  - month : Month (1-12) 
+ *  - day   : Day (1-31)
+ *
+ * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ */
 uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
 
     /*
@@ -194,6 +276,19 @@ uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
 }
 
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Prints the time from a given date/time structure into a string.
+ *
+ * Arguments
+ * ---------
+ *  - buffer  : Pointer to the string to write to.
+ *  - fmt_24h : TRUE for 24H time formator False for am/pm.
+ *  - date    : Structure containing the date and time to print.
+ *
+ * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
 
     Time time;
@@ -203,6 +298,19 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
     return timeToBuf( buffer, fmt_24h, &time );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Prints the given time into a string.
+ *
+ * Arguments
+ * ---------
+ *  - buffer  : Pointer to the string to write to.
+ *  - fmt_24h : TRUE for 24H time formator False for am/pm.
+ *  - time    : Structure containing the time to print.
+ *
+ * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
     uint8_t length;
 
@@ -223,6 +331,20 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
     return length;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Prints the date from a given date/time structure into a string unsign
+ * a specific format.
+ *
+ * Arguments
+ * ---------
+ *  - buffer  : Pointer to the string to write to.
+ *  - format  : Date format to use.
+ *  - date    : Structure containing the date to print
+ *
+ * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ */
 uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 
     uint8_t length;

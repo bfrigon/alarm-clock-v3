@@ -18,6 +18,17 @@
 #include "ui.h"
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when a key press occurs
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *  - key    : Detected key press.
+ *
+ * Returns : TRUE to allow default key press processingor False to override.
+ */
 bool rootScreen_onKeypress( Screen *screen, uint8_t key ) {
 
     switch( key ) {
@@ -56,6 +67,17 @@ bool rootScreen_onKeypress( Screen *screen, uint8_t key ) {
     return false;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when updating the screen.
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : TRUE to allow default screen updateor False to override.
+ */
 bool rootScreen_onDrawScreen( Screen *screen ) {
 
     char buffer[16];

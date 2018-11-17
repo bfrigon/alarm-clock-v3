@@ -24,14 +24,12 @@
  *
  * Arguments
  * ---------
- *  None
- *
- * Returns : Nothing
+ *  - address   : I2C address of the OLED module
+ *  - pin_reset : Pin connected to the OLED reset line
  */
-US2066::US2066( uint8_t address, uint8_t pin_reset, uint8_t pin_ven ) {
+US2066::US2066( uint8_t address, uint8_t pin_reset ) {
     this->_address = address;
     this->_pin_reset = pin_reset;
-    this->_pin_ven = pin_ven;
 }
 
 

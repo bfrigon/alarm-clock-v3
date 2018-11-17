@@ -15,22 +15,26 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "src/hardware.h"
 #include "src/ui/ui.h"
 #include "src/config.h"
+
 
 Alarm g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
                PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
 NeoClock g_clock( PIN_NEOCLOCK, PIN_PIX_SHDN );
 Lamp g_lamp( PIN_PIX_LAMP );
 QT1070 g_keypad( PIN_INT_KEYPAD );
-US2066 g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET, PIN_OLED_VEN );
+US2066 g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET );
 Power g_power( PIN_ON_BATTERY, PIN_LOW_BATTERY );
 DS3231 g_rtc( PIN_INT_RTC );
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Initialization
+ *
+ */
 void setup() {
 
     pinMode( PIN_WIFI_RESET, OUTPUT );
@@ -74,10 +78,7 @@ void setup() {
     g_rtc.begin();
     g_rtc.setAlarmFrequency( RTC_ALARM_EVERY_SECOND );
     g_rtc.enableInterrupt();
-
-
     resetClockDisplay();
-    g_screenUpdate = true;
 
     /* Initialize OLED display */
     g_lcd.begin();
@@ -98,8 +99,11 @@ void setup() {
 }
 
 
-
-
+/*--------------------------------------------------------------------------
+ *
+ * Main loop
+ *
+ */
 void loop() {
 
     /* Reset watchdog timer */
@@ -202,7 +206,7 @@ void loop() {
 
     // if( g_wifi.statusChanged() == true ) {
 
-    //     if( g_currentScreen->id == SCREEN_ID_ROOT )  {
+    //     if( g_currentScreen->id() == SCREEN_ID_ROOT )  {
     //         g_screenUpdate = true;
     //     }
     // }
@@ -212,6 +216,17 @@ void loop() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Checks if the check button is held after reset. In that case, it sets
+ * all settings to default. 
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if settings were reset to defaultor False
+ */
 bool checkFactoryResetBtn() {
     unsigned long start = millis();
     bool resetConfig = false;
@@ -250,6 +265,16 @@ bool checkFactoryResetBtn() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Set the clock display back to it's default state.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
 void resetClockDisplay() {
 
     DateTime now = g_rtc.now();

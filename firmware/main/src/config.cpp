@@ -15,7 +15,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "config.h"
 #include "alarm.h"
 #include "drivers/lamp.h"
@@ -25,16 +24,25 @@
 struct Config g_config;
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Load settings from EEPROM
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 void loadConfig() {
     uint8_t c;
     uint8_t byte;
 
-
-
-
     uint16_t magic;
     EEPROM.get( EEPROM_ADDR_MAGIC, magic );
 
+    /* If magic code is not found, assumes the EEPROM is empty or corrupted and
+       restore default settings */
     if( magic != 0xBEEF ) {
         restoreDefaultConfig();
         return;
@@ -45,21 +53,26 @@ void loadConfig() {
 
         *( ( ( uint8_t * )&g_config ) + c ) = byte;
     }
-
-
-
-
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Save settings to EEPROM
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 void saveConfig() {
     uint8_t c;
     uint8_t byte;
 
-
-    /* Put valid config magic number (0xBEEF) */
+    /* Save valid config magic number (0xBEEF) */
     EEPROM.update( EEPROM_ADDR_MAGIC + 0, 0xEF );
     EEPROM.update( EEPROM_ADDR_MAGIC + 1, 0xBE );
-
 
     for( c = 0; c < sizeof( Config ); c++ ) {
         byte = *( ( ( uint8_t * )&g_config ) + c );
@@ -70,6 +83,17 @@ void saveConfig() {
     Serial.println( "Written EEPROM" );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Restore default settings or initialize EEPROM contents.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns :
+ */
 void restoreDefaultConfig() {
 
     strcpy( g_config.ssid, "f287744230" );
@@ -83,17 +107,9 @@ void restoreDefaultConfig() {
     /* Store default config */
     saveConfig();
 
-    initAlarmProfiles();
 
-
-}
-
-
-
-void initAlarmProfiles() {
-
-    AlarmProfile profile;
-
+    /* Save default alarm profiles */
+    struct AlarmProfile profile;
     profile.snoozeDelay = 10;
     profile.volume = 30;
     profile.filename[0] = 0;
@@ -114,5 +130,3 @@ void initAlarmProfiles() {
         g_alarm.saveProfile( &profile, i );
     }
 }
-
-
