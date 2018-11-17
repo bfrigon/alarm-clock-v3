@@ -103,7 +103,7 @@ class Alarm : private VS1053 {
     uint8_t getPlayMode();
     bool isAlarmEnabled();
     struct AlarmProfile profile;
-    struct File currentFile;
+    struct SdBaseFile currentFile;
 
   private:
 
@@ -121,8 +121,8 @@ class Alarm : private VS1053 {
     bool _init = false;
 
 
-
     unsigned long _timerStart = 0;
+    unsigned long _alarmStart = 0;
     unsigned long _snoozeStart = 0;
     uint16_t _playDelay = 0;
     uint16_t _visualStepDelay = 0;
@@ -132,6 +132,7 @@ class Alarm : private VS1053 {
     bool _sd_present = false;
     bool _alarm_sw_on = false;
     uint8_t _playMode = ALARM_MODE_OFF;
+    uint8_t _volume = 0;
 
     uint16_t _pgm_audio_ptr = 0;
 

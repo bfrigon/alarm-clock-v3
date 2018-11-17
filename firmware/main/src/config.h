@@ -27,7 +27,7 @@
 #include "resources.h"
 
 #define MAX_ALARM_PROFILES          2
-#define ALARM_FILENAME_LENGTH       40
+#define ALARM_FILENAME_LENGTH       12  
 #define ALARM_MESSAGE_LENGTH        16
 
 

@@ -46,6 +46,7 @@ uint8_t Alarm::begin() {
     }
 
     this->_init = true;
+    this->_volume = 0;
     this->updatePowerState();
 }
 
@@ -200,18 +201,22 @@ bool Alarm::openFile( char *name ) {
     } else {
         this->currentFile.openNext( this->_sd.vwd(), O_READ );
 
+        char buffer[ ALARM_FILENAME_LENGTH ];
+        this->currentFile.getSFN( buffer );
+
         /* If the next filename is the same than the currently slected one, go
            to the next file */
-        if( strncmp( this->profile.filename, this->currentFile.name(), ALARM_FILENAME_LENGTH )
+        if( strncmp( this->profile.filename, buffer, ALARM_FILENAME_LENGTH )
                 == 0 ) {
             this->currentFile.openNext( this->_sd.vwd(), O_READ );
         }
 
-        this->currentFile.getSFN( this->profile.filename );
+        strcpy( this->profile.filename, buffer );
     }
 
     while( this->currentFile.isOpen() != false ) {
-        /* Validate file format */
+
+        /* Validate file extension */
         if( this->currentFile.isFile() == true ) {
             if( strstr_P( this->profile.filename, PSTR( ".MP3" ) ) != NULL
                     || strstr_P( this->profile.filename, PSTR( ".MID" ) ) != NULL
@@ -322,6 +327,7 @@ void Alarm::play( uint8_t mode ) {
     this->_timerStart = 0;
     this->_playDelay = 0;
     this->_snoozeStart = 0;
+    this->_alarmStart = millis();
 
     if( mode & ALARM_MODE_SCREEN ) {
         gotoScreen( &screen_alarm, true, g_currentScreen );
@@ -378,14 +384,20 @@ void Alarm::audioStart() {
         g_power.setPowerMode( POWER_MODE_LOW_POWER );
     }
 
-    this->setVolume( this->profile.volume );
+    if( this->profile.gradual == true && ( ( this->_playMode & ALARM_MODE_TEST ) == 0 ) ) {
+        this->setVolume( 0 );
+
+    } else {
+        this->setVolume( this->profile.volume );
+    }
+
     this->openFile( this->profile.filename );
 
-    if( this->currentFile == false ) {
+    if( this->currentFile.isOpen() == false ) {
         this->_pgm_audio_ptr = 0;
 
     } else {
-        this->currentFile.seek( 0 );
+        this->currentFile.seekSet( 0 );
     }
 
     /* reset playback */
@@ -430,6 +442,7 @@ void Alarm::resume() {
 
     this->_playMode &= ~ALARM_MODE_SNOOZE;
     this->_snoozeStart = 0;
+    this->_alarmStart = millis();
 
     this->audioStart();
     this->visualStart();
@@ -442,10 +455,12 @@ void Alarm::resume() {
 
 
 void Alarm::setVolume( uint8_t vol ) {
-    /* 120: -60db  0: +0db */
     if( vol > 100 ) {
         vol = 100;
     }
+
+    this->_volume = vol;
+
 
     vol = 100 - ( vol * 100 / 100 );
     VS1053::setVolume( vol, vol );
@@ -594,8 +609,10 @@ inline void Alarm::visualStep() {
 }
 
 inline void Alarm::visualStop() {
+
     /* Turn off lamp if active */
     g_lamp.deactivate();
+
     /* Restore clock settings */
     g_clock.setColorFromTable( g_config.clock_color );
     g_clock.setBrightness( g_config.clock_brightness );
@@ -629,6 +646,20 @@ void Alarm::processAlarmEvents() {
         this->play( this->_playMode );
     }
 
+
+    if( this->profile.gradual == true && ( ( this->_playMode & ALARM_MODE_TEST ) == 0 ) ) {
+        uint8_t volume = ( uint8_t )( ( unsigned long )( millis() - this->_alarmStart ) / ( 45000 / this->profile.volume ) );
+
+        if( volume > this->profile.volume ) {
+            volume = this->profile.volume;
+        }
+
+        if( volume != this->_volume ) {
+            this->setVolume( volume );
+        }
+    }
+
+
     if( this->_playMode & ALARM_MODE_AUDIO ) {
         g_power.resetSuspendDelay();
         this->feedBuffer();
@@ -650,28 +681,31 @@ inline void Alarm::feedBuffer() {
 
     uint8_t bytesRead;
 
-    /* Playback from program memory space */
-    if( this->currentFile == false ) {
+    if( this->currentFile.isOpen() == false ) {
+
+        /* Playback from program memory space */
         if( this->_pgm_audio_ptr + VS1053_DATABUFFERLEN > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
             bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - this->_pgm_audio_ptr;
             memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[this->_pgm_audio_ptr], bytesRead );
             this->_pgm_audio_ptr = 0;
 
         } else {
+
             bytesRead = VS1053_DATABUFFERLEN;
             memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[this->_pgm_audio_ptr],
                       VS1053_DATABUFFERLEN );
             this->_pgm_audio_ptr += VS1053_DATABUFFERLEN;
         }
 
-        /* Playback from file on SD card */
 
     } else {
+        /* Playback from file on SD card */
         bytesRead = this->currentFile.read( vs1053_buffer, VS1053_DATABUFFERLEN );
 
         if( bytesRead == 0 ) {
+
             /* Play the file in loop */
-            this->currentFile.seek( 0 );
+            this->currentFile.rewind();
         }
     }
 
