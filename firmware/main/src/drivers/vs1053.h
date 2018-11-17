@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : vs1053.h
+// File    : src/drivers/vs1053.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 // Credits : Based on Adafruit_VS1053 library
 //
@@ -16,7 +16,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef VS1053_H
 #define VS1053_H
 
@@ -72,42 +71,32 @@
 #define VS1053_DATA_SPI_SETTING         SPISettings( 8000000, MSBFIRST, SPI_MODE0 )
 
 
-
-
 class VS1053 {
   public:
 
     VS1053( int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_rst );
 
-    uint8_t begin();
+    int8_t begin();
     void end();
 
     bool readyForData();
     void playData( uint8_t *buffer, uint8_t buffsiz );
-
     void setVolume( uint8_t left, uint8_t right );
-    uint16_t decodeTime();
     void softReset();
     void reset();
 
-
   protected:
-
     uint16_t sciRead( uint8_t addr );
     void sciWrite( uint8_t addr, uint16_t data );
     inline void spiwrite( uint8_t c );
     void spiwrite( uint8_t *buffer, uint16_t num );
 
-
-
   private:
-
     bool _init = false;
     int8_t _pin_xdcs;
     int8_t _pin_cs;
     int8_t _pin_dreq;
     int8_t _pin_reset;
 };
-
 
 #endif /* VS1053_H */

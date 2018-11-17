@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : qt1070.h
+// File    : src/drivers/qt1070.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -21,7 +21,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "power.h"
+
 
 /* --- I2C address --- */
 #define I2C_ADDR_AT42QT1070     0x1B

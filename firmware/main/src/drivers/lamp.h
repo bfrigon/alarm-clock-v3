@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : lamp.h
+// File    : src/drivers/lamp.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,7 +15,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef LAMP_H
 #define LAMP_H
 
@@ -23,11 +22,6 @@
 
 #include "../config.h"
 #include "neopixel.h"
-#include "power.h"
-
-
-
-
 
 
 
@@ -40,8 +34,6 @@
 
 
 #define LAMP_MIMIMUM_FADING_BRIGHTNESS  20
-
-
 
 
 

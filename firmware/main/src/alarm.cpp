@@ -17,7 +17,9 @@
 //******************************************************************************
 
 #include "alarm.h"
+#include "screen.h"
 #include "ui/ui.h"
+
 
 
 uint8_t vs1053_buffer[VS1053_DATABUFFERLEN];

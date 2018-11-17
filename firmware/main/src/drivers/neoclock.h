@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : neoclock.h
+// File    : src/drivers/neoclock.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,7 +15,6 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef NEOCLOCK_H
 #define NEOCLOCK_H
 
@@ -23,10 +22,6 @@
 #include <avr/pgmspace.h>
 
 #include "neopixel.h"
-#include "../config.h"
-#include "../alarm.h"
-#include "../libs/time.h"
-#include "../resources.h"
 
 
 

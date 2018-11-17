@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : neoclock.cpp
+// File    : src/drivers/neoclock.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,22 +15,40 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "neoclock.h"
+#include "../config.h"
+#include "../alarm.h"
+#include "../libs/time.h"
+#include "../resources.h"
 
 
-
-
-
-
-
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  - pin_leds : Pin ID connected to the neopixel data line.
+ *  - pin_shdn : Pin ID connected to the neopixel power MOSFET.
+ *
+ * Returns : Nothing
+ */
 NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin_shdn ) {
 
     this->_flashTimerStart = millis();
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Refresh the lamp NeoPixel data.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void NeoClock::update() {
 
     uint8_t pixmap[5];
@@ -109,6 +127,16 @@ void NeoClock::update() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Check if the pixels needs to be updated.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void NeoClock::processUpdateEvents() {
 
     if( millis() - this->_flashTimerStart > ( this->flashRate * 10 ) ) {
@@ -129,10 +157,18 @@ void NeoClock::processUpdateEvents() {
 }
 
 
-
-
-
-
+/*--------------------------------------------------------------------------
+ *
+ * Sets pixel for a given segment digit position. Each digits contains 7 pixels.
+ *
+ * Arguments
+ * ---------
+ *  - pixmap : Pointer to the pixel buffer ( 1 bit per pixel )
+ *  - pos    : Position in the string where the segment digit begins.
+ *  - value  : Value to assign to digit.
+ * 
+ * Returns : Nothing
+ */
 void NeoClock::setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value ) {
 
     uint8_t chr = pgm_read_byte( &_charmap[ value ] );
@@ -143,11 +179,16 @@ void NeoClock::setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value ) {
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Turn on all the leds on the display.
+ *
+ * Arguments
+ * ---------
+ *  - testMode : True to enable pixel test mdoe.
+ *
+ * Returns : Nothing
+ */
 void NeoClock::setTestMode( bool testMode ) {
     this->_testMode = testMode;
 }
-
-
-
-

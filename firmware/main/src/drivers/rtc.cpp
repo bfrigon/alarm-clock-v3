@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : rtc.cpp
+// File    : src/drivers/rtc.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,16 +15,40 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "rtc.h"
+#include "power.h"
+#include "../libs/time.h"
 
 
 volatile bool rtc_event = false;
 
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  - pin_irq : DS3231 interrupt pin
+ *
+ * Returns : Nothing
+ */
 DS3231::DS3231( int8_t pin_irq ) {
     this->_pin_irq = pin_irq;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Initialize the RTC IC.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void DS3231::begin() {
 
     Wire.begin();
@@ -43,6 +67,16 @@ void DS3231::begin() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Enable the alarm interrupt.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void DS3231::enableInterrupt() {
     uint8_t control = this->read( DS3231_REG_CONTROL );
 
@@ -53,10 +87,32 @@ void DS3231::enableInterrupt() {
     attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_ds3231, LOW );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Disable the alarm interrupt.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void DS3231::disableInterrupt() {
     detachInterrupt( digitalPinToInterrupt( this->_pin_irq ) );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Clear the alarm flag.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void DS3231::clearAlarmFlag() {
     uint8_t status = this->read( DS3231_REG_STATUS );
 
@@ -64,6 +120,17 @@ void DS3231::clearAlarmFlag() {
     this->write( DS3231_REG_STATUS, status );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Set the frequency at which the alarm interrupt is raised.
+ *
+ * Arguments
+ * ---------
+ *  - freq : RTC_ALARM_EVERY_HOUR, RTC_ALARM_EVERY_MINUTE or RTC_ALARM_EVERY_SECOND
+ *
+ * Returns : Nothing
+ */
 void DS3231::setAlarmFrequency( uint8_t freq ) {
 
     switch( freq ) {
@@ -97,6 +164,18 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Check if an alarm event occured. If so, it will reset the alarm flag and
+ * rearm the interrupt.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if an alarm event occured, FALSE otherwise.
+ */
 bool DS3231::processEvents() {
 
     if( rtc_event == false ) {
@@ -110,6 +189,17 @@ bool DS3231::processEvents() {
     return true;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * For debugging purposes. Prints the contents of all registers
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void DS3231::dumpRegs() {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
     Wire.write( DS3231_REG_SEC );
@@ -129,7 +219,17 @@ void DS3231::dumpRegs() {
 }
 
 
-struct DateTime DS3231::now() {
+/*--------------------------------------------------------------------------
+ *
+ * Get the current date and time.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Structure containing the current date and time.
+ */
+DateTime DS3231::now() {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
     Wire.write( DS3231_REG_SEC );
     Wire.endTransmission();
@@ -150,15 +250,39 @@ struct DateTime DS3231::now() {
     return DateTime( y, m, d, hh, mm, ss, wd );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Get the current unix time. This function interpolate the unix time based
+ * on the date and time stored in the RTC. It accounts for leap year but Ignores
+ * time zone. It always assume the time zone is UTC.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : The unix time.
+ */
 unsigned long DS3231::getEpoch() {
     return this->now().getEpoch();
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Sets the date and time on the RTC IC.
+ *
+ * Arguments
+ * ---------
+ *  - ndt : Structure containing the date and time.
+ *
+ * Returns : Nothing
+ */
 void DS3231::setDateTime( DateTime ndt ) {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
 
     Wire.write( DS3231_REG_SEC );
+
     Wire.write( bin2bcd( ndt.second() ) );
     Wire.write( bin2bcd( ndt.minute() ) );
     Wire.write( bin2bcd( ndt.hour() & ~DS3231_HOUR_24H ) );
@@ -171,7 +295,18 @@ void DS3231::setDateTime( DateTime ndt ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Read data from the RTC IC.
+ *
+ * Arguments
+ * ---------
+ *  - reg : Register address to read data from.
+ *
+ * Returns : Nothing
+ */
 uint8_t DS3231::read( uint8_t reg ) {
+
     Wire.beginTransmission( I2C_ADDR_DS3231 );
 
     Wire.write( reg );
@@ -183,6 +318,18 @@ uint8_t DS3231::read( uint8_t reg ) {
     return Wire.read();
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Write data to the RTC IC.
+ *
+ * Arguments
+ * ---------
+ *  - reg   : Register address to write data to.
+ *  - value : Data to write
+ *
+ * Returns : Nothing
+ */
 void DS3231::write( uint8_t reg, uint8_t value ) {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
 
@@ -190,10 +337,21 @@ void DS3231::write( uint8_t reg, uint8_t value ) {
     Wire.write( value );
 
     Wire.endTransmission();
+
     delayMicroseconds( 10 );
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Interrupt service routine for the alarm event.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void isr_ds3231() {
     rtc_event = true;
 

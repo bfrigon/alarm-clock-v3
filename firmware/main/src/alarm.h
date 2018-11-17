@@ -30,7 +30,6 @@
 #include "libs/time.h"
 #include "hardware.h"
 #include "resources.h"
-#include "screen.h"
 #include "config.h"
 
 

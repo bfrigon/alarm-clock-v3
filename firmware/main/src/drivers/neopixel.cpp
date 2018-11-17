@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : neopixel.cpp
+// File    : src/drivers/neopixel.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,18 +15,38 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "neopixel.h"
 #include "power.h"
 #include "../resources.h"
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  - pin_leds : Pin ID connected to the neopixel data line.
+ *  - pin_shdn : Pin ID connected to the neopixel power MOSFET.
+ *
+ * Returns : Nothing
+ */
 NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
     this->_pin_leds = pin_leds;
     this->_pin_shdn = pin_shdn;
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Initialize pins for the LED string.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void NeoPixel::begin() {
     if( this->_init == true ) {
         return;
@@ -44,6 +64,16 @@ void NeoPixel::begin() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Disable power for the LED string.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void NeoPixel::end() {
     if( this->_init == false ) {
         return;
@@ -57,6 +87,16 @@ void NeoPixel::end() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Disable/enable power for the leds based on the current system power state
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void NeoPixel::updatePowerState() {
 
     if( this->_init == false ) {
@@ -71,6 +111,17 @@ void NeoPixel::updatePowerState() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Calculate the pixel brightness and apply gamma correction for an 
+ * individual color channel.
+ *
+ * Arguments
+ * ---------
+ *  - color : Color channel value.
+ *
+ * Returns : The corrected brightness value.
+ */
 inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 
     uint8_t brightness = this->_brightness;
@@ -90,6 +141,16 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Send the data to each pixels.
+ *
+ * Arguments
+ * ---------
+ *  - pixmap     : Pointer to the pixel data buffer ( 1 bit per pixel )
+ *  - num_pixels : Number of pixels contained in the pixel map.
+ * Returns : Nothing
+ */
 void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 
     volatile uint8_t comp = 0;
@@ -100,6 +161,7 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
     uint8_t i_pixel_grp = 0;
 
 
+    /* Don't send anything if currently in suspend mode */
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
         return;
     }
@@ -201,17 +263,40 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 }
 
 
-void NeoPixel::setPixel( uint8_t *pixmap, uint8_t id, bool state ) {
+/*--------------------------------------------------------------------------
+ *
+ * Set/clear pixel within the pixel map.
+ *
+ * Arguments
+ * ---------
+ *  - pixmap : Pointer to the pixel map data.
+ *  - pos    : Pixel position to modify.
+ *  - state  : State to assign to the pixel. (True for ON, false otherwise)
+ * 
+ * Returns : Nothing
+ */
+void NeoPixel::setPixel( uint8_t *pixmap, uint8_t pos, bool state ) {
 
     if( state == true ) {
-        *( pixmap + ( id / 8 ) ) |= ( 1 << ( id % 8 ) );
+        *( pixmap + ( pos / 8 ) ) |= ( 1 << ( pos % 8 ) );
 
     } else {
 
-        *( pixmap + ( id / 8 ) ) &= ~( 1 << ( id % 8 ) );
+        *( pixmap + ( pos / 8 ) ) &= ~( 1 << ( pos % 8 ) );
     }
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Sets the brightness of the pixel string.
+ *
+ * Arguments
+ * ---------
+ *  - brightness : Brighness value 0-100 %
+ *
+ * Returns : Nothing
+ */
 void NeoPixel::setBrightness( uint8_t brightness ) {
     if( brightness > 100 ) {
         brightness = 100;
@@ -221,6 +306,18 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Sets the pixel string color using an RGB value.
+ *
+ * Arguments
+ * ---------
+ *  - r: Red component
+ *  - g: Green component
+ *  - b: Blue component
+ *
+ * Returns : Nothing
+ */
 void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
     this->_r = r;
     this->_g = g;
@@ -228,6 +325,16 @@ void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Sets the pixel string color using the RGB table color ID.
+ *
+ * Arguments
+ * ---------
+ *  - id : value 0-12 (use color table in ressource.h)
+ *
+ * Returns : Nothing
+ */
 void NeoPixel::setColorFromTable( uint8_t id ) {
 
     if( id > COLOR_TABLE_MAX_COLORS - 1 ) {

@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : qt1070.cpp
+// File    : src/drivers/qt1070.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,20 +15,20 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "qt1070.h"
+#include "power.h"
 
 
 volatile bool qt1070_event = false;
 
 
-
 /*--------------------------------------------------------------------------
- * QT1070::QT1070() : Class constructor
+ *
+ * Class constructor
  *
  * Arguments
  * ---------
- *  None
+ *  - pin_irq : QT1070 interrupt pin
  *
  * Returns : Nothing
  */
@@ -71,11 +71,12 @@ QT1070::QT1070( uint8_t pin_irq ) {
 
 
 /*--------------------------------------------------------------------------
- * QT1070::begin() : initialize the touch IC.
+ *
+ * Initialize the touch IC.
  *
  * Arguments
  * ---------
- *  - pin_irq : QT1070 interrupt pin
+ *  None
  *
  * Returns : Nothing
  */
@@ -95,17 +96,40 @@ void QT1070::begin() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Enable key change interrupt.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void QT1070::enableInterrupt() {
-    pinMode( this->_pin_irq, INPUT_PULLUP );
+pinMode( this->_pin_irq, INPUT_PULLUP );
     attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_qt1070, LOW );
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Disable key change interrupt.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void QT1070::disableInterrupt() {
+
     detachInterrupt( digitalPinToInterrupt( this->_pin_irq ) );
 }
 
+
 /*--------------------------------------------------------------------------
- * QT1070::readStatus() : Read the two status bytes from the touch IC.
+ * Reads the two status bytes from the touch IC.
  *
  * Arguments
  * ---------
@@ -124,7 +148,7 @@ bool QT1070::readStatus() {
 
 
 /*--------------------------------------------------------------------------
- * QT1070::writeConfig() : Write configuration block to the touch IC.
+ * Write configuration block to the touch IC.
  *
  * Arguments
  * ---------
@@ -142,11 +166,7 @@ bool QT1070::writeConfig() {
 }
 
 
-
-
-
 /*--------------------------------------------------------------------------
- * QT1070::processEvents(reg, data, size)
  *
  * Process the touche events to detect which key was pressed or held or if
  * a swipe left or swipe right occured
@@ -157,7 +177,6 @@ bool QT1070::writeConfig() {
  *
  * Returns : The pressed key ID, false otherwize.
  */
-
 uint8_t QT1070::processEvents() {
 
     uint8_t key = 0;
@@ -232,6 +251,18 @@ uint8_t QT1070::processEvents() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Process key event using the standard mode meaning that holding the key down
+ * will be considered a SHIFT+KEY press.
+ *
+ * Arguments
+ * ---------
+ * - key            : Detected key
+ * - lastEventDelay : Delay in ms since the last event.
+ *
+ * Returns : The pressed key ID or KEY_NONE otherwise.
+ */
 uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 
     if( key != 0 && key == this->firstKeyState && lastEventDelay > this->longKeyDelay ) {
@@ -286,6 +317,18 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
     return KEY_NONE;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Process key event using the repeat mode.
+ *
+ * Arguments
+ * ---------
+ * - key            : Detected key
+ * - lastEventDelay : Delay in ms since the last event.
+ *
+ * Returns : The pressed key ID or KEY_NONE otherwise.
+ */
 uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 
     /* Key down */
@@ -338,10 +381,7 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 }
 
 
-
-
 /*--------------------------------------------------------------------------
- * QT1070::write(reg, data, size)
  *
  * Transmit data to the touch IC.
  *
@@ -373,7 +413,6 @@ uint8_t QT1070::write( uint8_t reg, void *data, uint8_t size ) {
 
 
 /*--------------------------------------------------------------------------
- * QT1070::read(reg, data, size)
  *
  * Read data from the touch IC.
  *
@@ -404,11 +443,16 @@ uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Interrupt service routine for the key change event.
+ *
+ * None
+ *
+ * Returns : Nothing
+ */
 void isr_qt1070() {
     qt1070_event = true;
 
     g_keypad.disableInterrupt();
 }
-
-

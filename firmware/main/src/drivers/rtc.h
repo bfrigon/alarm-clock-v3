@@ -15,14 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #ifndef RTC_H
 #define RTC_H
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "power.h"
-#include "time.h"
+
 
 
 /* --- I2C address --- */

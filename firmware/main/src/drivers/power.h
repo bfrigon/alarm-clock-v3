@@ -15,18 +15,13 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+#ifndef POWER_H
+#define POWER_H
 
 #include <Arduino.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
-
-#include "../hardware.h"
-
-
-
-#ifndef POWER_H
-#define POWER_H
 
 
 #define DELAY_BEFORE_SUSPEND        5000
@@ -34,6 +29,7 @@
 #define POWER_MODE_NORMAL           0
 #define POWER_MODE_LOW_POWER        1
 #define POWER_MODE_SUSPEND          2
+
 
 class Power {
 

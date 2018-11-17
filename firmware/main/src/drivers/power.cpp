@@ -15,16 +15,24 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-
 #include "power.h"
+#include "../screen.h"
+#include "../hardware.h"
+#include "../alarm.h"
 
 
-
-
-
-bool g_lowPowerMode = false;
-
-
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor
+ *
+ * Arguments
+ * ---------
+ *  - pin_onbatt  : Pin ID which detect when the system is running 
+ *                  on battery power.
+ *  - pin_lowbatt : Pin ID which detect the battery voltage.
+ *
+ * Returns : Nothing
+ */
 Power::Power( uint8_t pin_onbatt, uint8_t pin_lowbatt ) {
 
     this->_pin_onbatt = pin_onbatt;
@@ -32,6 +40,16 @@ Power::Power( uint8_t pin_onbatt, uint8_t pin_lowbatt ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Initialize the power management class
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Power::begin() {
 
     pinMode( this->_pin_onbatt, INPUT );
@@ -42,10 +60,31 @@ void Power::begin() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Get the current power state.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Current power state value.
+ */
 uint8_t Power::getPowerMode() {
     return this->_mode;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Set the power state
+ *
+ * Arguments
+ * ---------
+ *  - mode : The new power state
+ *
+ * Returns : New power state.
+ */
 uint8_t Power::setPowerMode( uint8_t mode ) {
     uint8_t prevMode = this->_mode;
 
@@ -76,6 +115,17 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
     return mode;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Detect the state of the 'on battery' pin and set power mode accordingly.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : New power state.
+ */
 uint8_t Power::detectPowerState() {
 
     if( this->isOnBatteryPower() ) {
@@ -103,20 +153,47 @@ uint8_t Power::detectPowerState() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Detect the state of the 'on battery' pin.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : New power state.
+ */
 bool Power::isOnBatteryPower() {
     return ( digitalRead( this->_pin_onbatt ) == LOW );
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Resets the suspend timer.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : New power state.
+ */
 void Power::resetSuspendDelay() {
     this->_lpwrTimerStart = millis();
 }
 
 
-
-
+/*--------------------------------------------------------------------------
+ *
+ * Enter CPU sleep mode.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Power::enterSleep() {
-
 
 
     /* Power-down unused modules during sleep */
@@ -160,6 +237,16 @@ void Power::enterSleep() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Enable watchdog timer.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Power::enableWatchdog() {
     /* Enable watchdog timer, 8 seconds timeout */
     // wdt_enable( WDTO_8S );
@@ -167,12 +254,33 @@ void Power::enableWatchdog() {
     this->_wdt = true;
 }
 
+/*--------------------------------------------------------------------------
+ *
+ * Disable watchdog timer.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Power::disableWatchdog() {
 
     wdt_disable();
     this->_wdt = false;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Reset watchdog timer.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
 void Power::resetWatchdog() {
     // wtd_reset();
 
