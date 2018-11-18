@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : screen.h
+// File    : src/screen.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -19,30 +19,22 @@
 #define SCREEN_H
 
 #include <Arduino.h>
-
 #include "libs/time.h"
-
 #include "drivers/qt1070.h"
 #include "drivers/us2066.h"
-
-
-
 
 
 
 #define DISPLAY_HEIGHT      2
 #define DISPLAY_WIDTH       16
 
-
 /* Characters : Menus */
 #define CHAR_BRACE_OPEN         0xFA
 #define CHAR_BRACE_CLOSE        0xFC
-
 #define CHAR_PAGE_UP            0x1A
 #define CHAR_PAGE_DOWN          0x1B
 #define CHAR_BAR_FULL           0xD1
 #define CHAR_BAR_HALF           0xD3
-
 #define CHAR_UNCHECKED          0x00
 #define CHAR_CHECKED            0x01
 #define CHAR_SELECT             0x02
@@ -50,11 +42,9 @@
 #define CHAR_FIELD_BEGIN        0x05
 #define CHAR_FIELD_END          0x06
 #define CHAR_HALF_BLOCK_RIGHT   0x07
-
 #define CHAR_TITLEBAR_FILL      0xD6
 #define CHAR_TITLEBAR_LEFT      0xD8
 #define CHAR_TITLEBAR_RIGHT     CHAR_HALF_BLOCK_RIGHT
-
 
 /* Characters : Root screen */
 #define CHAR_WIFI_ON            0x00
@@ -65,30 +55,22 @@
 #define CHAR_FARENHEIGHT        0x05
 #define CHAR_BATTERY            0x06
 
-
-
-
-#define ITEM_LIST_SRAM_POINTER          0x01
-#define ITEM_LIST_PROGMEM_POINTER       0x00
-#define ITEM_LIST_POINTER_CALLBACK      0x02
-
-#define ITEM_CAPTION_SRAM_POINTER       0x04
-#define ITEM_CAPTION_PROGMEM_POINTER    0x00
-
-#define ITEM_NUMBER_INC_DIGITS          0x00
-#define ITEM_NUMBER_INC_WHOLE           0x02
-
-
+/* Item attributes */
 #define ITEM_NOCURSOR                   0x08
 #define ITEM_BREAK                      0x10
 #define ITEM_EDIT_FULLSCREEN            0x20
 #define ITEM_NORMAL                     0x00
 #define ITEM_COMPACT                    0x40
 #define ITEM_READONLY                   0x80
+#define ITEM_LIST_SRAM_POINTER          0x01
+#define ITEM_LIST_PROGMEM_POINTER       0x00
+#define ITEM_LIST_POINTER_CALLBACK      0x02
+#define ITEM_CAPTION_SRAM_POINTER       0x04
+#define ITEM_CAPTION_PROGMEM_POINTER    0x00
+#define ITEM_NUMBER_INC_DIGITS          0x00
+#define ITEM_NUMBER_INC_WHOLE           0x02
 
-
-
-
+/* Item types */
 #define ITEM_TYPE_NULL      0
 #define ITEM_TYPE_LINK      1
 #define ITEM_TYPE_NUMBER    2
@@ -103,198 +85,321 @@
 #define ITEM_TYPE_BAR       11
 #define ITEM_TYPE_DOW       12
 
-
-
-
-
-
+/* Return values */
 #define RETURN_NONE     0
 #define RETURN_NO       1
 #define RETURN_YES      2
 
 
 
-//--------------------------------------------------------------------------
+//**************************************************************************
 //
-// Macro
+// Screen item definition macros
 //
-//--------------------------------------------------------------------------
+//**************************************************************************
 
-#define BEGIN_SCREEN_ITEMS( name )  \
-    PROGMEM const Item name[] = {
-
-#define END_SCREEN_ITEMS()  \
-    { ITEM_TYPE_NULL, 0, 0, 0, NULL, NULL, 0, 0 } };
+#define ITEM_END() \
+    { ITEM_TYPE_NULL, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, NULL }
 
 #define ITEM_TOGGLE( id, row, col, caption, value, options ) \
-    { ITEM_TYPE_TOGGLE, id, row, col, caption, value, 0, 0, 0, options },
+    { ITEM_TYPE_TOGGLE, id, row, col, caption, value, 0, 0, 0, options, NULL }
 
 #define ITEM_LINK( id, row, col, caption, screen, options ) \
-    { ITEM_TYPE_LINK, id, row, col, caption, screen, 0, 0, 0, options },
+    { ITEM_TYPE_LINK, id, row, col, caption, screen, 0, 0, 0, options, NULL }
 
 #define ITEM_NUMBER( id, row, col, caption, value, min, max, options) \
-    { ITEM_TYPE_NUMBER, id, row, col, caption, value, min, max, 0, options },
+    { ITEM_TYPE_NUMBER, id, row, col, caption, value, min, max, 0, options, NULL }
 
 #define ITEM_IP( id, row, col, caption, value, options ) \
-    { ITEM_TYPE_IP, id, row, col, caption, value, 0, 0, 0, options },
+    { ITEM_TYPE_IP, id, row, col, caption, value, 0, 0, 0, options, NULL }
 
 #define ITEM_TIME( id, row, col, caption, value, options ) \
-    { ITEM_TYPE_TIME, id, row, col, caption, value, 0, 0, 0, options },
+    { ITEM_TYPE_TIME, id, row, col, caption, value, 0, 0, 0, options, NULL }
 
 #define ITEM_MONTH( id, row, col, caption, value, options ) \
-        { ITEM_TYPE_MONTH, id, row, col, caption, value, 1, 12, 0, options },
+    { ITEM_TYPE_MONTH, id, row, col, caption, value, 1, 12, 0, options, NULL }
 
 #define ITEM_YEAR( id, row, col, caption, value, options ) \
-    { ITEM_TYPE_YEAR, id, row, col, caption, value, 0, 99, 0, options },
+    { ITEM_TYPE_YEAR, id, row, col, caption, value, 0, 99, 0, options, NULL }
 
 #define ITEM_STATIC( row, col, caption, options ) \
-    { ITEM_TYPE_STATIC, 0, row, col, caption, NULL, 0, 0, 0, options },
+    { ITEM_TYPE_STATIC, 0, row, col, caption, NULL, 0, 0, 0, options, NULL }
 
 #define ITEM_LIST( id, row, col, caption, value, list, min, max, length, options ) \
-    { ITEM_TYPE_LIST, id, row, col, caption, value, min, max, length, options, list },
+    { ITEM_TYPE_LIST, id, row, col, caption, value, min, max, length, options, list }
 
 #define ITEM_TEXT( id, row, col, caption, value, length, options ) \
-    { ITEM_TYPE_TEXT, id, row, col, caption, value, 0, 0, length, options },
+    { ITEM_TYPE_TEXT, id, row, col, caption, value, 0, 0, length, options, NULL }
 
 #define ITEM_BAR( id, row, col, caption, value, min, max, length, options ) \
-    { ITEM_TYPE_BAR, id, row, col, caption, value, min, max, length, options },
+    { ITEM_TYPE_BAR, id, row, col, caption, value, min, max, length, options, NULL }
 
 #define ITEM_DOW( id, row, col, caption, value, options ) \
-    { ITEM_TYPE_DOW, id, row, col, caption, value, 0, 0, 0, options },
+    { ITEM_TYPE_DOW, id, row, col, caption, value, 0, 0, 0, options, NULL }
 
 
 
-
-//--------------------------------------------------------------------------
+//**************************************************************************
 //
-// Screen items
 //
-//--------------------------------------------------------------------------
+//
+//**************************************************************************
+class Screen;
+class ScreenItem;
 
-struct Item {
-    uint8_t type;
-    uint8_t id;
-    uint8_t row;
-    uint8_t col;
-    const void *caption;
-    void *value;
-    uint16_t min;
-    uint16_t max;
-    uint8_t length;
-    uint8_t options;
-    const void *list;
+extern Screen* g_currentScreen;
+extern bool g_screenUpdate;
+extern bool g_screenClear;
+extern const char* g_currentCustomCharacterSet;
+
+
+//**************************************************************************
+//
+// Events callback function pointers
+//
+//**************************************************************************
+
+typedef bool ( *pfcbKeypress )( Screen* screen, uint8_t key ) ;
+typedef void ( *pfcbValueChange )( Screen* screen, ScreenItem* item );
+typedef void ( *pfcbSelectionChanged )( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen );
+typedef bool ( *pfcbDrawScreen )( Screen* screen );
+typedef bool ( *pfcbExitScreen )( Screen* currentScreen, Screen* newScreen );
+typedef bool ( *pfcbEnterScreen )( Screen* screen );
+typedef bool ( *pfcbDrawItem )( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
+typedef void ( *pfcbTimeout )( Screen* screen );
+
+
+//**************************************************************************
+//
+// Screen items class
+//
+//**************************************************************************
+
+struct ScreenItemBase {
+    uint8_t _type;
+    uint8_t _id;
+    uint8_t _row;
+    uint8_t _col;
+    const void* _caption;
+    void* _value;
+    uint16_t _min;
+    uint16_t _max;
+    uint8_t _length;
+    uint8_t _options;
+    const void* _list;
+};
+
+class ScreenItem : protected ScreenItemBase {
+
+  public:
+
+    //----------------------------------------------------------------------
+    // Class constructors
+    //----------------------------------------------------------------------
+    ScreenItem();
+
+
+    //----------------------------------------------------------------------
+    // Methods
+    //----------------------------------------------------------------------
+    void loadFromProgmem( const struct ScreenItemBase* item );
+    void unload();
+
+
+    //----------------------------------------------------------------------
+    // Properties
+    //----------------------------------------------------------------------
+
+    /* Gets the item type. */
+    uint8_t getType()                   { return this->_type; }
+
+    /* Gets the item ID. */
+    uint8_t getId()                     { return this->_id; }
+
+    /* Gets the zero-based Y position on the LCD. */
+    uint8_t getPositionRow()            { return this->_row; }
+
+    /* Gets the zero-based X position on the LCD. */
+    uint8_t getPositionCol()            { return this->_col; }
+
+    /* Gets a pointer to the caption. */
+    const void* getCaption()            { return this->_caption; }
+
+    /* Gets the item minimum value. */
+    uint8_t getMin()                    { return this->_min; }
+
+    /* Gets the item maximum value. */
+    uint8_t getMax()                    { return this->_max; }
+
+    /* Gets the item options */
+    uint8_t getOptions()                { return this->_options; }
+
+    /* Gets the item field length */
+    uint8_t getLength()                 { return this->_length; }
+
+    /* Gets a pointer to the list items */
+    const void* getListPtr()            { return this->_list; }
+
+    /* Gets a pointer to the value */
+    void* getValuePtr()                 { return this->_value; }
+
+    /* Gets the value (unsigned integer)  */
+    uint8_t getValue()                  { return *( ( uint8_t* )this->_value ); }
+
+    /* Gets the value (boolean)  */
+    bool getValueBoolean()              { return *( ( bool* )this->_value ); }
+
+    /* Sets the value (unsigned integer )  */
+    void setValue( uint8_t value )      { *( ( uint8_t* )this->_value ) = value; }
+
+    /* Sets the value (boolean)  */
+    void setValueBoolean( bool value )  { *( ( bool* )this->_value ) = value; }
 };
 
 
 
-class Screen;
-
-void gotoScreen( Screen *screen, bool selectFirstItem, Screen *parent );
-inline uint8_t numDigits( uint8_t number );
-
-
-
-extern Screen *g_currentScreen;
-extern Item g_currentItem;
-extern unsigned long g_enterScreenTime;
-
-extern bool g_screenUpdate;
-extern bool g_screenClear;
-extern const char *g_currentCustomCharacterSet;
-
-
-
-//--------------------------------------------------------------------------
+//**************************************************************************
 //
-// Events callback function pointers
+// Screen class
 //
-//--------------------------------------------------------------------------
-
-
-typedef bool ( *pfEventKeypress )( Screen *screen, uint8_t key ) ;
-typedef void ( *pfEventValueChange )( Screen *screen, Item *item );
-typedef void ( *pfEventSelectionChanged )( Screen *screen, Item *item, uint8_t fieldPos, bool fullscreen );
-typedef bool ( *pfEventDrawScreen )( Screen *screen );
-typedef bool ( *pfEventExitScreen )( Screen *currentScreen, Screen *newScreen );
-typedef bool ( *pfEventEnterScreen )( Screen *screen );
-typedef bool ( *pfEventDrawItem )( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col );
-typedef void ( *pfEventTimeout )( Screen *screen );
-
-
-//--------------------------------------------------------------------------
-//
-// Screen
-//
-//--------------------------------------------------------------------------
+//**************************************************************************
 class Screen {
 
   public:
 
+    //----------------------------------------------------------------------
+    // Class constructors
+    //----------------------------------------------------------------------
+
     Screen( uint8_t _id );
-    Screen( uint8_t _id, const Item *_items, pfEventValueChange _eventValueChange,
-            pfEventEnterScreen _eventEnterScreen, pfEventExitScreen _eventExitScreen );
-
-    const Item *items = NULL;
-    Screen *parent = NULL;
+    Screen( uint8_t _id, const struct ScreenItemBase* _items, pfcbValueChange _eventValueChange,
+            pfcbEnterScreen _eventEnterScreen, pfcbExitScreen _eventExitScreen );
 
 
-    pfEventKeypress eventKeypress = NULL;
-    pfEventValueChange eventValueChange = NULL;
-    pfEventDrawScreen eventDrawScreen = NULL;
-    pfEventExitScreen eventExitScreen = NULL;
-    pfEventEnterScreen eventEnterScreen = NULL;
-    pfEventDrawItem eventDrawItem = NULL;
-    pfEventSelectionChanged eventSelectionChanged = NULL;
-    pfEventTimeout eventTimeout = NULL;
+    //----------------------------------------------------------------------
+    // Methods
+    //----------------------------------------------------------------------
 
-
-    uint8_t id = 0;
-    uint8_t selected = 0;
-    uint8_t scroll = 0;
-    uint8_t fieldPos = 0;
-    bool itemChanged = false;
-    bool confirmChanges = false;
-    uint8_t returnValue = 0;
-    bool upperCase = false;
-    uint16_t timeout = 0;
-    const char *customCharacterSet = CUSTOM_CHARACTERS_DEFAULT;
-
-
-    void init( bool selectFirstItem );
     void update( bool force = false );
     void selectFirstItem();
     void clearSelection();
     void processKeypadEvent( uint8_t key );
-
     void resetTimeout();
-    bool isTimeout();
-    bool isFullscreen();
-
+    bool hasScreenTimedOut();
     void exitScreen();
+    void activate( bool selectFirstItem, Screen* parent );
+    void checkScreenTimeout();
+
+
+    //----------------------------------------------------------------------
+    // Properties
+    //----------------------------------------------------------------------
+
+    /* Gets the screen ID. */
+    uint8_t getId()                                     { return this->_id; }
+
+    /* Gets the screen return value. */
+    uint8_t getReturnValue()                            { return this->_returnValue; }
+
+    /* Gets/set the parent screen. */
+    Screen* getParent()                                 { return this->_parent; }
+    void setParent( Screen* parent )                    { this->_parent = parent; }
+
+    /* Gets the current selected item index. */
+    uint8_t getSelectedItemIndex()                      { return this->_selected; }
+
+    /* Gets the current cursor position within the item. */
+    uint8_t getCurrentFieldPos()                        { return this->_fieldPos; }
+
+    /* Gets/sets the screen timeout delay. */
+    uint16_t getTimeout()                               { return this->_timeout; }
+    void setTimeout( uint16_t timeout )                 { this->_timeout = timeout; }
+
+    /* Gets the current scroll position. */
+    uint8_t getScrollPos()                              { return this->_scroll; }
+
+    /* Returns whether or not any items value has changed. */
+    bool hasItemsChanged()                              { return this->_itemChanged; }
+
+    /* Returns whether the current item is shown full screen. */
+    bool isItemFullScreen()                             { return this->_itemFullscreen; }
+
+    /* Gets/sets whether to confirm changes when exiting the screen. */
+    bool isConfirmChanges()                             { return this->_confirmChanges; }
+    void setConfirmChanges( bool confirm )              { this->_confirmChanges = confirm; }
+
+    /* Sets which custom character set to use. */
+    void setCustomCharacterSet( const char* cset )      { this->_customCharacterSet = cset; }
+
+    /* Sets a callback for when a key is pressed. */
+    void setCbKeypress( pfcbKeypress p )                { this->_eventKeypress = p; }
+
+    /* Sets a callback for when a value has changed. */
+    void setCbValueChange( pfcbValueChange p )          { this->_eventValueChange = p; }
+
+    /* Sets a callback for when the screen is redrawn. */
+    void setCbDrawScreen( pfcbDrawScreen p )            { this->_eventDrawScreen = p; }
+
+    /* Sets a callback for when exiting the screen. */
+    void setCbExitScreen( pfcbExitScreen p )            { this->_eventExitScreen = p; }
+
+    /* Sets a callback for when entering the screen. */
+    void setCbEnterScreen( pfcbEnterScreen p )          { this->_eventEnterScreen = p; }
+
+    /* Sets a callback for when an item is redrawn. */
+    void setCbDrawItem( pfcbDrawItem p )                { this->_eventDrawItem = p; }
+
+    /* Sets a callback for when an item is selected or the
+       cursor change position. */
+    void setCbSelectionChange( pfcbSelectionChanged p ) { this->_eventSelectionChanged = p; }
+
+    /* Sets callback for when the timeout delay has elapsed */
+    void setCbTimeout( pfcbTimeout p )                  { this->_eventTimeout  = p; }
+
+
+
 
   private:
 
     bool _isShowConfirmDialog = false;
     bool _itemFullscreen = false;
+    bool _itemChanged = false;
+    bool _confirmChanges = false;
+    uint8_t _selected = 0;
+    uint8_t _id;
+    uint8_t _returnValue = 0;
+    uint8_t _fieldPos = 0;
+    uint8_t _scroll = 0;
+    uint16_t _timeout = 0;
+    bool _uppercase = false;
+    Screen* _parent = NULL;
+    const struct ScreenItemBase* _items = NULL;
+    const char* _customCharacterSet = CUSTOM_CHARACTERS_DEFAULT;
+
+    pfcbKeypress _eventKeypress = NULL;
+    pfcbValueChange _eventValueChange = NULL;
+    pfcbDrawScreen _eventDrawScreen = NULL;
+    pfcbExitScreen _eventExitScreen = NULL;
+    pfcbEnterScreen _eventEnterScreen = NULL;
+    pfcbDrawItem _eventDrawItem = NULL;
+    pfcbSelectionChanged _eventSelectionChanged = NULL;
+    pfcbTimeout _eventTimeout = NULL;
 
 
-    void drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col );
-    uint8_t printItemCaption( Item *item );
-    void incrementItemValue( Item *item, bool shift );
-    void clearItemValue( Item *item );
+    void drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
+    uint8_t printItemCaption( ScreenItem* item );
+    void incrementItemValue( ScreenItem* item, bool shift );
+    void clearItemValue( ScreenItem* item );
     void updateCursorPosition();
     void selectItem( uint8_t id );
-    bool isItemFullScreenEditable( Item *item );
+    bool isItemFullScreenEditable( ScreenItem* item );
     void updateKeypadRepeatMode();
-
-    void incDigit( uint8_t *value, uint8_t pos, uint8_t max, uint8_t min );
-    uint8_t calcFieldLength( Item *item );
+    void incDigit( uint8_t* value, uint8_t pos, uint8_t max, uint8_t min );
+    uint8_t calcFieldLength( ScreenItem* item );
     char nextValidCharacter( char current );
-    uint8_t itemValueToBars( Item *item );
+    uint8_t itemValueToBars( ScreenItem* item );
 
+    inline uint8_t getNumDigits( uint8_t number );
 };
-
-
-
 
 #endif /* SCREEN_H */

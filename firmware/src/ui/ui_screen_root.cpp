@@ -33,19 +33,19 @@ bool rootScreen_onKeypress( Screen *screen, uint8_t key ) {
 
     switch( key ) {
         case KEY_MENU:
-            gotoScreen( &screen_main_menu, true, &screen_root );
+            screen_main_menu.activate( true, &screen_root );
             break;
 
         case KEY_SET | KEY_SHIFT:
-            gotoScreen( &screen_set_time, true, &screen_root );
+            screen_set_time.activate( true, &screen_root );
             break;
 
         case KEY_ALARM | KEY_SHIFT:
-            gotoScreen( &screen_set_alarms, true, &screen_root );
+            screen_set_alarms.activate( true, &screen_root );
             break;
 
         case KEY_ALARM:
-            gotoScreen( &screen_show_alarms, true, &screen_root );
+            screen_show_alarms.activate( true, &screen_root );
             break;
 
         case KEY_SWIPE | KEY_RIGHT:

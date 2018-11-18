@@ -68,7 +68,7 @@ bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
             showHelpMsg = true;
 
             screen_alarm.resetTimeout();
-            screen_alarm.timeout = 3000;
+            screen_alarm.setTimeout( 3000 );
 
             g_screenUpdate = true;
             g_screenClear = true;
@@ -179,7 +179,7 @@ void alarmScreen_onTimeout( Screen *screen ) {
         showHelpMsg = false;
 
         screen_alarm.resetTimeout();
-        screen_alarm.timeout = 1000;
+        screen_alarm.setTimeout( 1000 );
 
         g_screenClear = true;
     }

@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : screen.cpp
+// File    : src/screen.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -20,33 +20,100 @@
 #include "resources.h"
 
 
-
-Screen *g_currentScreen;
-Item g_currentItem = {};
+Screen* g_currentScreen;
+ScreenItem g_currentItem;
 bool g_screenUpdate = false;
 bool g_screenClear = false;
-const char *g_currentCustomCharacterSet = NULL;
+const char* g_currentCustomCharacterSet = NULL;
 
 unsigned long g_enterScreenTime = 0;
 
 
-
 /*--------------------------------------------------------------------------
  *
- * Class constructor
+ * Class constructor for ScreenItem class.
  *
  * Arguments
  * ---------
- *  - id : Screen ID
+ *  None
  */
-Screen::Screen( uint8_t _id ) {
-    this->id = _id;
+ScreenItem::ScreenItem() {
+    this->unload();
 }
 
 
 /*--------------------------------------------------------------------------
  *
- * Class constructor with events pre-defined
+ * Load a screen item from program memory.
+ *
+ * Arguments
+ * ---------
+ *  - item : Pointer to the screen item structure contained in program 
+ *           memory
+ *
+ * Returns : Nothing
+ */
+void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
+
+    struct ScreenItemBase memItem;
+    memcpy_P( &memItem, item, sizeof( ScreenItemBase ));
+
+    this->_type = memItem._type;
+    this->_id = memItem._id;
+    this->_row = memItem._row;
+    this->_col = memItem._col;
+    this->_caption = memItem._caption;
+    this->_value = memItem._value;
+    this->_min = memItem._min;
+    this->_max = memItem._max;
+    this->_length = memItem._length;
+    this->_options = memItem._options;
+    this->_list = memItem._list;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Unload the screen item
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void ScreenItem::unload() {
+
+    this->_type = ITEM_TYPE_NULL;
+    this->_id = 0;
+    this->_row = 0;
+    this->_col = 0;
+    this->_caption = NULL;
+    this->_value = NULL;
+    this->_min = 0;
+    this->_max = 0;
+    this->_length = 0;
+    this->_options = 0;
+    this->_list = NULL;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor for Screen class.
+ *
+ * Arguments
+ * ---------
+ *  - id : Screen ID
+ */
+Screen::Screen( uint8_t id ) {
+    this->_id = id;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Class constructor for Screen class with events pre-defined.
  *
  * Arguments
  * ---------
@@ -56,42 +123,14 @@ Screen::Screen( uint8_t _id ) {
  *  - eventEnterScreen : Pointer to a function called when entering the screen.
  *  - eventExitScreen  : Pointer to a function called when leaving the screen.
  */
-Screen::Screen( uint8_t _id, const Item *_items, pfEventValueChange _eventValueChange,
-                pfEventEnterScreen _eventEnterScreen, pfEventExitScreen _eventExitScreen ) {
+Screen::Screen( uint8_t id, const struct ScreenItemBase* items, pfcbValueChange _eventValueChange,
+                pfcbEnterScreen _eventEnterScreen, pfcbExitScreen _eventExitScreen ) {
 
-    this->id = _id;
-    this->items = _items;
-    this->eventValueChange = _eventValueChange;
-    this->eventEnterScreen = _eventEnterScreen;
-    this->eventExitScreen = _eventExitScreen;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Initialise the screen
- *
- * Arguments
- * ---------
- *  - selectFirstItem : TRUE to select the first item or FALSE to leave the
- *                      selection as it were the last time the screen was
- *                      active.
- *
- * Returns : Nothing
- */
-void Screen::init( bool selectFirstItem ) {
-
-    this->returnValue = RETURN_NONE;
-    this->_isShowConfirmDialog = false;
-    this->itemChanged = false;
-    this->upperCase = false;
-
-    if( selectFirstItem ) {
-        this->selectFirstItem();
-    }
-
-    /* Reselect the item */
-    selectItem( this->selected );
+    this->_id = id;
+    this->_items = items;
+    this->_eventValueChange = _eventValueChange;
+    this->_eventEnterScreen = _eventEnterScreen;
+    this->_eventExitScreen = _eventExitScreen;
 }
 
 
@@ -108,7 +147,7 @@ void Screen::init( bool selectFirstItem ) {
  */
 void Screen::update( bool force = false ) {
 
-    Item item;
+    ScreenItem item;
 
     /* Do not draw the screen if it's not the current active screen */
     if( g_currentScreen != this && force == false ) {
@@ -120,10 +159,10 @@ void Screen::update( bool force = false ) {
         g_screenClear = false;
     }
 
-    if( this->customCharacterSet != g_currentCustomCharacterSet ) {
-        g_currentCustomCharacterSet = this->customCharacterSet;
+    if( this->_customCharacterSet != g_currentCustomCharacterSet ) {
+        g_currentCustomCharacterSet = this->_customCharacterSet;
 
-        g_lcd.setCustomCharacters( this->customCharacterSet );
+        g_lcd.setCustomCharacters( this->_customCharacterSet );
     }
 
     /* Disable blinking cursor */
@@ -134,34 +173,34 @@ void Screen::update( bool force = false ) {
         g_lcd.print_P( S_QUESTION_SAVE );
 
         g_lcd.setPosition( 1, 0 );
-        g_lcd.print( ( this->fieldPos == 0 ) ? CHAR_SELECT : CHAR_SPACE );
+        g_lcd.print( ( this->_fieldPos == 0 ) ? CHAR_SELECT : CHAR_SPACE );
         g_lcd.print_P( S_NO );
 
         g_lcd.setPosition( 1, 8 );
-        g_lcd.print( ( this->fieldPos == 1 ) ? CHAR_SELECT : CHAR_SPACE );
+        g_lcd.print( ( this->_fieldPos == 1 ) ? CHAR_SELECT : CHAR_SPACE );
         g_lcd.print_P( S_YES );
         return;
     }
 
 
     /* Allow the callback to override the default screen drawing */
-    if( this->eventDrawScreen != NULL ) {
+    if( this->_eventDrawScreen != NULL ) {
 
         g_lcd.setPosition( 0, 0 );
 
-        if( this->eventDrawScreen( this ) == false ) {
+        if( this->_eventDrawScreen( this ) == false ) {
             return;
         }
     }
 
-    if( this->items == NULL ) {
+    if( this->_items == NULL ) {
         return;
     }
 
     /* If the current selected item is full screen, only draw this item */
     if( this->_itemFullscreen == true ) {
 
-        memcpy_P( &item, &this->items[ this->selected ], sizeof( Item ) );
+        item.loadFromProgmem( &this->_items[ this->_selected ] );
         this->drawItem( &item, true, 0, 0 );
 
 
@@ -170,31 +209,31 @@ void Screen::update( bool force = false ) {
         /* Draw all visible items on the screen */
         for( uint8_t i = 0; true; i++ ) {
 
-            memcpy_P( &item, &this->items[ i ], sizeof( Item ) );
+            item.loadFromProgmem( &this->_items[ i ] );
 
-            bool isSelected = ( this->selected == i );
-            uint8_t row = item.row - this->scroll;
-            uint8_t col = item.col;
+            bool isSelected = ( this->_selected == i );
+            uint8_t row = item.getPositionRow() - this->_scroll;
+            uint8_t col = item.getPositionCol();
 
             /* No more items to draw */
-            if( item.type == ITEM_TYPE_NULL ) {
+            if( item.getType() == ITEM_TYPE_NULL ) {
                 break;
             }
 
             /* Ignore items above the scroll window, go to the next item. */
-            if( item.row < this->scroll ) {
+            if( item.getPositionRow() < this->_scroll ) {
                 continue;
             }
 
             /* Draw page up symbol if there are items above the scroll window. */
-            if( this->scroll > 0 ) {
+            if( this->_scroll > 0 ) {
 
                 g_lcd.setPosition( 0, DISPLAY_WIDTH - 1 );
                 g_lcd.print( CHAR_PAGE_UP );
             }
 
             /* Don't draw items below the scroll window, no need to continue. */
-            if( item.row > this->scroll + DISPLAY_HEIGHT - 1 ) {
+            if( item.getPositionRow() > this->_scroll + DISPLAY_HEIGHT - 1 ) {
 
                 /* Draw page down symbol */
                 g_lcd.setPosition( DISPLAY_HEIGHT - 1, DISPLAY_WIDTH - 1 );
@@ -214,7 +253,7 @@ void Screen::update( bool force = false ) {
 
 /*--------------------------------------------------------------------------
  *
- * Process key press
+ * Process key press events.
  *
  * Arguments
  * ---------
@@ -225,9 +264,9 @@ void Screen::update( bool force = false ) {
 void Screen::processKeypadEvent( uint8_t key ) {
 
     /* Allow the callback to override the keypress event */
-    if( this->eventKeypress != NULL ) {
+    if( this->_eventKeypress != NULL ) {
 
-        if( this->eventKeypress( this, key ) == false ) {
+        if( this->_eventKeypress( this, key ) == false ) {
             return;
         }
     }
@@ -240,8 +279,8 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             if( this->_itemFullscreen == true ) {
 
-                if( this->eventSelectionChanged != NULL ) {
-                    this->eventSelectionChanged( this, &g_currentItem, this->fieldPos, false );
+                if( this->_eventSelectionChanged != NULL ) {
+                    this->_eventSelectionChanged( this, &g_currentItem, this->_fieldPos, false );
                 }
 
                 this->_itemFullscreen = false;
@@ -263,9 +302,11 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             if( this->_isShowConfirmDialog ) {
 
-                this->returnValue = this->fieldPos + 1;
+                this->_returnValue = this->_fieldPos + 1;
 
-                gotoScreen( this->parent, false, NULL );
+                if( this->_parent != NULL ) {
+                    this->_parent->activate( false, NULL );
+                }
                 return;
             }
 
@@ -286,13 +327,13 @@ void Screen::processKeypadEvent( uint8_t key ) {
         /* Go to next item or next digit position.*/
         case KEY_NEXT:
 
-            this->fieldPos++;
+            this->_fieldPos++;
 
 
             if( this->_isShowConfirmDialog == true ) {
 
-                if( this->fieldPos > 1 ) {
-                    this->fieldPos = 0;
+                if( this->_fieldPos > 1 ) {
+                    this->_fieldPos = 0;
                 }
 
                 g_screenUpdate = true;
@@ -302,21 +343,21 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             /* increment cursor position within the current item, if
             it reaches the item length, skip to the next item */
-            if( this->fieldPos >= this->calcFieldLength( &g_currentItem ) ) {
+            if( this->_fieldPos >= this->calcFieldLength( &g_currentItem ) ) {
 
-                this->fieldPos = 0;
+                this->_fieldPos = 0;
 
                 if( this->_itemFullscreen == false ) {
 
-                    this->selectItem( this->selected + 1 );
+                    this->selectItem( this->_selected + 1 );
                 }
 
                 g_screenUpdate = true;
             }
 
 
-            if( this->eventSelectionChanged != NULL ) {
-                this->eventSelectionChanged( this, &g_currentItem, this->fieldPos, this->_itemFullscreen );
+            if( this->_eventSelectionChanged != NULL ) {
+                this->_eventSelectionChanged( this, &g_currentItem, this->_fieldPos, this->_itemFullscreen );
             }
 
             g_screenUpdate = true;
@@ -352,19 +393,43 @@ void Screen::resetTimeout() {
  *
  * Returns : TRUE if the screen has timed out or FALSE otherwise.
  */
-bool Screen::isTimeout() {
+bool Screen::hasScreenTimedOut() {
 
-    if( this->timeout == 0 ) {
+    if( this->_timeout == 0 ) {
         return false;
     }
 
-    return ( ( millis() - g_enterScreenTime ) > this->timeout );
+    return ( ( millis() - g_enterScreenTime ) > this->_timeout );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- * Exit the current screen and returns to the parent screen.
+ * Checks if the screen has timed out. If so, exits the screen
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void Screen::checkScreenTimeout() {
+    if( this->hasScreenTimedOut() ) {
+
+        if( this->_eventTimeout != NULL ) {
+            this->_eventTimeout( this );
+            this->resetTimeout();
+
+        } else {
+            this->exitScreen();
+        }
+    }
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Exits the current screen and returns to the parent screen.
  *
  * Arguments
  * ---------
@@ -373,12 +438,12 @@ bool Screen::isTimeout() {
  * Returns : Nothing
  */
 void Screen::exitScreen() {
-    if( this->parent == NULL ) {
+    if( this->_parent == NULL ) {
         return;
     }
 
     /* If items changed, show the confirm changes dialog */
-    if( this->confirmChanges && this->itemChanged ) {
+    if( this->_confirmChanges && this->_itemChanged ) {
 
         this->_isShowConfirmDialog = true;
 
@@ -388,10 +453,67 @@ void Screen::exitScreen() {
     }
 
     /* Goto back to parent screen */
-    gotoScreen( this->parent, false, NULL );
-    this->parent = NULL;
+    if( this->_parent != NULL ) {
+        this->_parent->activate( false, NULL );
+    }
+    this->_parent = NULL;
 
     return;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Leave the current screen and activate this one.
+ *
+ * Arguments
+ * ---------
+ *  - selectFirstItem : TRUE to select the first item or False to leave the
+ *                      previously selected item the last time the screen
+ *                      was active
+ *  - parent          : Sets which screen will be activated when leaving
+ *                      this screen.
+ *
+ * Returns : Nothing
+ */
+void Screen::activate( bool selectFirstItem, Screen* parent ) {
+
+    /* Trigger exit screen event. If callback return false, cancel screen change */
+    if( g_currentScreen->_eventExitScreen != NULL ) {
+        if( g_currentScreen->_eventExitScreen( g_currentScreen, this ) == false ) {
+            return;
+        }
+    }
+
+    g_currentScreen = this;
+    
+    this->_returnValue = RETURN_NONE;
+    this->_isShowConfirmDialog = false;
+    this->_itemChanged = false;
+    this->_uppercase = false;
+
+    if( selectFirstItem ) {
+        this->selectFirstItem();
+    }
+
+    /* Reselect the item */
+    selectItem( this->_selected );
+
+    g_enterScreenTime = millis();
+
+
+    if( parent != NULL && parent != this ) {
+        this->_parent =  parent;
+    }
+
+
+    /* Trigger enter screen event on new screen */
+    if( this->_eventEnterScreen != NULL ) {
+        this->_eventEnterScreen( this );
+    }
+
+    g_screenClear = true;
+    g_screenUpdate = true;
 }
 
 
@@ -408,7 +530,7 @@ void Screen::exitScreen() {
  *
  * Returns : Nothing
  */
-void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
+void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t col ) {
 
     uint8_t value;
 
@@ -418,7 +540,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
         if( this->_itemFullscreen == true ) {
 
-            if( item->caption != NULL ) {
+            if( item->getCaption() != NULL ) {
                 this->printItemCaption( item );
                 g_lcd.print_P( S_SEPARATOR );
 
@@ -438,9 +560,9 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
     } else {
 
-        if( ( item->options & ITEM_COMPACT ) == 0 ) {
+        if( ( item->getOptions() & ITEM_COMPACT ) == 0 ) {
 
-            switch( item->type ) {
+            switch( item->getType() ) {
 
                 case ITEM_TYPE_STATIC:
                 case ITEM_TYPE_IP:
@@ -459,7 +581,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
                     break;
 
                 default:
-                    if( item->caption != NULL ) {
+                    if( item->getCaption() != NULL ) {
                         g_lcd.print( isSelected ? CHAR_SELECT : CHAR_SPACE );
 
                         this->printItemCaption( item );
@@ -472,14 +594,14 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
     }
 
     /* Allow the callback to override the default item drawing. */
-    if( this->eventDrawItem != NULL ) {
+    if( this->_eventDrawItem != NULL ) {
 
-        if( this->eventDrawItem( this, item, isSelected, row, col ) == false ) {
+        if( this->_eventDrawItem( this, item, isSelected, row, col ) == false ) {
             return;
         }
     }
 
-    switch( item->type ) {
+    switch( item->getType() ) {
 
         case ITEM_TYPE_BAR:
 
@@ -487,7 +609,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
             nbars = this->itemValueToBars( item );
 
             uint8_t npadding;
-            npadding = item->length - ( nbars / 2 );
+            npadding = item->getLength() - ( nbars / 2 );
 
             g_lcd.print( CHAR_FIELD_BEGIN );
             g_lcd.fill( CHAR_BAR_FULL, nbars / 2 );
@@ -510,14 +632,14 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
             g_lcd.print( CHAR_FIELD_BEGIN );
 
-            if( item->length > maxWidth ) {
+            if( item->getLength() > maxWidth ) {
                 uint8_t offset;
-                offset = this->fieldPos > ( maxWidth - 1 ) ? this->fieldPos - maxWidth + 1 : 0;
+                offset = this->_fieldPos > ( maxWidth - 1 ) ? this->_fieldPos - maxWidth + 1 : 0;
 
-                g_lcd.print( ( char * )item->value + offset, maxWidth, TEXT_ALIGN_LEFT );
+                g_lcd.print( ( char* )item->getValuePtr() + offset, maxWidth, TEXT_ALIGN_LEFT );
 
             } else {
-                g_lcd.print( ( char * )item->value, maxWidth, TEXT_ALIGN_LEFT );
+                g_lcd.print( ( char* )item->getValuePtr(), maxWidth, TEXT_ALIGN_LEFT );
 
             }
 
@@ -528,40 +650,40 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
         case ITEM_TYPE_LIST:
 
-            if( item->options & ITEM_COMPACT || item->options & ITEM_EDIT_FULLSCREEN ) {
+            if( item->getOptions() & ITEM_COMPACT || item->getOptions() & ITEM_EDIT_FULLSCREEN ) {
 
                 g_lcd.print( isSelected ? CHAR_SELECT : CHAR_FIELD_BEGIN );
             }
 
 
 
-            if( item->list != NULL ) {
+            if( item->getListPtr() != NULL ) {
 
                 uint8_t offset = 0;
 
-                if( item->value != NULL ) {
-                    offset = *( ( uint8_t * )item->value ) * ( item->length + 1 );
+                if( item->getValuePtr() != NULL ) {
+                    offset = item->getValue() * ( item->getLength() + 1 );
                 }
 
-                if( item->options & ITEM_LIST_SRAM_POINTER ) {
-                    g_lcd.print( ( ( const char * )item->list ) + offset, item->length, TEXT_ALIGN_LEFT );
+                if( item->getOptions() & ITEM_LIST_SRAM_POINTER ) {
+                    g_lcd.print( ( ( const char* )item->getListPtr() ) + offset, item->getLength(), TEXT_ALIGN_LEFT );
 
                 } else {
-                    g_lcd.print_P( ( ( const char * )item->list ) + offset, item->length, TEXT_ALIGN_LEFT );
+                    g_lcd.print_P( ( ( const char* )item->getListPtr() ) + offset, item->getLength(), TEXT_ALIGN_LEFT );
                 }
 
             } else {
-                g_lcd.fill( CHAR_SPACE, item->length );
+                g_lcd.fill( CHAR_SPACE, item->getLength() );
             }
 
-            if( item->options & ITEM_COMPACT || item->options & ITEM_EDIT_FULLSCREEN ) {
+            if( item->getOptions() & ITEM_COMPACT || item->getOptions() & ITEM_EDIT_FULLSCREEN ) {
                 g_lcd.print( isSelected ? CHAR_SELECT_REV : CHAR_FIELD_END );
             }
 
             break;
 
         case ITEM_TYPE_MONTH:
-            g_lcd.print_P( getMonthName( *( ( uint8_t * )item->value ), true ) );
+            g_lcd.print_P( getMonthName( item->getValue(), true ) );
             break;
 
         case ITEM_TYPE_STATIC:
@@ -571,47 +693,47 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
         /* On/off */
         case ITEM_TYPE_TOGGLE:
 
-            if( item->options & ITEM_COMPACT ) {
+            if( item->getOptions() & ITEM_COMPACT ) {
 
-                if( item->caption != NULL ) {
+                if( item->getCaption() != NULL ) {
                     g_lcd.print( isSelected ? CHAR_SELECT : CHAR_SPACE );
 
                     this->printItemCaption( item );
                     g_lcd.print( CHAR_SPACE );
 
-                    g_lcd.print( *( ( bool * )item->value ) ? CHAR_CHECKED : CHAR_SPACE );
+                    g_lcd.print( item->getValueBoolean() ? CHAR_CHECKED : CHAR_SPACE );
 
                 } else {
-                    g_lcd.print( *( ( bool * )item->value ) ? CHAR_CHECKED : CHAR_UNCHECKED );
+                    g_lcd.print( item->getValueBoolean() ? CHAR_CHECKED : CHAR_UNCHECKED );
                 }
 
 
 
             } else {
 
-                if( item->caption == NULL ) {
+                if( item->getCaption() == NULL ) {
                     g_lcd.print( isSelected ? CHAR_SELECT : CHAR_SPACE );
                 }
 
-                g_lcd.print_P( *( ( bool * )item->value ) == true ? S_ON : S_OFF, 3, TEXT_ALIGN_LEFT );
+                g_lcd.print_P( item->getValueBoolean() == true ? S_ON : S_OFF, 3, TEXT_ALIGN_LEFT );
             }
 
             break;
 
 
         case ITEM_TYPE_NUMBER:
-            value = *( ( uint8_t * )item->value );
+            value = item->getValue();
 
             /* Left padding */
-            g_lcd.fill( CHAR_SPACE, numDigits( item->max ) - numDigits( value ) );
+            g_lcd.fill( CHAR_SPACE, this->getNumDigits( item->getMax() ) - this->getNumDigits( value ) );
 
-            g_lcd.printf( "%d", *( uint8_t * )item->value );
+            g_lcd.printf( "%d", item->getValue() );
 
             break;
 
         case ITEM_TYPE_TIME:
-            Time *time;
-            time = ( Time * )item->value;
+            Time* time;
+            time = ( Time* )item->getValuePtr();
 
             uint8_t hour;
             hour = time->hour;
@@ -635,7 +757,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
         case ITEM_TYPE_YEAR:
             uint8_t year;
-            year = *( ( uint8_t * )item->value );
+            year = item->getValue();
 
             g_lcd.printf( "20%02d", year );
 
@@ -643,11 +765,14 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
         case ITEM_TYPE_IP:
 
+            uint8_t address[4];
+            memcpy( &address, item->getValuePtr(), 4 );
+
             g_lcd.printf( "%3d.%3d.%3d.%3d",
-                          *( ( uint8_t * )item->value ),
-                          *( ( uint8_t * )item->value + 1 ),
-                          *( ( uint8_t * )item->value + 2 ),
-                          *( ( uint8_t * )item->value + 3 )
+                          address[ 0 ],
+                          address[ 1 ],
+                          address[ 2 ],
+                          address[ 3 ]
                         );
 
         case ITEM_TYPE_DOW:
@@ -656,7 +781,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
 
             for( i = 0; i < 7; i++ ) {
 
-                if( bitRead( *( ( uint8_t * )item->value ), i ) != 0 ) {
+                if( bitRead( item->getValue(), i ) != 0 ) {
 
                     char c;
                     c = pgm_read_byte( S_DOW + i );
@@ -667,7 +792,7 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
                     g_lcd.print( "-" );
                 }
 
-                if( ( item->options & ITEM_COMPACT ) == 0 ) {
+                if( ( item->getOptions() & ITEM_COMPACT ) == 0 ) {
                     g_lcd.print( CHAR_SPACE );
                 }
             }
@@ -688,9 +813,9 @@ void Screen::drawItem( Item *item, bool isSelected, uint8_t row, uint8_t col ) {
  *
  * Returns : TRUE if the item can be viewed full screenor False otherwise.
  */
-bool Screen::isItemFullScreenEditable( Item *item ) {
+bool Screen::isItemFullScreenEditable( ScreenItem* item ) {
 
-    switch( item->type ) {
+    switch( item->getType() ) {
 
         /* These items types cannot be editable full screen */
         case ITEM_TYPE_LINK:
@@ -699,24 +824,7 @@ bool Screen::isItemFullScreenEditable( Item *item ) {
             return false;
     }
 
-    return item->options & ITEM_EDIT_FULLSCREEN;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Returns whether or not the screen is currently displaying an item full
- * screen.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if currently full screenor False otherwise.
- */
-bool Screen::isFullscreen() {
-
-    return this->_itemFullscreen;
+    return item->getOptions() & ITEM_EDIT_FULLSCREEN;
 }
 
 
@@ -730,23 +838,23 @@ bool Screen::isFullscreen() {
  *
  * Returns : The number of character printed.
  */
-uint8_t Screen::printItemCaption( Item *item ) {
+uint8_t Screen::printItemCaption( ScreenItem* item ) {
 
     uint8_t nchr = 0;
 
-    if( item->caption == NULL ) {
+    if( item->getCaption() == NULL ) {
         return 0;
     }
 
-    if( item->options & ITEM_CAPTION_SRAM_POINTER ) {
+    if( item->getOptions() & ITEM_CAPTION_SRAM_POINTER ) {
 
         /* String stored in SRAM */
-        nchr = g_lcd.print( ( const char * )item->caption );
+        nchr = g_lcd.print( ( const char* )item->getCaption() );
 
     } else {
 
         /* String stored in program memory */
-        nchr = g_lcd.print_P( ( const char * )item->caption );
+        nchr = g_lcd.print_P( ( const char* )item->getCaption() );
     }
 
     return nchr;
@@ -755,7 +863,7 @@ uint8_t Screen::printItemCaption( Item *item ) {
 
 /*--------------------------------------------------------------------------
  *
- * Selects the first item in the screen.
+ * Selects the first item on the screen.
  *
  * Arguments
  * ---------
@@ -764,7 +872,7 @@ uint8_t Screen::printItemCaption( Item *item ) {
  * Returns : Nothing
  */
 void Screen::selectFirstItem() {
-    this->scroll = 0;
+    this->_scroll = 0;
     this->_itemFullscreen = false;
     this->_isShowConfirmDialog = false;
 
@@ -784,12 +892,12 @@ void Screen::selectFirstItem() {
  */
 void Screen::clearSelection() {
 
-    memset( &g_currentItem, 0, sizeof( Item ) );
+    g_currentItem.unload();
 
-    this->selected = 0;
-    this->scroll = 0;
-    this->fieldPos = 0;
-    this->upperCase = false;
+    this->_selected = 0;
+    this->_scroll = 0;
+    this->_fieldPos = 0;
+    this->_uppercase = false;
     this->_itemFullscreen = false;
 
     this->updateKeypadRepeatMode();
@@ -797,15 +905,15 @@ void Screen::clearSelection() {
     g_screenUpdate = true;
     g_screenClear = true;
 
-    if( this->eventSelectionChanged != NULL ) {
-        this->eventSelectionChanged( this, &g_currentItem, 0, false );
+    if( this->_eventSelectionChanged != NULL ) {
+        this->_eventSelectionChanged( this, &g_currentItem, 0, false );
     }
 }
 
 
 /*--------------------------------------------------------------------------
  *
- * Selects a given item
+ * Selects a given item from it's index position.
  *
  * Arguments
  * ---------
@@ -816,12 +924,12 @@ void Screen::clearSelection() {
 void Screen::selectItem( uint8_t index ) {
 
     uint8_t n_listIter = 0;
-    this->fieldPos = 0;
-    this->upperCase = false;
-    this->selected = index;
+    this->_fieldPos = 0;
+    this->_uppercase = false;
+    this->_selected = index;
     this->_itemFullscreen = false;
 
-    if( this->items == NULL ) {
+    if( this->_items == NULL ) {
 
         this->clearSelection();
         return;
@@ -829,7 +937,7 @@ void Screen::selectItem( uint8_t index ) {
 
     while( true ) {
 
-        memcpy_P( &g_currentItem, &this->items[ this->selected ], sizeof( Item ) );
+        g_currentItem.loadFromProgmem( &this->_items[ this->_selected ] );
 
         /* Give up looking for a selectable item if scanned list more than 1 time */
         if( n_listIter > 1 ) {
@@ -838,14 +946,14 @@ void Screen::selectItem( uint8_t index ) {
             return;
         }
 
-        switch( g_currentItem.type ) {
+        switch( g_currentItem.getType() ) {
 
             /* End of list */
             case ITEM_TYPE_NULL:
-                this->selected = 0;
+                this->_selected = 0;
 
-                if( this->scroll > 0 ) {
-                    this->scroll = 0;
+                if( this->_scroll > 0 ) {
+                    this->_scroll = 0;
                     g_screenClear = true;
                 }
 
@@ -854,32 +962,32 @@ void Screen::selectItem( uint8_t index ) {
 
             /* Non-selectable item */
             case ITEM_TYPE_STATIC:
-                this->selected++;
+                this->_selected++;
                 break;
 
             /* Selectable item */
             default:
 
-                if( this->eventSelectionChanged != NULL ) {
-                    this->eventSelectionChanged( this, &g_currentItem, this->fieldPos, false );
+                if( this->_eventSelectionChanged != NULL ) {
+                    this->_eventSelectionChanged( this, &g_currentItem, this->_fieldPos, false );
                 }
 
                 /* Skip over read-only items */
-                if( g_currentItem.options & ITEM_READONLY ) {
+                if( g_currentItem.getOptions() & ITEM_READONLY ) {
 
-                    this->selected++;
+                    this->_selected++;
                     break;
                 }
 
-                if( g_currentItem.row > this->scroll + DISPLAY_HEIGHT - 1 ) {
+                if( g_currentItem.getPositionRow() > this->_scroll + DISPLAY_HEIGHT - 1 ) {
 
-                    if( g_currentItem.options & ITEM_BREAK ) {
+                    if( g_currentItem.getOptions() & ITEM_BREAK ) {
                         /* Scroll item to the top of the screen */
-                        this->scroll = g_currentItem.row;
+                        this->_scroll = g_currentItem.getPositionRow();
 
                     } else {
                         /* Scroll item to the bottom of the screen */
-                        this->scroll = g_currentItem.row - ( DISPLAY_HEIGHT - 1 );
+                        this->_scroll = g_currentItem.getPositionRow() - ( DISPLAY_HEIGHT - 1 );
                     }
 
                     g_screenClear = true;
@@ -911,7 +1019,7 @@ void Screen::updateKeypadRepeatMode() {
         return;
     }
 
-    if( this->items == NULL ) {
+    if( this->_items == NULL ) {
         g_keypad.repeatMask = KEY_NONE;
         return;
     }
@@ -921,7 +1029,7 @@ void Screen::updateKeypadRepeatMode() {
         return;
     }
 
-    switch( g_currentItem.type ) {
+    switch( g_currentItem.getType() ) {
         case ITEM_TYPE_STATIC:
         case ITEM_TYPE_TOGGLE:
         case ITEM_TYPE_LINK:
@@ -946,7 +1054,7 @@ void Screen::updateKeypadRepeatMode() {
  *
  * Returns : The field length.
  */
-uint8_t Screen::calcFieldLength( Item *item ) {
+uint8_t Screen::calcFieldLength( ScreenItem* item ) {
     uint8_t length = 0;
 
     if( ( this->isItemFullScreenEditable( item ) ) && ( this->_itemFullscreen == false ) ) {
@@ -955,7 +1063,7 @@ uint8_t Screen::calcFieldLength( Item *item ) {
 
 
     /* Determine item length */
-    switch( item->type ) {
+    switch( item->getType() ) {
         case ITEM_TYPE_IP:
             length = 12;
             break;
@@ -966,11 +1074,11 @@ uint8_t Screen::calcFieldLength( Item *item ) {
 
         case ITEM_TYPE_NUMBER:
 
-            if( item->options & ITEM_NUMBER_INC_WHOLE ) {
+            if( item->getOptions() & ITEM_NUMBER_INC_WHOLE ) {
                 length = 1;
 
             } else {
-                length = numDigits( item->max );
+                length = this->getNumDigits( item->getMax() );
             }
 
             break;
@@ -984,7 +1092,7 @@ uint8_t Screen::calcFieldLength( Item *item ) {
             break;
 
         case ITEM_TYPE_TEXT:
-            length = item->length;
+            length = item->getLength();
             break;
 
     }
@@ -1006,10 +1114,10 @@ uint8_t Screen::calcFieldLength( Item *item ) {
 void Screen::updateCursorPosition() {
 
 
-    uint8_t row = g_currentItem.row - this->scroll;
-    uint8_t col = g_currentItem.col;
+    uint8_t row = g_currentItem.getPositionRow() - this->_scroll;
+    uint8_t col = g_currentItem.getPositionCol();
 
-    if( g_currentItem.options & ITEM_NOCURSOR ) {
+    if( g_currentItem.getOptions() & ITEM_NOCURSOR ) {
         return;
     }
 
@@ -1026,22 +1134,22 @@ void Screen::updateCursorPosition() {
 
     } else {
 
-        if( ( g_currentItem.options & ITEM_COMPACT ) == 0 && g_currentItem.caption != NULL ) {
+        if( ( g_currentItem.getOptions() & ITEM_COMPACT ) == 0 && g_currentItem.getCaption() != NULL ) {
 
-            if( g_currentItem.options & ITEM_CAPTION_SRAM_POINTER ) {
+            if( g_currentItem.getOptions() & ITEM_CAPTION_SRAM_POINTER ) {
 
-                col += strlen( ( const char * )g_currentItem.caption ) + 3;
+                col += strlen( ( const char* )g_currentItem.getCaption() ) + 3;
 
             } else {
-                col += strlen_P( ( const char * )g_currentItem.caption ) + 3;
+                col += strlen_P( ( const char* )g_currentItem.getCaption() ) + 3;
             }
         }
     }
 
-    switch( g_currentItem.type ) {
+    switch( g_currentItem.getType() ) {
         case ITEM_TYPE_TIME:
 
-            if( this->fieldPos == 0 ) {
+            if( this->_fieldPos == 0 ) {
                 g_lcd.setPosition( row, col + 1 );
 
             } else {
@@ -1051,16 +1159,16 @@ void Screen::updateCursorPosition() {
             break;
 
         case ITEM_TYPE_IP:
-            g_lcd.setPosition( row, this->fieldPos + ( this->fieldPos / 3 ) );
+            g_lcd.setPosition( row, this->_fieldPos + ( this->_fieldPos / 3 ) );
             break;
 
         case ITEM_TYPE_NUMBER:
 
-            if( g_currentItem.options & ITEM_NUMBER_INC_WHOLE ) {
-                g_lcd.setPosition( row, col + numDigits( g_currentItem.max ) - 1 );
+            if( g_currentItem.getOptions() & ITEM_NUMBER_INC_WHOLE ) {
+                g_lcd.setPosition( row, col + this->getNumDigits( g_currentItem.getMax() ) - 1 );
 
             } else {
-                g_lcd.setPosition( row, col + this->fieldPos );
+                g_lcd.setPosition( row, col + this->_fieldPos );
             }
 
             break;
@@ -1069,11 +1177,11 @@ void Screen::updateCursorPosition() {
             uint8_t maxWidth;
             maxWidth = DISPLAY_WIDTH - col - 2;
 
-            g_lcd.setPosition( row, col + ( this->fieldPos > ( maxWidth - 1 ) ? maxWidth - 1 : this->fieldPos ) + 1 );
+            g_lcd.setPosition( row, col + ( this->_fieldPos > ( maxWidth - 1 ) ? maxWidth - 1 : this->_fieldPos ) + 1 );
             break;
 
         case ITEM_TYPE_YEAR:
-            g_lcd.setPosition( row, col + this->fieldPos + 2 );
+            g_lcd.setPosition( row, col + this->_fieldPos + 2 );
             break;
 
         case ITEM_TYPE_MONTH:
@@ -1082,7 +1190,7 @@ void Screen::updateCursorPosition() {
 
         case ITEM_TYPE_TOGGLE:
 
-            if( g_currentItem.caption != NULL || ( g_currentItem.options & ITEM_COMPACT ) == 0 ) {
+            if( g_currentItem.getCaption() != NULL || ( g_currentItem.getOptions() & ITEM_COMPACT ) == 0 ) {
                 return;
             }
 
@@ -1091,11 +1199,11 @@ void Screen::updateCursorPosition() {
 
         case ITEM_TYPE_DOW:
 
-            if( g_currentItem.options & ITEM_COMPACT ) {
-                g_lcd.setPosition( row, col + this->fieldPos );
+            if( g_currentItem.getOptions() & ITEM_COMPACT ) {
+                g_lcd.setPosition( row, col + this->_fieldPos );
 
             } else {
-                g_lcd.setPosition( row, col + ( this->fieldPos * 2 ) );
+                g_lcd.setPosition( row, col + ( this->_fieldPos * 2 ) );
             }
 
             break;
@@ -1122,40 +1230,40 @@ void Screen::updateCursorPosition() {
  *
  * Returns : Nothing
  */
-void Screen::clearItemValue( Item *item ) {
+void Screen::clearItemValue( ScreenItem* item ) {
 
     if( ( this->isItemFullScreenEditable( item ) ) && ( this->_itemFullscreen == false ) ) {
         return;
     }
 
-    switch( item->type ) {
+    switch( item->getType() ) {
 
         case ITEM_TYPE_TEXT:
 
-            for( uint8_t i = this->fieldPos; i < item->length; i++ ) {
-                ( ( char * )item->value )[ i ] = 0x00;
+            for( uint8_t i = this->_fieldPos; i < item->getLength(); i++ ) {
+                ( ( char* )item->getValuePtr() )[ i ] = 0x00;
             }
 
-            this->upperCase = false;
+            this->_uppercase = false;
             break;
 
         case ITEM_TYPE_NUMBER:
         case ITEM_TYPE_BAR:
         case ITEM_TYPE_LIST:
         case ITEM_TYPE_YEAR:
-            *( ( uint8_t * )item->value ) = item->min;
+            item->setValue( item->getMin() );
             break;
 
         case ITEM_TYPE_MONTH:
-            *( ( uint8_t * )item->value ) = 1;
+            item->setValue( 1 );
             break;
 
         case ITEM_TYPE_DOW:
-            if( *( ( uint8_t * )item->value ) != 0 ) {
-                *( ( uint8_t * )item->value ) = 0;
+            if( item->getValue() != 0 ) {
+                item->setValue( 0 );
 
             } else {
-                *( ( uint8_t * )item->value ) = 0x7F;
+                item->setValue( 0x7F );
             }
 
             break;
@@ -1165,12 +1273,12 @@ void Screen::clearItemValue( Item *item ) {
 
     }
 
-    this->itemChanged = true;
+    this->_itemChanged = true;
 
     g_screenUpdate = true;
 
-    if( this->eventValueChange != NULL ) {
-        this->eventValueChange( this, item );
+    if( this->_eventValueChange != NULL ) {
+        this->_eventValueChange( this, item );
     }
 }
 
@@ -1186,22 +1294,22 @@ void Screen::clearItemValue( Item *item ) {
  *
  * Returns : The number of bars to display
  */
-uint8_t Screen::itemValueToBars( Item *item ) {
+uint8_t Screen::itemValueToBars( ScreenItem* item ) {
 
     uint8_t value;
-    value = *( ( uint8_t * )item->value );
+    value = item->getValue();
 
-    if( value < item->min ) {
-        value = item->min;
+    if( value < item->getMin() ) {
+        value = item->getMin();
     }
 
-    if( value > item->max ) {
-        value = item->max;
+    if( value > item->getMax() ) {
+        value = item->getMax();
     }
 
     double nbars;
-    nbars = ( value - item->min ) * ( item->length * 2 );
-    nbars /= ( item->max - item->min );
+    nbars = ( value - item->getMin() ) * ( item->getLength() * 2 );
+    nbars /= ( item->getMax() - item->getMin() );
 
     return ( uint8_t )lround( nbars );
 }
@@ -1218,24 +1326,23 @@ uint8_t Screen::itemValueToBars( Item *item ) {
  *
  * Returns : Nothing
  */
-void Screen::incrementItemValue( Item *item, bool shift ) {
+void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
 
     uint8_t pos;
-    char chr;
 
-    if( item->options & ITEM_READONLY ) {
+    if( item->getOptions() & ITEM_READONLY ) {
         return;
     }
 
     if( ( this->isItemFullScreenEditable( item ) ) && ( this->_itemFullscreen == false ) ) {
 
-        if( this->eventSelectionChanged != NULL ) {
-            this->eventSelectionChanged( this, item, this->fieldPos, true );
+        if( this->_eventSelectionChanged != NULL ) {
+            this->_eventSelectionChanged( this, item, this->_fieldPos, true );
         }
 
         this->_itemFullscreen = true;
 
-        this->fieldPos = 0;
+        this->_fieldPos = 0;
 
         this->updateKeypadRepeatMode();
 
@@ -1244,93 +1351,91 @@ void Screen::incrementItemValue( Item *item, bool shift ) {
         return;
     }
 
-    switch( item->type ) {
+    switch( item->getType() ) {
 
         case ITEM_TYPE_BAR:
 
             uint8_t nbars;
             nbars = this->itemValueToBars( item );
 
-            if( ( item->max - item->min ) / ( item->length * 2 ) > 0 ) {
+            if( ( item->getMax() - item->getMin() ) / ( item->getLength() * 2 ) > 0 ) {
 
                 nbars++;
 
-                if( nbars > ( item->length * 2 ) ) {
+                if( nbars > ( item->getLength() * 2 ) ) {
                     nbars = 0;
                 }
 
-                ( *( ( uint8_t * )item->value ) ) = item->min + nbars * ( item->max - item->min ) / ( item->length * 2 );
+                item->setValue( item->getMin() + nbars * ( item->getMax() - item->getMin() ) / ( item->getLength() * 2 ) );
 
             } else {
 
-                ( *( ( uint8_t * )item->value ) )++;
+                item->setValue( item->getValue() + 1 );
 
-                if( *( ( uint8_t * )item->value ) > item->max ) {
-                    *( ( uint8_t * )item->value ) = item->min;
+                if( item->getValue() > item->getMax() ) {
+                    item->setValue( item->getMin() );
                 }
             }
 
             break;
 
 
-        case ITEM_TYPE_TEXT:
+        case ITEM_TYPE_TEXT: {
 
-            chr = ( ( char * )item->value )[ this->fieldPos ];
+                char* text = ( char* )item->getValuePtr();
+                pos = strlen( text );
 
-            pos = strlen( ( char * )item->value );
+                if( this->_fieldPos >= pos ) {
 
-            if( this->fieldPos >= pos ) {
+                    while( pos < this->_fieldPos ) {
+                        text[ pos ] = CHAR_SPACE;
 
-                while( pos < this->fieldPos ) {
-                    ( ( char * )item->value )[ pos ] = CHAR_SPACE;
+                        pos++;
+                    }
 
-                    pos++;
+                    text[ pos + 1 ] = 0x00;
+
+                    text[ this->_fieldPos ] = 0x60;
                 }
 
-                ( ( char * )item->value )[ pos + 1 ] = 0x00;
-
-                chr = 0x60;
-            }
-
-            if( isalpha( chr ) ) {
-                this->upperCase = isupper( chr );
-            }
-
-            if( shift ) {
-
-                if( isalpha( chr ) == false ) {
-                    return;
+                if( isalpha( text[ this->_fieldPos ] ) ) {
+                    this->_uppercase = isupper( text[ this->_fieldPos ] );
                 }
 
-                if( isupper( chr ) ) {
-                    chr = tolower( chr );
+                if( shift ) {
+
+                    if( isalpha( text[ this->_fieldPos ] ) == false ) {
+                        return;
+                    }
+
+                    if( isupper( text[ this->_fieldPos ] ) ) {
+                        text[ this->_fieldPos ] = tolower( text[ this->_fieldPos ] );
+
+                    } else {
+                        text[ this->_fieldPos ] = toupper( text[ this->_fieldPos ] );
+                    }
 
                 } else {
-                    chr = toupper( chr );
+
+                    text[ this->_fieldPos ] = this->nextValidCharacter( text[ this->_fieldPos ] );
                 }
 
-            } else {
-
-                chr = this->nextValidCharacter( chr );
+                break;
             }
-
-            ( ( char * )item->value )[ this->fieldPos ] = chr;
-            break;
-
 
         case ITEM_TYPE_TOGGLE:
 
-            *( bool * )item->value = !( *( bool * ) item->value );
+            item->setValueBoolean( ! item->getValueBoolean() );
             break;
 
         case ITEM_TYPE_NUMBER:
 
-            if( item->options & ITEM_NUMBER_INC_WHOLE ) {
+            if( item->getOptions() & ITEM_NUMBER_INC_WHOLE ) {
 
-                ( *( ( uint8_t * )item->value ) )++;
+                item->setValue( item->getValue() + 1 );
 
-                if( *( ( uint8_t * )item->value ) > item->max ) {
-                    *( ( uint8_t * )item->value ) = item->min;
+                if( item->getValue() > item->getMax() ) {
+                    item->setValue( item->getMin() );
                 }
 
                 break;
@@ -1340,17 +1445,17 @@ void Screen::incrementItemValue( Item *item, bool shift ) {
 
         case ITEM_TYPE_YEAR:
 
-            pos = this->calcFieldLength( item ) - this->fieldPos - 1;
+            pos = this->calcFieldLength( item ) - this->_fieldPos - 1;
 
-            this->incDigit( ( uint8_t * )item->value, pos, item->max, item->min );
+            this->incDigit( ( uint8_t* )item->getValuePtr(), pos, item->getMax(), item->getMin() );
             break;
 
         case ITEM_TYPE_TIME:
-            Time *time;
-            time = ( Time * )item->value;
+            Time* time;
+            time = ( Time* )item->getValuePtr();
 
             /* Increment hours */
-            if( this->fieldPos == 0 ) {
+            if( this->_fieldPos == 0 ) {
                 time->hour++;
 
                 if( time->hour > 23 ) {
@@ -1372,21 +1477,21 @@ void Screen::incrementItemValue( Item *item, bool shift ) {
 
         case ITEM_TYPE_DOW:
 
-            if( bitRead( *( ( uint8_t * )item->value ), this->fieldPos ) != 0 ) {
+            if( bitRead( item->getValue(), this->_fieldPos ) != 0 ) {
 
-                bitClear( *( ( uint8_t * )item->value ), this->fieldPos );
+                item->setValue( item->getValue() & ~( 1UL << this->_fieldPos ) );
 
             } else {
-                bitSet( *( ( uint8_t * )item->value ), this->fieldPos );
+                item->setValue( item->getValue() | ( 1UL << this->_fieldPos ) );
             }
 
             break;
 
         case ITEM_TYPE_IP:
 
-            uint8_t *ip_seg;
-            ip_seg = ( ( uint8_t * )item->value ) + ( this->fieldPos / 3 );
-            pos = ( 2 - ( this->fieldPos % 3 ) );
+            uint8_t* ip_seg;
+            ip_seg = ( ( uint8_t* )item->getValuePtr() ) + ( this->_fieldPos / 3 );
+            pos = ( 2 - ( this->_fieldPos % 3 ) );
 
             this->incDigit( ip_seg, pos, 255, 1 );
 
@@ -1395,36 +1500,36 @@ void Screen::incrementItemValue( Item *item, bool shift ) {
         case ITEM_TYPE_MONTH:
         case ITEM_TYPE_LIST:
 
-            if( item->value == NULL ) {
+            if( item->getValuePtr() == NULL ) {
                 break;
             }
 
-            ( *( ( uint8_t * )item->value ) )++;
+            item->setValue( item->getValue() + 1 );
 
-            if( *( ( uint8_t * )item->value ) > item->max ) {
-                *( ( uint8_t * )item->value ) = item->min;
+            if( item->getValue() > item->getMax() ) {
+                item->setValue( item->getMin() );
             }
 
             break;
 
         case ITEM_TYPE_LINK:
 
-            if( this->eventValueChange != NULL ) {
-                this->eventValueChange( this, item );
+            if( this->_eventValueChange != NULL ) {
+                this->_eventValueChange( this, item );
             }
 
-            if( item->value != NULL ) {
-                gotoScreen( ( Screen * )item->value, true, this );
+            if( item->getValuePtr() != NULL ) {
+                (( Screen* )item->getValuePtr())->activate( true, this );
             }
 
             return;
     }
 
-    this->itemChanged = true;
+    this->_itemChanged = true;
     g_screenUpdate = true;
 
-    if( this->eventValueChange != NULL ) {
-        this->eventValueChange( this, item );
+    if( this->_eventValueChange != NULL ) {
+        this->_eventValueChange( this, item );
     }
 }
 
@@ -1449,7 +1554,7 @@ inline char Screen::nextValidCharacter( char current ) {
     /* 0x61-0x7A [a-z] */
 
     if( current == 0x20 ) {
-        return ( this->upperCase ) ? 0x41 : 0x61;
+        return ( this->_uppercase ) ? 0x41 : 0x61;
     }
 
     if( current == 0x23 ) {
@@ -1466,7 +1571,7 @@ inline char Screen::nextValidCharacter( char current ) {
         return 0x30;
     }
 
-    if( current > 0x5A && this->upperCase == true ) {
+    if( current > 0x5A && this->_uppercase == true ) {
         return 0x30;
     }
 
@@ -1492,7 +1597,7 @@ inline char Screen::nextValidCharacter( char current ) {
  *
  * Returns : Nothing
  */
-void Screen::incDigit( uint8_t *value, uint8_t pos, uint8_t max, uint8_t min ) {
+void Screen::incDigit( uint8_t* value, uint8_t pos, uint8_t max, uint8_t min ) {
 
     static uint8_t powLookup[] = { 1, 10, 100 };
     uint8_t pow = powLookup[ pos ];
@@ -1532,9 +1637,9 @@ void Screen::incDigit( uint8_t *value, uint8_t pos, uint8_t max, uint8_t min ) {
  * ---------
  *  None
  *
- * Returns :
+ * Returns : The number of digits.
  */
-inline uint8_t numDigits( uint8_t number ) {
+inline uint8_t Screen::getNumDigits( uint8_t number ) {
     if( number < 10 ) {
         return 1;
     }
@@ -1544,52 +1649,4 @@ inline uint8_t numDigits( uint8_t number ) {
     }
 
     return 3;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Leave the current screen and go to the specified one.
- *
- * Arguments
- * ---------
- *  - screen          : Pointer to the screen to load
- *  - selectFirstItem : TRUE to select the first item or False to leave the
- *                      previously selected item the last time the screen
- *                      was active
- *  - parent          : Sets which screen will be activated when leaving
- *                      this screen.
- *
- * Returns : Nothing
- */
-void gotoScreen( Screen *screen, bool selectFirstItem, Screen *parent ) {
-    if( screen == NULL ) {
-        return;
-    }
-
-    /* Trigger exit screen event. If callback return false, cancel screen change */
-    if( g_currentScreen->eventExitScreen != NULL ) {
-        if( g_currentScreen->eventExitScreen( g_currentScreen, screen ) == false ) {
-            return;
-        }
-    }
-
-    g_currentScreen = screen;
-    screen->init( selectFirstItem );
-
-    g_enterScreenTime = millis();
-
-
-    if( parent != NULL && parent != screen ) {
-        screen->parent = parent;
-    }
-
-
-    /* Trigger enter screen event on new screen */
-    if( screen->eventEnterScreen != NULL ) {
-        screen->eventEnterScreen( screen );
-    }
-
-    g_screenClear = true;
-    g_screenUpdate = true;
 }

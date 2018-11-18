@@ -132,7 +132,7 @@ void loop() {
                 g_screenUpdate = true;
             }
 
-            switch( g_currentScreen->id ) {
+            switch( g_currentScreen->getId() ) {
                 case SCREEN_ID_SET_TIME:
                 case SCREEN_ID_SHOW_ALARMS:
                     /* Don't update clock display on these screens */
@@ -168,16 +168,7 @@ void loop() {
     g_alarm.processAlarmEvents();
 
     /* Exit the current screen if it has reached its timeout value */
-    if( g_currentScreen->isTimeout() ) {
-
-        if( g_currentScreen->eventTimeout != NULL ) {
-            g_currentScreen->eventTimeout( g_currentScreen );
-            g_currentScreen->resetTimeout();
-
-        } else {
-            g_currentScreen->exitScreen();
-        }
-    }
+    g_currentScreen->checkScreenTimeout();
 
     /* Update the current screen if requested */
     if( g_screenUpdate == true ) {
@@ -206,7 +197,7 @@ void loop() {
 
     // if( g_wifi.statusChanged() == true ) {
 
-    //     if( g_currentScreen->id() == SCREEN_ID_ROOT )  {
+    //     if( g_currentScreen->getId()() == SCREEN_ID_ROOT )  {
     //         g_screenUpdate = true;
     //     }
     // }
@@ -225,7 +216,7 @@ void loop() {
  * ---------
  *  None
  *
- * Returns : TRUE if settings were reset to default or False
+ * Returns : TRUE if settings were reset to default or False otherwise.
  */
 bool checkFactoryResetBtn() {
     unsigned long start = millis();

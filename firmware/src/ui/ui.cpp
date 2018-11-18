@@ -79,50 +79,48 @@ Screen screen_edit_alarm_visual( SCREEN_ID_EDIT_ALARM_VISUAL, ITEMS_EDIT_PROFILE
  * ---------
  *  None
  *
- * Returns : 
+ * Returns :
  */
 void initScreens() {
 
-    screen_alarm.eventDrawScreen = &alarmScreen_onDrawScreen;
-    screen_alarm.eventKeypress = &alarmScreen_onKeypress;
-    screen_alarm.eventTimeout = &alarmScreen_onTimeout;
-    screen_alarm.timeout = 3000;
+    screen_alarm.setCbDrawScreen( &alarmScreen_onDrawScreen );
+    screen_alarm.setCbKeypress( &alarmScreen_onKeypress );
+    screen_alarm.setCbTimeout( &alarmScreen_onTimeout );
+    screen_alarm.setTimeout( 3000 );
 
     /* Root screen */
-    screen_root.eventDrawScreen = &rootScreen_onDrawScreen;
-    screen_root.eventKeypress = &rootScreen_onKeypress;
-    screen_root.customCharacterSet = CUSTOM_CHARACTERS_ROOT;
-    
-    
+    screen_root.setCbDrawScreen( &rootScreen_onDrawScreen );
+    screen_root.setCbKeypress( &rootScreen_onKeypress );
+    screen_root.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
 
     /* Set time screen */
-    screen_set_time.confirmChanges = true;
-    screen_set_time.eventSelectionChanged = &onSelectionChange;
+    screen_set_time.setConfirmChanges( true );
+    screen_set_time.setCbSelectionChange( &onSelectionChange );
 
     /* Set alarm screen */
-    screen_set_alarms.eventDrawItem = &onDrawItem;
+    screen_set_alarms.setCbDrawItem( &onDrawItem );
 
     /* Show alarms screen */
-    screen_show_alarms.timeout = 3000;
-    screen_show_alarms.eventKeypress = &showAlarmScreen_onKeypress;
-    screen_show_alarms.eventDrawScreen = &showAlarmScreen_onDrawScreen;
+    screen_show_alarms.setTimeout( 3000 );
+    screen_show_alarms.setCbKeypress( &showAlarmScreen_onKeypress );
+    screen_show_alarms.setCbDrawScreen( &showAlarmScreen_onDrawScreen );
 
     /* Network settings screen */
-    screen_network.confirmChanges = true;
+    screen_set_time.setConfirmChanges( true );
 
     /* List profile screen */
-    screen_edit_profile.eventSelectionChanged = &onSelectionChange;
-    screen_edit_profile.eventDrawItem = &onDrawItem;
+    screen_edit_profile.setCbSelectionChange( &onSelectionChange );
+    screen_edit_profile.setCbDrawItem( &onDrawItem );
 
     /* Edit alarm lamp settings */
-    screen_edit_alarm_lamp.eventSelectionChanged = &onSelectionChange;
+    screen_set_time.setCbSelectionChange( &onSelectionChange );
 
     /* Edit night lamp settings */
-    screen_edit_night_lamp.eventSelectionChanged = &onSelectionChange;
-    screen_edit_night_lamp.eventDrawItem = &onDrawItem;
+    screen_set_time.setCbSelectionChange( &onSelectionChange );
+    screen_set_time.setCbDrawItem( &onDrawItem );
 
     /* Edit alarm lamp settings */
-    screen_edit_alarm_visual.eventSelectionChanged = &onSelectionChange;
+    screen_set_time.setCbSelectionChange( &onSelectionChange );
 }
 
 
@@ -140,10 +138,10 @@ void initScreens() {
  *
  * Returns : TRUE to allow default item drawingor False to override.
  */
-bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8_t col ) {
+bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col ) {
     uint8_t length;
 
-    switch( item->id ) {
+    switch( item->getId() ) {
         case ID_PROFILE_FILENAME:
 
             g_lcd.print( isSelected ? CHAR_SELECT : CHAR_FIELD_BEGIN );
@@ -155,7 +153,7 @@ bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8
                 length = g_lcd.print( g_alarm.profile.filename );
             }
 
-            g_lcd.fill( CHAR_SPACE, item->length - length );
+            g_lcd.fill( CHAR_SPACE, item->getLength() - length );
             g_lcd.print( isSelected ? CHAR_SELECT_REV : CHAR_FIELD_END );
 
             return false;
@@ -163,7 +161,7 @@ bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8
         case ID_ALARM_EDIT_1:
         case ID_ALARM_EDIT_2:
             uint8_t alarm_id;
-            alarm_id = item->id - ID_ALARM_EDIT_1;
+            alarm_id = item->getId() - ID_ALARM_EDIT_1;
 
             Time time;
             g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );
@@ -183,7 +181,7 @@ bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8
         case ID_PROFILE_SNOOZE:
 
             uint8_t minutes;
-            minutes = *( ( uint8_t * )item->value );
+            minutes = item->getValue();
 
             if( minutes > 1 ) {
                 length = g_lcd.printf_P( S_DATETIME_M, minutes );
@@ -207,7 +205,7 @@ bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8
 
 /*--------------------------------------------------------------------------
  *
- * Event raised when the cursor on the currently selected item has changed 
+ * Event raised when the cursor on the currently selected item has changed
  * position or when another item is selected.
  *
  * Arguments
@@ -216,12 +214,12 @@ bool onDrawItem( Screen *screen, Item *item, bool isSelected, uint8_t row, uint8
  *  - item       : Item currently selected.
  *  - fieldPos   : Cursor position within the selected item.
  *  - fullscreen : TRUE if the item is shown full screenor False otherwise.
- * 
+ *
  * Returns : Nothing
  */
-void onSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fullscreen ) {
+void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen ) {
 
-    switch( item->id ) {
+    switch( item->getId() ) {
         case ID_PROFILE_FILENAME:
         case ID_PROFILE_VOLUME:
 
@@ -258,12 +256,12 @@ void onSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fulls
         case ID_LAMP_COLOR:
         case ID_LAMP_BRIGHTNESS:
 
-            NightLampSettings *settings;
+            NightLampSettings* settings;
             settings = edit_alarm_lamp_settings ? &g_alarm.profile.lamp : &g_config.lamp;
 
 
             if( fullscreen ) {
-                g_lamp.activate( settings, ( item->id != ID_LAMP_EFFECT_SPEED ) );
+                g_lamp.activate( settings, ( item->getId() != ID_LAMP_EFFECT_SPEED ) );
 
             } else {
                 g_lamp.deactivate();
@@ -310,9 +308,9 @@ void onSelectionChange( Screen *screen, Item *item, uint8_t fieldPos, bool fulls
  *
  * Returns : Nothing
  */
-void onValueChange( Screen *screen, Item *item ) {
+void onValueChange( Screen* screen, ScreenItem* item ) {
 
-    switch( item->id ) {
+    switch( item->getId() ) {
 
         case ID_CLOCK_24H:
 
@@ -351,7 +349,7 @@ void onValueChange( Screen *screen, Item *item ) {
 
             if( adjDate.day > month_days ) {
 
-                if( item->id == ID_SET_DATE_DAY ) {
+                if( item->getId() == ID_SET_DATE_DAY ) {
                     adjDate.day = 1;
 
                 } else {
@@ -388,7 +386,7 @@ void onValueChange( Screen *screen, Item *item ) {
 
         case ID_ALARM_EDIT_1:
         case ID_ALARM_EDIT_2:
-            selectedProfile = item->id - ID_ALARM_EDIT_1;
+            selectedProfile = item->getId() - ID_ALARM_EDIT_1;
 
             g_alarm.loadProfile( selectedProfile );
             break;
@@ -403,7 +401,7 @@ void onValueChange( Screen *screen, Item *item ) {
         case ID_LAMP_DELAY:
         case ID_PROFILE_SNOOZE:
             uint8_t minutes;
-            minutes = *( ( uint8_t * )item->value );
+            minutes = item->getValue();
 
             if( minutes > 10 ) {
                 minutes = ( minutes % 5 ) ? ( ( minutes / 5 ) * 5 ) + 5  : minutes;
@@ -413,12 +411,12 @@ void onValueChange( Screen *screen, Item *item ) {
                 minutes = ( minutes % 10 ) ? ( ( minutes / 10 ) * 10 ) + 10  : minutes;
             }
 
-            *( ( uint8_t * )item->value ) = minutes;
+            item->setValue( minutes );
             break;
 
 
         case ID_LAMP_MODE:
-            if( ( uint8_t * )item->value == LAMP_MODE_OFF ) {
+            if( item->getValue() == LAMP_MODE_OFF ) {
                 g_lamp.deactivate();
 
             } else {
@@ -428,15 +426,15 @@ void onValueChange( Screen *screen, Item *item ) {
             break;
 
         case ID_LAMP_COLOR:
-            g_lamp.setColorFromTable( *( ( uint8_t * )item->value ) );
+            g_lamp.setColorFromTable( item->getValue() );
             break;
 
         case ID_LAMP_BRIGHTNESS:
-            g_lamp.setBrightness( *( ( uint8_t * )item->value ) );
+            g_lamp.setBrightness( item->getValue() );
             break;
 
         case ID_LAMP_EFFECT_SPEED:
-            g_lamp.setEffectSpeed( *( ( uint8_t * )item->value ) );
+            g_lamp.setEffectSpeed( item->getValue() );
             break;
     }
 }
@@ -452,11 +450,11 @@ void onValueChange( Screen *screen, Item *item ) {
  *
  * Returns : TRUE to allow loading the screenor False to override.
  */
-bool onEnterScreen( Screen *screen ) {
+bool onEnterScreen( Screen* screen ) {
 
     DateTime now;
 
-    switch( screen->id ) {
+    switch( screen->getId() ) {
 
         case SCREEN_ID_SET_TIME:
             now = g_rtc.now();
@@ -514,20 +512,20 @@ bool onEnterScreen( Screen *screen ) {
  *
  * Returns : TRUE to allow leaving the screenor False to override.
  */
-bool onExitScreen( Screen *currentScreen, Screen *newScreen ) {
+bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
     bool save;
 
-    if( currentScreen->confirmChanges == true ) {
-        save = ( currentScreen->returnValue == RETURN_YES );
+    if( currentScreen->isConfirmChanges() == true ) {
+        save = ( currentScreen->getReturnValue() == RETURN_YES );
 
     } else {
 
-        save = currentScreen->itemChanged;
+        save = currentScreen->hasItemsChanged();
     }
 
 
-    switch( currentScreen->id ) {
+    switch( currentScreen->getId() ) {
 
         case SCREEN_ID_SET_TIME:
 

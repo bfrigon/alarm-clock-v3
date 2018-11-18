@@ -516,7 +516,7 @@ void Alarm::play( uint8_t mode ) {
     this->_alarmStart = millis();
 
     if( mode & ALARM_MODE_SCREEN ) {
-        gotoScreen( &screen_alarm, true, g_currentScreen );
+        screen_alarm.activate( true, g_currentScreen );
     }
 
     if( mode & ALARM_MODE_AUDIO ) {
@@ -663,7 +663,7 @@ void Alarm::snooze() {
     g_screenUpdate = true;
 
     screen_alarm.resetTimeout();
-    screen_alarm.timeout = 1000;
+    screen_alarm.setTimeout( 1000 );
 }
 
 
