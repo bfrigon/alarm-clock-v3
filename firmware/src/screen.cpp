@@ -774,6 +774,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
                           address[ 2 ],
                           address[ 3 ]
                         );
+            break;
 
         case ITEM_TYPE_DOW:
 

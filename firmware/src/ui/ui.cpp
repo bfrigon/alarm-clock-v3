@@ -106,21 +106,26 @@ void initScreens() {
     screen_show_alarms.setCbDrawScreen( &showAlarmScreen_onDrawScreen );
 
     /* Network settings screen */
-    screen_set_time.setConfirmChanges( true );
+    screen_network.setConfirmChanges( true );
 
     /* List profile screen */
     screen_edit_profile.setCbSelectionChange( &onSelectionChange );
     screen_edit_profile.setCbDrawItem( &onDrawItem );
 
     /* Edit alarm lamp settings */
-    screen_set_time.setCbSelectionChange( &onSelectionChange );
+    screen_edit_alarm_lamp.setCbSelectionChange( &onSelectionChange );
 
     /* Edit night lamp settings */
-    screen_set_time.setCbSelectionChange( &onSelectionChange );
-    screen_set_time.setCbDrawItem( &onDrawItem );
+    screen_edit_night_lamp.setCbSelectionChange( &onSelectionChange );
+    screen_edit_night_lamp.setCbDrawItem( &onDrawItem );
 
-    /* Edit alarm lamp settings */
-    screen_set_time.setCbSelectionChange( &onSelectionChange );
+    /* Edit alarm visual settings */
+    screen_edit_alarm_visual.setCbSelectionChange( &onSelectionChange );
+
+
+    g_currentScreen = &screen_root;
+    g_screenUpdate = true;
+    g_screenClear = true;
 }
 
 
@@ -261,7 +266,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
 
 
             if( fullscreen ) {
-                g_lamp.activate( settings, ( item->getId() != ID_LAMP_EFFECT_SPEED ) );
+                g_lamp.activate( settings, true );
 
             } else {
                 g_lamp.deactivate();
@@ -516,7 +521,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
     bool save;
 
-    if( currentScreen->isConfirmChanges() == true ) {
+    if( currentScreen->getConfirmChanges() == true ) {
         save = ( currentScreen->getReturnValue() == RETURN_YES );
 
     } else {

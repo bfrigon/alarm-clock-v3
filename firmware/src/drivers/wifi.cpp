@@ -32,13 +32,14 @@
  */
 void updateWifiConfig() {
 
+    /*
     IPAddress net_ip( &g_config.net_ip[0] );
     IPAddress net_mask( &g_config.net_mask[0] );
     IPAddress net_gateway( &g_config.net_gateway[0] );
     IPAddress net_dns( &g_config.net_dns[0] );
 
     g_wifi.config( g_config.net_dhcp, net_ip, net_dns, net_gateway, net_mask );
-
+    */
 }
 
 

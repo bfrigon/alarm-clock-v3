@@ -325,7 +325,7 @@ class Screen {
     bool isItemFullScreen()                             { return this->_itemFullscreen; }
 
     /* Gets/sets whether to confirm changes when exiting the screen. */
-    bool isConfirmChanges()                             { return this->_confirmChanges; }
+    bool getConfirmChanges()                            { return this->_confirmChanges; }
     void setConfirmChanges( bool confirm )              { this->_confirmChanges = confirm; }
 
     /* Sets which custom character set to use. */

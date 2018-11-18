@@ -52,8 +52,8 @@ void setup() {
     Wire.setClock( 100000 );
 
 
+    /* Initialize UI */
     initScreens();
-    g_currentScreen = &screen_root;
 
     /* Initialize power management driver */
     g_power.begin();
@@ -89,6 +89,7 @@ void setup() {
 
     /* Initialize audio system */
     g_alarm.begin();
+
 
 
     //enableWifi();

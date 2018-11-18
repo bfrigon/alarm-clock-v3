@@ -116,7 +116,7 @@ void US2066::begin() {
 
     /* Give time for SEG/COM to turn on */
     delay( 200 );
-
+    
 }
 
 
