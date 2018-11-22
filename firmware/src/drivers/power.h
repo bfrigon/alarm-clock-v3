@@ -34,7 +34,7 @@
 class Power {
 
   public:
-    Power( uint8_t pin_onbatt, uint8_t pin_lowbatt );
+    Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst = -1 );
     void begin();
     uint8_t detectPowerState();
     uint8_t getPowerMode();
@@ -44,13 +44,15 @@ class Power {
     void enableWatchdog();
     void disableWatchdog();
     void resetWatchdog();
-
+    void cpuReset();
+    void poweroff();
+    bool detectConfigResetButton();
 
 
   private:
-    uint8_t _pin_onbatt;
-    uint8_t _pin_lowbatt;
-    uint8_t _pin_pixel_shdn;
+    int8_t _pin_onbatt;
+    int8_t _pin_sysoff;
+    int8_t _pin_cfgrst;
     uint8_t _mode = POWER_MODE_NORMAL;
     bool _init = false;
     bool _wdt = false;

@@ -62,7 +62,7 @@
 #define PIN_SD_DETECT       33
 #define PIN_AMP_SHDN        28
 #define PIN_ON_BATTERY      A14
-#define PIN_LOW_BATTERY     A8
+#define PIN_SYSOFF          A8
 
 
 // ----------------------------------------

@@ -27,14 +27,16 @@
  *
  * Arguments
  * ---------
- *  - pin_onbatt  : Pin ID which detect when the system is running 
+ *  - pin_onbatt : Pin which detect when the system is running
  *                  on battery power.
- *  - pin_lowbatt : Pin ID which detect the battery voltage.
+ *  - pin_sysoff : Pin connected to BQ24075 system off pin
+ *  - pin_cfgrst : Pin which is connected to the reset/factory reset button.
  */
-Power::Power( uint8_t pin_onbatt, uint8_t pin_lowbatt ) {
+Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst = -1 ) {
 
     this->_pin_onbatt = pin_onbatt;
-    this->_pin_lowbatt = pin_lowbatt;
+    this->_pin_sysoff = pin_sysoff;
+    this->_pin_cfgrst = pin_cfgrst;
 }
 
 
@@ -51,6 +53,8 @@ Power::Power( uint8_t pin_onbatt, uint8_t pin_lowbatt ) {
 void Power::begin() {
 
     pinMode( this->_pin_onbatt, INPUT );
+    pinMode( this->_pin_sysoff, OUTPUT );
+    digitalWrite( this->_pin_sysoff, LOW );
 
     this->_mode = POWER_MODE_NORMAL;
 
@@ -162,7 +166,7 @@ uint8_t Power::detectPowerState() {
  * Returns : New power state.
  */
 bool Power::isOnBatteryPower() {
-    return ( digitalRead( this->_pin_onbatt ) == LOW );
+    return ( digitalRead( this->_pin_onbatt ) == HIGH );
 }
 
 
@@ -232,6 +236,50 @@ void Power::enterSleep() {
     if( this->_wdt == true ) {
         this->enableWatchdog();
     }
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Pull the reset pin low from the "factory config/reset" pin to reset 
+ * the processor.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void Power::cpuReset() {
+
+    if( this->_pin_cfgrst == -1 ) {
+        return;
+    }
+
+    pinMode( this->_pin_cfgrst, OUTPUT );
+    digitalWrite( this->_pin_cfgrst, LOW );
+
+    /* Halt */
+    while( true );
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Checkd the state of the "factory config/reset" button
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if the button is pressed or FALSE otherwise.
+ */
+bool Power::detectConfigResetButton() {
+    if( this->_pin_cfgrst == -1 ) {
+        return false;
+    }
+
+    return ( digitalRead( this->_pin_cfgrst ) == LOW );
 }
 
 

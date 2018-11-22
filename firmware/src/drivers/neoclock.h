@@ -68,6 +68,7 @@ class NeoClock : public NeoPixel {
 
     void update();
     void setTestMode( bool testMode );
+    void restoreClockDisplay();
     void processUpdateEvents();
 
 

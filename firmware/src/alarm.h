@@ -76,10 +76,11 @@ class Alarm : private VS1053 {
     void saveProfile( uint8_t id );
     bool readProfileAlarmTime( uint8_t id, Time *time, uint8_t *dow );
 
-    bool DetectSDCard();
+    bool detectSDCard();
     bool isSDCardPresent();
     bool openNextFile();
     bool openFile( char *name );
+    bool fileExists( char* filename );
 
     void setVolume( uint8_t vol );
     void play( uint8_t mode );
@@ -102,8 +103,8 @@ class Alarm : private VS1053 {
     uint8_t getPlayMode();
     bool isAlarmEnabled();
     struct AlarmProfile profile;
-    struct SdBaseFile currentFile;
-
+    FatFile currentFile;
+    
   private:
 
     void feedBuffer();

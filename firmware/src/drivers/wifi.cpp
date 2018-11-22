@@ -33,13 +33,16 @@
 void updateWifiConfig() {
 
     /*
-    IPAddress net_ip( &g_config.net_ip[0] );
-    IPAddress net_mask( &g_config.net_mask[0] );
-    IPAddress net_gateway( &g_config.net_gateway[0] );
-    IPAddress net_dns( &g_config.net_dns[0] );
+    IPAddress net_ip( &g_config.settings.net_ip[0] );
+    IPAddress net_mask( &g_config.settings.net_mask[0] );
+    IPAddress net_gateway( &g_config.settings.net_gateway[0] );
+    IPAddress net_dns( &g_config.settings.net_dns[0] );
 
-    g_wifi.config( g_config.net_dhcp, net_ip, net_dns, net_gateway, net_mask );
+    g_wifi.config( g_config.settings.net_dhcp, net_ip, net_dns, net_gateway, net_mask );
     */
+
+   
+   
 }
 
 
@@ -64,7 +67,7 @@ void enableWifi() {
 
     updateWifiConfig();
 
-    g_wifi.connect( g_config.ssid, g_config.wkey );
+    g_wifi.connect( g_config.settings.ssid, g_config.settings.wkey );
 }
 
 

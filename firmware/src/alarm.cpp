@@ -158,7 +158,7 @@ bool Alarm::isSDCardPresent() {
  *
  * Returns : TRUE if detectedor False otherwise.
  */
-bool Alarm::DetectSDCard() {
+bool Alarm::detectSDCard() {
     if( digitalRead( this->_pin_sd_detect ) == LOW ) {
 
         /* Already detected, no need to re-initialize */
@@ -234,6 +234,8 @@ bool Alarm::DetectSDCard() {
 }
 
 
+
+
 /*--------------------------------------------------------------------------
  *
  * Open the next music file in the SD card root directory. If the end of
@@ -249,7 +251,7 @@ bool Alarm::DetectSDCard() {
  * ---------
  *  None
  *
- * Returns : TRUE if successfulor False otherwise.
+ * Returns : TRUE if successful or False otherwise.
  */
 bool Alarm::openNextFile() {
     if( this->_playMode != ALARM_MODE_OFF ) {
@@ -276,9 +278,9 @@ bool Alarm::openNextFile() {
  * ---------
  *  None
  *
- * Returns : TRUE if successfulor False otherwise.
+ * Returns : TRUE if successful or False otherwise.
  */
-bool Alarm::openFile( char *name ) {
+bool Alarm::openFile( char* name ) {
     if( this->_sd.vwd()->isOpen() == false ) {
         return false;
     }
@@ -288,24 +290,25 @@ bool Alarm::openFile( char *name ) {
         this->currentFile.close();
     }
 
-    /* Open the specified file */
     if( name != NULL ) {
+
+        /* Open the specified file */
         if( strlen( name ) > 0 ) {
             this->currentFile.open( this->_sd.vwd(), name, O_READ );
+
             this->currentFile.getSFN( this->profile.filename );
         }
 
-        /* Open the next file in the root directory */
-
     } else {
+        /* Open the next file in the root directory */
         this->currentFile.openNext( this->_sd.vwd(), O_READ );
 
-        char buffer[ ALARM_FILENAME_LENGTH ];
+        char buffer[ MAX_LENGTH_ALARM_FILENAME + 1 ];
         this->currentFile.getSFN( buffer );
 
         /* If the next filename is the same than the currently slected one, go
            to the next file */
-        if( strncmp( this->profile.filename, buffer, ALARM_FILENAME_LENGTH )
+        if( strcmp( this->profile.filename, buffer )
                 == 0 ) {
             this->currentFile.openNext( this->_sd.vwd(), O_READ );
         }
@@ -355,13 +358,13 @@ bool Alarm::openFile( char *name ) {
  *  - dow        : Pointer to a unsigned integer where the day of week mask
  *                 will be copied.
  *
- * Returns : TRUE if successfulor False otherwise.
+ * Returns : TRUE if successful or False otherwise.
  */
-bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow ) {
+bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time* time, uint8_t* dow ) {
     uint8_t i;
     uint8_t byte;
 
-    if( profile_id > MAX_ALARM_PROFILES - 1 ) {
+    if( profile_id > MAX_NUM_PROFILES - 1 ) {
         return false;
     }
 
@@ -371,7 +374,7 @@ bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow )
                                 + offsetof( struct AlarmProfile, time ) );
 
 
-            * ( ( ( uint8_t * ) time ) + i ) = byte;
+            * ( ( ( uint8_t* ) time ) + i ) = byte;
         }
     }
 
@@ -395,7 +398,7 @@ bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time *time, uint8_t *dow )
  * ---------
  *  - id : Alarm profile ID to load.
  *
- * Returns : TRUE if successfulor False otherwise.
+ * Returns : TRUE if successful or False otherwise.
  */
 bool Alarm::loadProfile( uint8_t id ) {
     return this->loadProfile( &this->profile, id );
@@ -410,16 +413,16 @@ bool Alarm::loadProfile( uint8_t id ) {
  * ---------
  *  - id : Alarm profile ID to load.
  *
- * Returns : TRUE if successfulor False otherwise.
+ * Returns : TRUE if successful or False otherwise.
  */
-bool Alarm::loadProfile( AlarmProfile *profile, uint8_t id ) {
-    if( id > MAX_ALARM_PROFILES - 1 ) {
+bool Alarm::loadProfile( AlarmProfile* profile, uint8_t id ) {
+    if( id > MAX_NUM_PROFILES - 1 ) {
         return false;
     }
 
     for( uint8_t i = 0; i < sizeof( AlarmProfile ); i++ ) {
         uint8_t byte = EEPROM.read( EEPROM_ADDR_PROFILES + ( id * sizeof( AlarmProfile ) ) + i );
-        * ( ( ( uint8_t * ) profile ) + i ) = byte;
+        * ( ( ( uint8_t* ) profile ) + i ) = byte;
     }
 
     return true;
@@ -453,13 +456,13 @@ void Alarm::saveProfile( uint8_t id ) {
  *
  * Returns :
  */
-void Alarm::saveProfile( AlarmProfile *profile, uint8_t id ) {
-    if( id > MAX_ALARM_PROFILES - 1 ) {
+void Alarm::saveProfile( AlarmProfile* profile, uint8_t id ) {
+    if( id > MAX_NUM_PROFILES - 1 ) {
         return;
     }
 
     for( uint8_t i = 0; i < sizeof( AlarmProfile ); i++ ) {
-        uint8_t byte = * ( ( ( uint8_t * ) profile ) + i );
+        uint8_t byte = * ( ( ( uint8_t* ) profile ) + i );
         EEPROM.update( EEPROM_ADDR_PROFILES + ( id * sizeof( AlarmProfile ) ) + i, byte );
     }
 }
@@ -815,7 +818,7 @@ void Alarm::visualStart() {
     switch( this->profile.visualMode ) {
 
         case ALARM_VISUAL_FADING:
-            this->_visualStepValue = g_config.clock_brightness;
+            this->_visualStepValue = g_config.settings.clock_brightness;
             break;
 
         default:
@@ -889,7 +892,7 @@ inline void Alarm::visualStep() {
 
             this->_visualStepReverse = !this->_visualStepReverse;
 
-            g_clock.setBrightness( this->_visualStepReverse ? 0 : ( g_config.clock_brightness + 25 ) );
+            g_clock.setBrightness( this->_visualStepReverse ? 0 : ( g_config.settings.clock_brightness + 25 ) );
 
             if( this->profile.visualMode == ALARM_VISUAL_RED_FLASH ) {
                 g_clock.setColorFromTable( COLOR_RED );
@@ -900,17 +903,17 @@ inline void Alarm::visualStep() {
         case ALARM_VISUAL_WHITE_FLASH:
             this->_visualStepReverse = !this->_visualStepReverse;
 
-            g_clock.setBrightness( g_config.clock_brightness + 25 );
-            g_clock.setColorFromTable( this->_visualStepReverse ? COLOR_WHITE : g_config.clock_color );
+            g_clock.setBrightness( g_config.settings.clock_brightness + 25 );
+            g_clock.setColorFromTable( this->_visualStepReverse ? COLOR_WHITE : g_config.settings.clock_color );
             break;
 
         case ALARM_VISUAL_FADING:
             if( this->_visualStepValue
-                    < ( ( g_config.clock_brightness < 25 ) ? 5 : ( g_config.clock_brightness - 20 ) ) ) {
+                    < ( ( g_config.settings.clock_brightness < 25 ) ? 5 : ( g_config.settings.clock_brightness - 20 ) ) ) {
                 this->_visualStepReverse = false;
             }
 
-            if( this->_visualStepValue > ( g_config.clock_brightness + 20 ) ) {
+            if( this->_visualStepValue > ( g_config.settings.clock_brightness + 20 ) ) {
                 this->_visualStepReverse = true;
             }
 
@@ -919,7 +922,7 @@ inline void Alarm::visualStep() {
             break;
 
         case ALARM_VISUAL_RAINBOW:
-            g_clock.setBrightness( g_config.clock_brightness + 25 );
+            g_clock.setBrightness( g_config.settings.clock_brightness + 25 );
 
             this->_visualStepValue += 5;
 
@@ -961,8 +964,8 @@ inline void Alarm::visualStop() {
     g_lamp.deactivate();
 
     /* Restore clock settings */
-    g_clock.setColorFromTable( g_config.clock_color );
-    g_clock.setBrightness( g_config.clock_brightness );
+    g_clock.setColorFromTable( g_config.settings.clock_color );
+    g_clock.setBrightness( g_config.settings.clock_brightness );
     g_clock.update();
 }
 
@@ -1133,7 +1136,7 @@ bool Alarm::isAlarmEnabled() {
         return false;
     }
 
-    return ( ( g_config.alarm_on[0] == true ) || ( g_config.alarm_on[1] == true ) );
+    return ( ( g_config.settings.alarm_on[0] == true ) || ( g_config.settings.alarm_on[1] == true ) );
 }
 
 
@@ -1148,7 +1151,7 @@ bool Alarm::isAlarmEnabled() {
  *
  * Returns : TRUE if an alarm matchor False otherwise
  */
-bool Alarm::checkForAlarms( DateTime *now ) {
+bool Alarm::checkForAlarms( DateTime* now ) {
     if( this->isAlarmEnabled() == false ) {
         return false;
     }
@@ -1177,19 +1180,19 @@ bool Alarm::checkForAlarms( DateTime *now ) {
  * Arguments
  * ---------
  *  - currentTime : DateTime structure containing the current time.
- *  - matchNow    : TRUE to include alarm which match the current time 
- *                  or FALSE to ignore 
+ *  - matchNow    : TRUE to include alarm which match the current time
+ *                  or FALSE to ignore
  *
  * Returns : The next alarm ID or -1 if no alarm are set.
  */
-int8_t Alarm::getNextAlarmID( DateTime *currentTime, bool matchNow ) {
+int8_t Alarm::getNextAlarmID( DateTime* currentTime, bool matchNow ) {
     if( this->isAlarmEnabled() == false ) {
         /* All alarms off */
         return -1;
     }
 
-    if( g_config.alarm_on[1] == true ) {
-        if( g_config.alarm_on[0] == false ) {
+    if( g_config.settings.alarm_on[1] == true ) {
+        if( g_config.settings.alarm_on[0] == false ) {
 
             /* Alarm 0 is not active, so alarm 1 is always next */
             return 1;
@@ -1215,13 +1218,13 @@ int8_t Alarm::getNextAlarmID( DateTime *currentTime, bool matchNow ) {
  * Arguments
  * ---------
  *  - currentTime : DateTime structure containing the current time.
- *  - matchNow    : TRUE to include alarm which match the current time 
- *                  or FALSE to ignore 
+ *  - matchNow    : TRUE to include alarm which match the current time
+ *                  or FALSE to ignore
  *
  * Returns : The delay in minutes or -1 if no alarm is set.
  */
-int16_t Alarm::getNextAlarmOffset( int8_t alarm_id, DateTime *currentTime, bool matchNow ) {
-    if( alarm_id > MAX_ALARM_PROFILES - 1 ) {
+int16_t Alarm::getNextAlarmOffset( int8_t alarm_id, DateTime* currentTime, bool matchNow ) {
+    if( alarm_id > MAX_NUM_PROFILES - 1 ) {
         return -1;
     }
 

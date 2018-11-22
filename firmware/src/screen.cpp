@@ -21,7 +21,6 @@
 
 
 Screen* g_currentScreen;
-ScreenItem g_currentItem;
 bool g_screenUpdate = false;
 bool g_screenClear = false;
 const char* g_currentCustomCharacterSet = NULL;
@@ -48,7 +47,7 @@ ScreenItem::ScreenItem() {
  *
  * Arguments
  * ---------
- *  - item : Pointer to the screen item structure contained in program 
+ *  - item : Pointer to the screen item structure contained in program
  *           memory
  *
  * Returns : Nothing
@@ -56,7 +55,7 @@ ScreenItem::ScreenItem() {
 void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
 
     struct ScreenItemBase memItem;
-    memcpy_P( &memItem, item, sizeof( ScreenItemBase ));
+    memcpy_P( &memItem, item, sizeof( ScreenItemBase ) );
 
     this->_type = memItem._type;
     this->_id = memItem._id;
@@ -280,7 +279,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
             if( this->_itemFullscreen == true ) {
 
                 if( this->_eventSelectionChanged != NULL ) {
-                    this->_eventSelectionChanged( this, &g_currentItem, this->_fieldPos, false );
+                    this->_eventSelectionChanged( this, &this->_item, this->_fieldPos, false );
                 }
 
                 this->_itemFullscreen = false;
@@ -305,23 +304,24 @@ void Screen::processKeypadEvent( uint8_t key ) {
                 this->_returnValue = this->_fieldPos + 1;
 
                 if( this->_parent != NULL ) {
-                    this->_parent->activate( false, NULL );
+                    this->_parent->activate( false );
                 }
+
                 return;
             }
 
             /* Or increment the value of the item */
-            this->incrementItemValue( &g_currentItem, false );
+            this->incrementItemValue( &this->_item, false );
 
             break;
 
         case KEY_SWIPE | KEY_RIGHT:
 
-            this->incrementItemValue( &g_currentItem, true );
+            this->incrementItemValue( &this->_item, true );
             break;
 
         case KEY_SHIFT | KEY_MENU:
-            this->clearItemValue( &g_currentItem );
+            this->clearItemValue( &this->_item );
             break;
 
         /* Go to next item or next digit position.*/
@@ -343,7 +343,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             /* increment cursor position within the current item, if
             it reaches the item length, skip to the next item */
-            if( this->_fieldPos >= this->calcFieldLength( &g_currentItem ) ) {
+            if( this->_fieldPos >= this->calcFieldLength( &this->_item ) ) {
 
                 this->_fieldPos = 0;
 
@@ -357,7 +357,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
 
             if( this->_eventSelectionChanged != NULL ) {
-                this->_eventSelectionChanged( this, &g_currentItem, this->_fieldPos, this->_itemFullscreen );
+                this->_eventSelectionChanged( this, &this->_item, this->_fieldPos, this->_itemFullscreen );
             }
 
             g_screenUpdate = true;
@@ -377,7 +377,11 @@ void Screen::processKeypadEvent( uint8_t key ) {
  *
  * Returns : Nothing
  */
-void Screen::resetTimeout() {
+void Screen::resetTimeout( int16_t timeout = -1 ) {
+
+    if( timeout >= 0 ) {
+        this->_timeout = timeout;
+    }
 
     g_enterScreenTime = millis();
 }
@@ -453,9 +457,7 @@ void Screen::exitScreen() {
     }
 
     /* Goto back to parent screen */
-    if( this->_parent != NULL ) {
-        this->_parent->activate( false, NULL );
-    }
+    this->_parent->activate( false );
     this->_parent = NULL;
 
     return;
@@ -476,7 +478,7 @@ void Screen::exitScreen() {
  *
  * Returns : Nothing
  */
-void Screen::activate( bool selectFirstItem, Screen* parent ) {
+void Screen::activate( bool selectFirstItem, Screen* parent = NULL ) {
 
     /* Trigger exit screen event. If callback return false, cancel screen change */
     if( g_currentScreen->_eventExitScreen != NULL ) {
@@ -486,7 +488,7 @@ void Screen::activate( bool selectFirstItem, Screen* parent ) {
     }
 
     g_currentScreen = this;
-    
+
     this->_returnValue = RETURN_NONE;
     this->_isShowConfirmDialog = false;
     this->_itemChanged = false;
@@ -738,7 +740,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
             uint8_t hour;
             hour = time->hour;
 
-            if( g_config.clock_24h == false ) {
+            if( g_config.settings.clock_24h == false ) {
 
                 hour = time->hour % 12;
 
@@ -749,7 +751,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 
             g_lcd.printf( "%2d:%02d ", hour, time->minute );
 
-            if( g_config.clock_24h == false ) {
+            if( g_config.settings.clock_24h == false ) {
                 g_lcd.print_P( ( time->hour > 11 ) ? S_PM : S_AM );
             }
 
@@ -893,7 +895,7 @@ void Screen::selectFirstItem() {
  */
 void Screen::clearSelection() {
 
-    g_currentItem.unload();
+    this->_item.unload();
 
     this->_selected = 0;
     this->_scroll = 0;
@@ -907,7 +909,7 @@ void Screen::clearSelection() {
     g_screenClear = true;
 
     if( this->_eventSelectionChanged != NULL ) {
-        this->_eventSelectionChanged( this, &g_currentItem, 0, false );
+        this->_eventSelectionChanged( this, &this->_item, 0, false );
     }
 }
 
@@ -938,7 +940,7 @@ void Screen::selectItem( uint8_t index ) {
 
     while( true ) {
 
-        g_currentItem.loadFromProgmem( &this->_items[ this->_selected ] );
+        this->_item.loadFromProgmem( &this->_items[ this->_selected ] );
 
         /* Give up looking for a selectable item if scanned list more than 1 time */
         if( n_listIter > 1 ) {
@@ -947,7 +949,7 @@ void Screen::selectItem( uint8_t index ) {
             return;
         }
 
-        switch( g_currentItem.getType() ) {
+        switch( this->_item.getType() ) {
 
             /* End of list */
             case ITEM_TYPE_NULL:
@@ -970,25 +972,25 @@ void Screen::selectItem( uint8_t index ) {
             default:
 
                 if( this->_eventSelectionChanged != NULL ) {
-                    this->_eventSelectionChanged( this, &g_currentItem, this->_fieldPos, false );
+                    this->_eventSelectionChanged( this, &this->_item, this->_fieldPos, false );
                 }
 
                 /* Skip over read-only items */
-                if( g_currentItem.getOptions() & ITEM_READONLY ) {
+                if( this->_item.getOptions() & ITEM_READONLY ) {
 
                     this->_selected++;
                     break;
                 }
 
-                if( g_currentItem.getPositionRow() > this->_scroll + DISPLAY_HEIGHT - 1 ) {
+                if( this->_item.getPositionRow() > this->_scroll + DISPLAY_HEIGHT - 1 ) {
 
-                    if( g_currentItem.getOptions() & ITEM_BREAK ) {
+                    if( this->_item.getOptions() & ITEM_BREAK ) {
                         /* Scroll item to the top of the screen */
-                        this->_scroll = g_currentItem.getPositionRow();
+                        this->_scroll = this->_item.getPositionRow();
 
                     } else {
                         /* Scroll item to the bottom of the screen */
-                        this->_scroll = g_currentItem.getPositionRow() - ( DISPLAY_HEIGHT - 1 );
+                        this->_scroll = this->_item.getPositionRow() - ( DISPLAY_HEIGHT - 1 );
                     }
 
                     g_screenClear = true;
@@ -1025,12 +1027,12 @@ void Screen::updateKeypadRepeatMode() {
         return;
     }
 
-    if( ( this->isItemFullScreenEditable( &g_currentItem ) ) && ( this->_itemFullscreen == false ) ) {
+    if( ( this->isItemFullScreenEditable( &this->_item ) ) && ( this->_itemFullscreen == false ) ) {
         g_keypad.repeatMask = KEY_NONE;
         return;
     }
 
-    switch( g_currentItem.getType() ) {
+    switch( this->_item.getType() ) {
         case ITEM_TYPE_STATIC:
         case ITEM_TYPE_TOGGLE:
         case ITEM_TYPE_LINK:
@@ -1115,14 +1117,14 @@ uint8_t Screen::calcFieldLength( ScreenItem* item ) {
 void Screen::updateCursorPosition() {
 
 
-    uint8_t row = g_currentItem.getPositionRow() - this->_scroll;
-    uint8_t col = g_currentItem.getPositionCol();
+    uint8_t row = this->_item.getPositionRow() - this->_scroll;
+    uint8_t col = this->_item.getPositionCol();
 
-    if( g_currentItem.getOptions() & ITEM_NOCURSOR ) {
+    if( this->_item.getOptions() & ITEM_NOCURSOR ) {
         return;
     }
 
-    if( this->isItemFullScreenEditable( &g_currentItem ) ) {
+    if( this->isItemFullScreenEditable( &this->_item ) ) {
 
         if( this->_itemFullscreen == false ) {
             /* No blinking cursor if not currently full screen */
@@ -1135,19 +1137,19 @@ void Screen::updateCursorPosition() {
 
     } else {
 
-        if( ( g_currentItem.getOptions() & ITEM_COMPACT ) == 0 && g_currentItem.getCaption() != NULL ) {
+        if( ( this->_item.getOptions() & ITEM_COMPACT ) == 0 && this->_item.getCaption() != NULL ) {
 
-            if( g_currentItem.getOptions() & ITEM_CAPTION_SRAM_POINTER ) {
+            if( this->_item.getOptions() & ITEM_CAPTION_SRAM_POINTER ) {
 
-                col += strlen( ( const char* )g_currentItem.getCaption() ) + 3;
+                col += strlen( ( const char* )this->_item.getCaption() ) + 3;
 
             } else {
-                col += strlen_P( ( const char* )g_currentItem.getCaption() ) + 3;
+                col += strlen_P( ( const char* )this->_item.getCaption() ) + 3;
             }
         }
     }
 
-    switch( g_currentItem.getType() ) {
+    switch( this->_item.getType() ) {
         case ITEM_TYPE_TIME:
 
             if( this->_fieldPos == 0 ) {
@@ -1165,8 +1167,8 @@ void Screen::updateCursorPosition() {
 
         case ITEM_TYPE_NUMBER:
 
-            if( g_currentItem.getOptions() & ITEM_NUMBER_INC_WHOLE ) {
-                g_lcd.setPosition( row, col + this->getNumDigits( g_currentItem.getMax() ) - 1 );
+            if( this->_item.getOptions() & ITEM_NUMBER_INC_WHOLE ) {
+                g_lcd.setPosition( row, col + this->getNumDigits( this->_item.getMax() ) - 1 );
 
             } else {
                 g_lcd.setPosition( row, col + this->_fieldPos );
@@ -1191,7 +1193,7 @@ void Screen::updateCursorPosition() {
 
         case ITEM_TYPE_TOGGLE:
 
-            if( g_currentItem.getCaption() != NULL || ( g_currentItem.getOptions() & ITEM_COMPACT ) == 0 ) {
+            if( this->_item.getCaption() != NULL || ( this->_item.getOptions() & ITEM_COMPACT ) == 0 ) {
                 return;
             }
 
@@ -1200,7 +1202,7 @@ void Screen::updateCursorPosition() {
 
         case ITEM_TYPE_DOW:
 
-            if( g_currentItem.getOptions() & ITEM_COMPACT ) {
+            if( this->_item.getOptions() & ITEM_COMPACT ) {
                 g_lcd.setPosition( row, col + this->_fieldPos );
 
             } else {
@@ -1380,7 +1382,6 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
 
             break;
 
-
         case ITEM_TYPE_TEXT: {
 
                 char* text = ( char* )item->getValuePtr();
@@ -1514,13 +1515,14 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
             break;
 
         case ITEM_TYPE_LINK:
-
             if( this->_eventValueChange != NULL ) {
                 this->_eventValueChange( this, item );
             }
 
-            if( item->getValuePtr() != NULL ) {
-                (( Screen* )item->getValuePtr())->activate( true, this );
+            if( this->_item.getValuePtr() != NULL ) {
+                
+                Screen *link = (Screen*)this->_item.getValuePtr();
+                link->activate( true, this );
             }
 
             return;

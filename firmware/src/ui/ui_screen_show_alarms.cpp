@@ -31,7 +31,7 @@
  */
 bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 
-    screen_root.activate( true, NULL );
+    screen->exitScreen();
     return false;
 }
 

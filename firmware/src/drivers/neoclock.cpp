@@ -16,6 +16,7 @@
 //
 //******************************************************************************
 #include "neoclock.h"
+#include "rtc.h"
 #include "../config.h"
 #include "../alarm.h"
 #include "../libs/time.h"
@@ -35,6 +36,34 @@ NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin
 
     this->_flashTimerStart = millis();
 }
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Set the clock display back to it's default state.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : 
+ */
+void NeoClock::restoreClockDisplay() {
+
+    DateTime now = g_rtc.now();
+
+    this->_testMode = false;
+    this->hour = now.hour();
+    this->minute = now.minute();
+    g_clock.hourFlashing = false;
+    g_clock.minutesFlashing = false;
+    g_clock.status_set = false;
+    
+
+    g_clockUpdate = true;
+}
+
+
 
 
 /*--------------------------------------------------------------------------
@@ -62,7 +91,7 @@ void NeoClock::update() {
     bool is_pm = false;
     uint8_t hour = this->hour;
 
-    if( ( g_config.clock_24h == false ) && ( this->hour != 0xFF ) ) {
+    if( ( g_config.settings.clock_24h == false ) && ( this->hour != 0xFF ) ) {
 
         if( hour > 12 ) {
             hour -= 12;
@@ -108,8 +137,8 @@ void NeoClock::update() {
         this->setDigitPixels( pixmap, 25, this->minute % 10 );
     }
 
-    this->setPixel( pixmap, 32, g_config.alarm_on[0] && g_alarm.isAlarmSwitchOn() );
-    this->setPixel( pixmap, 33, g_config.alarm_on[1] && g_alarm.isAlarmSwitchOn() );
+    this->setPixel( pixmap, 32, g_config.settings.alarm_on[0] && g_alarm.isAlarmSwitchOn() );
+    this->setPixel( pixmap, 33, g_config.settings.alarm_on[1] && g_alarm.isAlarmSwitchOn() );
 
 
     /* Turn on all pixels in test mode */

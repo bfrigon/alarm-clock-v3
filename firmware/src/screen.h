@@ -284,10 +284,10 @@ class Screen {
     void selectFirstItem();
     void clearSelection();
     void processKeypadEvent( uint8_t key );
-    void resetTimeout();
+    void resetTimeout( int16_t timeout = -1 );
     bool hasScreenTimedOut();
     void exitScreen();
-    void activate( bool selectFirstItem, Screen* parent );
+    void activate( bool selectFirstItem, Screen* parent = NULL );
     void checkScreenTimeout();
 
 
@@ -308,12 +308,15 @@ class Screen {
     /* Gets the current selected item index. */
     uint8_t getSelectedItemIndex()                      { return this->_selected; }
 
+    /* Gets the ID of the currently selected item. */
+    uint8_t getSelectedItemId()                         { return this->_item.getId(); }
+
     /* Gets the current cursor position within the item. */
     uint8_t getCurrentFieldPos()                        { return this->_fieldPos; }
 
     /* Gets/sets the screen timeout delay. */
     uint16_t getTimeout()                               { return this->_timeout; }
-    void setTimeout( uint16_t timeout )                 { this->_timeout = timeout; }
+    void setTimeout( int16_t timeout )                  { this->resetTimeout( timeout ); }
 
     /* Gets the current scroll position. */
     uint8_t getScrollPos()                              { return this->_scroll; }
@@ -370,9 +373,10 @@ class Screen {
     uint8_t _returnValue = 0;
     uint8_t _fieldPos = 0;
     uint8_t _scroll = 0;
-    uint16_t _timeout = 0;
+    int16_t _timeout = 0;
     bool _uppercase = false;
     Screen* _parent = NULL;
+    ScreenItem _item;
     const struct ScreenItemBase* _items = NULL;
     const char* _customCharacterSet = CUSTOM_CHARACTERS_DEFAULT;
 

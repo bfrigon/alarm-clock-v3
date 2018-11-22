@@ -29,7 +29,7 @@
  *
  * Returns : TRUE to allow default key press processingor False to override.
  */
-bool rootScreen_onKeypress( Screen *screen, uint8_t key ) {
+bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
 
     switch( key ) {
         case KEY_MENU:
@@ -49,18 +49,12 @@ bool rootScreen_onKeypress( Screen *screen, uint8_t key ) {
             break;
 
         case KEY_SWIPE | KEY_RIGHT:
-            g_config.lamp.mode = LAMP_MODE_ON;
-            g_lamp.activate( &g_config.lamp );
+            g_config.settings.lamp.mode = LAMP_MODE_ON;
+            g_lamp.activate( &g_config.settings.lamp );
             break;
 
         case KEY_SWIPE | KEY_LEFT:
             g_lamp.deactivate();
-            break;
-
-        case KEY_SET:
-            /* temporary */
-            g_alarm.loadProfile( 0 );
-            g_alarm.play( ALARM_MODE_NORMAL );
             break;
     }
 
@@ -78,7 +72,7 @@ bool rootScreen_onKeypress( Screen *screen, uint8_t key ) {
  *
  * Returns : TRUE to allow default screen updateor False to override.
  */
-bool rootScreen_onDrawScreen( Screen *screen ) {
+bool rootScreen_onDrawScreen( Screen* screen ) {
 
     char buffer[16];
     DateTime now = g_rtc.now();
@@ -99,10 +93,10 @@ bool rootScreen_onDrawScreen( Screen *screen ) {
     g_lcd.print( ( g_power.getPowerMode() == POWER_MODE_NORMAL ) ? CHAR_SPACE : CHAR_BATTERY );
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-        timeToBuf( buffer, g_config.clock_24h, &now );
+        timeToBuf( buffer, g_config.settings.clock_24h, &now );
 
     } else {
-        dateToBuf( buffer, g_config.date_format, &now );
+        dateToBuf( buffer, g_config.settings.date_format, &now );
     }
 
     g_lcd.setPosition( 1, 0 );

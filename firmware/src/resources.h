@@ -106,6 +106,7 @@ PROG_STR( S_MAIN_MENU_DISPLAY,          "Display" );
 PROG_STR( S_MAIN_MENU_NETWORK,          "Network" );
 PROG_STR( S_MAIN_MENU_LAMP,             "Night lamp" );
 PROG_STR( S_MAIN_MENU_PROFILES,         "Profiles" );
+PROG_STR( S_MAIN_MENU_SETTINGS,         "Settings" );
 
 /* Network menu srings */
 PROG_STR( S_MENU_NETWORK_DHCP,          "DHCP" );
@@ -114,8 +115,12 @@ PROG_STR( S_MENU_NETWORK_MASK,          "Mask" );
 PROG_STR( S_MENU_NETWORK_GATEWAY,       "Gateway" );
 PROG_STR( S_MENU_NETWORK_DNS,           "DNS" );
 
-
 /* Settings menu strings */
+PROG_STR( S_MENU_SETTINGS_BACKUP,       "Backup" );
+PROG_STR( S_MENU_SETTINGS_RESTORE,      "Restore" );
+PROG_STR( S_MENU_SETTINGS_RESET,        "Factory reset" );
+
+/* Display settings menu strings */
 PROG_STR( S_MENU_SETTINGS_24H,          "24H format" );
 PROG_STR( S_MENU_SETTINGS_COLOR,        "Color" );
 PROG_STR( S_MENU_SETTINGS_BRIGHT,       "Brightness" );
@@ -157,6 +162,19 @@ PROG_STR( S_SNOOZE,                     "Snooze" );
 PROG_STR( S_INSTR_CANCEL_ALARM_1,       "Hold <Alarm> to" );
 PROG_STR( S_INSTR_CANCEL_ALARM_2,       "cancel..." );
 
+
+PROG_STR( S_CONFIRM_SETTINGS_RESTORE,   "Restore?" );
+PROG_STR( S_CONFIRM_SETTINGS_RESET,     "Factory reset?" );
+PROG_STR( S_CONFIRM_OVERWRITE,          "Overwrite file?" );
+
+PROG_STR( S_STATUS_SAVING,              "Saving..." );
+PROG_STR( S_STATUS_RESTORING,           "Restoring..." );
+PROG_STR( S_STATUS_DONE,                "Done" );
+PROG_STR( S_STATUS_ERROR_NO_SDCARD,     "No SD card!" );
+PROG_STR( S_STATUS_ERROR_WRITE,         "Write error!" );
+PROG_STR( S_STATUS_ERROR_NOTFOUND,      "File not found!" );
+PROG_STR( S_STATUS_ERROR_READ,          "Read error!" );
+PROG_STR( S_STATUS_ERROR_UNKNOWN,       "Unknown error!" );
 
 //--------------------------------------------------------------------------
 //

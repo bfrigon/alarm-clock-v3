@@ -33,7 +33,7 @@ Screen screen_root( SCREEN_ID_ROOT, NULL, NULL, &onEnterScreen, &onExitScreen );
 Screen screen_main_menu( SCREEN_ID_MAIN_MENU, ITEMS_MAIN_MENU,
                          &onValueChange, &onEnterScreen, &onExitScreen );
 
-Screen screen_display( SCREEN_ID_SETTINGS, ITEMS_DISPLAY_SETTINGS,
+Screen screen_display( SCREEN_ID_DISPLAY_SETTINGS, ITEMS_DISPLAY_SETTINGS,
                        &onValueChange, &onEnterScreen, &onExitScreen );
 
 Screen screen_network( SCREEN_ID_NETWORK, ITEMS_NETWORK,
@@ -69,6 +69,11 @@ Screen screen_edit_alarm_lamp( SCREEN_ID_EDIT_ALARM_LAMP, ITEMS_EDIT_ALARM_LAMP,
 Screen screen_edit_alarm_visual( SCREEN_ID_EDIT_ALARM_VISUAL, ITEMS_EDIT_PROFILE_VISUAL,
                                  &onValueChange, &onEnterScreen, onExitScreen );
 
+Screen screen_menu_settings( SCREEN_ID_MENU_SETTINGS, ITEMS_MENU_SETTINGS,
+                             NULL, NULL, NULL );
+
+Screen screen_settings_manager( SCREEN_ID_SETTINGS_MANAGER, ITEMS_DIALOG_YESNO,
+                                NULL, &settingsManager_onEnterScreen, NULL );
 
 
 /*--------------------------------------------------------------------------
@@ -123,6 +128,12 @@ void initScreens() {
     screen_edit_alarm_visual.setCbSelectionChange( &onSelectionChange );
 
 
+    screen_menu_settings.setCbValueChange( &settingsMenu_onValueChange);
+
+    screen_settings_manager.setCbDrawScreen( &settingsManager_onDrawScreen );
+    screen_settings_manager.setCbKeypress( &settingsManager_onKeypress );
+    
+
     g_currentScreen = &screen_root;
     g_screenUpdate = true;
     g_screenClear = true;
@@ -172,7 +183,7 @@ bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row,
             g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );
 
             char bufTime[9];
-            length = timeToBuf( bufTime, g_config.clock_24h, &time );
+            length = timeToBuf( bufTime, g_config.settings.clock_24h, &time );
 
             g_lcd.print( bufTime );
 
@@ -262,7 +273,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
         case ID_LAMP_BRIGHTNESS:
 
             NightLampSettings* settings;
-            settings = edit_alarm_lamp_settings ? &g_alarm.profile.lamp : &g_config.lamp;
+            settings = edit_alarm_lamp_settings ? &g_alarm.profile.lamp : &g_config.settings.lamp;
 
 
             if( fullscreen ) {
@@ -323,19 +334,19 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
             break;
 
         case ID_CLOCK_COLOR:
-            g_clock.setColorFromTable( g_config.clock_color );
+            g_clock.setColorFromTable( g_config.settings.clock_color );
 
             g_clockUpdate = true;
             break;
 
         case ID_CLOCK_BRIGHTNESS:
-            g_clock.setBrightness( g_config.clock_brightness );
+            g_clock.setBrightness( g_config.settings.clock_brightness );
 
             g_clockUpdate = true;
             break;
 
         case ID_LCD_CONTRAST:
-            g_lcd.setContrast( g_config.lcd_contrast );
+            g_lcd.setContrast( g_config.settings.lcd_contrast );
             break;
 
 
@@ -425,7 +436,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
                 g_lamp.deactivate();
 
             } else {
-                g_lamp.activate( edit_alarm_lamp_settings == true ? &g_alarm.profile.lamp : &g_config.lamp );
+                g_lamp.activate( edit_alarm_lamp_settings == true ? &g_alarm.profile.lamp : &g_config.settings.lamp );
             }
 
             break;
@@ -546,27 +557,27 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
                 g_rtc.setDateTime( nDate );
             }
 
-            resetClockDisplay();
+            g_clock.restoreClockDisplay();
             break;
 
         case SCREEN_ID_NETWORK:
             if( save == true ) {
-                saveConfig();
+                g_config.save();
 
                 updateWifiConfig();
 
             } else {
-                loadConfig();
+                g_config.load();
             }
 
             break;
 
         case SCREEN_ID_EDIT_NIGHT_LAMP:
             if( save == true ) {
-                saveConfig();
+                g_config.save();
 
             } else {
-                loadConfig();
+                g_config.load();
             }
 
             g_lamp.deactivate();
@@ -583,19 +594,19 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
             break;
 
         case SCREEN_ID_SET_ALARMS:
-            ( save == true ) ? saveConfig() : loadConfig();
+            ( save == true ) ? g_config.save() : g_config.load();
 
             g_clockUpdate = true;
 
             break;
 
         case SCREEN_ID_SHOW_ALARMS:
-            resetClockDisplay();
+            g_clock.restoreClockDisplay();
             break;
 
-        case SCREEN_ID_SETTINGS:
+        case SCREEN_ID_DISPLAY_SETTINGS:
             if( save == true ) {
-                saveConfig();
+                g_config.save();
             }
 
             break;
