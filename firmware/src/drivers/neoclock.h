@@ -21,6 +21,7 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 
+#include "../libs/task.h"
 #include "neopixel.h"
 
 
@@ -69,13 +70,15 @@ class NeoClock : public NeoPixel {
     void update();
     void setTestMode( bool testMode );
     void restoreClockDisplay();
-    void processUpdateEvents();
+    void runTask();
+    
 
 
   private:
     uint32_t _flashTimerStart = 0;
     bool _flashState = false;
     bool _testMode = false;
+    int8_t _rtcmin = -1;
 
     void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
 

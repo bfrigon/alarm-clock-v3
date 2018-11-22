@@ -154,6 +154,7 @@ void setup() {
 
     /* Enable watchdog timer */
     g_power.enableWatchdog();
+
 }
 
 
@@ -164,71 +165,23 @@ void setup() {
  */
 void loop() {
 
-
-
     /* Reset watchdog timer */
     g_power.resetWatchdog();
 
-    if( g_power.getPowerMode() != g_power.detectPowerState() ) {
-        g_screenUpdate = true;
-    }
+    /* Run power management tasks */
+    g_power.runTask();
 
-    /* Process Keypad event if available */
-    uint8_t key = g_keypad.processEvents();
+    /* If an RTC interrupt occured, read the current time */
+    g_rtc.processEvents();
+    
+    /* Update the Clock display if needed */
+    g_clock.runTask();
+   
+    /* Check for alarms, feed alarm audio buffer */
+    g_alarm.runTask();
 
-    if( key != KEY_NONE ) {
-        g_currentScreen->processKeypadEvent( key );
-    }
-
-    /* Process RTC event if available */
-    if( g_rtc.processEvents() == true ) {
-
-        DateTime now = g_rtc.now();
-        
-        if( now.hour() != g_clock.hour || now.minute() != g_clock.minute ) {
-            g_alarm.checkForAlarms( &now );
-
-            if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-                g_screenUpdate = true;
-            }
-
-            switch( g_currentScreen->getId() ) {
-                case SCREEN_ID_SET_TIME:
-                case SCREEN_ID_SHOW_ALARMS:
-                    /* Don't update clock display on these screens */
-                    break;
-
-                case SCREEN_ID_ROOT:
-                    g_screenUpdate = true;
-
-                /* Fall-through */
-
-                default:
-                    g_clock.hour = now.hour();
-                    g_clock.minute = now.minute();
-
-                    g_clockUpdate = true;
-            }
-        }
-    }
-
-    /* Detect if the SD card is present, if so, initialize it */
-    if( g_alarm.isSDCardPresent() != g_alarm.detectSDCard() ) {
-        g_screenUpdate = true;
-    }
-
-    /* Detect alarm switch state */
-    if( g_alarm.isAlarmSwitchOn() != g_alarm.detectAlarmSwitchState() ) {
-        g_power.resetSuspendDelay();
-        g_clockUpdate = true;
-        g_screenUpdate = true;
-    }
-
-    /* Feed alarm audio buffer and process visual effect */
-    g_alarm.processAlarmEvents();
-
-    /* Exit the current screen if it has reached its timeout value */
-    g_currentScreen->checkScreenTimeout();
+    /* Process keypad events and check if screen has timed out */
+    g_currentScreen->runTask();
 
     /* Update the current screen if requested */
     if( g_screenUpdate == true ) {
@@ -243,33 +196,11 @@ void loop() {
         g_screenUpdate = false;
     }
 
-    /* Update the Clock display if requested */
-    g_clock.processUpdateEvents();
-
     /* Process lamp effect if lamp is active */
     g_lamp.processEvents();
 
-
-
-
-
+    /* Run config manager tasks */
     g_config.runTask();
-
-
-
-
-    /* Handle pending WiFi module events */
-    // g_wifi.handleEvents();
-
-    // if( g_wifi.statusChanged() == true ) {
-
-    //     if( g_currentScreen->getId()() == SCREEN_ID_ROOT )  {
-    //         g_screenUpdate = true;
-    //     }
-    // }
-
-
-
 }
 
 

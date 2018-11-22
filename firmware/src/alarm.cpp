@@ -980,7 +980,32 @@ inline void Alarm::visualStop() {
  *
  * Returns :
  */
-void Alarm::processAlarmEvents() {
+void Alarm::runTask() {
+
+    /* Detect if the SD card is present, if so, initialize it */
+    if( this->_sd_present != this->detectSDCard() ) {
+        g_screenUpdate = true;
+    }
+
+    /* Detect alarm switch state */
+    if( this->_alarm_sw_on != this->detectAlarmSwitchState() ) {
+        g_power.resetSuspendDelay();
+
+        g_clockUpdate = true;
+
+        if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
+            g_screenUpdate = true;
+        }
+    }
+
+    /* If time has changed, checks for alarms */
+    if( g_rtc.minute() != this->_rtcmin ) {
+        this->_rtcmin = g_rtc.minute();
+
+        this->checkForAlarms( g_rtc.now() );
+    }
+
+
     if( this->_playMode == ALARM_MODE_OFF ) {
         return;
     }

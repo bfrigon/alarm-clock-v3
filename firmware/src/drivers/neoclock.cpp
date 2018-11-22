@@ -17,11 +17,13 @@
 //******************************************************************************
 #include "neoclock.h"
 #include "rtc.h"
+#include "power.h"
+#include "../screen.h"
 #include "../config.h"
 #include "../alarm.h"
 #include "../libs/time.h"
 #include "../resources.h"
-
+#include "../ui/ui.h"
 
 /*--------------------------------------------------------------------------
  *
@@ -46,24 +48,22 @@ NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin
  * ---------
  *  None
  *
- * Returns : 
+ * Returns :
  */
 void NeoClock::restoreClockDisplay() {
 
-    DateTime now = g_rtc.now();
+    DateTime* now = g_rtc.now();
 
     this->_testMode = false;
-    this->hour = now.hour();
-    this->minute = now.minute();
+    this->hour = now->hour();
+    this->minute = now->minute();
     g_clock.hourFlashing = false;
     g_clock.minutesFlashing = false;
     g_clock.status_set = false;
-    
+
 
     g_clockUpdate = true;
 }
-
-
 
 
 /*--------------------------------------------------------------------------
@@ -164,8 +164,36 @@ void NeoClock::update() {
  *
  * Returns : Nothing
  */
-void NeoClock::processUpdateEvents() {
+void NeoClock::runTask() {
 
+    /* If time has changed, update the clock display */
+    if( g_rtc.minute() != this->_rtcmin ) {
+        this->_rtcmin = g_rtc.minute();
+
+        if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
+            g_screenUpdate = true;
+        }
+
+        switch( g_currentScreen->getId() ) {
+            case SCREEN_ID_SET_TIME:
+            case SCREEN_ID_SHOW_ALARMS:
+                /* Don't update clock display on these screens */
+                break;
+
+            case SCREEN_ID_ROOT:
+                g_screenUpdate = true;
+
+            /* Fall-through */
+
+            default:
+                this->hour = g_rtc.hour();
+                this->minute = g_rtc.minute();
+
+                g_clockUpdate = true;
+        }
+    }
+
+    /* Update the clock display when blinking state changes */
     if( millis() - this->_flashTimerStart > ( this->flashRate * 10 ) ) {
         this->_flashTimerStart = millis();
         this->_flashState = !( this->_flashState );
@@ -175,7 +203,7 @@ void NeoClock::processUpdateEvents() {
         }
     }
 
-
+    /* Update the clock display if requested */
     if( g_clockUpdate == true ) {
 
         g_clock.update();
@@ -193,10 +221,10 @@ void NeoClock::processUpdateEvents() {
  *  - pixmap : Pointer to the pixel buffer ( 1 bit per pixel )
  *  - pos    : Position in the string where the segment digit begins.
  *  - value  : Value to assign to digit.
- * 
+ *
  * Returns : Nothing
  */
-void NeoClock::setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value ) {
+void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
 
     uint8_t chr = pgm_read_byte( &_charmap[ value ] );
 

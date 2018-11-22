@@ -20,6 +20,7 @@
 
 #include <Arduino.h>
 #include "libs/time.h"
+#include "libs/task.h"
 #include "drivers/qt1070.h"
 #include "drivers/us2066.h"
 
@@ -263,7 +264,7 @@ class ScreenItem : protected ScreenItemBase {
 // Screen class
 //
 //**************************************************************************
-class Screen {
+class Screen : public Task {
 
   public:
 
@@ -288,7 +289,7 @@ class Screen {
     bool hasScreenTimedOut();
     void exitScreen();
     void activate( bool selectFirstItem, Screen* parent = NULL );
-    void checkScreenTimeout();
+    void runTask();
 
 
     //----------------------------------------------------------------------

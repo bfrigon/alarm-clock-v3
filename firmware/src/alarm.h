@@ -27,6 +27,7 @@
 
 
 #include "libs/time.h"
+#include "libs/task.h"
 #include "hardware.h"
 #include "resources.h"
 #include "config.h"
@@ -59,7 +60,7 @@
 
 
 
-class Alarm : private VS1053 {
+class Alarm : private VS1053, public Task {
 
   public:
 
@@ -93,7 +94,7 @@ class Alarm : private VS1053 {
     bool isAlarmSwitchOn();
     bool detectAlarmSwitchState();
 
-    void processAlarmEvents();
+    void runTask();
     bool checkForAlarms( DateTime *now );
     int8_t getNextAlarmID( DateTime *currentTime, bool matchNow );
     int16_t getNextAlarmOffset( int8_t profile_id, DateTime *currentTime, bool matchNow );
@@ -119,6 +120,8 @@ class Alarm : private VS1053 {
     uint8_t _pin_sd_cs;
     uint8_t _pin_alarm_sw;
     bool _init = false;
+
+    int8_t _rtcmin = -1;
 
 
     unsigned long _timerStart = 0;

@@ -75,8 +75,6 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
 bool rootScreen_onDrawScreen( Screen* screen ) {
 
     char buffer[16];
-    DateTime now = g_rtc.now();
-
 
     /* Print status icons */
     g_lcd.setPosition( 0, 12 );
@@ -93,10 +91,10 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
     g_lcd.print( ( g_power.getPowerMode() == POWER_MODE_NORMAL ) ? CHAR_SPACE : CHAR_BATTERY );
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-        timeToBuf( buffer, g_config.settings.clock_24h, &now );
+        timeToBuf( buffer, g_config.settings.clock_24h, g_rtc.now() );
 
     } else {
-        dateToBuf( buffer, g_config.settings.date_format, &now );
+        dateToBuf( buffer, g_config.settings.date_format, g_rtc.now() );
     }
 
     g_lcd.setPosition( 1, 0 );

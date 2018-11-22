@@ -18,6 +18,7 @@
 #include "screen.h"
 #include "config.h"
 #include "resources.h"
+#include "ui/ui.h"
 
 
 Screen* g_currentScreen;
@@ -130,6 +131,40 @@ Screen::Screen( uint8_t id, const struct ScreenItemBase* items, pfcbValueChange 
     this->_eventValueChange = _eventValueChange;
     this->_eventEnterScreen = _eventEnterScreen;
     this->_eventExitScreen = _eventExitScreen;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Run task for this screen
+ *
+ * Arguments
+ * ---------
+ *  - None
+ *
+ * Returns : Nothing
+ */
+void Screen::runTask() {
+
+    /* Process Keypad event if available */
+    uint8_t key;
+    key = g_keypad.processEvents();
+
+    if( key != KEY_NONE ) {
+        this->processKeypadEvent( key );
+    }
+
+    /* Exit the screen if the timeout timer has elapsed. */
+    if( this->hasScreenTimedOut() ) {
+
+        if( this->_eventTimeout != NULL ) {
+            this->_eventTimeout( this );
+            this->resetTimeout();
+
+        } else {
+            this->exitScreen();
+        }
+    }
 }
 
 
@@ -404,30 +439,6 @@ bool Screen::hasScreenTimedOut() {
     }
 
     return ( ( millis() - g_enterScreenTime ) > this->_timeout );
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Checks if the screen has timed out. If so, exits the screen
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- */
-void Screen::checkScreenTimeout() {
-    if( this->hasScreenTimedOut() ) {
-
-        if( this->_eventTimeout != NULL ) {
-            this->_eventTimeout( this );
-            this->resetTimeout();
-
-        } else {
-            this->exitScreen();
-        }
-    }
 }
 
 
@@ -1520,8 +1531,8 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
             }
 
             if( this->_item.getValuePtr() != NULL ) {
-                
-                Screen *link = (Screen*)this->_item.getValuePtr();
+
+                Screen* link = ( Screen* )this->_item.getValuePtr();
                 link->activate( true, this );
             }
 

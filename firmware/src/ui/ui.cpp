@@ -473,13 +473,11 @@ bool onEnterScreen( Screen* screen ) {
     switch( screen->getId() ) {
 
         case SCREEN_ID_SET_TIME:
-            now = g_rtc.now();
-
-            adjTime.hour = now.hour();
-            adjTime.minute = now.minute();
-            adjDate.day = now.date();
-            adjDate.month = now.month();
-            adjDate.year = ( uint8_t )( now.year() - 2000 );
+            adjTime.hour = g_rtc.hour();
+            adjTime.minute = g_rtc.minute();
+            adjDate.day = g_rtc.date();
+            adjDate.month = g_rtc.month();
+            adjDate.year = ( uint8_t )( g_rtc.year() - 2000 );
 
             g_clock.status_set = true;
             g_clockUpdate = true;
@@ -488,10 +486,8 @@ bool onEnterScreen( Screen* screen ) {
 
         case SCREEN_ID_SHOW_ALARMS:
 
-            now = g_rtc.now();
-
             int8_t alarm_id;
-            alarm_id = g_alarm.getNextAlarmID( &now, false );
+            alarm_id = g_alarm.getNextAlarmID( g_rtc.now(), false );
 
             Time time;
             g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );

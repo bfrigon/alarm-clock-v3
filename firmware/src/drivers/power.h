@@ -23,6 +23,8 @@
 #include <avr/power.h>
 #include <avr/wdt.h>
 
+#include "../libs/task.h"
+
 
 #define DELAY_BEFORE_SUSPEND        5000
 
@@ -31,7 +33,7 @@
 #define POWER_MODE_SUSPEND          2
 
 
-class Power {
+class Power : public Task {
 
   public:
     Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst = -1 );
@@ -47,6 +49,7 @@ class Power {
     void cpuReset();
     void poweroff();
     bool detectConfigResetButton();
+    void runTask();
 
 
   private:

@@ -51,8 +51,7 @@ bool showAlarmScreen_onDrawScreen( Screen *screen ) {
 
 
     /* Get the next alarm id closest from now. */
-    DateTime now = g_rtc.now();
-    int8_t alarm_id = g_alarm.getNextAlarmID( &now, false );
+    int8_t alarm_id = g_alarm.getNextAlarmID( g_rtc.now(), false );
 
     if( alarm_id == -1 ) {
 
@@ -61,7 +60,7 @@ bool showAlarmScreen_onDrawScreen( Screen *screen ) {
     }
 
     /* Get alarm next trigger time */
-    int16_t alarm_time = g_alarm.getNextAlarmOffset( alarm_id, &now, false );
+    int16_t alarm_time = g_alarm.getNextAlarmOffset( alarm_id, g_rtc.now(), false );
 
     g_lcd.printf_P( S_ALARM_IN, alarm_id + 1 );
     g_lcd.setPosition( 1, 0 );

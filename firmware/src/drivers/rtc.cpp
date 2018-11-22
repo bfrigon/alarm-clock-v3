@@ -62,6 +62,8 @@ void DS3231::begin() {
 
     this->clearAlarmFlag();
     this->enableInterrupt();
+
+    this->getTime();
 }
 
 
@@ -182,8 +184,12 @@ bool DS3231::processEvents() {
 
     this->clearAlarmFlag();
     this->enableInterrupt();
-
     rtc_event = false;
+
+    /* Read the current time */
+    this->getTime();
+
+
     return true;
 }
 
@@ -227,7 +233,8 @@ void DS3231::dumpRegs() {
  *
  * Returns : Structure containing the current date and time.
  */
-DateTime DS3231::now() {
+DateTime* DS3231::getTime() {
+
     Wire.beginTransmission( I2C_ADDR_DS3231 );
     Wire.write( DS3231_REG_SEC );
     Wire.endTransmission();
@@ -245,7 +252,9 @@ DateTime DS3231::now() {
     uint8_t  m = bcd2bin( Wire.read() );
     uint16_t y = bcd2bin( Wire.read() ) + 2000;
 
-    return DateTime( y, m, d, hh, mm, ss, wd );
+    this->_now = DateTime( y, m, d, hh, mm, ss, wd );
+
+    return &this->_now;
 }
 
 
@@ -262,7 +271,7 @@ DateTime DS3231::now() {
  * Returns : The unix time.
  */
 unsigned long DS3231::getEpoch() {
-    return this->now().getEpoch();
+    return this->_now.getEpoch();
 }
 
 

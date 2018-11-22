@@ -55,29 +55,13 @@ class DateTime {
     DateTime();
     DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec, uint8_t dow );
 
-    uint8_t second() const  {
-        return this->_ss;
-    }
-    uint8_t minute() const  {
-        return this->_mm;
-    }
-    uint8_t hour() const    {
-        return this->_hh;
-    }
-
-    uint8_t date() const    {
-        return this->_d;
-    }
-    uint8_t month() const   {
-        return this->_m;
-    }
-    uint16_t year() const   {
-        return 2000 + this->_year;
-    }
-
-    uint8_t dow() const     {
-        return this->_dow;    /*Sunday=1 */
-    }
+    uint8_t second()    { return this->_ss; }
+    uint8_t minute()    { return this->_mm; }
+    uint8_t hour()      { return this->_hh; }
+    uint8_t date()      { return this->_d; }
+    uint8_t month()     { return this->_m; }
+    uint16_t year()     { return 2000 + this->_year; }
+    uint8_t dow()       { return this->_dow; }   /*Sunday=1 */
 
     unsigned long getEpoch();
 
@@ -92,13 +76,13 @@ class DateTime {
 };
 
 
-const char *getMonthName( uint8_t month, bool shortName );
-const char *getDayName( uint8_t day, bool shortName );
+const char* getMonthName( uint8_t month, bool shortName );
+const char* getDayName( uint8_t day, bool shortName );
 uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day );
 uint8_t getMonthNumDays( uint8_t month, uint8_t year );
 
-uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date );
-uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date );
-uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time );
+uint8_t dateToBuf( char* buffer, uint8_t format, DateTime* date );
+uint8_t timeToBuf( char* buffer, bool fmt_24h, DateTime* date );
+uint8_t timeToBuf( char* buffer, bool fmt_24h, Time* time );
 
 #endif /* TIME_H */

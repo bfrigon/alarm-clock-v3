@@ -120,6 +120,32 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
 
 /*--------------------------------------------------------------------------
  *
+ * Run power management tasks.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : New power state.
+ */
+void Power::runTask() {
+
+    uint8_t prevState = this->_mode;
+    uint8_t newState = g_power.detectPowerState();
+
+
+    if( newState != prevState ) {
+        g_screenUpdate = true;
+
+        if( prevState == POWER_MODE_SUSPEND || newState == POWER_MODE_SUSPEND ) {
+            g_screenClear = true;
+        }
+    }
+}
+
+
+/*--------------------------------------------------------------------------
+ *
  * Detect the state of the 'on battery' pin and set power mode accordingly.
  *
  * Arguments
