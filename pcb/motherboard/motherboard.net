@@ -1,8 +1,8 @@
 (export (version D)
   (design
     (source /home/ben/Projects/alarm-clock-v3/pcb/motherboard/motherboard.sch)
-    (date "Thu 08 Nov 2018 04:00:56 PM EST")
-    (tool "Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1")
+    (date "Tue 27 Nov 2018 07:30:22 PM EST")
+    (tool "Eeschema 5.0.1-33cea8e~68~ubuntu18.04.1")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title Motherboard)
@@ -1520,7 +1520,7 @@
     (net (code 14) (name /ALRM_SW)
       (node (ref J9) (pin 16))
       (node (ref U1) (pin 75)))
-    (net (code 15) (name /LOW_BATT)
+    (net (code 15) (name /SYSOFF)
       (node (ref U1) (pin 89))
       (node (ref J6) (pin 1)))
     (net (code 16) (name /PIX_LAMP)

@@ -979,7 +979,7 @@ ALRM_SW
 Wire Wire Line
 	5050 4650 4200 4650
 Text Label 4200 4650 0    60   ~ 0
-LOW_BATT
+SYSOFF
 Wire Wire Line
 	2800 4300 3450 4300
 Wire Wire Line
@@ -1403,7 +1403,7 @@ $EndComp
 Text Label 1650 2500 2    60   ~ 0
 ON_BATT
 Text Label 1650 2400 2    60   ~ 0
-LOW_BATT
+SYSOFF
 Wire Wire Line
 	1100 2500 1650 2500
 Wire Wire Line
