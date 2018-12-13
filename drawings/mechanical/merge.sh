@@ -60,6 +60,7 @@ combine_drawing_files () {
 ####################################################
 echo "Changing title metadata in pdf files..."
 
+
 change_drawing_title "clkv3-dwg-01_rgb-digits-pcb" "Display - RGB digit PCB"
 change_drawing_title "clkv3-dwg-02_display-frame-front" "Display - Frame - Front"
 change_drawing_title "clkv3-dwg-03_display-front-cover" "Display - Front cover"
@@ -81,6 +82,7 @@ change_drawing_title "clkv3-dwg-18_rtc-battery-door" "RTC Battery door"
 change_drawing_title "clkv3-dwg-19_rgb-lamp-window-frame" "RGB lamp window - Frame"
 change_drawing_title "clkv3-dwg-20_rgb-lamp-window-cover" "RGB lamp window - Cover"
 change_drawing_title "clkv3-dwg-21_front-panel-window" "Front panel window"
+change_drawing_title "clkv3-dwg-22_battery-holder" "Battery holder"
 change_drawing_title "clkv3-dwg-30_assy-display-frame-front" "ASSY - Display frame - Front"
 change_drawing_title "clkv3-dwg-31_assy-display-frame-back" "ASSY - Display frame - Back"
 change_drawing_title "clkv3-dwg-32_assy-display" "ASSY - Display panel"
@@ -94,7 +96,7 @@ change_drawing_title "clkv3-dwg-51_motherboard-assy-jig" "Motherboard assembly j
 ####################################################
 echo "Combining pdf files..."
 
-combine_drawing_files "clkv3-dwg" "01,06,02,03,07,08,34,30,04,05,09,19,20,31,32,10,11,18,13,21,17,14,15,16,12,33,35"
+combine_drawing_files "clkv3-dwg" "01,06,02,03,07,08,34,30,04,05,09,19,20,31,32,10,11,18,13,21,17,14,15,16,22,12,33,35"
 change_drawing_title "clkv3-dwg" "Alarm clock V3"
 
 

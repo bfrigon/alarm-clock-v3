@@ -24,6 +24,7 @@ CLKV3-DWG-18  | CLKV3-ML-07       | RTC Battery door
 CLKV3-DWG-19  | CLKV3-ML-08       | RGB lamp window - Frame
 CLKV3-DWG-20  | CLKV3-ML-09       | RGB lamp window - Cover
 CLKV3-DWG-21  | CLKV3-ML-11       | Front panel window
+CLKV3-DWG-22  | CLKV3-ML-12       | Battery holder
 CLKV3-DWG-30  | CLKV3-AS-01       | ASSY - Display frame - Front
 CLKV3-DWG-31  | CLKV3-AS-02       | ASSY - Display frame - Back
 CLKV3-DWG-32  | CLKV3-AS-03       | ASSY - Display
