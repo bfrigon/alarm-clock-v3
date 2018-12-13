@@ -29,6 +29,8 @@
 #define DISPLAY_HEIGHT      2
 #define DISPLAY_WIDTH       16
 
+#define CHAR_HEALTH             0x93
+
 /* Characters : Menus */
 #define CHAR_BRACE_OPEN         0xFA
 #define CHAR_BRACE_CLOSE        0xFC
@@ -50,11 +52,16 @@
 /* Characters : Root screen */
 #define CHAR_WIFI_ON            0x00
 #define CHAR_NO_SD              0x01
-#define CHAR_ALARM              0x02
-#define CHAR_DEGREE             0x03
-#define CHAR_CELCIUS            0x04
-#define CHAR_FARENHEIGHT        0x05
-#define CHAR_BATTERY            0x06
+#define CHAR_DEGREE             0x02
+#define CHAR_BATTERY_LOW        0x03
+#define CHAR_BATTERY_HALF       0x04
+#define CHAR_BATTERY_FULL       0x05
+#define CHAR_BATTERY_CHARGING   0x06
+#define CHAR_NO_BATTERY         0x07
+#define CHAR_ALARM              0x92
+
+
+
 
 /* Item attributes */
 #define ITEM_NOCURSOR                   0x08

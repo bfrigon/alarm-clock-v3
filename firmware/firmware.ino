@@ -28,6 +28,7 @@ QT1070 g_keypad( PIN_INT_KEYPAD );
 US2066 g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET );
 Power g_power( PIN_ON_BATTERY, PIN_SYSOFF, PIN_FACTORY_RESET );
 DS3231 g_rtc( PIN_INT_RTC );
+BQ27441 g_battery;
 ConfigManager g_config;
 
 
@@ -113,6 +114,7 @@ void setup() {
 
     /* Initialize power management driver */
     g_power.begin();
+    g_battery.begin( BATTERY_DESIGN_CAPACITY );
 
     /* Check for factory reset sequence */
     if( checkFactoryReset() == false ) {

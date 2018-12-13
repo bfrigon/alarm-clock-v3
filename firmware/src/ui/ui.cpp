@@ -75,6 +75,9 @@ Screen screen_menu_settings( SCREEN_ID_MENU_SETTINGS, ITEMS_MENU_SETTINGS,
 Screen screen_settings_manager( SCREEN_ID_SETTINGS_MANAGER, ITEMS_DIALOG_YESNO,
                                 NULL, &settingsManager_onEnterScreen, NULL );
 
+Screen screen_batt_status( SCREEN_ID_BATT_STATUS, NULL,
+                           NULL, &battStatus_onEnterScreen, NULL );
+
 
 /*--------------------------------------------------------------------------
  *
@@ -96,6 +99,8 @@ void initScreens() {
     /* Root screen */
     screen_root.setCbDrawScreen( &rootScreen_onDrawScreen );
     screen_root.setCbKeypress( &rootScreen_onKeypress );
+    screen_root.setCbTimeout( &rootScreen_onTimeout );
+    screen_root.setTimeout( 1500 );
     screen_root.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
 
     /* Set time screen */
@@ -128,11 +133,15 @@ void initScreens() {
     screen_edit_alarm_visual.setCbSelectionChange( &onSelectionChange );
 
 
-    screen_menu_settings.setCbValueChange( &settingsMenu_onValueChange);
+    screen_menu_settings.setCbValueChange( &settingsMenu_onValueChange );
 
     screen_settings_manager.setCbDrawScreen( &settingsManager_onDrawScreen );
     screen_settings_manager.setCbKeypress( &settingsManager_onKeypress );
-    
+
+    screen_batt_status.setCbDrawScreen( &battStatus_onDrawScreen );
+    screen_batt_status.setCbTimeout( &battStatus_onTimeout );
+    screen_batt_status.setCbKeypress( &battStatus_onKeypress );
+    screen_batt_status.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
 
     g_currentScreen = &screen_root;
     g_screenUpdate = true;

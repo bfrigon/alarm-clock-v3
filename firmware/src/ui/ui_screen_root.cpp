@@ -18,6 +18,9 @@
 #include "ui.h"
 
 
+uint8_t g_prevBattState = 0;
+
+
 /*--------------------------------------------------------------------------
  *
  * Event raised when a key press occurs
@@ -56,6 +59,10 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
         case KEY_SWIPE | KEY_LEFT:
             g_lamp.deactivate();
             break;
+
+        case KEY_SET:
+            screen_batt_status.activate( true, &screen_root );
+            break;
     }
 
     return false;
@@ -88,7 +95,32 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
         g_lcd.print( CHAR_SPACE );
     }
 
-    g_lcd.print( ( g_power.getPowerMode() == POWER_MODE_NORMAL ) ? CHAR_SPACE : CHAR_BATTERY );
+
+    switch( g_battery.getBatteryState() ) {
+        case BATTERY_STATE_NOT_PRESENT:
+            g_lcd.print( CHAR_NO_BATTERY );
+            break;
+
+        case BATTERY_STATE_CHARGING:
+            g_lcd.print( CHAR_BATTERY_CHARGING );
+            break;
+
+        case BATTERY_STATE_DISCHARGE_FULL:
+            g_lcd.print( CHAR_BATTERY_FULL );
+            break;
+
+        case BATTERY_STATE_DISCHARGE_HALF:
+            g_lcd.print( CHAR_BATTERY_HALF );
+            break;
+        
+        case BATTERY_STATE_DISCHARGE_LOW:
+            g_lcd.print( CHAR_BATTERY_LOW );
+            break;
+
+        default:
+            g_lcd.print( CHAR_SPACE );
+    }
+
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
         timeToBuf( buffer, g_config.settings.clock_24h, g_rtc.now() );
@@ -101,4 +133,26 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
     g_lcd.print( buffer, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
 
     return false;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when the exit screen timeout delay has elapsed.
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : Nothing
+ */
+void rootScreen_onTimeout( Screen *screen ) {
+
+    screen->resetTimeout();
+
+    uint8_t battState = g_battery.getBatteryState();
+
+    if( battState != g_prevBattState )    {
+        g_screenUpdate = true;
+    }
 }

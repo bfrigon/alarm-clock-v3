@@ -28,6 +28,7 @@
 #include "libs/task.h"
 #include "resources.h"
 
+#define BATTERY_DESIGN_CAPACITY         350
 
 
 #define CONFIG_BACKUP_FILENAME          "config.txt"

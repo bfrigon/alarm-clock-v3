@@ -51,13 +51,13 @@ const char CUSTOM_CHARACTERS_DEFAULT[] PROGMEM = {
 
 const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
     0x00, 0x01, 0x01, 0x05, 0x05, 0x15, 0x00, 0x00,     /* Wifi connected */
-    0x04, 0x0E, 0x0E, 0x04, 0x00, 0x04, 0x00, 0x00,     /* NO SD Card */
-    0x04, 0x0E, 0x0E, 0x0E, 0x1F, 0x04, 0x00, 0x00,     /* Snooze */
-    0x02, 0x05, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,     /* Degree */
-    0x06, 0x08, 0x08, 0x08, 0x06, 0x00, 0x00, 0x00,     /* Celcius */
-    0x0E, 0x08, 0x0C, 0x08, 0x08, 0x00, 0x00, 0x00,     /* Farenheight */
-    0x04, 0x0E, 0x0A, 0x0A, 0x0A, 0x0E, 0x00, 0x00,     /* On battery */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,     /* --Unused-- */
+    0x06, 0x0E, 0x1E, 0x1E, 0x1E, 0x1E, 0x00, 0x00,     /* NO SD Card */
+    0x00, 0x0E, 0x0A, 0x0E, 0x00, 0x00, 0x00, 0x00,     /* Degree */
+    0x06, 0x09, 0x09, 0x09, 0x09, 0x0F, 0x00, 0x00,     /* Battery : Empty */
+    0x06, 0x09, 0x09, 0x0F, 0x0F, 0x0F, 0x00, 0x00,     /* Battery : Half */
+    0x06, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x00, 0x00,     /* Battery : Full */
+    0x07, 0x0E, 0x1C, 0x06, 0x0C, 0x18, 0x00, 0x00,     /* Charging */
+    0x04, 0x0E, 0x0E, 0x04, 0x00, 0x04, 0x00, 0x00      /* No battery */
 };
 
 
@@ -77,6 +77,7 @@ PROG_STR( S_DATETIME_1M,                "1 minute" );
 PROG_STR( S_DATETIME_1D,                "24 hours" );
 PROG_STR( S_DATETIME_D,                 "%d days" );
 PROG_STR( S_DATETIME_S,                 "%d seconds" );
+
 
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
@@ -119,6 +120,10 @@ PROG_STR( S_MENU_NETWORK_DNS,           "DNS" );
 PROG_STR( S_MENU_SETTINGS_BACKUP,       "Backup" );
 PROG_STR( S_MENU_SETTINGS_RESTORE,      "Restore" );
 PROG_STR( S_MENU_SETTINGS_RESET,        "Factory reset" );
+PROG_STR( S_MENU_SETTINGS_BATT_INFO,    "Battery status" );
+
+
+
 
 /* Display settings menu strings */
 PROG_STR( S_MENU_SETTINGS_24H,          "24H format" );
@@ -175,6 +180,21 @@ PROG_STR( S_STATUS_ERROR_WRITE,         "Write error!" );
 PROG_STR( S_STATUS_ERROR_NOTFOUND,      "File not found!" );
 PROG_STR( S_STATUS_ERROR_READ,          "Read error!" );
 PROG_STR( S_STATUS_ERROR_UNKNOWN,       "Unknown error!" );
+
+/* Battery status screen */
+PROG_STR( S_BATT_VOLTAGE,               "%d.%03d V" );
+PROG_STR( S_BATT_CAPACITY,              "%d mAh (%d%%)" );
+PROG_STR( S_BATT_SOH,                   "SOH : %d%%" );
+PROG_STR( S_BATT_FULL_CAP,              "FCap: %d mAh" );
+PROG_STR( S_BATT_CURRENT,               "Cur: %d mA" );
+PROG_STR( S_BATT_POWER,                 "Pwr: %d mW" );
+PROG_STR( S_BATT_NO_VOLTAGE,            "*.*** V" );
+PROG_STR( S_BATT_NO_CAPACITY,           "*** mAh (n/a)" );
+PROG_STR( S_BATT_NO_FULL_CAP,           "FCap: n/a" );
+PROG_STR( S_BATT_NO_SOH,                "SOH : n/a" );
+PROG_STR( S_BATT_NO_CURRENT,            "Cur: n/a" );
+PROG_STR( S_BATT_NO_POWER,              "Pwr: n/a" );
+
 
 //--------------------------------------------------------------------------
 //

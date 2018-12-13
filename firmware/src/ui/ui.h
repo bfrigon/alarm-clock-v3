@@ -95,10 +95,14 @@
 #define ID_SETTINGS_BACKUP          80
 #define ID_SETTINGS_RESTORE         81
 #define ID_SETTINGS_FACTORY_RESET   82
+#define ID_SETTINGS_BATT_STATUS     83
 
-/* --- dialog screen --- */
+/* --- YES/NO dialog screen --- */
 #define ID_DIALOG_YES               250
 #define ID_DIALOG_NO                251
+
+
+
 
 
 // ----------------------------------------
@@ -120,6 +124,7 @@
 #define SCREEN_ID_ALARM             13
 #define SCREEN_ID_MENU_SETTINGS     14
 #define SCREEN_ID_SETTINGS_MANAGER  15
+#define SCREEN_ID_BATT_STATUS       16
 
 
 
@@ -138,6 +143,7 @@ bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row,
 /* Root screen events */
 bool rootScreen_onDrawScreen( Screen* screen );
 bool rootScreen_onKeypress( Screen* screen, uint8_t key );
+void rootScreen_onTimeout( Screen* screen );
 
 /* Show alarm screen events */
 bool showAlarmScreen_onKeypress( Screen* screen, uint8_t key );
@@ -157,6 +163,10 @@ bool settingsManager_onDrawScreen( Screen* screen );
 bool settingsManager_onKeypress( Screen* screen, uint8_t key );
 bool settingsManager_onEnterScreen( Screen* screen );
 
+bool battStatus_onDrawScreen( Screen* screen );
+void battStatus_onTimeout( Screen* screen );
+bool battStatus_onEnterScreen( Screen* screen );
+bool battStatus_onKeypress( Screen* screen, uint8_t key );
 
 
 extern struct Time adjTime;
@@ -180,6 +190,7 @@ extern Screen screen_edit_alarm_visual;
 extern Screen screen_alarm;
 extern Screen screen_menu_settings;
 extern Screen screen_settings_manager;
+extern Screen screen_batt_status;
 
 
 //--------------------------------------------------------------------------
@@ -333,6 +344,7 @@ PROGMEM const struct ScreenItemBase ITEMS_MENU_SETTINGS[] = {
     ITEM_LINK( ID_SETTINGS_BACKUP, 0, 0, S_MENU_SETTINGS_BACKUP, &screen_settings_manager, ITEM_NORMAL ),
     ITEM_LINK( ID_SETTINGS_RESTORE, 1, 0, S_MENU_SETTINGS_RESTORE, &screen_settings_manager, ITEM_NORMAL ),
     ITEM_LINK( ID_SETTINGS_FACTORY_RESET, 2, 0, S_MENU_SETTINGS_RESET, &screen_settings_manager, ITEM_NORMAL ),
+    ITEM_LINK( ID_SETTINGS_BATT_STATUS, 3, 0, S_MENU_SETTINGS_BATT_INFO, &screen_batt_status, ITEM_NORMAL ),
     ITEM_END()
 };
 

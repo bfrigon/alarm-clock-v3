@@ -36,6 +36,7 @@
 #include "drivers/neoclock.h"
 #include "drivers/neopixel.h"
 #include "drivers/wifi.h"
+#include "drivers/bq27441.h"
 #include "drivers/power.h"
 
 
