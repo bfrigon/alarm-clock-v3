@@ -1,7 +1,7 @@
 ### Bill of material ###
 
 ```
-Date    : 2018-09-23
+Date    : 2018-10-29
 Doc. ID : CLKV3-SCH-05
 Project : Alarm Clock (V3)
 Title   : Motherboard

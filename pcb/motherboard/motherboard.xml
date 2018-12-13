@@ -2,14 +2,14 @@
 <export version="D">
   <design>
     <source>/home/ben/Projects/alarm-clock-v3/pcb/motherboard/motherboard.sch</source>
-    <date>Mon 29 Oct 2018 02:05:32 PM EDT</date>
-    <tool>Eeschema 5.0.0-fee4fd1~65~ubuntu17.10.1</tool>
+    <date>Fri 30 Nov 2018 02:58:59 AM EST</date>
+    <tool>Eeschema 5.0.1-33cea8e~68~ubuntu18.04.1</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>Motherboard</title>
         <company/>
         <rev>B</rev>
-        <date>2018-09-23</date>
+        <date>2018-10-29</date>
         <source>motherboard.sch</source>
         <comment number="1" value="CLKV3-PC-05"/>
         <comment number="2" value="CLKV3-SCH-05"/>
@@ -22,7 +22,7 @@
         <title>Motherboard\nUSB Serial</title>
         <company/>
         <rev>B</rev>
-        <date>2018-08-22</date>
+        <date>2018-10-29</date>
         <source>usb-serial.sch</source>
         <comment number="1" value="CLKV3-PC-05"/>
         <comment number="2" value="CLKV3-SCH-05"/>
@@ -35,7 +35,7 @@
         <title>Motherboard\nPeripherals</title>
         <company/>
         <rev>B</rev>
-        <date>2018-08-22</date>
+        <date>2018-10-29</date>
         <source>peripherals.sch</source>
         <comment number="1" value="CLKV3-PC-05"/>
         <comment number="2" value="CLKV3-SCH-05"/>
@@ -681,7 +681,7 @@
       <tstamp>5C2A94A9</tstamp>
     </comp>
     <comp ref="J13">
-      <value>HEADER-1x04</value>
+      <value>USB-LED</value>
       <footprint>conn-wire-pads:WP-50mil-1x04</footprint>
       <fields>
         <field name="Family">Virtual</field>
@@ -1792,8 +1792,8 @@
       <node ref="J9" pin="3"/>
       <node ref="U5" pin="8"/>
       <node ref="C3" pin="2"/>
-      <node ref="J1" pin="3"/>
       <node ref="C26" pin="1"/>
+      <node ref="J1" pin="3"/>
       <node ref="J1" pin="2"/>
       <node ref="C24" pin="2"/>
       <node ref="J15" pin="2"/>
@@ -1812,8 +1812,8 @@
       <node ref="J14" pin="2"/>
     </net>
     <net code="7" name="/P44">
-      <node ref="U1" pin="40"/>
       <node ref="J14" pin="3"/>
+      <node ref="U1" pin="40"/>
     </net>
     <net code="8" name="Net-(U1-Pad37)">
       <node ref="U1" pin="37"/>
@@ -1826,22 +1826,22 @@
     </net>
     <net code="11" name="/SD_DET">
       <node ref="R22" pin="1"/>
-      <node ref="U1" pin="57"/>
       <node ref="J5" pin="DT"/>
+      <node ref="U1" pin="57"/>
     </net>
     <net code="12" name="/P45">
-      <node ref="U1" pin="39"/>
       <node ref="J14" pin="4"/>
+      <node ref="U1" pin="39"/>
     </net>
     <net code="13" name="/P46">
-      <node ref="U1" pin="38"/>
       <node ref="J14" pin="5"/>
+      <node ref="U1" pin="38"/>
     </net>
     <net code="14" name="/ALRM_SW">
-      <node ref="U1" pin="75"/>
       <node ref="J9" pin="16"/>
+      <node ref="U1" pin="75"/>
     </net>
-    <net code="15" name="/LOW_BATT">
+    <net code="15" name="/SYSOFF">
       <node ref="U1" pin="89"/>
       <node ref="J6" pin="1"/>
     </net>
@@ -1863,9 +1863,9 @@
       <node ref="J3" pin="1"/>
     </net>
     <net code="19" name="+5V">
-      <node ref="U3" pin="4"/>
       <node ref="U6" pin="3"/>
       <node ref="R9" pin="2"/>
+      <node ref="U3" pin="4"/>
       <node ref="U6" pin="1"/>
       <node ref="R5" pin="2"/>
       <node ref="C26" pin="2"/>
@@ -1877,8 +1877,8 @@
       <node ref="R22" pin="2"/>
       <node ref="C14" pin="2"/>
       <node ref="C11" pin="1"/>
-      <node ref="C19" pin="2"/>
       <node ref="J13" pin="1"/>
+      <node ref="C19" pin="2"/>
       <node ref="R21" pin="2"/>
       <node ref="U3" pin="32"/>
       <node ref="D2" pin="K"/>
@@ -2206,8 +2206,8 @@
       <node ref="J2" pin="4"/>
     </net>
     <net code="100" name="/USB Serial/URXD">
-      <node ref="U3" pin="8"/>
       <node ref="R24" pin="1"/>
+      <node ref="U3" pin="8"/>
     </net>
     <net code="101" name="/USB Serial/LED_TX">
       <node ref="U3" pin="11"/>
@@ -2218,11 +2218,11 @@
       <node ref="R1" pin="2"/>
     </net>
     <net code="103" name="/USB Serial/UTXD">
-      <node ref="R19" pin="1"/>
       <node ref="U3" pin="9"/>
+      <node ref="R19" pin="1"/>
     </net>
     <net code="104" name="/USB Serial/VUSB-DET">
-      <node ref="U3" pin="18"/>
+      <node ref="U3" pin="22"/>
       <node ref="Q1" pin="3"/>
       <node ref="R2" pin="2"/>
     </net>
@@ -2244,22 +2244,22 @@
       <node ref="U3" pin="16"/>
     </net>
     <net code="110" name="/USB Serial/MISO-USB">
-      <node ref="U3" pin="17"/>
       <node ref="J4" pin="1"/>
+      <node ref="U3" pin="17"/>
     </net>
     <net code="111" name="Net-(C4-Pad2)">
-      <node ref="C4" pin="2"/>
       <node ref="U3" pin="27"/>
+      <node ref="C4" pin="2"/>
     </net>
     <net code="112" name="/USB Serial/RESET-USB">
+      <node ref="J4" pin="5"/>
       <node ref="U3" pin="24"/>
       <node ref="R5" pin="1"/>
       <node ref="D2" pin="A"/>
-      <node ref="J4" pin="5"/>
     </net>
     <net code="113" name="/USB Serial/SCK-USB">
-      <node ref="J4" pin="3"/>
       <node ref="U3" pin="15"/>
+      <node ref="J4" pin="3"/>
     </net>
     <net code="114" name="Net-(U3-Pad14)">
       <node ref="U3" pin="14"/>
@@ -2271,24 +2271,24 @@
       <node ref="J13" pin="3"/>
       <node ref="U3" pin="10"/>
     </net>
-    <net code="117" name="Net-(U3-Pad25)">
+    <net code="117" name="Net-(U3-Pad18)">
+      <node ref="U3" pin="18"/>
+    </net>
+    <net code="118" name="Net-(U3-Pad25)">
       <node ref="U3" pin="25"/>
     </net>
-    <net code="118" name="/USB Serial/UVCC">
+    <net code="119" name="/USB Serial/UVCC">
       <node ref="R1" pin="1"/>
       <node ref="U3" pin="31"/>
       <node ref="DA1" pin="4"/>
       <node ref="C5" pin="2"/>
       <node ref="F1" pin="2"/>
     </net>
-    <net code="119" name="Net-(U3-Pad26)">
+    <net code="120" name="Net-(U3-Pad26)">
       <node ref="U3" pin="26"/>
     </net>
-    <net code="120" name="Net-(U3-Pad23)">
+    <net code="121" name="Net-(U3-Pad23)">
       <node ref="U3" pin="23"/>
-    </net>
-    <net code="121" name="Net-(U3-Pad22)">
-      <node ref="U3" pin="22"/>
     </net>
     <net code="122" name="Net-(U3-Pad21)">
       <node ref="U3" pin="21"/>
