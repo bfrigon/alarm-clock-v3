@@ -18,8 +18,8 @@ Specs
 
 ---------------------------------------------------
 
-![alt tag](/pictures/final-assembly/assembly-final-front "Front view")
-![alt tag](/pictures/final-assembly/rear-view "Rear view")
+![alt tag](/pictures/final-assembly/assembly-final-front.jpg "Front view")
+![alt tag](/pictures/final-assembly/rear-view.jpg "Rear view")
 
 
 
