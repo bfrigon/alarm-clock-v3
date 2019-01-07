@@ -70,9 +70,9 @@ bool battStatus_onDrawScreen( Screen* screen ) {
     char buffer[ DISPLAY_WIDTH + 1 ];
 
     if( g_battStatusPage == 0 ) {
-        uint8_t soc = g_battery.getStateOfCharge();
+        uint8_t soc = g_battery.getStateOfCharge( false );
         uint16_t voltage = g_battery.getVoltage();
-        uint16_t remain_cap = g_battery.getRemainingCapacity();
+        uint16_t remain_cap = g_battery.getRemainingCapacity( false );
 
         if( bat_det == true ) {
 
@@ -118,7 +118,7 @@ bool battStatus_onDrawScreen( Screen* screen ) {
 
     if( g_battStatusPage == 2 ) {
         int8_t soh = g_battery.getStateOfHealth();
-        int16_t fcap = g_battery.getFullCapacity();
+        int16_t fcap = g_battery.getFullCapacity( false );
 
         /* Print Full capacity */
         g_lcd.setPosition( 0, 0 );
