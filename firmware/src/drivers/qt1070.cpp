@@ -19,8 +19,6 @@
 #include "power.h"
 
 
-volatile bool qt1070_event = false;
-
 
 /*--------------------------------------------------------------------------
  *
@@ -105,7 +103,8 @@ void QT1070::begin() {
  * Returns : Nothing
  */
 void QT1070::enableInterrupt() {
-pinMode( this->_pin_irq, INPUT_PULLUP );
+
+    pinMode( this->_pin_irq, INPUT );
     attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_qt1070, LOW );
 }
 
@@ -184,21 +183,20 @@ uint8_t QT1070::processEvents() {
     /* Calculate the elapsed time since the last event */
     lastEventDelay = this->lastEventStart > 0 ? millis() - this->lastEventStart : 0;
 
-    if( qt1070_event == true ) {
-
-        qt1070_event = false;
+    if( digitalRead( this->_pin_irq) == LOW ) {
 
         /* Read the status bytes (2-3) to reset the interrupt */
         if( this->readStatus() == false ) {
             return KEY_NONE;
         }
 
+        this->enableInterrupt();
+
         /* Ignore event if the touch IC is calibrating */
         if( this->status.calibrating == true ) {
             return KEY_NONE;
         }
-
-        this->enableInterrupt();
+        
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
 
@@ -450,7 +448,5 @@ uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
  * Returns : Nothing
  */
 void isr_qt1070() {
-    qt1070_event = true;
-
     g_keypad.disableInterrupt();
 }
