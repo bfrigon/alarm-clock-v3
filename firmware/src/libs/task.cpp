@@ -42,7 +42,7 @@ uint8_t Task::startTask( uint8_t task ) {
     return task;
 }
 
-void Task::endTask( int error = TASK_SUCCESS ) {
+void Task::endTask( int error ) {
     
     this->_currentTask = TASK_NONE;
 

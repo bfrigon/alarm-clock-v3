@@ -61,13 +61,13 @@ void enableWifi() {
     digitalWrite( PIN_WIFI_RESET, HIGH );
 
     /* Init wifi module */
-    g_wifi.setPins( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
-    g_wifi.begin();
+    //g_wifi.setPins( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
+    //g_wifi.begin();
 
 
     updateWifiConfig();
 
-    g_wifi.connect( g_config.settings.ssid, g_config.settings.wkey );
+    //g_wifi.connect( g_config.settings.ssid, g_config.settings.wkey );
 }
 
 
@@ -83,7 +83,7 @@ void enableWifi() {
  */
 void disableWifi() {
 
-    g_wifi.end();
+    //g_wifi.end();
 
     digitalWrite( PIN_WIFI_RESET, LOW );
 }

@@ -51,6 +51,9 @@ void ConfigManager::load() {
 
         *( ( ( uint8_t* )&this->settings ) + c ) = byte;
     }
+
+
+    this->settings.lamp.mode = LAMP_MODE_OFF;
 }
 
 
@@ -116,7 +119,7 @@ void ConfigManager::reset() {
     this->settings.ssid[0] = 0;
     this->settings.wkey[0] = 0;
     this->settings.lamp.brightness = 60;
-    this->settings.lamp.mode = LAMP_MODE_ON;
+    this->settings.lamp.mode = LAMP_MODE_OFF;
     this->settings.lamp.color = COLOR_WHITE;
 
 
@@ -238,7 +241,7 @@ void ConfigManager::runTask() {
  *
  * Returns : TRUE if successfuly started or FALSE otherwise.
  */
-bool ConfigManager::startBackup( bool overwrite = true ) {
+bool ConfigManager::startBackup( bool overwrite ) {
 
     /* Checks if another task is already running. */
     if( this->startTask( TASK_BACKUP_CONFIG ) != TASK_BACKUP_CONFIG ) {
@@ -287,7 +290,7 @@ bool ConfigManager::startBackup( bool overwrite = true ) {
  *
  * Returns : Nothing
  */
-void ConfigManager::endBackup( int error = TASK_SUCCESS ) {
+void ConfigManager::endBackup( int error ) {
     if( this->_sd_file.isOpen() == true ) {
         this->_sd_file.close();
     }
@@ -341,7 +344,7 @@ bool ConfigManager::startRestore() {
  *
  * Returns : Nothing
  */
-void ConfigManager::endRestore( int error = TASK_SUCCESS ) {
+void ConfigManager::endRestore( int error ) {
     if( this->_sd_file.isOpen() == true ) {
         this->_sd_file.close();
     }
@@ -579,8 +582,8 @@ inline bool ConfigManager::matchSettingName( char* currentName, const char* name
  *
  * Returns : Nothing
  */
-void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingType, uint8_t min = 0,
-                                       uint8_t max = 255 ) {
+void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingType, uint8_t min,
+                                       uint8_t max ) {
 
     IPAddress addr;
     Time time;

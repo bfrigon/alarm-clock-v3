@@ -22,7 +22,6 @@
 bool g_clockUpdate = true;
 uint8_t selectedProfile = 0;
 uint8_t selectedAlarm = 0;
-bool edit_alarm_lamp_settings = false;
 
 
 struct Time adjTime;
@@ -124,9 +123,11 @@ void initScreens() {
 
     /* Edit alarm lamp settings */
     screen_edit_alarm_lamp.setCbSelectionChange( &onSelectionChange );
+    screen_edit_alarm_lamp.setCbKeypress( &onKeypress );
 
     /* Edit night lamp settings */
     screen_edit_night_lamp.setCbSelectionChange( &onSelectionChange );
+    screen_edit_night_lamp.setCbKeypress( &onKeypress );
     screen_edit_night_lamp.setCbDrawItem( &onDrawItem );
 
     /* Edit alarm visual settings */
@@ -148,6 +149,39 @@ void initScreens() {
     g_screenClear = true;
 }
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when a key press occurs
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *  - key    : Detected key press.
+ *
+ * Returns : TRUE to allow default key press processing or False to override.
+ */
+bool onKeypress( Screen* screen, uint8_t key ) {
+
+    switch( key ) {
+
+        /* Enable/disable night light */
+        case KEY_SWIPE | KEY_LEFT:
+        case KEY_SWIPE | KEY_RIGHT:
+
+            /* Does not allow to enable/disable the night light if currently etiting lamp settings */
+            if( screen->getId() == SCREEN_ID_EDIT_ALARM_LAMP || 
+                screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP ) {
+
+                    if ( screen->isItemFullScreen() ) {
+                        return false;
+                    }
+            }
+
+        break;
+    }
+
+    return true;
+}
 
 /*--------------------------------------------------------------------------
  *
@@ -269,32 +303,52 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
 
             break;
 
-        case ID_LAMP_MODE:
+        
             if( g_alarm.profile.lamp.mode == LAMP_MODE_OFF ) {
                 g_lamp.deactivate();
                 break;
             }
 
-        /* Fall through */
+        
+        case ID_LAMP_MODE:
+            if( g_alarm.profile.lamp.mode != LAMP_MODE_OFF && fullscreen ) {
 
-        case ID_LAMP_EFFECT_SPEED:
-        case ID_LAMP_COLOR:
-        case ID_LAMP_BRIGHTNESS:
-
-            NightLampSettings* settings;
-            settings = edit_alarm_lamp_settings ? &g_alarm.profile.lamp : &g_config.settings.lamp;
-
-
-            if( fullscreen ) {
-                g_lamp.activate( settings, true );
-
+                g_lamp.activate( &g_alarm.profile.lamp, true );
+                break;
             } else {
-                g_lamp.deactivate();
+                g_lamp.deactivate();                
             }
 
             break;
 
 
+        case ID_LAMP_EFFECT_SPEED:
+        case ID_LAMP_COLOR:
+        case ID_LAMP_BRIGHTNESS:
+
+            if( fullscreen ) {
+
+                if ( screen->getId() == SCREEN_ID_EDIT_ALARM_LAMP ) {
+                    g_lamp.activate( &g_alarm.profile.lamp, true );
+
+                } else {
+                    g_config.settings.lamp.mode = LAMP_MODE_OFF;
+                    g_lamp.activate( &g_config.settings.lamp, true );
+
+                    /* Disable delay off while editing lamp settings */
+                    g_lamp.setDelayOff( 0 );
+                }
+
+            } else {
+                if ( screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP ) {
+                    /* Restore delay off */
+                    g_lamp.setDelayOff( g_config.settings.lamp.delay_off );
+                }
+
+                g_lamp.deactivate();
+            }
+
+            break;
 
 
         case ID_SET_TIME:
@@ -334,6 +388,8 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
  * Returns : Nothing
  */
 void onValueChange( Screen* screen, ScreenItem* item ) {
+
+    
 
     switch( item->getId() ) {
 
@@ -437,6 +493,10 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
             }
 
             item->setValue( minutes );
+
+            if( item->getId() == ID_LAMP_DELAY && screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP ) {
+                g_lamp.setDelayOff( minutes );
+            }
             break;
 
 
@@ -445,17 +505,17 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
                 g_lamp.deactivate();
 
             } else {
-                g_lamp.activate( edit_alarm_lamp_settings == true ? &g_alarm.profile.lamp : &g_config.settings.lamp );
+                g_lamp.activate( screen->getId() == SCREEN_ID_EDIT_ALARM_LAMP ? &g_alarm.profile.lamp : &g_config.settings.lamp, true );
             }
 
             break;
 
         case ID_LAMP_COLOR:
-            g_lamp.setColorFromTable( item->getValue() );
+            g_lamp.setColorFromTable( item->getValue(), screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP );
             break;
 
         case ID_LAMP_BRIGHTNESS:
-            g_lamp.setBrightness( item->getValue() );
+            g_lamp.setBrightness( item->getValue(), screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP );
             break;
 
         case ID_LAMP_EFFECT_SPEED:
@@ -508,14 +568,6 @@ bool onEnterScreen( Screen* screen ) {
 
                 g_clockUpdate = true;
             }
-
-        case SCREEN_ID_EDIT_ALARM_LAMP:
-            edit_alarm_lamp_settings = true;
-            break;
-
-        case SCREEN_ID_EDIT_NIGHT_LAMP:
-            edit_alarm_lamp_settings = false;
-            break;
     }
 
     return true;
@@ -585,7 +637,6 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
                 g_config.load();
             }
 
-            g_lamp.deactivate();
             break;
 
         case SCREEN_ID_EDIT_ALARM_LAMP:
@@ -615,11 +666,18 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
             }
 
             break;
-
-        case SCREEN_ID_ROOT:
-            g_lamp.deactivate();
-            break;
     }
 
     return true;
+}
+
+
+void enableNightLamp() {
+
+    g_config.settings.lamp.mode = LAMP_MODE_NIGHTLIGHT;
+    g_lamp.activate( &g_config.settings.lamp );
+}
+
+void disableNightLamp() {
+    g_lamp.deactivate( true );
 }

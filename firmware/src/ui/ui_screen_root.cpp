@@ -30,7 +30,7 @@ uint8_t g_prevBattState = 0;
  *  - screen : Pointer to the screen where the event occured.
  *  - key    : Detected key press.
  *
- * Returns : TRUE to allow default key press processingor False to override.
+ * Returns : TRUE to allow default key press processing or False to override.
  */
 bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
 
@@ -51,18 +51,8 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
             screen_show_alarms.activate( true, &screen_root );
             break;
 
-        case KEY_SWIPE | KEY_RIGHT:
-            g_config.settings.lamp.mode = LAMP_MODE_ON;
-            g_lamp.activate( &g_config.settings.lamp );
-            break;
-
-        case KEY_SWIPE | KEY_LEFT:
-            g_lamp.deactivate();
-            break;
-
-        case KEY_SET:
-            screen_batt_status.activate( true, &screen_root );
-            break;
+        default:
+            return true;
     }
 
     return false;
@@ -85,7 +75,10 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
 
     /* Print status icons */
     g_lcd.setPosition( 0, 12 );
-    g_lcd.print( ( g_wifi.connected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
+
+    //g_lcd.print( ( g_wifi.connected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
+    g_lcd.print( CHAR_SPACE ); /* Temporary */
+
     g_lcd.print( ( g_alarm.isSDCardPresent() == false ) ? CHAR_NO_SD : CHAR_SPACE );
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {

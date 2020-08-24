@@ -28,6 +28,7 @@ QT1070 g_keypad( PIN_INT_KEYPAD );
 US2066 g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET );
 Power g_power( PIN_ON_BATTERY, PIN_SYSOFF, PIN_FACTORY_RESET );
 DS3231 g_rtc( PIN_INT_RTC );
+TSL2591 g_als;
 BQ27441 g_battery;
 ConfigManager g_config;
 
@@ -116,6 +117,10 @@ void setup() {
     g_power.begin();
     g_battery.begin( BATTERY_DESIGN_CAPACITY );
 
+    /* Initialize ambiant light detector */
+    g_als.begin();
+    g_als.configure( TSL2591_GAIN_HIGH, TSL2591_INTEGRATION_500MS );
+
     /* Check for factory reset sequence */
     if( checkFactoryReset() == false ) {
 
@@ -175,6 +180,8 @@ void loop() {
 
     /* If an RTC interrupt occured, read the current time */
     g_rtc.processEvents();
+
+    
     
     /* Update the Clock display if needed */
     g_clock.runTask();
@@ -203,6 +210,9 @@ void loop() {
 
     /* Run config manager tasks */
     g_config.runTask();
+
+    /* Run ambiand light sensor tasks */
+    g_als.runTask();
 }
 
 

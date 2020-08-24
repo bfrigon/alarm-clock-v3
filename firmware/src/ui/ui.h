@@ -128,10 +128,9 @@
 
 
 
-
-
 void initScreens();
-
+void enableNightLamp();
+void disableNightLamp();
 
 /* default screen events */
 bool onEnterScreen( Screen* screen );
@@ -139,6 +138,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen );
 void onValueChange( Screen* screen, ScreenItem* item );
 void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen );
 bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
+bool onKeypress( Screen* screen, uint8_t key );
 
 /* Root screen events */
 bool rootScreen_onDrawScreen( Screen* screen );

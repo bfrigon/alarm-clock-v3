@@ -343,7 +343,7 @@ uint8_t BQ27441::getBatteryState() {
  *
  * Returns : Remaining capacity in milliamps-hour (mAh)
  */
-uint16_t BQ27441::getRemainingCapacity( bool filtered = true ) {
+uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
     if( this->_init == false ) {
         return 0;
     }
@@ -362,7 +362,7 @@ uint16_t BQ27441::getRemainingCapacity( bool filtered = true ) {
  *
  * Returns : Fully charged capacity in milliamps-hour (mAh)
  */
-uint16_t BQ27441::getFullCapacity( bool filtered = true ) {
+uint16_t BQ27441::getFullCapacity( bool filtered ) {
     if( this->_init == false ) {
         return 0;
     }
@@ -436,7 +436,7 @@ int8_t BQ27441::getStateOfHealth() {
  *
  * Returns : State of charge in percent.
  */
-uint8_t BQ27441::getStateOfCharge( bool filtered = true ) {
+uint8_t BQ27441::getStateOfCharge( bool filtered ) {
     if( this->_init == false ) {
         return 0;
     }

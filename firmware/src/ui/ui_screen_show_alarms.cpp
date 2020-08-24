@@ -31,6 +31,12 @@
  */
 bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 
+    switch( key ) {
+        case KEY_SWIPE | KEY_RIGHT:
+        case KEY_SWIPE | KEY_LEFT:
+            return true;
+    }
+
     screen->exitScreen();
     return false;
 }

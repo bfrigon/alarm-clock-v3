@@ -38,6 +38,7 @@
 #include "drivers/wifi.h"
 #include "drivers/bq27441.h"
 #include "drivers/power.h"
+#include "drivers/tsl2591.h"
 
 
 // ----------------------------------------

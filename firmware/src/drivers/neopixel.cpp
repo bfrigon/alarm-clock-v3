@@ -58,7 +58,7 @@ void NeoPixel::begin() {
         pinMode( this->_pin_shdn, OUTPUT );
     }
 
-    this->updatePowerState();
+    this->onPowerStateChange( g_power.getPowerMode() );
 }
 
 
@@ -91,18 +91,18 @@ void NeoPixel::end() {
  *
  * Arguments
  * ---------
- *  None
+ *  - state : Current power state
  *
  * Returns : Nothing
  */
-void NeoPixel::updatePowerState() {
+void NeoPixel::onPowerStateChange( uint8_t state ) {
 
     if( this->_init == false ) {
         return;
     }
 
     if( this->_pin_shdn >= 0 ) {
-        digitalWrite( this->_pin_shdn, ( g_power.getPowerMode() == POWER_MODE_SUSPEND ? HIGH : LOW ) );
+        digitalWrite( this->_pin_shdn, ( state == POWER_MODE_SUSPEND ? HIGH : LOW ) );
     }
 
     this->update();

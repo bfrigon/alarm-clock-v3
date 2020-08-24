@@ -67,9 +67,9 @@ class Alarm : private VS1053, public Task {
     Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect,
            int8_t pin_alarm_sw, int8_t pin_amp_shdn );
 
-    uint8_t begin();
+    void begin();
     void end();
-    void updatePowerState();
+    void onPowerStateChange( uint8_t state );
 
     bool loadProfile( struct AlarmProfile *profile, uint8_t id );
     bool loadProfile( uint8_t id );
@@ -114,7 +114,7 @@ class Alarm : private VS1053, public Task {
     void visualStop();
     void audioStop();
     void audioStart();
-    inline void Alarm::updateVisualStepDelay();
+    inline void updateVisualStepDelay();
 
     uint8_t _pin_sd_detect;
     uint8_t _pin_sd_cs;

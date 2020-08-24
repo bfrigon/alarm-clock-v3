@@ -63,7 +63,7 @@ Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq,
  *
  * Returns : Nothing
  */
-uint8_t Alarm::begin() {
+void Alarm::begin() {
     if( this->_init == true ) {
         return;
     }
@@ -71,7 +71,7 @@ uint8_t Alarm::begin() {
     this->_init = true;
     this->_volume = 0;
 
-    this->updatePowerState();
+    this->onPowerStateChange( g_power.getPowerMode() );
 }
 
 
@@ -105,17 +105,17 @@ void Alarm::end() {
  *
  * Arguments
  * ---------
- *  None
+ *  - state : Current power state 
  *
  * Returns : Nothing
  */
-void Alarm::updatePowerState() {
+void Alarm::onPowerStateChange( uint8_t state ) {
 
     if( this->_init == false ) {
         return;
     }
 
-    if( g_power.getPowerMode() != POWER_MODE_SUSPEND ) {
+    if( state != POWER_MODE_SUSPEND ) {
         VS1053::begin();
 
         this->_amplifier.begin();
@@ -804,6 +804,7 @@ void Alarm::visualStart() {
     /* Turn on lamp if option enabled */
     if( this->_playMode & ALARM_MODE_LAMP && profile.lamp.mode != LAMP_MODE_OFF ) {
         this->profile.lamp.delay_off = 0;
+        g_lamp.deactivate( true );
         g_lamp.activate( &this->profile.lamp );
     }
 

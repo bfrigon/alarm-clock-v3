@@ -39,10 +39,15 @@ Lamp::Lamp( int8_t pin_leds ) : NeoPixel( pin_leds, -1 ) {
  * Arguments
  * ---------
  *  - brightness : Brighness value 0-100 %
+ *  - force      : Force set even if night light is active
  *
  * Returns : Nothing
  */
-void Lamp::setBrightness( uint8_t brightness ) {
+void Lamp::setBrightness( uint8_t brightness, bool force ) {
+
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT && force == false ) {
+        return;
+    }
 
     if( brightness > 100 ) {
         brightness = 100;
@@ -59,7 +64,10 @@ void Lamp::setBrightness( uint8_t brightness ) {
     }
 
     NeoPixel::setBrightness( brightness );
-    this->update();
+
+    if( this->_mode != LAMP_MODE_OFF ) {
+        this->update();
+    }
 }
 
 
@@ -69,18 +77,26 @@ void Lamp::setBrightness( uint8_t brightness ) {
  *
  * Arguments
  * ---------
- *  - id : value 0-12 (color table in ressource.h)
- *
+ *  - id    : value 0-12 (color table in ressource.h)
+ *  - force : Force set even if night light is active
+ * 
  * Returns : Nothing
  */
-void Lamp::setColorFromTable( uint8_t id ) {
+void Lamp::setColorFromTable( uint8_t id, bool force ) {
+
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT && force == false ) {
+        return;
+    }
 
     if( this->_mode == LAMP_MODE_RAINBOW ) {
         return;
     }
-
+    
     NeoPixel::setColorFromTable( id );
-    this->update();
+
+    if( this->_mode != LAMP_MODE_OFF ) {
+        this->update();
+    }
 }
 
 
@@ -90,20 +106,28 @@ void Lamp::setColorFromTable( uint8_t id ) {
  *
  * Arguments
  * ---------
- *  - r: Red component
- *  - g: Green component
- *  - b: Blue component
+ *  - r     : Red component
+ *  - g     : Green component
+ *  - b     : Blue component
+ *  - force : Force set even if night light is active
  *
  * Returns : Nothing
  */
-void Lamp::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
+void Lamp::setColorRGB( uint8_t r, uint8_t g, uint8_t b, bool force ) {
+
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT && force == false ) {
+        return;
+    }
 
     if( this->_mode == LAMP_MODE_RAINBOW ) {
         return;
     }
 
     NeoPixel::setColorRGB( r, g, b );
-    this->update();
+
+    if( this->_mode != LAMP_MODE_OFF ) {
+        this->update();
+    }
 }
 
 
@@ -134,6 +158,27 @@ void Lamp::setEffectSpeed( uint8_t speed ) {
 
 /*--------------------------------------------------------------------------
  *
+ * Sets the lamp off delay.
+ *
+ * Arguments
+ * ---------
+ *  - delay : Delay in minutes before the lamp turn off 
+
+ * Returns : Nothing
+ */
+void Lamp::setDelayOff( uint8_t delay ) {
+    this->_delay_off = delay;
+
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT ) {
+
+        /* Reset timer */
+        this->_timerStart = millis();
+    }
+}
+
+
+/*--------------------------------------------------------------------------
+ *
  * Turn on the lamp
  *
  * Arguments
@@ -143,7 +188,11 @@ void Lamp::setEffectSpeed( uint8_t speed ) {
  *
  * Returns : Nothing
  */
-void Lamp::activate( struct NightLampSettings *settings, bool test_mode = false ) {
+void Lamp::activate( struct NightLampSettings *settings, bool test_mode ) {
+
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT ) {
+        return;
+    }
 
     uint8_t mode;
     mode = settings->mode;
@@ -151,20 +200,15 @@ void Lamp::activate( struct NightLampSettings *settings, bool test_mode = false 
     if( test_mode == true && mode == LAMP_MODE_OFF ) {
         mode = LAMP_MODE_ON;
     }
-
-    if( mode == this->_mode ) {
-        /* Already active */
-        return;
-    }
-
-    this->_mode = mode;
+    
     this->_settings = settings;
-    this->setColorFromTable( settings->color );
-    this->setBrightness( settings->brightness );
     this->_delay_off = ( test_mode == true ) ? 0 : settings->delay_off;
     this->_visualStepSpeed = settings->speed;
     this->_visualStepReverse = false;
     this->_timerStart = millis();
+    this->setColorFromTable( settings->color );
+    this->setBrightness( settings->brightness );
+    this->_mode = mode;
 
     this->update();
 
@@ -223,11 +267,15 @@ void Lamp::updateVisualStepDelay() {
  *
  * Arguments
  * ---------
- *  None
+ *  - force : Force deactivate even if night light is active
  *
  * Returns : Nothing
  */
-void Lamp::deactivate() {
+void Lamp::deactivate( bool force ) {
+
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT && force == false ) {
+        return;
+    }
 
     if( this->_mode == LAMP_MODE_OFF ) {
         /* Alread off */
@@ -257,10 +305,14 @@ void Lamp::processEvents() {
     }
 
     /* Check if the OFF delay is elapsed */
-    if( this->_delay_off > 0 ) {
+    if( this->_delay_off > 0 && this->_mode == LAMP_MODE_NIGHTLIGHT ) {
 
         if( millis() >= this->_timerStart + ( this->_delay_off * 60000 ) ) {
-            this->deactivate();
+
+
+            
+            
+            this->deactivate( true );
             return;
         }
     }

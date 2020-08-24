@@ -62,7 +62,7 @@ void US2066::begin() {
 
     /* Setup stream for printf function */
     fdev_setup_stream( &this->_lcdout, this->_putchar, NULL, _FDEV_SETUP_WRITE );
-    fdev_set_udata( &this->_lcdout, ( void * )this->_address );
+    fdev_set_udata( &this->_lcdout, ( void * )this );
 
 
     /* Disable internal regulator */
@@ -536,7 +536,7 @@ uint8_t US2066::print( char c ) {
  *
  * Returns : Number of characters written
  */
-uint8_t US2066::print( const char *str, bool ptr_pgm_space = false ) {
+uint8_t US2066::print( const char *str, bool ptr_pgm_space ) {
     if( this->_init == false ) {
         this->begin();
     }
@@ -587,7 +587,7 @@ uint8_t US2066::print( const char *str, bool ptr_pgm_space = false ) {
  *
  * Returns : Number of characters written
  */
-uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false ) {
+uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space ) {
     uint8_t res;
     uint8_t num = 0;
     uint8_t slen;
@@ -750,14 +750,8 @@ uint8_t US2066::printf_P( const char *format, ... ) {
  */
 int US2066::_putchar( char ch, FILE *stream ) {
 
-    uint8_t address;
-    address = ( uint8_t )fdev_get_udata( stream );
-
-    Wire.beginTransmission( address );
-    Wire.write( US2066_MODE_DATA );
-
-    Wire.write( ch );
-
-    Wire.endTransmission();
-    return 0;
+    US2066 *lcd;
+    lcd = ( US2066* )fdev_get_udata( stream );
+    
+    return lcd->print( ch );
 }

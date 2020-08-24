@@ -32,7 +32,7 @@
  *  - pin_sysoff : Pin connected to BQ24075 system off pin
  *  - pin_cfgrst : Pin which is connected to the reset/factory reset button.
  */
-Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst = -1 ) {
+Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst ) {
 
     this->_pin_onbatt = pin_onbatt;
     this->_pin_sysoff = pin_sysoff;
@@ -104,9 +104,10 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
     this->resetSuspendDelay();
 
     /* Update modules power state */
-    g_clock.updatePowerState();
-    g_lamp.updatePowerState();
-    g_alarm.updatePowerState();
+    g_clock.onPowerStateChange( mode );
+    g_lamp.onPowerStateChange( mode );
+    g_alarm.onPowerStateChange( mode );
+    g_als.onPowerStateChange( mode );
 
     g_screenUpdate = true;
 
@@ -169,7 +170,7 @@ uint8_t Power::detectPowerState() {
             return this->_mode;
         }
 
-        return;
+        return this->_mode;
     }
 
     /* Already in normal power mode */

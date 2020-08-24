@@ -142,7 +142,7 @@ PROG_STR( S_EDIT_PROFILE_SNOOZE,        "Snooze delay" );
 PROG_STR( S_EDIT_PROFILE_VOLUME,        "Volume" );
 PROG_STR( S_EDIT_PROFILE_GRADUAL,       "Gradual" );
 PROG_STR( S_EDIT_PROFILE_VISUAL,        "Visual effect" );
-PROG_STR( S_EDIT_PROFILE_LAMP,          "Night lamp" );
+PROG_STR( S_EDIT_PROFILE_LAMP,          "Alarm lamp" );
 PROG_STR( S_EDIT_PROFILE_MESSAGE,       "Message" );
 PROG_STR( S_EDIT_PROFILE_TEST,          "Test..." );
 

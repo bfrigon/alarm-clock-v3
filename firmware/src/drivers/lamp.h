@@ -25,16 +25,18 @@
 
 
 
-#define LAMP_MODE_OFF       0
-#define LAMP_MODE_ON        1
-#define LAMP_MODE_FLASHING  2
-#define LAMP_MODE_FADING    3
-#define LAMP_MODE_RAINBOW   4
-#define LAMP_MODE_FADEOUT   100
+#define LAMP_MODE_OFF         0
+#define LAMP_MODE_ON          1
+#define LAMP_MODE_FLASHING    2
+#define LAMP_MODE_FADING      3
+#define LAMP_MODE_RAINBOW     4
+#define LAMP_MODE_NIGHTLIGHT  5
+
+
+
 
 
 #define LAMP_MIMIMUM_FADING_BRIGHTNESS  20
-
 
 
 class Lamp : public NeoPixel {
@@ -44,18 +46,21 @@ class Lamp : public NeoPixel {
     Lamp( int8_t pin_leds );
 
 
-    void setBrightness( uint8_t brightness );
-    void setColorFromTable( uint8_t id );
-    void setColorRGB( uint8_t r, uint8_t g, uint8_t b );
+    void setBrightness( uint8_t brightness, bool force = false );
+    void setColorFromTable( uint8_t id, bool force = false );
+    void setColorRGB( uint8_t r, uint8_t g, uint8_t b, bool force = false );
     void setEffectSpeed( uint8_t speed );
     void activate( struct NightLampSettings *settings, bool test_mode = false );
-    void deactivate();
+    void deactivate( bool force = false );
     void processEvents();
+    void setDelayOff( uint8_t delay );
     void update();
+
 
   private:
     uint8_t _delay_off = 0;
     uint8_t _mode = LAMP_MODE_OFF;
+    bool _nightLightMode = false;
 
     uint32_t _timerStart = 0;
 
@@ -65,7 +70,7 @@ class Lamp : public NeoPixel {
     bool _visualStepReverse = false;
 
     struct NightLampSettings *_settings;
-
+    
 
     void updateVisualStepDelay();
 };

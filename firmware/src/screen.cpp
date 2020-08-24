@@ -179,7 +179,7 @@ void Screen::runTask() {
  *
  * Returns : Nothing
  */
-void Screen::update( bool force = false ) {
+void Screen::update( bool force ) {
 
     ScreenItem item;
 
@@ -309,7 +309,6 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
         /* Exit current menu */
         case KEY_MENU:
-        case KEY_SWIPE | KEY_LEFT:
 
             if( this->_itemFullscreen == true ) {
 
@@ -348,11 +347,6 @@ void Screen::processKeypadEvent( uint8_t key ) {
             /* Or increment the value of the item */
             this->incrementItemValue( &this->_item, false );
 
-            break;
-
-        case KEY_SWIPE | KEY_RIGHT:
-
-            this->incrementItemValue( &this->_item, true );
             break;
 
         case KEY_SHIFT | KEY_MENU:
@@ -397,6 +391,14 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             g_screenUpdate = true;
             break;
+
+        case KEY_SWIPE | KEY_RIGHT:
+            enableNightLamp();
+            break;
+
+        case KEY_SWIPE | KEY_LEFT:
+            disableNightLamp();
+            break;        
     }
 
 }
@@ -412,7 +414,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
  *
  * Returns : Nothing
  */
-void Screen::resetTimeout( int16_t timeout = -1 ) {
+void Screen::resetTimeout( int16_t timeout ) {
 
     if( timeout >= 0 ) {
         this->_timeout = timeout;
@@ -489,7 +491,7 @@ void Screen::exitScreen() {
  *
  * Returns : Nothing
  */
-void Screen::activate( bool selectFirstItem, Screen* parent = NULL ) {
+void Screen::activate( bool selectFirstItem, Screen* parent ) {
 
     /* Trigger exit screen event. If callback return false, cancel screen change */
     if( g_currentScreen->_eventExitScreen != NULL ) {

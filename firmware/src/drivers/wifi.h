@@ -19,7 +19,7 @@
 #define WIFI_H
 
 #include <Arduino.h>
-#include <winc1500_async.h>
+//#include <winc1500_async.h>
 
 
 void updateWifiConfig();

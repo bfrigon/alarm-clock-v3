@@ -30,12 +30,12 @@ class NeoPixel {
 
     void begin();
     void end();
-    void updatePowerState();
+    void onPowerStateChange( uint8_t state );
     void setColorRGB( uint8_t r, uint8_t g, uint8_t b );
     void setColorFromTable( uint8_t id );
     void setBrightness( uint8_t brightness );
 
-    virtual void update();
+    virtual void update() = 0;
 
   protected:
 
