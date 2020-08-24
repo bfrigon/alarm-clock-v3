@@ -24,7 +24,7 @@
 #include "neopixel.h"
 
 
-
+#define LAMP_MODE_NOOVERRIDE  255
 #define LAMP_MODE_OFF         0
 #define LAMP_MODE_ON          1
 #define LAMP_MODE_FLASHING    2
@@ -50,7 +50,7 @@ class Lamp : public NeoPixel {
     void setColorFromTable( uint8_t id, bool force = false );
     void setColorRGB( uint8_t r, uint8_t g, uint8_t b, bool force = false );
     void setEffectSpeed( uint8_t speed );
-    void activate( struct NightLampSettings *settings, bool test_mode = false );
+    void activate( struct NightLampSettings *settings, bool test_mode = false, bool force = false, uint8_t mode = LAMP_MODE_NOOVERRIDE );
     void deactivate( bool force = false );
     void processEvents();
     void setDelayOff( uint8_t delay );
@@ -60,7 +60,6 @@ class Lamp : public NeoPixel {
   private:
     uint8_t _delay_off = 0;
     uint8_t _mode = LAMP_MODE_OFF;
-    bool _nightLightMode = false;
 
     uint32_t _timerStart = 0;
 

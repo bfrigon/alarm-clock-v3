@@ -64,10 +64,7 @@ void Lamp::setBrightness( uint8_t brightness, bool force ) {
     }
 
     NeoPixel::setBrightness( brightness );
-
-    if( this->_mode != LAMP_MODE_OFF ) {
-        this->update();
-    }
+    this->update();
 }
 
 
@@ -93,10 +90,7 @@ void Lamp::setColorFromTable( uint8_t id, bool force ) {
     }
     
     NeoPixel::setColorFromTable( id );
-
-    if( this->_mode != LAMP_MODE_OFF ) {
-        this->update();
-    }
+    this->update();
 }
 
 
@@ -124,10 +118,7 @@ void Lamp::setColorRGB( uint8_t r, uint8_t g, uint8_t b, bool force ) {
     }
 
     NeoPixel::setColorRGB( r, g, b );
-
-    if( this->_mode != LAMP_MODE_OFF ) {
-        this->update();
-    }
+    this->update();
 }
 
 
@@ -167,6 +158,10 @@ void Lamp::setEffectSpeed( uint8_t speed ) {
  * Returns : Nothing
  */
 void Lamp::setDelayOff( uint8_t delay ) {
+    if( delay == this->_delay_off ) {
+        return;
+    }
+
     this->_delay_off = delay;
 
     if( this->_mode == LAMP_MODE_NIGHTLIGHT ) {
@@ -185,17 +180,24 @@ void Lamp::setDelayOff( uint8_t delay ) {
  * ---------
  *  - settings  : Structure containing the lamp settings.
  *  - test_mode : True to force the lamp to remain on.
+ *  - force     : Force activate even if night light active 
  *
  * Returns : Nothing
  */
-void Lamp::activate( struct NightLampSettings *settings, bool test_mode ) {
+void Lamp::activate( struct NightLampSettings *settings, bool test_mode, bool force, uint8_t mode ) {
 
-    if( this->_mode == LAMP_MODE_NIGHTLIGHT ) {
+    if( this->_mode == LAMP_MODE_NIGHTLIGHT && force == false ) {
         return;
     }
 
-    uint8_t mode;
-    mode = settings->mode;
+    if( mode == LAMP_MODE_NOOVERRIDE ) {
+
+        if( this->_mode == LAMP_MODE_NIGHTLIGHT ) {
+            mode = LAMP_MODE_NIGHTLIGHT;
+        } else {
+            mode = settings->mode;
+        } 
+    }
 
     if( test_mode == true && mode == LAMP_MODE_OFF ) {
         mode = LAMP_MODE_ON;
@@ -206,8 +208,8 @@ void Lamp::activate( struct NightLampSettings *settings, bool test_mode ) {
     this->_visualStepSpeed = settings->speed;
     this->_visualStepReverse = false;
     this->_timerStart = millis();
-    this->setColorFromTable( settings->color );
-    this->setBrightness( settings->brightness );
+    this->setColorFromTable( settings->color, force );
+    this->setBrightness( settings->brightness, force );
     this->_mode = mode;
 
     this->update();
@@ -240,11 +242,6 @@ void Lamp::activate( struct NightLampSettings *settings, bool test_mode ) {
 void Lamp::updateVisualStepDelay() {
 
     switch( this->_mode ) {
-        case LAMP_MODE_OFF:
-        case LAMP_MODE_ON:
-            this->_visualStepDelay = 0;
-            break;
-
         case LAMP_MODE_FLASHING:
             this->_visualStepDelay = 2500 / this->_visualStepSpeed;
             break;
@@ -256,6 +253,10 @@ void Lamp::updateVisualStepDelay() {
 
         case LAMP_MODE_RAINBOW:
             this->_visualStepDelay = 250 / this->_visualStepSpeed;
+            break;
+
+        default:
+            this->_visualStepDelay = 0;
             break;
     }
 }
@@ -274,11 +275,6 @@ void Lamp::updateVisualStepDelay() {
 void Lamp::deactivate( bool force ) {
 
     if( this->_mode == LAMP_MODE_NIGHTLIGHT && force == false ) {
-        return;
-    }
-
-    if( this->_mode == LAMP_MODE_OFF ) {
-        /* Alread off */
         return;
     }
 
@@ -305,14 +301,29 @@ void Lamp::processEvents() {
     }
 
     /* Check if the OFF delay is elapsed */
-    if( this->_delay_off > 0 && this->_mode == LAMP_MODE_NIGHTLIGHT ) {
+    if( this->_delay_off > 0 ) {
 
-        if( millis() >= this->_timerStart + ( this->_delay_off * 60000 ) ) {
+        uint32_t timerEnd;
+        timerEnd = this->_timerStart + ( this->_delay_off * 60000);
 
+        if( millis() >= timerEnd ) {
 
-            
-            
-            this->deactivate( true );
+            if( millis() >= timerEnd + 5000 ) {
+                this->deactivate( true );
+                return;
+
+            } else {
+
+                uint8_t brightness;
+                brightness = this->_settings->brightness - ((millis() - timerEnd) * this->_settings->brightness / 5000);
+
+                if ( brightness != this->_brightness ) {
+
+                    this->_brightness = brightness;
+                    this->update();
+                }
+            }
+
             return;
         }
     }

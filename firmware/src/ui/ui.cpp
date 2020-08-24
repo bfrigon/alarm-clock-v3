@@ -332,11 +332,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
                     g_lamp.activate( &g_alarm.profile.lamp, true );
 
                 } else {
-                    g_config.settings.lamp.mode = LAMP_MODE_OFF;
-                    g_lamp.activate( &g_config.settings.lamp, true );
-
-                    /* Disable delay off while editing lamp settings */
-                    g_lamp.setDelayOff( 0 );
+                    g_lamp.activate( &g_config.settings.lamp, true, true );
                 }
 
             } else {
@@ -673,9 +669,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
 
 void enableNightLamp() {
-
-    g_config.settings.lamp.mode = LAMP_MODE_NIGHTLIGHT;
-    g_lamp.activate( &g_config.settings.lamp );
+    g_lamp.activate( &g_config.settings.lamp, false, true, LAMP_MODE_NIGHTLIGHT );
 }
 
 void disableNightLamp() {

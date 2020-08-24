@@ -41,7 +41,7 @@
 #define MAX_LENGTH_ALARM_MESSAGE        16
 #define MAX_SSID_LENGTH                 32
 #define MAX_WKEY_LENGTH                 63
-#define MIN_CLOCK_BRIGHTNESS            15
+#define MIN_CLOCK_BRIGHTNESS            10
 #define MAX_CLOCK_BRIGHTNESS            80
 #define MIN_LAMP_BRIGHTNESS             5
 #define MAX_LAMP_BRIGHTNESS             100
