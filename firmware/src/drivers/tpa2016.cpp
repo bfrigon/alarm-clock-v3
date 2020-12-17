@@ -28,19 +28,29 @@
  *
  */
 TPA2016::TPA2016() {
-    this->_control = TPA2016_CTRL_NG;
+    _control = TPA2016_CTRL_NG_ON | TPA2016_CTRL_LSPK_OFF | TPA2016_CTRL_RSPK_OFF;
+    _attackTime = 5;
+    _releaseTime = 11;
+    _holdTime = 0;
+    _fixedGain = 6;
+    _outputLimiterDisabled = false;
+    _noiseGateThreshold = TPA2016_AGC_NG_THRESHOLD_4;
+    _outputLimiterLevel = 26;
+    _maxGain = 30;
+    _compression = TPA2016_COMPRESSION_4_1;
+
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Set hardware pins
  *
  * Arguments
  * ---------
- *  None
+ *  - pin_shutdown
  *
- * Returns : 
+ * Returns : Nothing
  */
 void TPA2016::setPins( int8_t pin_shutdown ) {
     this->_pin_shutdown = pin_shutdown;
@@ -49,20 +59,16 @@ void TPA2016::setPins( int8_t pin_shutdown ) {
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Initialize the amplifier IC
  *
  * Arguments
  * ---------
  *  None
  *
- * Returns : 
+ * Returns : Nothing
  */
 void TPA2016::begin() {
-    if( this->_init == true ) {
-        return;
-    }
-
-    this->_init = true;
+    _init = true;
 
     /* Disable shutdown mode */
     if( this->_pin_shutdown >= 0 ) {
@@ -71,19 +77,20 @@ void TPA2016::begin() {
         digitalWrite( this->_pin_shutdown, LOW );
     }
 
-
-    this->write( 0x01, 0b00000000 );
-    this->write( 0x02, 0 );
-    this->write( 0x03, 0 );
-    this->write( 0x04, 0 );
-    this->write( 0x06, 0b00110101 );
-    this->write( 0x07, 0b11000000 );
+    /* Sets all config registers with default values */
+    this->write( TPA2016_REG_CONTROL, _control );
+    this->setAttackTime( _attackTime );
+    this->setReleaseTime( _releaseTime );
+    this->setHoldTime( _holdTime );
+    this->setFixedGain( _fixedGain );
+    this->setLimiter( _outputLimiterDisabled, _outputLimiterLevel );
+    this->setCompression( _compression );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Deinitialize the amplifier IC
  *
  * Arguments
  * ---------
@@ -93,7 +100,7 @@ void TPA2016::begin() {
  */
 void TPA2016::end() {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
@@ -108,55 +115,65 @@ void TPA2016::end() {
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Enable left and right speaker outputs.
  *
  * Arguments
  * ---------
  *  None
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::enableOutputs() {
+bool TPA2016::enableOutputs() {
 
-    this->_control |= TPA2016_CTRL_LSPK;
-    this->_control |= TPA2016_CTRL_RSPK;
+    if( _init == false ) {
+        return false;
+    }
 
-    this->write( TPA2016_REG_CONTROL, this->_control );
-    this->write( 0x07, 0b11000000 );
+    this->_control |= TPA2016_CTRL_LSPK_ON;
+    this->_control |= TPA2016_CTRL_RSPK_ON;
 
+    return this->write( TPA2016_REG_CONTROL, this->_control );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Disable left and right speaker outputs.
  *
  * Arguments
  * ---------
  *  None
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::disableOutputs() {
+bool TPA2016::disableOutputs() {
 
-    this->_control &= ~TPA2016_CTRL_LSPK;
-    this->_control &= ~TPA2016_CTRL_RSPK;
+    if( _init == false ) {
+        return false;
+    }
 
-    this->write( TPA2016_REG_CONTROL, this->_control );
+    this->_control &= ~TPA2016_CTRL_LSPK_ON;
+    this->_control &= ~TPA2016_CTRL_RSPK_ON;
+
+    return this->write( TPA2016_REG_CONTROL, this->_control );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the fixed gain of the amplifier.
  *
  * Arguments
  * ---------
- *  None
+ *  - db : Gain value in decibel. Valid range -28dB to +30dB
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::setFixedGain( int8_t db ) {
+bool TPA2016::setFixedGain( int8_t db ) {
+
+    if( _init == false ) {
+        return false;
+    }
 
     if( db < -28 ) {
         db = -28;
@@ -166,111 +183,197 @@ void TPA2016::setFixedGain( int8_t db ) {
         db = 30;
     }
 
-    this->write( TPA2016_REG_FIXED_GAIN, db );
+    _fixedGain = db;
+
+    return this->write( TPA2016_REG_FIXED_GAIN, db );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the auto gain control attack time.
  *
  * Arguments
  * ---------
- *  None
+ *  - time : Number of steps 0-63. Each steps represents 0.1067 milliseconds.
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::setAttackTime( int8_t time ) {
+bool TPA2016::setAttackTime( int8_t time ) {
 
+    if( _init == false ) {
+        return false;
+    }
 
+    if( time > 63 ) {
+        time = 63;
+    }
+
+    _attackTime = time;
+
+    return this->write( TPA2016_REG_AGC_ATTACK, time );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the auto gain control release time.
  *
  * Arguments
  * ---------
- *  None
+ *  - time : Number of steps 0-63. Each steps represents 0.0137 seconds.
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::setReleaseTime( int8_t time ) {
+bool TPA2016::setReleaseTime( int8_t time ) {
 
+    if( _init == false ) {
+        return false;
+    }
+
+    if( time > 63 ) {
+        time = 63;
+    }
+
+    _releaseTime = time;
+
+    return this->write( TPA2016_REG_AGC_RELEASE, time );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the auto gain control hold time.
  *
  * Arguments
  * ---------
- *  None
+ *  - time : Number of steps 0-63. Each steps represents 0.0137 seconds.
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::setHoldTime( int8_t time ) {
+bool TPA2016::setHoldTime( int8_t time ) {
 
+    if( _init == false ) {
+        return false;
+    }
+
+    if( time > 63 ) {
+        time = 63;
+    }
+
+    _holdTime = time;
+
+    return this->write( TPA2016_REG_AGC_HOLD, time );
 }
+
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the maximum gain the auto gain control can acheive.
  *
  * Arguments
  * ---------
- *  None
+ - db : Value in decibel. Valid range from 18 dB to 30 dB
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::enableAGC( bool enabled ) {
+bool TPA2016::setMaxGain( int8_t db ) {
+
+    if( _init == false ) {
+        return false;
+    }
+
+    if( db > 30 ) {
+        db = 30;
+    }
+
+    if ( db < 18 ) {
+        db = 18;
+    }
+
+    _maxGain = db;
+
+    /* Stored in the same register as compression ratio */
+    return this->setCompression( _compression );
 
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the AGC compression ratio
  *
  * Arguments
  * ---------
- *  None
+ *  - compression : 0=Off, 1=2:1, 2=4:1, 3=8:1
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::setMaxGain( int8_t db ) {
+bool TPA2016::setCompression( uint8_t compression ) {
 
+    if( _init == false ) {
+        return false;
+    }
+
+    if( compression > 3 ) {
+        compression = 3;
+    }
+
+    _compression = compression;
+
+    
+
+    int8_t reg;
+    reg = _compression | ((( _maxGain - 18 ) & 0xF) << 4 );
+
+    return this->write( TPA2016_REG_AGC_CTRL2, reg );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Sets the output limiter level. 
  *
  * Arguments
  * ---------
- *  None
- *
- * Returns : 
+ *  - disabled : TRUE to disable the output limiter function, otherwise
+ *               enabled by default.
+ *  - level    : Limiter level in 0.5 dB steps from -6.5 dBV. 
+ *               0=-6.5dBV, 31=+9dBV
+ * 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::setCompression( uint8_t compression ) {
+bool TPA2016::setLimiter( bool disabled, int8_t level ) {
 
+    if( _init == false ) {
+        return false;
+    }
 
+    if( level > 31 ) {
+        level = 31;
+    }
+
+    int8_t reg;
+    reg = level | (( _noiseGateThreshold & 0x3 ) << 5 );
+
+    if( disabled ) {
+        reg |= TPA2016_AGC_LIMITER_DISABLED;
+    }
+
+    return this->write( TPA2016_REG_AGC_CTRL1, reg );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Prints the contents of the config register to the serial port
  *
  * Arguments
  * ---------
  *  None
  *
- * Returns : 
+ * Returns : Nothing
  */
 void TPA2016::dumpRegs() {
 
@@ -294,20 +397,31 @@ void TPA2016::dumpRegs() {
 
 /*--------------------------------------------------------------------------
  *
- *
+ * Write data to a config register
  *
  * Arguments
  * ---------
- *  None
+ *  - reg  : Register address
+ *  - data : Data to write
  *
- * Returns : 
+ * Returns : TRUE if successful, FALSE otherwise
  */
-void TPA2016::write( uint8_t reg, uint8_t data ) {
+bool TPA2016::write( uint8_t reg, uint8_t data ) {
 
     Wire.beginTransmission( TPA2016_I2C_ADDR );
 
-    Wire.write( reg );
-    Wire.write( data );
+    uint8_t ret;
+    ret = Wire.write( reg );
+    if( ret < 1 ) {
+        return false;
+    }
+
+    ret = Wire.write( data );
+    if( ret < 1 ) {
+        return false;
+    }
 
     Wire.endTransmission();
+
+    return true;
 }

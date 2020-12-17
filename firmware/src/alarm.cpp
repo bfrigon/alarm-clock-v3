@@ -101,6 +101,29 @@ void Alarm::end() {
 
 /*--------------------------------------------------------------------------
  *
+ * Initialize the TPA2016 amplifier 
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void Alarm::initAmplifier() {
+    this->_amplifier.begin();
+
+    this->_amplifier.setCompression( TPA2016_COMPRESSION_2_1 );
+    this->_amplifier.setFixedGain( -3 );
+    this->_amplifier.setMaxGain( 30 );
+    this->_amplifier.setLimiter( false, 17 );   /* +2dBV */
+    this->_amplifier.setAttackTime( 0 );
+    this->_amplifier.setReleaseTime( 0 );
+    this->_amplifier.setHoldTime( 0 );
+}
+
+
+/*--------------------------------------------------------------------------
+ *
  * Power up or down the codec and amplifier based on the current power mode
  *
  * Arguments
@@ -118,10 +141,12 @@ void Alarm::onPowerStateChange( uint8_t state ) {
     if( state != POWER_MODE_SUSPEND ) {
         VS1053::begin();
 
-        this->_amplifier.begin();
-        this->_amplifier.setFixedGain( 25 );
-
+        /* Initialize the TPA2017 amplifier */
+        this->initAmplifier();
+        
         delay( 50 );
+
+        this->_amplifier.dumpRegs();
 
     } else {
         this->_amplifier.end();
@@ -232,8 +257,6 @@ bool Alarm::detectSDCard() {
     this->_sd_present = true;
     return true;
 }
-
-
 
 
 /*--------------------------------------------------------------------------
@@ -717,7 +740,6 @@ void Alarm::setVolume( uint8_t vol ) {
     }
 
     this->_volume = vol;
-
     VS1053::setVolume( 100 - vol, 100 - vol );
 }
 

@@ -35,7 +35,7 @@
 #include "drivers/us2066.h"
 #include "drivers/neoclock.h"
 #include "drivers/neopixel.h"
-#include "drivers/wifi.h"
+#include "drivers/wifimanager.h"
 #include "drivers/bq27441.h"
 #include "drivers/power.h"
 #include "drivers/tsl2591.h"

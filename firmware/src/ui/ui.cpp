@@ -77,6 +77,8 @@ Screen screen_settings_manager( SCREEN_ID_SETTINGS_MANAGER, ITEMS_DIALOG_YESNO,
 Screen screen_batt_status( SCREEN_ID_BATT_STATUS, NULL,
                            NULL, &battStatus_onEnterScreen, NULL );
 
+Screen screen_net_status( SCREEN_ID_NET_STATUS, NULL,
+                           NULL, &netStatus_onEnterScreen, NULL );
 
 /*--------------------------------------------------------------------------
  *
@@ -143,6 +145,10 @@ void initScreens() {
     screen_batt_status.setCbTimeout( &battStatus_onTimeout );
     screen_batt_status.setCbKeypress( &battStatus_onKeypress );
     screen_batt_status.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
+
+    screen_net_status.setCbDrawScreen( &netStatus_onDrawScreen );
+    screen_net_status.setCbKeypress( &netStatus_onKeypress );
+    screen_net_status.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
 
     g_currentScreen = &screen_root;
     g_screenUpdate = true;
@@ -617,7 +623,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
             if( save == true ) {
                 g_config.save();
 
-                updateWifiConfig();
+                g_wifimanager.connect();
 
             } else {
                 g_config.load();

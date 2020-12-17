@@ -80,8 +80,6 @@ void ConfigManager::save() {
 
         EEPROM.update( EEPROM_ADDR_CONFIG + c, byte );
     }
-
-    Serial.println( "Written EEPROM" );
 }
 
 
@@ -121,6 +119,8 @@ void ConfigManager::reset() {
     this->settings.lamp.brightness = 60;
     this->settings.lamp.mode = LAMP_MODE_OFF;
     this->settings.lamp.color = COLOR_WHITE;
+
+    strcpy_P(&this->settings.hostname[0], S_DEFAULT_HOSTNAME );
 
 
     /* Store default config */
@@ -403,6 +403,9 @@ bool ConfigManager::readNextLine() {
         if( strcmp_P( name, SETTING_NAME_SECTION_CLOCK ) == 0 ) {
             this->_currentSectionID = SECTION_ID_CLOCK;
 
+        } else if( strcmp_P( name, SETTING_NAME_SECTION_ALS ) == 0 ) {
+            this->_currentSectionID = SECTION_ID_ALS;
+
         } else if( strcmp_P( name, SETTING_NAME_SECTION_LAMP ) == 0 ) {
             this->_currentSectionID = SECTION_ID_LAMP;
 
@@ -456,6 +459,9 @@ bool ConfigManager::readNextLine() {
     } else if( this->matchSettingName( name, SETTING_NAME_DATEFMT, SECTION_ID_LCD ) == true ) {
         this->parseSettingValue( value, &this->settings.date_format, SETTING_TYPE_INTEGER, 0, MAX_DATE_FORMATS - 1 );
 
+    } else if( this->matchSettingName( name, SETTING_NAME_ALS_PRESET, SECTION_ID_ALS ) == true ) {
+        this->parseSettingValue( value, &this->settings.als_preset, SETTING_TYPE_INTEGER, 0, MAX_ALS_PRESETS_NAMES - 1 );
+
     } else if( this->matchSettingName( name, SETTING_NAME_CONTRAST, SECTION_ID_LCD ) == true ) {
         this->parseSettingValue( value, &this->settings.lcd_contrast, SETTING_TYPE_INTEGER,
                                  MIN_LCD_CONTRAST, MAX_LCD_CONTRAST );
@@ -485,6 +491,9 @@ bool ConfigManager::readNextLine() {
 
     } else if( this->matchSettingName( name, SETTING_NAME_DNS, SECTION_ID_NETWORK ) == true ) {
         this->parseSettingValue( value, &this->settings.net_dns, SETTING_TYPE_IP );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_HOSTNAME, SECTION_ID_NETWORK ) == true ) {
+        this->parseSettingValue( value, &this->settings.hostname, SETTING_TYPE_STRING, 0, MAX_HOSTNAME_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_SSID, SECTION_ID_NETWORK ) == true ) {
         this->parseSettingValue( value, &this->settings.ssid, SETTING_TYPE_STRING, 0, MAX_SSID_LENGTH );
@@ -821,6 +830,11 @@ bool ConfigManager::writeNextLine()  {
             this->writeConfigLine( SETTING_NAME_BRIGHTNESS, SETTING_TYPE_INTEGER, &this->settings.clock_brightness );
             break;
 
+        case SETTING_ID_ALS_PRESET:
+            this->writeConfigLine( SETTING_NAME_SECTION_ALS, SETTING_TYPE_SECTION, NULL );
+            this->writeConfigLine( SETTING_NAME_ALS_PRESET, SETTING_TYPE_INTEGER, &this->settings.als_preset );
+            break;
+
         case SETTING_ID_LCD_DATEFMT:
             this->writeConfigLine( SETTING_NAME_SECTION_LCD, SETTING_TYPE_SECTION, NULL );
             this->writeConfigLine( SETTING_NAME_DATEFMT, SETTING_TYPE_INTEGER, &this->settings.date_format );
@@ -862,6 +876,10 @@ bool ConfigManager::writeNextLine()  {
 
         case SETTING_ID_NETWORK_DNS:
             this->writeConfigLine( SETTING_NAME_DNS, SETTING_TYPE_IP, &this->settings.net_dns );
+            break;
+
+        case SETTING_ID_NETWORK_HOSTNAME:
+            this->writeConfigLine( SETTING_NAME_HOSTNAME, SETTING_TYPE_STRING, &this->settings.hostname );
             break;
 
         case SETTING_ID_NETWORK_SSID:

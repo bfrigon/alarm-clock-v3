@@ -115,6 +115,7 @@ class Alarm : private VS1053, public Task {
     void audioStop();
     void audioStart();
     inline void updateVisualStepDelay();
+    void initAmplifier();
 
     uint8_t _pin_sd_detect;
     uint8_t _pin_sd_cs;

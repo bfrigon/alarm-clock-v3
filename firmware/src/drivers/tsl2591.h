@@ -22,6 +22,8 @@
 #include <Wire.h>
 #include "../libs/task.h"
 
+#define TSL2591_LUX_DF          428.0F
+
 #define TSL2591_I2C_ADDR        0x29
 
 #define TSL2591_REG_ENABLE      0x00
@@ -59,6 +61,7 @@
 #define TSL2591_INTEGRATION_400MS   0x03
 #define TSL2591_INTEGRATION_500MS   0x04
 #define TSL2591_INTEGRATION_600MS   0x05
+#define TSL2591_INTEGRATION_MAX     0x05
 
 
 #define TSL2591_ENABLE_PON          0x01
@@ -93,8 +96,10 @@ class TSL2591 : public Task {
 
     bool _init = false;
     uint32_t _lastIntegrationStart;
+    uint8_t _integration;
+    uint8_t _gain;
     uint8_t _integrationDelay;
-    uint8_t _lux;
+    float _lux;
 
 };
 

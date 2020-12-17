@@ -53,15 +53,15 @@ QT1070::QT1070( uint8_t pin_irq ) {
 
     /* Initialize Keypad touch IC */
     this->config.nthr[3] = 30;   /* Menu */
-    this->config.aks[3] = { 0x00, 0x08 };
+    this->config.aks[3] = { 0x00, 0x16 };
     this->config.di[3] = 0x02;
 
     this->config.nthr[1] = 30;   /* Alarm */
-    this->config.aks[1] = { 0x00, 0x08 };
+    this->config.aks[1] = { 0x00, 0x16 };
     this->config.di[1] = 0x02;
 
     this->config.nthr[2] = 45;   /* Set */
-    this->config.aks[2] = { 0x00, 0x08 };
+    this->config.aks[2] = { 0x00, 0x16 };
     this->config.di[2] = 0x02;
 }
 

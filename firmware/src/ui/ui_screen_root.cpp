@@ -18,6 +18,7 @@
 #include "ui.h"
 
 
+
 uint8_t g_prevBattState = 0;
 
 
@@ -51,6 +52,11 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
             screen_show_alarms.activate( true, &screen_root );
             break;
 
+        case KEY_SET:
+            Serial.println( "Start resolve ");
+            g_wifimanager.startHostnameResolve( "www.google.com" );
+            break;
+
         default:
             return true;
     }
@@ -73,12 +79,11 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
 
     char buffer[16];
 
+    g_lcd.setPosition( 0, 0 );
+    g_lcd.print( ( g_wifimanager.isConnected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
+
     /* Print status icons */
-    g_lcd.setPosition( 0, 12 );
-
-    //g_lcd.print( ( g_wifi.connected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
-    g_lcd.print( CHAR_SPACE ); /* Temporary */
-
+    g_lcd.setPosition( 0, 13 );
     g_lcd.print( ( g_alarm.isSDCardPresent() == false ) ? CHAR_NO_SD : CHAR_SPACE );
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
@@ -87,7 +92,6 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
     } else {
         g_lcd.print( CHAR_SPACE );
     }
-
 
     switch( g_battery.getBatteryState() ) {
         case BATTERY_STATE_NOT_PRESENT:

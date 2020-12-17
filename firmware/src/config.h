@@ -40,6 +40,7 @@
 #define MAX_LENGTH_ALARM_FILENAME       12
 #define MAX_LENGTH_ALARM_MESSAGE        16
 #define MAX_SSID_LENGTH                 32
+#define MAX_HOSTNAME_LENGTH             64
 #define MAX_WKEY_LENGTH                 63
 #define MIN_CLOCK_BRIGHTNESS            10
 #define MAX_CLOCK_BRIGHTNESS            80
@@ -87,6 +88,7 @@ PROG_STR( COMMENT_FILE_HEADER,
           "; -----------------------\r\n" );
 
 PROG_STR( SETTING_NAME_SECTION_CLOCK,       "clock" );
+PROG_STR( SETTING_NAME_SECTION_ALS,         "als" );
 PROG_STR( SETTING_NAME_SECTION_LCD,         "lcd" );
 PROG_STR( SETTING_NAME_SECTION_LAMP,        "lamp" );
 PROG_STR( SETTING_NAME_SECTION_NETWORK,     "network" );
@@ -96,6 +98,7 @@ PROG_STR( SETTING_NAME_COLOR,               "color" );
 PROG_STR( SETTING_NAME_BRIGHTNESS,          "brightness" );
 PROG_STR( SETTING_NAME_DELAY,               "delay" );
 PROG_STR( SETTING_NAME_DATEFMT,             "datefmt" );
+PROG_STR( SETTING_NAME_ALS_PRESET,          "preset" );
 PROG_STR( SETTING_NAME_CONTRAST,            "contrast" );
 PROG_STR( SETTING_NAME_VOLUME,              "volume" );
 PROG_STR( SETTING_NAME_TIME,                "time" );
@@ -111,6 +114,7 @@ PROG_STR( SETTING_NAME_MASK,                "mask" );
 PROG_STR( SETTING_NAME_GATEWAY,             "gateway" );
 PROG_STR( SETTING_NAME_DNS,                 "dns" );
 PROG_STR( SETTING_NAME_SSID,                "ssid" );
+PROG_STR( SETTING_NAME_HOSTNAME,            "hostname" );
 PROG_STR( SETTING_NAME_WKEY,                "passphrase" );
 PROG_STR( SETTING_NAME_ENABLED,             "enabled" );
 PROG_STR( SETTING_NAME_SNOOZE,              "snooze" );
@@ -123,43 +127,48 @@ PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 #define SETTING_ID_CLOCK_24H                1   /* Begin clock section */
 #define SETTING_ID_CLOCK_COLOR              2
 #define SETTING_ID_CLOCK_BRIGHTNESS         3
-#define SETTING_ID_LCD_DATEFMT              4   /* Begin LCD section */
-#define SETTING_ID_LCD_CONTRAST             5
-#define SETTING_ID_LAMP_COLOR               6
-#define SETTING_ID_LAMP_BRIGHTNESS          7
-#define SETTING_ID_LAMP_DELAY               8
-#define SETTING_ID_NETWORK_DHCP             9   /* Begin network section */
-#define SETTING_ID_NETWORK_IP               10
-#define SETTING_ID_NETWORK_MASK             11
-#define SETTING_ID_NETWORK_GATEWAY          12
-#define SETTING_ID_NETWORK_DNS              13
-#define SETTING_ID_NETWORK_SSID             14
-#define SETTING_ID_NETWORK_WKEY             15
-#define SETTING_ID_ALARM_BEGIN              16  /* Begin alarm section */
-#define SETTING_ID_ALARM_ENABLED            16
-#define SETTING_ID_ALARM_FILENAME           17
-#define SETTING_ID_ALARM_TIME               18
-#define SETTING_ID_ALARM_SNOOZE             19
-#define SETTING_ID_ALARM_VOLUME             20
-#define SETTING_ID_ALARM_GRADUAL            21
-#define SETTING_ID_ALARM_DOW                22
-#define SETTING_ID_ALARM_MESSAGE            23
-#define SETTING_ID_ALARM_VISUAL             24
-#define SETTING_ID_ALARM_VISUAL_SPEED       25
-#define SETTING_ID_ALARM_LAMP_MODE          26
-#define SETTING_ID_ALARM_LAMP_SPEED         27
-#define SETTING_ID_ALARM_LAMP_COLOR         28
-#define SETTING_ID_ALARM_LAMP_BRIGHTNESS    29
-#define SETTING_ID_END                      29
+#define SETTING_ID_ALS_PRESET               4   /* Begin ALS section */
+#define SETTING_ID_LCD_DATEFMT              5   /* Begin LCD section */
+#define SETTING_ID_LCD_CONTRAST             6
+#define SETTING_ID_LAMP_COLOR               7
+#define SETTING_ID_LAMP_BRIGHTNESS          8
+#define SETTING_ID_LAMP_DELAY               9
+#define SETTING_ID_NETWORK_DHCP             10  /* Begin network section */
+#define SETTING_ID_NETWORK_IP               11
+#define SETTING_ID_NETWORK_MASK             12
+#define SETTING_ID_NETWORK_GATEWAY          13
+#define SETTING_ID_NETWORK_DNS              14
+#define SETTING_ID_NETWORK_SSID             15
+#define SETTING_ID_NETWORK_HOSTNAME         16
+#define SETTING_ID_NETWORK_WKEY             17
+
+#define SETTING_ID_ALARM_BEGIN              18  /* Begin alarm section */
+#define SETTING_ID_ALARM_ENABLED            18
+#define SETTING_ID_ALARM_FILENAME           19
+#define SETTING_ID_ALARM_TIME               20
+#define SETTING_ID_ALARM_SNOOZE             21
+#define SETTING_ID_ALARM_VOLUME             22
+#define SETTING_ID_ALARM_GRADUAL            23
+#define SETTING_ID_ALARM_DOW                24
+#define SETTING_ID_ALARM_MESSAGE            25
+#define SETTING_ID_ALARM_VISUAL             26
+#define SETTING_ID_ALARM_VISUAL_SPEED       27
+#define SETTING_ID_ALARM_LAMP_MODE          28
+#define SETTING_ID_ALARM_LAMP_SPEED         29
+#define SETTING_ID_ALARM_LAMP_COLOR         30
+#define SETTING_ID_ALARM_LAMP_BRIGHTNESS    31
+
+#define SETTING_ID_END                      31
 
 /* Section ID's */
 #define SECTION_ID_UNKNOWN                  0
 #define SECTION_ID_ANY                      0
 #define SECTION_ID_CLOCK                    1
-#define SECTION_ID_LCD                      2
-#define SECTION_ID_LAMP                     3
-#define SECTION_ID_NETWORK                  4
-#define SECTION_ID_ALARM                    5
+#define SECTION_ID_ALS                      2
+#define SECTION_ID_LCD                      3
+#define SECTION_ID_LAMP                     4
+#define SECTION_ID_NETWORK                  5
+#define SECTION_ID_ALARM                    6
 
 /* Setting parser token types */
 #define TOKEN_NAME                          0
@@ -223,21 +232,23 @@ struct GlobalSettings {
     bool alarm_on[2] = { false, false };
 
     bool net_dhcp = true;
-    uint8_t net_ip[4] = { 10, 0, 0, 125 };
-    uint8_t net_mask[4] = { 255, 255, 192, 0 };
-    uint8_t net_gateway[4] = { 10, 0, 0, 1 };
-    uint8_t net_dns[4] = { 10, 0, 0, 1 };
+    uint8_t net_ip[4] = { 0, 0, 0, 0 };
+    uint8_t net_mask[4] = { 255, 255, 255, 0 };
+    uint8_t net_gateway[4] = { 0, 0, 0, 0 };
+    uint8_t net_dns[4] = { 0, 0, 0, 0 };
 
     uint8_t clock_color = 1;
     uint8_t clock_brightness = 40;
     uint8_t lcd_contrast = 50;
     uint8_t date_format = 0;
+    uint8_t als_preset = 0;
 
 
     struct NightLampSettings lamp;
 
     char ssid[ MAX_SSID_LENGTH + 1 ];
     char wkey[ MAX_WKEY_LENGTH + 1 ];
+    char hostname[ MAX_HOSTNAME_LENGTH + 1 ];
 };
 
 

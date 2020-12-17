@@ -22,6 +22,7 @@
 
 Alarm g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
                PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
+WiFiManager g_wifimanager( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
 NeoClock g_clock( PIN_NEOCLOCK, PIN_PIX_SHDN );
 Lamp g_lamp( PIN_PIX_LAMP );
 QT1070 g_keypad( PIN_INT_KEYPAD );
@@ -119,7 +120,7 @@ void setup() {
 
     /* Initialize ambiant light detector */
     g_als.begin();
-    g_als.configure( TSL2591_GAIN_HIGH, TSL2591_INTEGRATION_500MS );
+    g_als.configure( TSL2591_GAIN_HIGH, TSL2591_INTEGRATION_200MS );
 
     /* Check for factory reset sequence */
     if( checkFactoryReset() == false ) {
@@ -154,14 +155,11 @@ void setup() {
     /* Initialize audio system */
     g_alarm.begin();
 
-
-
-    //enableWifi();
-
-
     /* Enable watchdog timer */
     g_power.enableWatchdog();
 
+    /* Initialize WIFI driver */
+    g_wifimanager.begin();
 }
 
 
@@ -180,8 +178,6 @@ void loop() {
 
     /* If an RTC interrupt occured, read the current time */
     g_rtc.processEvents();
-
-    
     
     /* Update the Clock display if needed */
     g_clock.runTask();
@@ -213,6 +209,19 @@ void loop() {
 
     /* Run ambiand light sensor tasks */
     g_als.runTask();
+
+    /* Process WIFI driver events */
+    g_wifimanager.runTask();
+
+    IPAddress test;
+    if( g_wifimanager.getHostnameResolveResults( test ) == true ) {
+
+        if( test != 0 ) {
+            Serial.print( "Resolve : " );
+            test.printTo( Serial );
+            Serial.println( "" );
+        }
+        
+        
+    }
 }
-
-

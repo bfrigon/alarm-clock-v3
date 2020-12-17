@@ -115,6 +115,8 @@ PROG_STR( S_MENU_NETWORK_IP,            "IP Address" );
 PROG_STR( S_MENU_NETWORK_MASK,          "Mask" );
 PROG_STR( S_MENU_NETWORK_GATEWAY,       "Gateway" );
 PROG_STR( S_MENU_NETWORK_DNS,           "DNS" );
+PROG_STR( S_MENU_NETWORK_HOSTNAME,      "Hostname" );
+PROG_STR( S_MENU_NETWORK_STATUS,        "Network status" );
 
 /* Settings menu strings */
 PROG_STR( S_MENU_SETTINGS_BACKUP,       "Backup" );
@@ -122,21 +124,19 @@ PROG_STR( S_MENU_SETTINGS_RESTORE,      "Restore" );
 PROG_STR( S_MENU_SETTINGS_RESET,        "Factory reset" );
 PROG_STR( S_MENU_SETTINGS_BATT_INFO,    "Battery status" );
 
-
-
-
 /* Display settings menu strings */
 PROG_STR( S_MENU_SETTINGS_24H,          "24H format" );
 PROG_STR( S_MENU_SETTINGS_COLOR,        "Color" );
 PROG_STR( S_MENU_SETTINGS_BRIGHT,       "Brightness" );
 PROG_STR( S_MENU_SETTINGS_LCD_CTR,      "LCD contrast" );
 PROG_STR( S_MENU_SETTINGS_DATE_FMT,     "Date format" );
+PROG_STR( S_MENU_SETTINGS_ALS_PRESET,   "ALS preset");
 
 /* List profile screen */
 PROG_STR( S_EDIT_ALARM_1,               "Alarm #1..." );
 PROG_STR( S_EDIT_ALARM_2,               "Alarm #2..." );
 
-
+/* Edit profile menu */
 PROG_STR( S_EDIT_PROFILE_FILENAME,      "Sound file" );
 PROG_STR( S_EDIT_PROFILE_SNOOZE,        "Snooze delay" );
 PROG_STR( S_EDIT_PROFILE_VOLUME,        "Volume" );
@@ -145,10 +145,10 @@ PROG_STR( S_EDIT_PROFILE_VISUAL,        "Visual effect" );
 PROG_STR( S_EDIT_PROFILE_LAMP,          "Alarm lamp" );
 PROG_STR( S_EDIT_PROFILE_MESSAGE,       "Message" );
 PROG_STR( S_EDIT_PROFILE_TEST,          "Test..." );
-
 PROG_STR( S_EDIT_PROFILE_VISUAL_MODE,   "Effect type" );
 PROG_STR( S_EDIT_PROFILE_VISUAL_SPEED,  "Speed" );
 
+/* Night lamp config menu */
 PROG_STR( S_NIGHT_LAMP_COLOR,           "Color" );
 PROG_STR( S_NIGHT_LAMP_BRIGHTNESS,      "Brightness" );
 PROG_STR( S_NIGHT_LAMP_EFFECT,          "Mode" );
@@ -195,6 +195,12 @@ PROG_STR( S_BATT_NO_SOH,                "SOH : n/a" );
 PROG_STR( S_BATT_NO_CURRENT,            "Cur: n/a" );
 PROG_STR( S_BATT_NO_POWER,              "Pwr: n/a" );
 
+/* Network status screen */
+PROG_STR( S_NETINFO_IP,                 "%d.%d.%d.%d" );
+PROG_STR( S_SSID,                       "SSID" );
+
+
+PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 
 //--------------------------------------------------------------------------
 //
@@ -216,13 +222,19 @@ const char _MONTHS[ 12 ][ 10 ] PROGMEM = {
     "July", "August", "September", "October", "November", "December"
 };
 
-const char _DAYS_SHORT[ 12 ][ 4 ] PROGMEM = {
+const char _DAYS_SHORT[ 7 ][ 4 ] PROGMEM = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
 
-const char _DAYS[ 12 ][ 10 ] PROGMEM = {
+const char _DAYS[ 7 ][ 10 ] PROGMEM = {
     "Sunday", "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday"
+};
+
+#define MAX_ALS_PRESETS_NAMES   4
+#define ALS_PRESET_NAME_LENGTH  8
+const char _ALS_PRESET_NAMES[ MAX_ALS_PRESETS_NAMES ][ ALS_PRESET_NAME_LENGTH + 1 ] PROGMEM = {
+    "Disabled", "Low", "Medium", "High"
 };
 
 

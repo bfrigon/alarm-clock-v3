@@ -104,10 +104,12 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
     this->resetSuspendDelay();
 
     /* Update modules power state */
+    g_wifimanager.onPowerStateChange( mode );
     g_clock.onPowerStateChange( mode );
     g_lamp.onPowerStateChange( mode );
     g_alarm.onPowerStateChange( mode );
     g_als.onPowerStateChange( mode );
+    
 
     g_screenUpdate = true;
 

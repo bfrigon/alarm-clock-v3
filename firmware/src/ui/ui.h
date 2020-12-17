@@ -60,6 +60,7 @@
 #define ID_CLOCK_BRIGHTNESS         22
 #define ID_LCD_CONTRAST             23
 #define ID_DATE_FORMAT              24
+#define ID_ALS_PRESET               25
 
 /* --- Network settings screen --- */
 #define ID_NETWORK_DHCP             30
@@ -67,6 +68,8 @@
 #define ID_NETWORK_MASK             32
 #define ID_NETWORK_GATEWAY          33
 #define ID_NETWORK_DNS              34
+#define ID_NETWORK_HOSTNAME         35
+#define ID_NETWORK_STATUS           36
 
 /* --- Edit profile screen / edit alarm screen --- */
 #define ID_PROFILE_FILENAME         40
@@ -97,11 +100,10 @@
 #define ID_SETTINGS_FACTORY_RESET   82
 #define ID_SETTINGS_BATT_STATUS     83
 
+
 /* --- YES/NO dialog screen --- */
 #define ID_DIALOG_YES               250
 #define ID_DIALOG_NO                251
-
-
 
 
 
@@ -125,6 +127,7 @@
 #define SCREEN_ID_MENU_SETTINGS     14
 #define SCREEN_ID_SETTINGS_MANAGER  15
 #define SCREEN_ID_BATT_STATUS       16
+#define SCREEN_ID_NET_STATUS        17
 
 
 
@@ -168,6 +171,10 @@ void battStatus_onTimeout( Screen* screen );
 bool battStatus_onEnterScreen( Screen* screen );
 bool battStatus_onKeypress( Screen* screen, uint8_t key );
 
+bool netStatus_onDrawScreen( Screen* screen );
+bool netStatus_onEnterScreen( Screen* screen );
+bool netStatus_onKeypress( Screen* screen, uint8_t key );
+
 
 extern struct Time adjTime;
 extern struct Date adjDate;
@@ -191,6 +198,7 @@ extern Screen screen_alarm;
 extern Screen screen_menu_settings;
 extern Screen screen_settings_manager;
 extern Screen screen_batt_status;
+extern Screen screen_net_status;
 
 
 //--------------------------------------------------------------------------
@@ -216,6 +224,11 @@ PROGMEM const struct ScreenItemBase ITEMS_DISPLAY_SETTINGS[] = {
     ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.settings.date_format,
                _DATE_FORMATS, 0, MAX_DATE_FORMATS - 1, DATE_FORMAT_LENGTH,
                ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_LIST( ID_ALS_PRESET, 5, 0, S_MENU_SETTINGS_ALS_PRESET, &g_config.settings.als_preset,
+               _ALS_PRESET_NAMES, 0, MAX_ALS_PRESETS_NAMES - 1, ALS_PRESET_NAME_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
     ITEM_END()
 };
 
@@ -261,11 +274,14 @@ PROGMEM const struct ScreenItemBase ITEMS_LIST_PROFILES[] = {
 
 /* Network menu items */
 PROGMEM const struct ScreenItemBase ITEMS_NETWORK[] = {
-    ITEM_TOGGLE( ID_NETWORK_DHCP, 0, 0, S_MENU_NETWORK_DHCP, &g_config.settings.net_dhcp, ITEM_NORMAL ),
-    ITEM_IP( ID_NETWORK_IP, 1, 0, S_MENU_NETWORK_IP, &g_config.settings.net_ip, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_MASK, 2, 0, S_MENU_NETWORK_MASK, &g_config.settings.net_mask, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_GATEWAY, 3, 0, S_MENU_NETWORK_GATEWAY, &g_config.settings.net_gateway, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_DNS, 4, 0, S_MENU_NETWORK_DNS, &g_config.settings.net_dns, ITEM_EDIT_FULLSCREEN ),
+    ITEM_LINK( ID_NETWORK_STATUS, 0, 0, S_MENU_NETWORK_STATUS, &screen_net_status, ITEM_NORMAL ),
+    ITEM_TOGGLE( ID_NETWORK_DHCP, 1, 0, S_MENU_NETWORK_DHCP, &g_config.settings.net_dhcp, ITEM_NORMAL ),
+    ITEM_IP( ID_NETWORK_IP, 2, 0, S_MENU_NETWORK_IP, &g_config.settings.net_ip, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_MASK, 3, 0, S_MENU_NETWORK_MASK, &g_config.settings.net_mask, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_GATEWAY, 4, 0, S_MENU_NETWORK_GATEWAY, &g_config.settings.net_gateway, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_DNS, 5, 0, S_MENU_NETWORK_DNS, &g_config.settings.net_dns, ITEM_EDIT_FULLSCREEN ),
+    ITEM_TEXT( ID_NETWORK_HOSTNAME, 6, 0, S_MENU_NETWORK_HOSTNAME, &g_config.settings.hostname,
+               MAX_HOSTNAME_LENGTH, ITEM_EDIT_FULLSCREEN ),
     ITEM_END()
 };
 
