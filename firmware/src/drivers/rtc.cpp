@@ -214,11 +214,11 @@ void DS3231::dumpRegs() {
     uint8_t i;
 
     for( i = 0; i < 18; i++ ) {
-        Serial.print( F( "Register 0x" ) );
-        Serial.print( i, HEX );
-        Serial.print( F( ": " ) );
-        Serial.print( Wire.read(), BIN );
-        Serial.println( "" );
+        //Serial.print( F( "Register 0x" ) );
+        //Serial.print( i, HEX );
+        //Serial.print( F( ": " ) );
+        //Serial.print( Wire.read(), BIN );
+        //Serial.println( "" );
     }
 }
 

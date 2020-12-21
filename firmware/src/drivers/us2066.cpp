@@ -30,6 +30,9 @@
 US2066::US2066( uint8_t address, uint8_t pin_reset ) {
     this->_address = address;
     this->_pin_reset = pin_reset;
+
+    /* Initialize IPrint interface */
+    this->_initPrint();
 }
 
 
@@ -59,12 +62,6 @@ void US2066::begin() {
     digitalWrite( this->_pin_reset, HIGH );
     delay( 1 );
 
-
-    /* Setup stream for printf function */
-    fdev_setup_stream( &this->_lcdout, this->_putchar, NULL, _FDEV_SETUP_WRITE );
-    fdev_set_udata( &this->_lcdout, ( void * )this );
-
-
     /* Disable internal regulator */
     this->selectInstructions( US2066_ISET_EXTENDED );   /* RE=1, SD=0 */
     this->sendCommand( US2066_CMD_FUNC_A, US2066_INTERNAL_VDD_OFF );
@@ -90,8 +87,6 @@ void US2066::begin() {
     /* Set SEG pins HW config */
     this->selectInstructions( US2066_ISET_OLED );       /* RE=1, SD=1 */
     this->sendCommand( US2066_CMD_SEG_HW, US2066_SEG_ALT | US2066_LR_DISABLED );
-
-
 
     /* Set contrast */
     this->sendCommand( US2066_CMD_CONTRAST, 128 );
@@ -486,10 +481,6 @@ void US2066::fill( char c, uint8_t num ) {
         return;
     }
 
-    if( this->_init == false ) {
-        this->begin();
-    }
-
     while( num-- ) {
         this->print( c );
     }
@@ -498,20 +489,16 @@ void US2066::fill( char c, uint8_t num ) {
 
 /*--------------------------------------------------------------------------
  *
- * Prints a single character on the LCD module at the current coordinates.
+ * IPrint interface callback for printing a single character. Sends the 
+ * output to the LCD module at the current coordinates.
  *
  * Arguments
  * ---------
  *  - c : Character to print
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * Returns : Number of bytes written
  */
-uint8_t US2066::print( char c ) {
+uint8_t US2066::_print( char c ) {
     if( this->_init == false ) {
         this->begin();
     }
@@ -521,237 +508,5 @@ uint8_t US2066::print( char c ) {
     Wire.write( US2066_MODE_DATA );
     Wire.write( c );
 
-    return Wire.endTransmission();
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Prints a string on the LCD module at the current coordinates.
- *
- * Arguments
- * ---------
- *  - str           : Pointer to the string to print.
- *  - ptr_pgm_space : True if 'str' points to a program memory location, false otherwize
- *
- * Returns : Number of characters written
- */
-uint8_t US2066::print( const char *str, bool ptr_pgm_space ) {
-    if( this->_init == false ) {
-        this->begin();
-    }
-
-    uint8_t num = 0;
-
-    if( this->_init == false ) {
-        this->begin();
-    }
-
-
-    while( true ) {
-
-        char c;
-
-        if( ptr_pgm_space == true ) {
-            c = pgm_read_byte( str++ );
-
-        } else {
-            c = *str++;
-        }
-
-        if( c == 0x00 ) {
-            break;
-        }
-
-        if( this->print( c ) != 0 ) {
-            return num;
-        }
-
-        num++;
-    }
-
-    return num;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Prints a string with padding on the LCD module at the current coordinates.
- *
- * Arguments
- * ---------
- *  - str           : Pointer to the string to print.
- *  - length        : Maximum number of characters to print, including padding
- *  - align         : Text alignment ( TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT )
- *  - ptr_pgm_space : True if 'str' points to a program memory location, false otherwize
- *
- * Returns : Number of characters written
- */
-uint8_t US2066::print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space ) {
-    uint8_t res;
-    uint8_t num = 0;
-    uint8_t slen;
-    uint8_t pre_padding;
-    uint8_t post_padding;
-
-    if( this->_init == false ) {
-        this->begin();
-    }
-
-    if( ptr_pgm_space == true ) {
-        slen = strlen_P( str );
-
-    } else {
-        slen = strlen( str );
-    }
-
-    if( slen < length ) {
-        switch( align ) {
-            case TEXT_ALIGN_CENTER:
-                pre_padding = ( length - slen ) / 2 ;
-                post_padding = length - slen - pre_padding;
-                break;
-
-            case TEXT_ALIGN_RIGHT:
-                pre_padding = length - slen;
-                post_padding = 0;
-                break;
-
-            /* TEXT_ALIGN_LEFT */
-            default:
-                pre_padding = 0;
-                post_padding = length - slen;
-                break;
-        }
-
-    } else {
-        pre_padding = 0;
-        post_padding = 0;
-    }
-
-
-    uint8_t i;
-
-    for( i = 0; i < length; i++ ) {
-
-        if( pre_padding > 0 ) {
-            if( this->print( CHAR_SPACE ) != 0 ) {
-                return num;
-            }
-
-            pre_padding--;
-            num++;
-            continue;
-        }
-
-        if( slen > 0 ) {
-
-            if( ptr_pgm_space == true ) {
-                res = this->print( pgm_read_byte( str++ ) );
-
-            } else {
-                res = this->print( *str++ );
-            }
-
-
-            if( res != 0 ) {
-                return num;
-            }
-
-            slen--;
-            num++;
-            continue;
-        }
-
-        if( post_padding > 0 ) {
-            if( this->print( CHAR_SPACE ) != 0 ) {
-                return num;
-            }
-
-            post_padding--;
-            num++;
-            continue;
-        }
-    }
-
-    return num;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Prints a formated string on the LCD module at the current coordinates.
- *
- * Arguments
- * ---------
- *  - format : Pointer to the string to print.
- *  - ...    : Additional arguments.
- *
- * Returns : Number of characters printed.
- */
-uint8_t US2066::printf( const char *format, ... ) {
-
-    if( this->_init == false ) {
-        this->begin();
-    }
-
-    va_list args;
-    va_start( args, format );
-
-    uint8_t length;
-    length = vfprintf( &this->_lcdout, format, args );
-
-    va_end( args );
-
-    return length;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Prints a formated string on the LCD module at the current coordinates
- * using format string stored in program memory.
- *
- * Arguments
- * ---------
- *  - format : Pointer to the string to print.
- *  - ...    : Additional arguments.
- *
- * Returns : Number of characters printed.
- */
-uint8_t US2066::printf_P( const char *format, ... ) {
-
-    if( this->_init == false ) {
-        this->begin();
-    }
-
-    va_list args;
-    va_start( args, format );
-
-    uint8_t length;
-    length = vfprintf_P( &this->_lcdout, format, args );
-
-    va_end( args );
-
-    return length;
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Write callback function for the output stream.
- *
- * Arguments
- * ---------
- *  - format : Pointer to the string to print.
- *  - args   : Variable argument list.
- *
- * Returns : Number of characters printed.
- */
-int US2066::_putchar( char ch, FILE *stream ) {
-
-    US2066 *lcd;
-    lcd = ( US2066* )fdev_get_udata( stream );
-    
-    return lcd->print( ch );
+    return ( Wire.endTransmission() == 0 ? 1 : 0 );
 }

@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/task.cpp
+// File    : src/libs/itask.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,23 +15,23 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "task.h"
+#include "itask.h"
 
 
-bool Task::isBusy() {
+bool ITask::isBusy() {
     return this->_currentTask != TASK_NONE;
 }
 
-uint8_t Task::getCurrentTask() {
+uint8_t ITask::getCurrentTask() {
     return this->_currentTask;
 }
 
-int Task::getTaskError() {
+int ITask::getTaskError() {
     return this->_taskError;
 }
 
 
-uint8_t Task::startTask( uint8_t task ) {
+uint8_t ITask::startTask( uint8_t task ) {
 
     if( this->_currentTask != TASK_NONE ) {
         return this->_currentTask;
@@ -42,7 +42,7 @@ uint8_t Task::startTask( uint8_t task ) {
     return task;
 }
 
-void Task::endTask( int error ) {
+void ITask::endTask( int error ) {
     
     this->_currentTask = TASK_NONE;
 
@@ -51,6 +51,6 @@ void Task::endTask( int error ) {
     }
 }
 
-void Task::setTaskError( int error ) {
+void ITask::setTaskError( int error ) {
     this->_taskError = error;
 }

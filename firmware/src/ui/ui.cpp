@@ -623,7 +623,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
             if( save == true ) {
                 g_config.save();
 
-                g_wifimanager.connect();
+                g_wifimanager.reconnect();
 
             } else {
                 g_config.load();

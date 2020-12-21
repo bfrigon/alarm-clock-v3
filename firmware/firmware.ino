@@ -16,6 +16,7 @@
 //
 //******************************************************************************
 #include "src/hardware.h"
+#include "src/console/console.h"
 #include "src/ui/ui.h"
 #include "src/config.h"
 
@@ -32,6 +33,7 @@ DS3231 g_rtc( PIN_INT_RTC );
 TSL2591 g_als;
 BQ27441 g_battery;
 ConfigManager g_config;
+Console g_console;
 
 
 
@@ -96,20 +98,14 @@ bool checkFactoryReset() {
  */
 void setup() {
 
-    pinMode( PIN_WIFI_RESET, OUTPUT );
-    digitalWrite( PIN_WIFI_RESET, LOW );
-
-    pinMode( PIN_WIFI_ENABLE, OUTPUT );
-    digitalWrite( PIN_WIFI_ENABLE, LOW );
-
-
-    /* Setup serial */
-    Serial.begin( 115200 );
+    /* Setup console */
+    g_console.begin( 115200 );
+    g_console.println_P( S_CONSOLE_INIT );
+    g_console.println();
 
     /* Setup I2C */
     Wire.begin();
     Wire.setClock( 100000 );
-
 
     /* Initialize UI */
     initScreens();
@@ -160,6 +156,8 @@ void setup() {
 
     /* Initialize WIFI driver */
     g_wifimanager.begin();
+    
+    g_console.enableInput();
 }
 
 
@@ -213,15 +211,6 @@ void loop() {
     /* Process WIFI driver events */
     g_wifimanager.runTask();
 
-    IPAddress test;
-    if( g_wifimanager.getHostnameResolveResults( test ) == true ) {
-
-        if( test != 0 ) {
-            Serial.print( "Resolve : " );
-            test.printTo( Serial );
-            Serial.println( "" );
-        }
-        
-        
-    }
+    /* Process serial console inputs */
+    g_console.runTask();
 }

@@ -71,12 +71,12 @@ bool BQ27441::begin( uint16_t capacity ) {
         return false;
     }
 
-    Serial.println( "BQ27441: Initialized data memory parameters" );
-    Serial.print( "BQ27441: Capacity=" );
-    Serial.print( this->readWord( BQ27441_EXTENDED_CAPACITY ) );
-    Serial.println( "mAh" );
+    // Serial.println( "BQ27441: Initialized data memory parameters" );
+    // Serial.print( "BQ27441: Capacity=" );
+    // Serial.print( this->readWord( BQ27441_EXTENDED_CAPACITY ) );
+    // Serial.println( "mAh" );
 
-    Serial.println( this->readControlData( BQ27441_CONTROL_STATUS ), HEX );
+    // Serial.println( this->readControlData( BQ27441_CONTROL_STATUS ), HEX );
 
     return true;
 }

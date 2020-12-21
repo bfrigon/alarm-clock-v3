@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/task.h
+// File    : src/libs/itask.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,16 +15,17 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef TASK_H
-#define TASK_H
+#ifndef I_TASK_H
+#define I_TASK_H
 
 #include <Arduino.h>
 
 #define TASK_NONE     0
 #define TASK_SUCCESS  0
+#define TASK_TIMEOUT  255
 
 
-class Task {
+class ITask {
 
   public:
 
@@ -43,6 +44,6 @@ class Task {
     void setTaskError( int error );
 };
 
-#endif /* TASK_H */
+#endif /* I_TASK_H */
 
 

@@ -25,7 +25,7 @@
 #include <IPAddress.h>
 
 #include "libs/time.h"
-#include "libs/task.h"
+#include "libs/itask.h"
 #include "resources.h"
 
 #define BATTERY_DESIGN_CAPACITY         350
@@ -258,7 +258,7 @@ struct GlobalSettings {
 // Configuration manager class
 //
 //**************************************************************************
-class ConfigManager : public Task {
+class ConfigManager : public ITask {
   public:
 
     void reset();

@@ -20,6 +20,9 @@
 
 #include <avr/pgmspace.h>
 
+#define FW_VERSION      "2020.12"
+
+
 //--------------------------------------------------------------------------
 //
 // Macro
@@ -28,7 +31,7 @@
 
 /* Declare a string in program memory */
 #define PROG_STR(name, value) \
-    static const char name[] PROGMEM = value
+    const char name[] PROGMEM = value
 
 
 //--------------------------------------------------------------------------
@@ -200,7 +203,47 @@ PROG_STR( S_NETINFO_IP,                 "%d.%d.%d.%d" );
 PROG_STR( S_SSID,                       "SSID" );
 
 
+PROG_STR( S_CONSOLE_INIT,               "Initializing..." );
+PROG_STR( S_CONSOLE_BUSY,               "Console is busy running another task!" );
+PROG_STR( S_CONSOLE_WIFI_BUSY,          "WiFi manager is busy running another request." );
+PROG_STR( S_CONSOLE_PROMPT,             "> " );
+PROG_STR( S_CONSOLE_USAGE,              "Usage : " );
+PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
+PROG_STR( S_CONSOLE_MISSING_PARAMATER,  "Missing parameter!" );
+PROG_STR( S_CONSOLE_INVALID_PARAMATER,  "Invalid parameter!" );
+PROG_STR( S_CONSOLE_NET_CONNECTED,      "Connected" );
+PROG_STR( S_CONSOLE_NET_DISCONNECTED,   "Disconnected" );
+PROG_STR( S_CONSOLE_NET_NOT_CONNECTED,  "Not connected to the WiFi network" );
+PROG_STR( S_CONSOLE_NET_CONNECT_FAIL,   "Failed to connect (%d)\r\n" );
+PROG_STR( S_CONSOLE_NET_RECONNECTING,   "Reonnecting to %s...\r\n" );
+PROG_STR( S_CONSOLE_NET_INVALID_HOST,   "Invalid hostname" );
+PROG_STR( S_CONSOLE_NET_DNS_QUERY,      "Resolving %s..." );
+PROG_STR( S_CONSOLE_NET_PING_HOSTNAME,  "Pinging %s..." );
+PROG_STR( S_CONSOLE_NET_PING_IP,        "Pinging %d.%d.%d.%d" );
+PROG_STR( S_CONSOLE_NET_PING_RESULT,    "Reply from %d.%d.%d.%d time=%dms\r\n" );
+PROG_STR( S_CONSOLE_NET_PING_TIMEOUT,   "Ping timeout" );
+PROG_STR( S_CONSOLE_NET_PING_UNREACH,   "Destination network unreachable" );
+PROG_STR( S_CONSOLE_NET_PING_ERROR,     "Ping error" );
+PROG_STR( S_CONSOLE_NET_PING_UNKNOWN,   "Unknown host" );
+
+PROG_STR( S_CONSOLE_NET_STATUS,         "Status           : " );
+PROG_STR( S_CONSOLE_NET_DHCP,           "DHCP             : " );
+PROG_STR( S_CONSOLE_NET_SSID,           "SSID             : %s\r\n" );
+PROG_STR( S_CONSOLE_NET_IP,             "Local IP address : %d.%d.%d.%d\r\n" );
+PROG_STR( S_CONSOLE_NET_MASK,           "Subnet mask      : %d.%d.%d.%d\r\n" );
+PROG_STR( S_CONSOLE_NET_GATEWAY,        "Gateway          : %d.%d.%d.%d\r\n" );
+PROG_STR( S_CONSOLE_NET_DNS,            "DNS              : %d.%d.%d.%d\r\n" );
+
+
+
+
+
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
+
+
+
+
+
 
 //--------------------------------------------------------------------------
 //

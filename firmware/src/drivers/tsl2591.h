@@ -20,7 +20,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "../libs/task.h"
+#include "../libs/itask.h"
 
 #define TSL2591_LUX_DF          428.0F
 
@@ -72,7 +72,7 @@
 #define TSL2591_ENABLE_OFF          0x00
 
 
-class TSL2591 : public Task {
+class TSL2591 : public ITask {
 
   public:
     TSL2591();

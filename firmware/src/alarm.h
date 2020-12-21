@@ -27,7 +27,7 @@
 
 
 #include "libs/time.h"
-#include "libs/task.h"
+#include "libs/itask.h"
 #include "hardware.h"
 #include "resources.h"
 #include "config.h"
@@ -60,7 +60,7 @@
 
 
 
-class Alarm : private VS1053, public Task {
+class Alarm : private VS1053, public ITask {
 
   public:
 

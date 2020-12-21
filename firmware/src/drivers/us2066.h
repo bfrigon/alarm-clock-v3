@@ -23,6 +23,7 @@
 #include <avr/pgmspace.h>
 #include <Wire.h>
 #include "../resources.h"
+#include "../libs/iprint.h"
 #include "power.h"
 
 
@@ -141,9 +142,7 @@
 #endif
 
 
-#define TEXT_ALIGN_LEFT     0
-#define TEXT_ALIGN_CENTER   1
-#define TEXT_ALIGN_RIGHT    2
+
 
 
 
@@ -162,7 +161,7 @@ typedef struct {
 
 
 
-class US2066 {
+class US2066 : public IPrint {
 
   public:
 
@@ -177,35 +176,14 @@ class US2066 {
     void setCursor( bool underline, bool blinking );
     void setDisplay( bool on, bool reverse );
     uint8_t setCustomCharacters( const char *pchrmap );
-
-
-    uint8_t print( char c );
-    uint8_t print( const char *str, bool ptr_pgm_space = false );
-    uint8_t print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
-    inline uint8_t print_P( const char *str ) {
-        return this->print( str, true );
-    }
-
-    inline uint8_t print_P( const char *str, uint8_t length, uint8_t align ) {
-        return this->print( str, length, align, true );
-    }
-
-
-    uint8_t printf( const char *format, ... );
-    uint8_t printf_P( const char *format, ... );
-
     void fill( char c, uint8_t num );
 
-
-
   private:
-
-    static int _putchar( char ch, FILE *stream );
-
     void selectInstructions( uint8_t iset );
     void updateDisplayState();
     uint8_t sendCommand( uint8_t cmd );
     uint8_t sendCommand( uint8_t cmd, uint8_t data );
+    uint8_t _print( char c );
 
     bool _init = false;
     uint8_t _address = US2066_DEF_I2C_ADDR;

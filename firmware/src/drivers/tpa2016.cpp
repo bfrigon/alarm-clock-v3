@@ -387,10 +387,10 @@ void TPA2016::dumpRegs() {
 
         while( Wire.available() == false );
 
-        Serial.print( "REG: 0x" );
-        Serial.print( i, HEX );
-        Serial.print( " = 0x" );
-        Serial.println( Wire.read(), HEX );
+        // Serial.print( "REG: 0x" );
+        // Serial.print( i, HEX );
+        // Serial.print( " = 0x" );
+        // Serial.println( Wire.read(), HEX );
     }
 }
 

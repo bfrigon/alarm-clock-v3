@@ -20,7 +20,7 @@
 
 #include <Arduino.h>
 #include "libs/time.h"
-#include "libs/task.h"
+#include "libs/itask.h"
 #include "drivers/qt1070.h"
 #include "drivers/us2066.h"
 
@@ -271,7 +271,7 @@ class ScreenItem : protected ScreenItemBase {
 // Screen class
 //
 //**************************************************************************
-class Screen : public Task {
+class Screen : public ITask {
 
   public:
 

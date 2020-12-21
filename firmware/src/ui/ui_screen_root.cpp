@@ -52,11 +52,6 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
             screen_show_alarms.activate( true, &screen_root );
             break;
 
-        case KEY_SET:
-            Serial.println( "Start resolve ");
-            g_wifimanager.startHostnameResolve( "www.google.com" );
-            break;
-
         default:
             return true;
     }

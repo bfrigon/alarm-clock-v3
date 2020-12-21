@@ -21,7 +21,7 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 
-#include "../libs/task.h"
+#include "../libs/itask.h"
 #include "neopixel.h"
 
 

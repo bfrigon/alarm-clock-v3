@@ -38,7 +38,7 @@ unsigned long g_enterScreenTime = 0;
  *  None
  */
 ScreenItem::ScreenItem() {
-    this->unload();
+    this->unload();  
 }
 
 
@@ -655,7 +655,6 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 
             } else {
                 g_lcd.print( ( char* )item->getValuePtr(), maxWidth, TEXT_ALIGN_LEFT );
-
             }
 
             g_lcd.print( CHAR_FIELD_END );

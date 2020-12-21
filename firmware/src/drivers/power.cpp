@@ -59,6 +59,8 @@ void Power::begin() {
     this->_mode = POWER_MODE_NORMAL;
 
     this->detectPowerState();
+
+    
 }
 
 
@@ -290,6 +292,27 @@ void Power::cpuReset() {
 
     /* Halt */
     while( true );
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Gracefuly reset the clock
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void Power::reboot() {
+    g_alarm.end();
+    g_wifimanager.end();
+    g_clock.end();
+    g_lamp.end();
+    g_lcd.end();
+    
+    this->cpuReset();
 }
 
 

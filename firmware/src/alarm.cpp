@@ -239,10 +239,10 @@ bool Alarm::detectSDCard() {
 
     this->_sd_present = false;
     this->_timerStart = 0;
-    Serial.println( F( "Init SD card... " ) );
+    //Serial.println( F( "Init SD card... " ) );
 
     if( this->_sd.begin( this->_pin_sd_cs ) == false ) {
-        Serial.println( F( "SD init failed " ) );
+        //Serial.println( F( "SD init failed " ) );
         return false;
     }
 
@@ -250,7 +250,7 @@ bool Alarm::detectSDCard() {
     this->_sd.vwd()->rewind();
 
     if( this->_sd.vwd()->isOpen() == false ) {
-        Serial.println( F( "Cannot open root directory on SD card" ) );
+        //Serial.println( F( "Cannot open root directory on SD card" ) );
         return false;
     }
 
