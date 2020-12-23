@@ -25,9 +25,8 @@
 #include "../libs/iprint.h"
 
 #define INPUT_BUFFER_LENGTH         128
-#define LOG_BUFFER_LENGTH           1024
 
-#define CONSOLE_COMMANDS_COUNT      9
+#define CONSOLE_COMMANDS_COUNT      10
 
 #define TASK_CONSOLE_PRINT_HELP     1
 #define TASK_CONSOLE_NET_RESTART    2
@@ -35,6 +34,9 @@
 #define TASK_CONSOLE_NET_CONFIG     4
 #define TASK_CONSOLE_NET_NSLOOKUP   5
 #define TASK_CONSOLE_NET_PING       6
+#define TASK_CONSOLE_NET_CONFIG     7
+#define TASK_CONSOLE_NET_START      8
+#define TASK_CONSOLE_NET_STOP       9
 
 
 
@@ -48,19 +50,25 @@ PROG_STR( S_COMMAND_SET_DATE,         "set time" );
 PROG_STR( S_COMMAND_PRINT_LOGS,       "print logs" );
 PROG_STR( S_COMMAND_NET_STATUS,       "net status" );
 PROG_STR( S_COMMAND_NET_CONFIG,       "net config" );
+PROG_STR( S_COMMAND_NET_STOP,         "net stop" );
+PROG_STR( S_COMMAND_NET_START,        "net start" );
 PROG_STR( S_COMMAND_NET_RESTART,      "net restart" );
 PROG_STR( S_COMMAND_NET_NSLOOKUP,     "nslookup" );
 PROG_STR( S_COMMAND_NET_PING,         "ping" );
+PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
+PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
+PROG_STR( S_COMMAND_FACTORY_RESET,    "config defaults" );
 
 PROG_STR( S_HELP_HELP,                "Display this message." );
 PROG_STR( S_HELP_REBOOT,              "Restart the firmware." );
-PROG_STR( S_HELP_SET_DATE,            "Set the clock" );
-PROG_STR( S_HELP_PRINT_LOGS,          "Print event log" );
-PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection" );
-PROG_STR( S_HELP_NET_CONFIG,          "Setup WiFi parameters");
-PROG_STR( S_HELP_NET_RESTART,         "Reconnect to the WiFi network" );
-PROG_STR( S_HELP_NET_NSLOOKUP,        "Query the nameserver for the IP address of the given host" );
-PROG_STR( S_HELP_NET_PING,            "Test the reachability of a given host " );
+PROG_STR( S_HELP_SET_DATE,            "Set the clock." );
+PROG_STR( S_HELP_PRINT_LOGS,          "Print the event log stored on SD card." );
+PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection." );
+PROG_STR( S_HELP_NET_CONFIG,          "Configure the network settings.");
+PROG_STR( S_HELP_NET_RESTART,         "Restart the WiFi manager." );
+PROG_STR( S_HELP_NET_STOP,            "Stop the WiFi manager." );
+PROG_STR( S_HELP_NET_NSLOOKUP,        "Query the nameserver for the IP address of the given host." );
+PROG_STR( S_HELP_NET_PING,            "Test the reachability of a given host." );
 
 PROG_STR( S_USAGE_NSLOOKUP,           "nslookup [hostname]" );
 PROG_STR( S_USAGE_PING,               "ping [host]" );
@@ -72,6 +80,7 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_NET_STATUS,
     S_COMMAND_NET_CONFIG,
     S_COMMAND_NET_RESTART,
+    S_COMMAND_NET_STOP,
     S_COMMAND_NET_NSLOOKUP,
     S_COMMAND_NET_PING,
     S_COMMAND_REBOOT,
@@ -83,6 +92,7 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_NET_STATUS,
     S_HELP_NET_CONFIG,
     S_HELP_NET_RESTART,
+    S_HELP_NET_STOP,
     S_HELP_NET_NSLOOKUP,
     S_HELP_NET_PING,
     S_HELP_REBOOT,
@@ -96,18 +106,9 @@ class Console : public IPrint, ITask {
     Console();
     void begin( unsigned long baud );
 
-    void log( const char *message );
-
     void enableInput();
     void disableInput();
-
     void runTask();
-    void endTask( int error );
-    uint8_t startTask( uint8_t task );
-
-    
-
-
 
   private:
     bool processInput();
@@ -124,21 +125,24 @@ class Console : public IPrint, ITask {
     void runTaskPrintHelp();
     bool startTaskNetRestart();
     void runTaskNetRestart();
-    bool startTaskNetStatus();
-    void runTaskNetStatus();
+    bool startTaskNetStart();
+    bool startTaskNetStop();
+    void runTaskNetStop();
+    void printNetStatus();
     bool startTaskNslookup();
     void runTaskNsLookup();
     bool startTaskPing();
     void runTaskPing();
+    bool startTaskNetworkConfig();
+    void runTaskNetworkConfig();
 
 
 
-    char _logbuffer[1024];
-    char _inputbuffer[ INPUT_BUFFER_LENGTH ];
+    char _inputbuffer[ INPUT_BUFFER_LENGTH + 1 ];
     char* _inputParameter= NULL;
     uint8_t _inputlength = 0;
     bool _inputenabled = false;
-    unsigned long _timerCommandStart = 0;
+    
     
 
     uint16_t _taskIndex = 0;

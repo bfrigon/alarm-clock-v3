@@ -33,13 +33,15 @@ class ITask {
     virtual void runTask();
     uint8_t getCurrentTask();
     int getTaskError();
+    unsigned long getTaskRunningTime();
 
   private:
     uint8_t _currentTask = TASK_NONE;
+    unsigned long _timerTaskStart = 0;
     int _taskError = 0;
 
   protected:
-    uint8_t startTask( uint8_t task );
+    uint8_t startTask( uint8_t task, bool force = false );
     void endTask( int error = TASK_SUCCESS );
     void setTaskError( int error );
 };

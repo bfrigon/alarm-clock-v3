@@ -201,6 +201,22 @@ wl_status_t WiFiManager::reconnect() {
 
 /*--------------------------------------------------------------------------
  *
+ * Sets whether or not the WiFi manager should attempt to reconnect when
+ * it loses connection.
+ *
+ * Arguments
+ * ---------
+ *  - autoReconnect: TRUE to enable auto-reconnect, FALSE otherwise
+ *
+ * Returns : Nothing
+ */
+void WiFiManager::setAutoReconnect( bool autoReconnect ) {
+    _autoReconnect = autoReconnect;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
  * Connect to the WiFi network set in config.
  *
  * Arguments
@@ -222,21 +238,25 @@ wl_status_t WiFiManager::connect() {
         return WL_CONNECTED;
     }
 
+    if( this->getCurrentTask() != TASK_NONE ) {
+        this->endTask( WL_DISCONNECTED );
+    }
+
     /* Starts a task to monitor connection progress */
     this->startTask( TASK_WIFIMANAGER_CONNECT );
 
     /* Reset the last connection attempt timer */
     _lastConnectAttempt = millis();
 
-    if( g_config.settings.net_dhcp == false ) {
+    if( g_config.network.dhcp == false ) {
 
         _dhcp = false;
         m2m_wifi_enable_dhcp( 0 );    // disable DHCP
 
-        conf.u32DNS = IPAddress( &g_config.settings.net_dns[0] );
-        conf.u32Gateway = IPAddress( &g_config.settings.net_gateway[0] );
-        conf.u32StaticIP = IPAddress( &g_config.settings.net_ip[0] );
-        conf.u32SubnetMask = IPAddress( &g_config.settings.net_mask[0] );
+        conf.u32DNS = IPAddress( &g_config.network.dns[0] );
+        conf.u32Gateway = IPAddress( &g_config.network.gateway[0] );
+        conf.u32StaticIP = IPAddress( &g_config.network.ip[0] );
+        conf.u32SubnetMask = IPAddress( &g_config.network.mask[0] );
         m2m_wifi_set_static_ip( &conf );
 
         _localip = conf.u32StaticIP;
@@ -256,8 +276,8 @@ wl_status_t WiFiManager::connect() {
     }
 
     
-    const char *ssid = g_config.settings.ssid;
-    const void *pvAuthInfo = g_config.settings.wkey;
+    const char *ssid = g_config.network.ssid;
+    const void *pvAuthInfo = g_config.network.wkey;
 
     /* Start connection to the WiFi network */
     if( m2m_wifi_connect( (char*)ssid, strlen(ssid), M2M_WIFI_SEC_WPA_PSK, (void*)pvAuthInfo, M2M_WIFI_CH_ALL) < 0 ) {
@@ -269,7 +289,7 @@ wl_status_t WiFiManager::connect() {
 
     /* Set the hostname only if DHCP is used */
     if( _dhcp == true ) {
-        m2m_wifi_set_device_name( (uint8 *)g_config.settings.hostname, strlen(g_config.settings.hostname ));
+        m2m_wifi_set_device_name( (uint8 *)g_config.network.hostname, strlen(g_config.network.hostname ));
     }
 
     /* Status remains idle until DHCP response has been received or a connection 
@@ -600,7 +620,6 @@ bool WiFiManager::startHostnameResolve( const char *hostname ) {
     }
 
     _resolve = 0;
-    _timerTaskStart = millis();
 
     if( gethostbyname( (uint8 *)hostname ) != SOCK_ERR_NO_ERROR ) {
         return false;
@@ -660,7 +679,6 @@ bool WiFiManager::startPing( const char* hostname ) {
         return false;
     }
 
-    _timerTaskStart = millis();
     _resolve = 0;
     _rtt = 0;
 
@@ -695,7 +713,6 @@ bool WiFiManager::startPing( IPAddress host ) {
         return false;
     }
 
-    _timerTaskStart = millis();
     _resolve = host;
     _rtt = 0;
 
@@ -805,7 +822,7 @@ void WiFiManager::runTask() {
         case TASK_WIFIMANAGER_RESOLVE:
         {
 
-            if(  millis() - _timerTaskStart > WIFI_RESOLVE_TIMEOUT ) {
+            if( this->getTaskRunningTime() > WIFI_RESOLVE_TIMEOUT ) {
 
                 this->endTask( TASK_TIMEOUT );
                 _resolve = 0;
@@ -818,7 +835,7 @@ void WiFiManager::runTask() {
         case TASK_WIFIMANAGER_PING:
         {
 
-            if(  millis() - _timerTaskStart > WIFI_PING_TIMEOUT ) {
+            if( this->getTaskRunningTime() > WIFI_PING_TIMEOUT ) {
 
                 this->endTask( TASK_TIMEOUT );
                 _resolve = 0;
@@ -833,7 +850,7 @@ void WiFiManager::runTask() {
         {
 
             /* Attempt to reconnect WIFI if connection was lost */
-            if( _status != WL_CONNECTED && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_DELAY )) {
+            if( _autoReconnect == true && _status != WL_CONNECTED && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_DELAY )) {
 
                 /* Do not reconnect WIFI if clock is running on battery */
                 if( g_power.getPowerMode() == POWER_MODE_NORMAL ) {

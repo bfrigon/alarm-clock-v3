@@ -752,7 +752,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
             uint8_t hour;
             hour = time->hour;
 
-            if( g_config.settings.clock_24h == false ) {
+            if( g_config.clock.display_24h == false ) {
 
                 hour = time->hour % 12;
 
@@ -763,7 +763,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 
             g_lcd.printf( "%2d:%02d ", hour, time->minute );
 
-            if( g_config.settings.clock_24h == false ) {
+            if( g_config.clock.display_24h == false ) {
                 g_lcd.print_P( ( time->hour > 11 ) ? S_PM : S_AM );
             }
 

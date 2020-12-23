@@ -232,7 +232,7 @@ bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row,
             g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );
 
             char bufTime[9];
-            length = timeToBuf( bufTime, g_config.settings.clock_24h, &time );
+            length = timeToBuf( bufTime, g_config.clock.display_24h, &time );
 
             g_lcd.print( bufTime );
 
@@ -338,13 +338,13 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
                     g_lamp.activate( &g_alarm.profile.lamp, true );
 
                 } else {
-                    g_lamp.activate( &g_config.settings.lamp, true, true );
+                    g_lamp.activate( &g_config.clock.lamp, true, true );
                 }
 
             } else {
                 if ( screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP ) {
                     /* Restore delay off */
-                    g_lamp.setDelayOff( g_config.settings.lamp.delay_off );
+                    g_lamp.setDelayOff( g_config.clock.lamp.delay_off );
                 }
 
                 g_lamp.deactivate();
@@ -401,19 +401,19 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
             break;
 
         case ID_CLOCK_COLOR:
-            g_clock.setColorFromTable( g_config.settings.clock_color );
+            g_clock.setColorFromTable( g_config.clock.clock_color );
 
             g_clockUpdate = true;
             break;
 
         case ID_CLOCK_BRIGHTNESS:
-            g_clock.setBrightness( g_config.settings.clock_brightness );
+            g_clock.setBrightness( g_config.clock.clock_brightness );
 
             g_clockUpdate = true;
             break;
 
         case ID_LCD_CONTRAST:
-            g_lcd.setContrast( g_config.settings.lcd_contrast );
+            g_lcd.setContrast( g_config.clock.lcd_contrast );
             break;
 
 
@@ -507,7 +507,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
                 g_lamp.deactivate();
 
             } else {
-                g_lamp.activate( screen->getId() == SCREEN_ID_EDIT_ALARM_LAMP ? &g_alarm.profile.lamp : &g_config.settings.lamp, true );
+                g_lamp.activate( screen->getId() == SCREEN_ID_EDIT_ALARM_LAMP ? &g_alarm.profile.lamp : &g_config.clock.lamp, true );
             }
 
             break;
@@ -621,22 +621,21 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
         case SCREEN_ID_NETWORK:
             if( save == true ) {
-                g_config.save();
-
-                g_wifimanager.reconnect();
+                g_config.save( EEPROM_SECTION_NETWORK );
+                g_config.apply( EEPROM_SECTION_NETWORK );
 
             } else {
-                g_config.load();
+                g_config.load( EEPROM_SECTION_NETWORK );
             }
 
             break;
 
         case SCREEN_ID_EDIT_NIGHT_LAMP:
             if( save == true ) {
-                g_config.save();
+                g_config.save( EEPROM_SECTION_CLOCK );
 
             } else {
-                g_config.load();
+                g_config.load( EEPROM_SECTION_CLOCK );
             }
 
             break;
@@ -652,7 +651,11 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
             break;
 
         case SCREEN_ID_SET_ALARMS:
-            ( save == true ) ? g_config.save() : g_config.load();
+            if( save == true ) {
+                g_config.save( EEPROM_SECTION_CLOCK );
+            } else {
+                g_config.load( EEPROM_SECTION_CLOCK );
+            }
 
             g_clockUpdate = true;
 
@@ -664,7 +667,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
         case SCREEN_ID_DISPLAY_SETTINGS:
             if( save == true ) {
-                g_config.save();
+                g_config.save( EEPROM_SECTION_CLOCK );
             }
 
             break;
@@ -675,7 +678,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
 
 void enableNightLamp() {
-    g_lamp.activate( &g_config.settings.lamp, false, true, LAMP_MODE_NIGHTLIGHT );
+    g_lamp.activate( &g_config.clock.lamp, false, true, LAMP_MODE_NIGHTLIGHT );
 }
 
 void disableNightLamp() {

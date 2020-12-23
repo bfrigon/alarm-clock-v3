@@ -29,9 +29,9 @@
 #define TASK_WIFIMANAGER_PING           4
 #define TASK_WIFIMANAGER_PING_HOSTNAME  5
 
-#define WIFI_RECONNECT_DELAY            10000   
+#define WIFI_RECONNECT_DELAY            15000   
 #define WIFI_RESOLVE_TIMEOUT            5000
-#define WIFI_PING_TIMEOUT               10000
+#define WIFI_PING_TIMEOUT               5000
 
 
 
@@ -65,6 +65,7 @@ class WiFiManager : public ITask {
     void handleResolve( uint8 *hostName, uint32_t hostIp );
     void handlePingResponse( uint32 ip, uint32 rtt, uint8 error );
     void onPowerStateChange( uint8_t state );
+    void setAutoReconnect( bool autoReconnect );
 
     bool startPing( const char* hostname );
     bool startPing( IPAddress host );
@@ -76,6 +77,7 @@ class WiFiManager : public ITask {
 
     bool _init = false;
     bool _dhcp = true;
+    bool _autoReconnect = true;
 
     uint32_t _localip;
 	  uint32_t _submask;
@@ -85,10 +87,9 @@ class WiFiManager : public ITask {
     int32_t _rtt;
     wl_status_t _status;
     wl_status_t _prev_status;
-    
+
 
     unsigned long _lastConnectAttempt;
-    unsigned long _timerTaskStart;
 };
 
 extern WiFiManager g_wifimanager;

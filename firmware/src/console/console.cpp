@@ -27,10 +27,7 @@
  *  None
   */
 Console::Console() {
-
-    memset( _logbuffer, 0, 1024 );
-    memset( _inputbuffer, 0, INPUT_BUFFER_LENGTH );
-
+    memset( _inputbuffer, 0, INPUT_BUFFER_LENGTH + 1);
 
     /* Initialize IPrint interface */
     this->_initPrint();
@@ -342,14 +339,26 @@ void Console::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_NET_RESTART ) == true ) {
         started = this->startTaskNetRestart();
 
+    } else if( this->matchCommandName( S_COMMAND_NET_START ) == true ) {
+        started = this->startTaskNetStart();
+
+    } else if( this->matchCommandName( S_COMMAND_NET_STOP ) == true ) {
+        started = this->startTaskNetStop();
+
     } else if( this->matchCommandName( S_COMMAND_NET_STATUS ) == true ) {
-        started = this->startTaskNetStatus();
+        this->printNetStatus();
+        this->println();
+
+        started = false;
 
     } else if( this->matchCommandName( S_COMMAND_NET_NSLOOKUP, true ) == true ) {
         started = this->startTaskNslookup();
     
     } else if( this->matchCommandName( S_COMMAND_NET_PING, true ) == true ) {
         started = this->startTaskPing();
+    
+    } else if( this->matchCommandName( S_COMMAND_NET_CONFIG, false ) == true ) {
+        started = this->startTaskNetworkConfig();
     
     } else if( strlen( _inputbuffer ) == 0 ) {
         started = false;
@@ -364,6 +373,7 @@ void Console::parseCommand() {
     if( started == false ) {
         this->displayPrompt();
     }
+
     this->resetInput();
 }
 
@@ -380,70 +390,53 @@ void Console::parseCommand() {
  */
 void Console::runTask() {
 
-    switch( this->getCurrentTask() ) {
+    if( this->getCurrentTask() == TASK_NONE ) {
 
-        case TASK_CONSOLE_PRINT_HELP:
-            this->runTaskPrintHelp();
-            break;
+        /* If no task is running, process the input buffer */
+        if( this->processInput() == true ) {
+            
+            /* If new line is found, parse the line */
+            this->parseCommand();
+        }
 
-        case TASK_CONSOLE_NET_RESTART:
-            this->runTaskNetRestart();
-            break;
+    } else {
 
-        case TASK_CONSOLE_NET_STATUS:
-            this->runTaskNetStatus();
-            break;
-        
-        case TASK_CONSOLE_NET_NSLOOKUP:
-            this->runTaskNsLookup();
-            break;
+        /* Task is currently running, call the task runner */
+        switch( this->getCurrentTask() ) {
 
-        case TASK_CONSOLE_NET_PING:
-            this->runTaskPing();
-            break;
+            case TASK_CONSOLE_PRINT_HELP:
+                this->runTaskPrintHelp();
+                break;
 
-        default:
-            if( this->processInput() == true ) {
-                this->parseCommand();
-            }
-            break;
+            case TASK_CONSOLE_NET_START:
+            case TASK_CONSOLE_NET_RESTART:
+                this->runTaskNetRestart();
+                break;
+
+            case TASK_CONSOLE_NET_STOP:
+                this->runTaskNetStop();
+                break;
+            
+            case TASK_CONSOLE_NET_NSLOOKUP:
+                this->runTaskNsLookup();
+                break;
+
+            case TASK_CONSOLE_NET_PING:
+                this->runTaskPing();
+                break;
+
+            case TASK_CONSOLE_NET_CONFIG:
+                this->runTaskNetworkConfig();
+                break;
+        }
+
+        /* If task is done, displays the prompt and reset input buffer */
+        if( this->getCurrentTask() == TASK_NONE ) {
+            
+            this->println();
+            this->displayPrompt();
+
+            this->resetInput();
+        }
     }
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Starts a new task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Currently running task ID
- */
-uint8_t Console::startTask( uint8_t task ) {
-
-    return ITask::startTask( task );
-
-    _timerCommandStart = millis();
-}
-
-
-/*--------------------------------------------------------------------------
- *
- * Remove leading and trailing white spaces from the input buffer
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- */
-void Console::endTask( int error ) {
-    ITask::endTask( error );
-
-    this->println();
-    this->displayPrompt();
-
-    this->resetInput();
 }

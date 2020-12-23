@@ -28,6 +28,12 @@
 #include "libs/itask.h"
 #include "resources.h"
 
+
+#define IPADDRESS_TO_ARRAY( src, dest )   dest[ 0 ] = src[ 0 ]; \
+                                          dest[ 1 ] = src[ 1 ]; \
+                                          dest[ 2 ] = src[ 2 ]; \
+                                          dest[ 3 ] = src[ 3 ]; 
+
 #define BATTERY_DESIGN_CAPACITY         350
 
 
@@ -64,8 +70,14 @@
 /* EEPROM addresses */
 #define EEPROM_ADDR_MAGIC               0
 #define EEPROM_ADDR_FIRMWARE_VER        4
-#define EEPROM_ADDR_CONFIG              10
-#define EEPROM_ADDR_PROFILES            EEPROM_ADDR_CONFIG + ( sizeof( GlobalSettings ) )
+#define EEPROM_ADDR_CLOCK_CONFIG        10
+#define EEPROM_ADDR_NETWORK_CONFIG      EEPROM_ADDR_CLOCK_CONFIG + ( sizeof( ClockSettings ) )
+#define EEPROM_ADDR_PROFILES            EEPROM_ADDR_NETWORK_CONFIG + ( sizeof( NetworkSettings ) )
+
+/* EEPROM settings sections */
+#define EEPROM_SECTION_CLOCK            0x01
+#define EEPROM_SECTION_NETWORK          0x02
+#define EEPROM_SECTION_ALL              EEPROM_SECTION_CLOCK | EEPROM_SECTION_NETWORK
 
 /* Settings type */
 #define SETTING_TYPE_UNKNOWN        0
@@ -191,7 +203,7 @@ PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 
 //**************************************************************************
 //
-// Memory writable structure containing night lamp settings */
+// Structure containing settings */
 //
 //**************************************************************************
 struct NightLampSettings {
@@ -202,12 +214,6 @@ struct NightLampSettings {
     uint8_t mode;
 };
 
-
-//**************************************************************************
-//
-// Memory writable structure containing alarm profile settings */
-//
-//**************************************************************************
 struct AlarmProfile {
     char filename[ MAX_LENGTH_ALARM_FILENAME + 1 ];
     char message[ MAX_LENGTH_ALARM_MESSAGE + 1 ];
@@ -221,21 +227,9 @@ struct AlarmProfile {
     struct NightLampSettings lamp;
 };
 
-
-//**************************************************************************
-//
-// Memory writable structure containing all settings */
-//
-//**************************************************************************
-struct GlobalSettings {
-    bool clock_24h = false;
+struct ClockSettings {
+    bool display_24h = false;
     bool alarm_on[2] = { false, false };
-
-    bool net_dhcp = true;
-    uint8_t net_ip[4] = { 0, 0, 0, 0 };
-    uint8_t net_mask[4] = { 255, 255, 255, 0 };
-    uint8_t net_gateway[4] = { 0, 0, 0, 0 };
-    uint8_t net_dns[4] = { 0, 0, 0, 0 };
 
     uint8_t clock_color = 1;
     uint8_t clock_brightness = 40;
@@ -243,14 +237,20 @@ struct GlobalSettings {
     uint8_t date_format = 0;
     uint8_t als_preset = 0;
 
-
     struct NightLampSettings lamp;
+};
+
+struct NetworkSettings {
+    bool dhcp = true;
+    uint8_t ip[4] = { 0, 0, 0, 0 };
+    uint8_t mask[4] = { 255, 255, 255, 0 };
+    uint8_t gateway[4] = { 0, 0, 0, 0 };
+    uint8_t dns[4] = { 0, 0, 0, 0 };
 
     char ssid[ MAX_SSID_LENGTH + 1 ];
     char wkey[ MAX_WKEY_LENGTH + 1 ];
     char hostname[ MAX_HOSTNAME_LENGTH + 1 ];
 };
-
 
 
 //**************************************************************************
@@ -262,9 +262,9 @@ class ConfigManager : public ITask {
   public:
 
     void reset();
-    void load();
-    void save();
-    void apply();
+    void load( uint8_t section = EEPROM_SECTION_ALL );
+    void save( uint8_t section = EEPROM_SECTION_ALL );
+    void apply( uint8_t section = EEPROM_SECTION_ALL );
     bool isEepromValid();
     void formatEeprom();
     bool startRestore();
@@ -273,7 +273,8 @@ class ConfigManager : public ITask {
     void endRestore( int error = TASK_SUCCESS );
     void runTask();
 
-    GlobalSettings settings;
+    ClockSettings clock;
+    NetworkSettings network;
 
   private:
 

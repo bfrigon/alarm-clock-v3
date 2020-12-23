@@ -209,23 +209,23 @@ extern Screen screen_net_status;
 
 /* Display settings menu items */
 PROGMEM const struct ScreenItemBase ITEMS_DISPLAY_SETTINGS[] = {
-    ITEM_TOGGLE( ID_CLOCK_24H, 0, 0, S_MENU_SETTINGS_24H, &g_config.settings.clock_24h, ITEM_COMPACT ),
+    ITEM_TOGGLE( ID_CLOCK_24H, 0, 0, S_MENU_SETTINGS_24H, &g_config.clock.display_24h, ITEM_COMPACT ),
 
-    ITEM_LIST( ID_CLOCK_COLOR, 1, 0, S_MENU_SETTINGS_COLOR, &g_config.settings.clock_color,
+    ITEM_LIST( ID_CLOCK_COLOR, 1, 0, S_MENU_SETTINGS_COLOR, &g_config.clock.clock_color,
                _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
                ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_BAR( ID_CLOCK_BRIGHTNESS, 2, 0, S_MENU_SETTINGS_BRIGHT, &g_config.settings.clock_brightness,
+    ITEM_BAR( ID_CLOCK_BRIGHTNESS, 2, 0, S_MENU_SETTINGS_BRIGHT, &g_config.clock.clock_brightness,
               MIN_CLOCK_BRIGHTNESS, MAX_CLOCK_BRIGHTNESS, 12, ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_BAR( ID_LCD_CONTRAST, 3, 0, S_MENU_SETTINGS_LCD_CTR, &g_config.settings.lcd_contrast,
+    ITEM_BAR( ID_LCD_CONTRAST, 3, 0, S_MENU_SETTINGS_LCD_CTR, &g_config.clock.lcd_contrast,
               MIN_LCD_CONTRAST, MAX_LCD_CONTRAST, 12, ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.settings.date_format,
+    ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.clock.date_format,
                _DATE_FORMATS, 0, MAX_DATE_FORMATS - 1, DATE_FORMAT_LENGTH,
                ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_LIST( ID_ALS_PRESET, 5, 0, S_MENU_SETTINGS_ALS_PRESET, &g_config.settings.als_preset,
+    ITEM_LIST( ID_ALS_PRESET, 5, 0, S_MENU_SETTINGS_ALS_PRESET, &g_config.clock.als_preset,
                _ALS_PRESET_NAMES, 0, MAX_ALS_PRESETS_NAMES - 1, ALS_PRESET_NAME_LENGTH,
                ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
 
@@ -246,12 +246,12 @@ PROGMEM const struct ScreenItemBase ITEMS_SET_ALARM[] = {
 
     /* Alarm 1 */
     ITEM_STATIC( 0, 0, S_ALARM_NUM1, ITEM_NORMAL ),
-    ITEM_TOGGLE( ID_ALARM_ON_1, 0, 2, NULL, &g_config.settings.alarm_on[ 0 ], ITEM_NORMAL ),
+    ITEM_TOGGLE( ID_ALARM_ON_1, 0, 2, NULL, &g_config.clock.alarm_on[ 0 ], ITEM_NORMAL ),
     ITEM_LINK( ID_ALARM_EDIT_1, 0, 7, NULL, &screen_edit_alarm, ITEM_NORMAL ),
 
     /* Alarm 2 */
     ITEM_STATIC( 1, 0, S_ALARM_NUM2, ITEM_NORMAL ),
-    ITEM_TOGGLE( ID_ALARM_ON_2, 1, 2, NULL, &g_config.settings.alarm_on[ 1 ], ITEM_NORMAL ),
+    ITEM_TOGGLE( ID_ALARM_ON_2, 1, 2, NULL, &g_config.clock.alarm_on[ 1 ], ITEM_NORMAL ),
     ITEM_LINK( ID_ALARM_EDIT_2, 1, 7, NULL, &screen_edit_alarm, ITEM_NORMAL ),
 
     ITEM_END()
@@ -275,12 +275,12 @@ PROGMEM const struct ScreenItemBase ITEMS_LIST_PROFILES[] = {
 /* Network menu items */
 PROGMEM const struct ScreenItemBase ITEMS_NETWORK[] = {
     ITEM_LINK( ID_NETWORK_STATUS, 0, 0, S_MENU_NETWORK_STATUS, &screen_net_status, ITEM_NORMAL ),
-    ITEM_TOGGLE( ID_NETWORK_DHCP, 1, 0, S_MENU_NETWORK_DHCP, &g_config.settings.net_dhcp, ITEM_NORMAL ),
-    ITEM_IP( ID_NETWORK_IP, 2, 0, S_MENU_NETWORK_IP, &g_config.settings.net_ip, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_MASK, 3, 0, S_MENU_NETWORK_MASK, &g_config.settings.net_mask, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_GATEWAY, 4, 0, S_MENU_NETWORK_GATEWAY, &g_config.settings.net_gateway, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_DNS, 5, 0, S_MENU_NETWORK_DNS, &g_config.settings.net_dns, ITEM_EDIT_FULLSCREEN ),
-    ITEM_TEXT( ID_NETWORK_HOSTNAME, 6, 0, S_MENU_NETWORK_HOSTNAME, &g_config.settings.hostname,
+    ITEM_TOGGLE( ID_NETWORK_DHCP, 1, 0, S_MENU_NETWORK_DHCP, &g_config.network.dhcp, ITEM_NORMAL ),
+    ITEM_IP( ID_NETWORK_IP, 2, 0, S_MENU_NETWORK_IP, &g_config.network.ip, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_MASK, 3, 0, S_MENU_NETWORK_MASK, &g_config.network.mask, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_GATEWAY, 4, 0, S_MENU_NETWORK_GATEWAY, &g_config.network.gateway, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_DNS, 5, 0, S_MENU_NETWORK_DNS, &g_config.network.dns, ITEM_EDIT_FULLSCREEN ),
+    ITEM_TEXT( ID_NETWORK_HOSTNAME, 6, 0, S_MENU_NETWORK_HOSTNAME, &g_config.network.hostname,
                MAX_HOSTNAME_LENGTH, ITEM_EDIT_FULLSCREEN ),
     ITEM_END()
 };
@@ -324,14 +324,14 @@ PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE_VISUAL[] = {
 
 /* Edit night lamp settings */
 PROGMEM const struct ScreenItemBase ITEMS_EDIT_NIGHT_LAMP[] = {
-    ITEM_LIST( ID_LAMP_COLOR, 0, 0, S_NIGHT_LAMP_COLOR, &g_config.settings.lamp.color,
+    ITEM_LIST( ID_LAMP_COLOR, 0, 0, S_NIGHT_LAMP_COLOR, &g_config.clock.lamp.color,
                _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
                ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_BAR( ID_LAMP_BRIGHTNESS, 1, 0, S_NIGHT_LAMP_BRIGHTNESS, &g_config.settings.lamp.brightness,
+    ITEM_BAR( ID_LAMP_BRIGHTNESS, 1, 0, S_NIGHT_LAMP_BRIGHTNESS, &g_config.clock.lamp.brightness,
               MIN_LAMP_BRIGHTNESS, MAX_LAMP_BRIGHTNESS, 12, ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_NUMBER( ID_LAMP_DELAY, 2, 0, S_NIGHT_LAMP_DELAY, &g_config.settings.lamp.delay_off,
+    ITEM_NUMBER( ID_LAMP_DELAY, 2, 0, S_NIGHT_LAMP_DELAY, &g_config.clock.lamp.delay_off,
                  MIN_LAMP_DELAY_OFF, MAX_LAMP_DELAY_OFF,
                  ITEM_NUMBER_INC_WHOLE | ITEM_EDIT_FULLSCREEN | ITEM_NOCURSOR ),
     ITEM_END()

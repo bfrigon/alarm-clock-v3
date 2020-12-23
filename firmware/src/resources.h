@@ -208,14 +208,19 @@ PROG_STR( S_CONSOLE_BUSY,               "Console is busy running another task!" 
 PROG_STR( S_CONSOLE_WIFI_BUSY,          "WiFi manager is busy running another request." );
 PROG_STR( S_CONSOLE_PROMPT,             "> " );
 PROG_STR( S_CONSOLE_USAGE,              "Usage : " );
+PROG_STR( S_CONSOLE_APPLY,              "Apply settings? " );
 PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
+PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid parameter! Enter 'Y' or 'N'" );
+PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
+PROG_STR( S_CONSOLE_INVALID_INPUT_SUB,  "Invalid subnet mask" );
 PROG_STR( S_CONSOLE_MISSING_PARAMATER,  "Missing parameter!" );
-PROG_STR( S_CONSOLE_INVALID_PARAMATER,  "Invalid parameter!" );
 PROG_STR( S_CONSOLE_NET_CONNECTED,      "Connected" );
 PROG_STR( S_CONSOLE_NET_DISCONNECTED,   "Disconnected" );
 PROG_STR( S_CONSOLE_NET_NOT_CONNECTED,  "Not connected to the WiFi network" );
+PROG_STR( S_CONSOLE_NET_ALREADY_CONN,   "Already connected to the WiFi network" );
 PROG_STR( S_CONSOLE_NET_CONNECT_FAIL,   "Failed to connect (%d)\r\n" );
-PROG_STR( S_CONSOLE_NET_RECONNECTING,   "Reonnecting to %s...\r\n" );
+PROG_STR( S_CONSOLE_NET_RECONNECTING,   "Re-connecting to %s...\r\n" );
+PROG_STR( S_CONSOLE_NET_CONNECTING,     "Connecting to %s...\r\n" );
 PROG_STR( S_CONSOLE_NET_INVALID_HOST,   "Invalid hostname" );
 PROG_STR( S_CONSOLE_NET_DNS_QUERY,      "Resolving %s..." );
 PROG_STR( S_CONSOLE_NET_PING_HOSTNAME,  "Pinging %s..." );
@@ -233,6 +238,17 @@ PROG_STR( S_CONSOLE_NET_IP,             "Local IP address : %d.%d.%d.%d\r\n" );
 PROG_STR( S_CONSOLE_NET_MASK,           "Subnet mask      : %d.%d.%d.%d\r\n" );
 PROG_STR( S_CONSOLE_NET_GATEWAY,        "Gateway          : %d.%d.%d.%d\r\n" );
 PROG_STR( S_CONSOLE_NET_DNS,            "DNS              : %d.%d.%d.%d\r\n" );
+
+PROG_STR( S_CONSOLE_NET_CFG_INSTR,      "Network settings\r\nLeave the field empty to keep existing settings." );
+PROG_STR( S_CONSOLE_NET_CFG_SSID,       "SSID (%s): " );
+PROG_STR( S_CONSOLE_NET_CFG_KEY,        "Password: " );
+PROG_STR( S_CONSOLE_NET_CFG_DHCP,       "Use DHCP (%s): " );
+PROG_STR( S_CONSOLE_NET_CFG_IP,         "Local IP address (%d.%d.%d.%d): " );
+PROG_STR( S_CONSOLE_NET_CFG_SUBNET,     "Subnet mask (%d.%d.%d.%d): " );
+PROG_STR( S_CONSOLE_NET_CFG_GATEWAY,    "Gateway address (%d.%d.%d.%d): " );
+PROG_STR( S_CONSOLE_NET_CFG_DNS,        "DNS (%d.%d.%d.%d): " );
+PROG_STR( S_CONSOLE_NET_CFG_APPLY,      "Apply network settings? " );
+
 
 
 

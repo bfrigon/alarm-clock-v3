@@ -33,17 +33,18 @@
  */
 bool Console::startTaskNetRestart() {
 
-     if( g_wifimanager.isBusy() ) {
+     if( g_wifimanager.isBusy() && g_wifimanager.isConnected() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
         this->println();
         return false;
     }
 
     _taskIndex = 0;
-    this->startTask( TASK_CONSOLE_NET_RESTART );
+    this->startTask( TASK_CONSOLE_NET_RESTART, true );
 
-    this->printf_P( S_CONSOLE_NET_RECONNECTING, g_config.settings.ssid );
+    this->printf_P( S_CONSOLE_NET_RECONNECTING, g_config.network.ssid );
     g_wifimanager.reconnect();
+    g_wifimanager.setAutoReconnect( true );
 
     return true;
 }
@@ -61,6 +62,10 @@ bool Console::startTaskNetRestart() {
  *           
  */
 void Console::runTaskNetRestart() {
+
+    if( g_wifimanager.isBusy() == true ) {
+        return;
+    }
 
     wl_status_t status;
     status = g_wifimanager.status();
@@ -90,7 +95,7 @@ void Console::runTaskNetRestart() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts a network status print task
+ * Starts a network connection task
  *
  * Arguments
  * ---------
@@ -99,8 +104,18 @@ void Console::runTaskNetRestart() {
  * Returns : TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool Console::startTaskNetStatus() {
-    this->startTask( TASK_CONSOLE_NET_STATUS );
+bool Console::startTaskNetStart() {
+    if( g_wifimanager.isConnected() == true ) {
+        this->println_P( S_CONSOLE_NET_ALREADY_CONN );
+        this->println();
+        return false;
+    }
+
+    this->startTask( TASK_CONSOLE_NET_START, true );
+
+    this->printf_P( S_CONSOLE_NET_CONNECTING, g_config.network.ssid );
+    g_wifimanager.connect();
+    g_wifimanager.setAutoReconnect( true );
 
     return true;
 }
@@ -108,7 +123,40 @@ bool Console::startTaskNetStatus() {
 
 /*--------------------------------------------------------------------------
  *
- * Run the network status print task
+ * Starts a network disconnect task
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successful, FALSE if another task is already running.
+ *           
+ */
+bool Console::startTaskNetStop() {
+    if( g_wifimanager.isConnected() == false ) {
+        this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
+        this->println();
+        return false;
+    }
+
+    if( g_wifimanager.isBusy() && g_wifimanager.isConnected() ) {
+        this->println_P( S_CONSOLE_WIFI_BUSY );
+        this->println();
+        return false;
+    }
+    
+    this->startTask( TASK_CONSOLE_NET_STOP, true );
+
+    g_wifimanager.setAutoReconnect( false );
+    g_wifimanager.disconnect();
+
+    return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Monitor the network disconnect task
  *
  * Arguments
  * ---------
@@ -117,7 +165,29 @@ bool Console::startTaskNetStatus() {
  * Returns : Nothing
  *           
  */
-void Console::runTaskNetStatus() {
+void Console::runTaskNetStop() {
+    
+    if( g_wifimanager.isConnected() == false ) {
+        this->println_P( S_CONSOLE_NET_DISCONNECTED );
+
+        this->endTask( TASK_SUCCESS );
+    }
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Print status of the WiFi connection
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
+void Console::printNetStatus() {
+
     IPAddress addr;
 
     /* Print connection status */
@@ -130,11 +200,11 @@ void Console::runTaskNetStatus() {
     }
     
     /* Print SSID */
-    this->printf_P( S_CONSOLE_NET_SSID, g_config.settings.ssid );
+    this->printf_P( S_CONSOLE_NET_SSID, g_config.network.ssid );
 
     /* Print if DHCP is ON or OFF */
     this->print_P( S_CONSOLE_NET_DHCP );
-    this->println_P( g_config.settings.net_dhcp == true ? S_YES : S_NO );
+    this->println_P( g_config.network.dhcp == true ? S_YES : S_NO );
 
     /* Print local IP address */
     addr = g_wifimanager.getLocalIP();
@@ -151,10 +221,6 @@ void Console::runTaskNetStatus() {
     /* Print DNS server address */
     addr = g_wifimanager.getDNS();
     this->printf_P( S_CONSOLE_NET_DNS, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
-
-
-    this->endTask( TASK_SUCCESS );
-
 }
 
 
@@ -361,4 +427,228 @@ void Console::runTaskPing() {
         this->endTask( rtt );          
     }    
     
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Starts the network configuration task
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successful, FALSE if another task is already running.
+ *           
+ */
+bool Console::startTaskNetworkConfig() {
+
+    _taskIndex = 0;
+
+    this->println();
+    this->println_P( S_CONSOLE_NET_CFG_INSTR );
+    this->println();
+
+    this->startTask( TASK_CONSOLE_NET_CONFIG );
+
+    /* Disable auto-reconnect while entering settings */
+    g_wifimanager.setAutoReconnect( false );
+
+    return true;
+}
+
+
+void Console::runTaskNetworkConfig() {
+    IPAddress addr;
+
+    /* Even index display the prompt, odd index process user input */
+    if( _taskIndex % 2 ) {
+
+        if( this->processInput() == false ) {
+            return;
+        }
+
+        this->trimInput();
+    }
+
+    switch( _taskIndex++ ) {
+
+        /* Display network SSID prompt */
+        case 0:
+            this->printf_P( S_CONSOLE_NET_CFG_SSID, g_config.network.ssid );
+            break;
+
+        /* Validate network SSID input */
+        case 1:
+            if( _inputlength > 0 ) {
+                strncpy( g_config.network.ssid, _inputbuffer, MAX_SSID_LENGTH );
+            }
+            break;
+
+        /* Display WiFi password prompt */
+        case 2:
+            this->print_P( S_CONSOLE_NET_CFG_KEY );
+            break;
+
+        /* Validate WiFi password prompt */
+        case 3:
+            if( _inputlength > 0 ) {
+                strncpy( g_config.network.wkey, _inputbuffer, MAX_WKEY_LENGTH );
+            }
+            break;
+
+        /* Display use DHCP prompt */
+        case 4:
+            this->printf_P( S_CONSOLE_NET_CFG_DHCP, (g_config.network.dhcp == true ? "Y" : "N" ));
+            break;
+
+        /* Validate use DHCP answer */
+        case 5:
+            if( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+                g_config.network.dhcp = true;
+
+                /* Skips static ip settings */
+                _taskIndex = 14;
+
+            } else if ( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+                g_config.network.dhcp = false;
+
+            } else if ( _inputlength > 0 ) {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+                this->println();
+
+                /* try again */
+                _taskIndex = 4;
+            } else {
+
+                if( g_config.network.dhcp == true ) {
+
+                    /* Skips static ip settings */
+                    _taskIndex = 14;
+                }
+            }
+            break;
+
+        /* Display local ip address prompt */
+        case 6:
+            addr = g_config.network.ip;
+            this->printf_P( S_CONSOLE_NET_CFG_IP, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+            break;
+
+        /* Validate local ip address prompt */
+        case 7:
+            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+                IPADDRESS_TO_ARRAY( addr, g_config.network.ip );
+                
+            } else if( _inputlength > 0 ) {
+                this->println_P( S_CONSOLE_INVALID_INPUT_IP );
+                this->println();
+
+                /* try again */
+                _taskIndex = 6;
+
+            }
+            break;
+
+        /* Display subnet mask prompt */
+        case 8:
+            addr = g_config.network.mask;
+            this->printf_P( S_CONSOLE_NET_CFG_SUBNET, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+            break;
+
+        /* Validate local ip address prompt */
+        case 9:
+            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+                IPADDRESS_TO_ARRAY( addr, g_config.network.mask );
+                
+            } else if( _inputlength > 0 ) {
+                this->println_P( S_CONSOLE_INVALID_INPUT_SUB );
+                this->println();
+
+                /* try again */
+                _taskIndex = 8;
+
+            }
+            break;  
+
+        /* Display gateway address prompt */
+        case 10:
+            addr = g_config.network.gateway;
+            this->printf_P( S_CONSOLE_NET_CFG_GATEWAY, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+            break;
+
+        /* Validate gateway address prompt */
+        case 11:
+            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+                IPADDRESS_TO_ARRAY( addr, g_config.network.gateway );
+                
+            } else if( _inputlength > 0 ) {
+                this->println_P( S_CONSOLE_INVALID_INPUT_IP );
+                this->println();
+
+                /* try again */
+                _taskIndex = 10;
+
+            }
+            break;       
+
+        /* Display DNS address prompt */
+        case 12:
+            addr = g_config.network.dns;
+            this->printf_P( S_CONSOLE_NET_CFG_DNS, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+            break;
+
+        /* Validate local ip address prompt */
+        case 13:
+            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+                IPADDRESS_TO_ARRAY( addr, g_config.network.dns );
+                
+            } else if( _inputlength > 0 ) {
+                this->println_P( S_CONSOLE_INVALID_INPUT_IP );
+                this->println();
+
+                /* try again */
+                _taskIndex = 12;
+
+            }
+            break;   
+
+        /* Display apply settings prompt */
+        case 14:
+            this->println();
+            this->print_P( S_CONSOLE_NET_CFG_APPLY );
+            break;
+
+        /* Validate apply settings answer */
+        case 15:
+
+            if( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+                g_config.save( EEPROM_SECTION_NETWORK );
+                g_config.apply( EEPROM_SECTION_NETWORK );
+
+                g_wifimanager.setAutoReconnect( true );
+
+            } else if ( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+                g_config.load( EEPROM_SECTION_NETWORK );
+
+            } else {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+
+                /* try again */
+                _taskIndex = 14;
+            }
+            break;
+            
+    }
+
+    this->resetInput();    
+
+    
+    if (_taskIndex > 15 ) {
+        this->endTask( TASK_SUCCESS );
+
+        if( g_wifimanager.isConnected() == true ) {
+            g_wifimanager.setAutoReconnect( true );
+        }
+    }
 }

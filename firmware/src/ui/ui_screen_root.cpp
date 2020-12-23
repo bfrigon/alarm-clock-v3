@@ -115,10 +115,10 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
 
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-        timeToBuf( buffer, g_config.settings.clock_24h, g_rtc.now() );
+        timeToBuf( buffer, g_config.clock.display_24h, g_rtc.now() );
 
     } else {
-        dateToBuf( buffer, g_config.settings.date_format, g_rtc.now() );
+        dateToBuf( buffer, g_config.clock.date_format, g_rtc.now() );
     }
 
     g_lcd.setPosition( 1, 0 );

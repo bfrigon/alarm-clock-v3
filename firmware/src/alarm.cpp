@@ -841,7 +841,7 @@ void Alarm::visualStart() {
     switch( this->profile.visualMode ) {
 
         case ALARM_VISUAL_FADING:
-            this->_visualStepValue = g_config.settings.clock_brightness;
+            this->_visualStepValue = g_config.clock.clock_brightness;
             break;
 
         default:
@@ -915,7 +915,7 @@ inline void Alarm::visualStep() {
 
             this->_visualStepReverse = !this->_visualStepReverse;
 
-            g_clock.setBrightness( this->_visualStepReverse ? 0 : ( g_config.settings.clock_brightness + 25 ) );
+            g_clock.setBrightness( this->_visualStepReverse ? 0 : ( g_config.clock.clock_brightness + 25 ) );
 
             if( this->profile.visualMode == ALARM_VISUAL_RED_FLASH ) {
                 g_clock.setColorFromTable( COLOR_RED );
@@ -926,17 +926,17 @@ inline void Alarm::visualStep() {
         case ALARM_VISUAL_WHITE_FLASH:
             this->_visualStepReverse = !this->_visualStepReverse;
 
-            g_clock.setBrightness( g_config.settings.clock_brightness + 25 );
-            g_clock.setColorFromTable( this->_visualStepReverse ? COLOR_WHITE : g_config.settings.clock_color );
+            g_clock.setBrightness( g_config.clock.clock_brightness + 25 );
+            g_clock.setColorFromTable( this->_visualStepReverse ? COLOR_WHITE : g_config.clock.clock_color );
             break;
 
         case ALARM_VISUAL_FADING:
             if( this->_visualStepValue
-                    < ( ( g_config.settings.clock_brightness < 25 ) ? 5 : ( g_config.settings.clock_brightness - 20 ) ) ) {
+                    < ( ( g_config.clock.clock_brightness < 25 ) ? 5 : ( g_config.clock.clock_brightness - 20 ) ) ) {
                 this->_visualStepReverse = false;
             }
 
-            if( this->_visualStepValue > ( g_config.settings.clock_brightness + 20 ) ) {
+            if( this->_visualStepValue > ( g_config.clock.clock_brightness + 20 ) ) {
                 this->_visualStepReverse = true;
             }
 
@@ -945,7 +945,7 @@ inline void Alarm::visualStep() {
             break;
 
         case ALARM_VISUAL_RAINBOW:
-            g_clock.setBrightness( g_config.settings.clock_brightness + 25 );
+            g_clock.setBrightness( g_config.clock.clock_brightness + 25 );
 
             this->_visualStepValue += 5;
 
@@ -987,8 +987,8 @@ inline void Alarm::visualStop() {
     g_lamp.deactivate();
 
     /* Restore clock settings */
-    g_clock.setColorFromTable( g_config.settings.clock_color );
-    g_clock.setBrightness( g_config.settings.clock_brightness );
+    g_clock.setColorFromTable( g_config.clock.clock_color );
+    g_clock.setBrightness( g_config.clock.clock_brightness );
     g_clock.update();
 }
 
@@ -1184,7 +1184,7 @@ bool Alarm::isAlarmEnabled() {
         return false;
     }
 
-    return ( ( g_config.settings.alarm_on[0] == true ) || ( g_config.settings.alarm_on[1] == true ) );
+    return ( ( g_config.clock.alarm_on[0] == true ) || ( g_config.clock.alarm_on[1] == true ) );
 }
 
 
@@ -1239,8 +1239,8 @@ int8_t Alarm::getNextAlarmID( DateTime* currentTime, bool matchNow ) {
         return -1;
     }
 
-    if( g_config.settings.alarm_on[1] == true ) {
-        if( g_config.settings.alarm_on[0] == false ) {
+    if( g_config.clock.alarm_on[1] == true ) {
+        if( g_config.clock.alarm_on[0] == false ) {
 
             /* Alarm 0 is not active, so alarm 1 is always next */
             return 1;

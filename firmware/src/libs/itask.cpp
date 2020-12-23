@@ -30,13 +30,18 @@ int ITask::getTaskError() {
     return this->_taskError;
 }
 
+unsigned long ITask::getTaskRunningTime() {
+    return millis() - this->_timerTaskStart;
+}
 
-uint8_t ITask::startTask( uint8_t task ) {
 
-    if( this->_currentTask != TASK_NONE ) {
+uint8_t ITask::startTask( uint8_t task, bool force ) {
+
+    if( this->_currentTask != TASK_NONE && force == false ) {
         return this->_currentTask;
     }
 
+    this->_timerTaskStart = millis();
     this->_currentTask = task;
     this->_taskError = TASK_SUCCESS;
     return task;
@@ -45,6 +50,7 @@ uint8_t ITask::startTask( uint8_t task ) {
 void ITask::endTask( int error ) {
     
     this->_currentTask = TASK_NONE;
+    this->_timerTaskStart = 0;
 
     if( this->_taskError == TASK_SUCCESS ) {
         this->_taskError = error;

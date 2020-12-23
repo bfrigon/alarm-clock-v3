@@ -76,7 +76,7 @@ bool netStatus_onDrawScreen( Screen* screen ) {
             g_lcd.print_P( S_SSID );
 
             g_lcd.setPosition( 1, 0 );
-            g_lcd.print( g_config.settings.ssid, 16, TEXT_ALIGN_LEFT);
+            g_lcd.print( g_config.network.ssid, 16, TEXT_ALIGN_LEFT);
             break;
     }
 

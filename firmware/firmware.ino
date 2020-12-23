@@ -131,8 +131,8 @@ void setup() {
     
 
     /* Set clock display color and brightness */
-    g_clock.setColorFromTable( g_config.settings.clock_color );
-    g_clock.setBrightness( g_config.settings.clock_brightness );
+    g_clock.setColorFromTable( g_config.clock.clock_color );
+    g_clock.setBrightness( g_config.clock.clock_brightness );
     g_clock.update();
 
     /* Initialize DS3231 RTC */
@@ -143,7 +143,7 @@ void setup() {
 
     /* Initialize OLED display */
     g_lcd.begin();
-    g_lcd.setContrast( g_config.settings.lcd_contrast );
+    g_lcd.setContrast( g_config.clock.lcd_contrast );
 
     /* Initialize touch keypad */
     g_keypad.begin();

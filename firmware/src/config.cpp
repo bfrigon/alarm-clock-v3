@@ -34,7 +34,7 @@
  *
  * Returns :
  */
-void ConfigManager::load() {
+void ConfigManager::load( uint8_t section ) {
     uint8_t c;
     uint8_t byte;
 
@@ -46,14 +46,25 @@ void ConfigManager::load() {
         return;
     }
 
-    for( c = 0; c < sizeof( GlobalSettings ); c++ ) {
-        byte = EEPROM.read( EEPROM_ADDR_CONFIG + c );
+    if( section & EEPROM_SECTION_CLOCK ) {
 
-        *( ( ( uint8_t* )&this->settings ) + c ) = byte;
+        for( c = 0; c < sizeof( ClockSettings ); c++ ) {
+            byte = EEPROM.read( EEPROM_ADDR_CLOCK_CONFIG + c );
+
+            *( ( ( uint8_t* )&this->clock ) + c ) = byte;
+        }
+
+        this->clock.lamp.mode = LAMP_MODE_OFF;
     }
 
+    if( section & EEPROM_SECTION_NETWORK ) {
 
-    this->settings.lamp.mode = LAMP_MODE_OFF;
+        for( c = 0; c < sizeof( NetworkSettings ); c++ ) {
+            byte = EEPROM.read( EEPROM_ADDR_NETWORK_CONFIG + c );
+
+            *( ( ( uint8_t* )&this->network ) + c ) = byte;
+        }
+    }
 }
 
 
@@ -67,7 +78,7 @@ void ConfigManager::load() {
  *
  * Returns :
  */
-void ConfigManager::save() {
+void ConfigManager::save( uint8_t section ) {
     uint8_t c;
     uint8_t byte;
 
@@ -75,10 +86,22 @@ void ConfigManager::save() {
     EEPROM.update( EEPROM_ADDR_MAGIC + 0, 0xEF );
     EEPROM.update( EEPROM_ADDR_MAGIC + 1, 0xBE );
 
-    for( c = 0; c < sizeof( GlobalSettings ); c++ ) {
-        byte = *( ( ( uint8_t* )&this->settings ) + c );
+    if( section & EEPROM_SECTION_CLOCK ) {
 
-        EEPROM.update( EEPROM_ADDR_CONFIG + c, byte );
+        for( c = 0; c < sizeof( ClockSettings ); c++ ) {
+            byte = *((( uint8_t* )&this->clock ) + c );
+
+            EEPROM.update( EEPROM_ADDR_CLOCK_CONFIG + c, byte );
+        }
+    }
+
+    if( section & EEPROM_SECTION_NETWORK ) {
+
+        for( c = 0; c < sizeof( NetworkSettings ); c++ ) {
+            byte = *((( uint8_t* )&this->network ) + c );
+
+            EEPROM.update( EEPROM_ADDR_NETWORK_CONFIG + c, byte );
+        }
     }
 }
 
@@ -93,13 +116,20 @@ void ConfigManager::save() {
  *
  * Returns :
  */
-void ConfigManager::apply() {
+void ConfigManager::apply( uint8_t section ) {
 
-    g_clock.setColorFromTable( this->settings.clock_color );
-    g_clock.setBrightness( this->settings.clock_brightness );
-    g_lcd.setContrast( this->settings.lcd_contrast );
+    if( section & EEPROM_SECTION_CLOCK ) {
 
-    g_clockUpdate = true;
+        g_clock.setColorFromTable( this->clock.clock_color );
+        g_clock.setBrightness( this->clock.clock_brightness );
+        g_lcd.setContrast( this->clock.lcd_contrast );
+
+        g_clockUpdate = true;
+    }
+
+    if( section & EEPROM_SECTION_NETWORK ) {
+        g_wifimanager.reconnect();
+    }
 }
 
 
@@ -114,13 +144,13 @@ void ConfigManager::apply() {
  * Returns :
  */
 void ConfigManager::reset() {
-    this->settings.ssid[0] = 0;
-    this->settings.wkey[0] = 0;
-    this->settings.lamp.brightness = 60;
-    this->settings.lamp.mode = LAMP_MODE_OFF;
-    this->settings.lamp.color = COLOR_WHITE;
+    this->network.ssid[0] = 0;
+    this->network.wkey[0] = 0;
+    this->clock.lamp.brightness = 60;
+    this->clock.lamp.mode = LAMP_MODE_OFF;
+    this->clock.lamp.color = COLOR_WHITE;
 
-    strcpy_P(&this->settings.hostname[0], S_DEFAULT_HOSTNAME );
+    strcpy_P(&this->network.hostname[0], S_DEFAULT_HOSTNAME );
 
 
     /* Store default config */
@@ -355,9 +385,9 @@ void ConfigManager::endRestore( int error ) {
     if( error == TASK_SUCCESS ) {
 
         g_alarm.saveProfile( this->_currentAlarmID );
-        this->save();
+        this->save( EEPROM_SECTION_ALL );
 
-        this->apply();
+        this->apply( EEPROM_SECTION_ALL );
     }
 }
 
@@ -447,62 +477,62 @@ bool ConfigManager::readNextLine() {
 
 
     if( this->matchSettingName( name, SETTING_NAME_24H, SECTION_ID_CLOCK ) == true ) {
-        this->parseSettingValue( value, &this->settings.clock_24h, SETTING_TYPE_BOOL );
+        this->parseSettingValue( value, &this->clock.display_24h, SETTING_TYPE_BOOL );
 
     } else if( this->matchSettingName( name, SETTING_NAME_COLOR,  SECTION_ID_CLOCK ) == true ) {
-        this->parseSettingValue( value, &this->settings.clock_color, SETTING_TYPE_INTEGER, 0, COLOR_TABLE_MAX_COLORS - 1 );
+        this->parseSettingValue( value, &this->clock.clock_color, SETTING_TYPE_INTEGER, 0, COLOR_TABLE_MAX_COLORS - 1 );
 
     } else if( this->matchSettingName( name, SETTING_NAME_BRIGHTNESS, SECTION_ID_CLOCK ) == true ) {
-        this->parseSettingValue( value, &this->settings.clock_brightness, SETTING_TYPE_INTEGER,
+        this->parseSettingValue( value, &this->clock.clock_brightness, SETTING_TYPE_INTEGER,
                                  MIN_CLOCK_BRIGHTNESS, MAX_CLOCK_BRIGHTNESS );
 
     } else if( this->matchSettingName( name, SETTING_NAME_DATEFMT, SECTION_ID_LCD ) == true ) {
-        this->parseSettingValue( value, &this->settings.date_format, SETTING_TYPE_INTEGER, 0, MAX_DATE_FORMATS - 1 );
+        this->parseSettingValue( value, &this->clock.date_format, SETTING_TYPE_INTEGER, 0, MAX_DATE_FORMATS - 1 );
 
     } else if( this->matchSettingName( name, SETTING_NAME_ALS_PRESET, SECTION_ID_ALS ) == true ) {
-        this->parseSettingValue( value, &this->settings.als_preset, SETTING_TYPE_INTEGER, 0, MAX_ALS_PRESETS_NAMES - 1 );
+        this->parseSettingValue( value, &this->clock.als_preset, SETTING_TYPE_INTEGER, 0, MAX_ALS_PRESETS_NAMES - 1 );
 
     } else if( this->matchSettingName( name, SETTING_NAME_CONTRAST, SECTION_ID_LCD ) == true ) {
-        this->parseSettingValue( value, &this->settings.lcd_contrast, SETTING_TYPE_INTEGER,
+        this->parseSettingValue( value, &this->clock.lcd_contrast, SETTING_TYPE_INTEGER,
                                  MIN_LCD_CONTRAST, MAX_LCD_CONTRAST );
 
     } else if( this->matchSettingName( name, SETTING_NAME_COLOR,  SECTION_ID_LAMP ) == true ) {
-        this->parseSettingValue( value, &this->settings.lamp.color, SETTING_TYPE_INTEGER, 0, COLOR_TABLE_MAX_COLORS - 1 );
+        this->parseSettingValue( value, &this->clock.lamp.color, SETTING_TYPE_INTEGER, 0, COLOR_TABLE_MAX_COLORS - 1 );
 
     } else if( this->matchSettingName( name, SETTING_NAME_BRIGHTNESS, SECTION_ID_LAMP ) == true ) {
-        this->parseSettingValue( value, &this->settings.lamp.brightness, SETTING_TYPE_INTEGER, MIN_LAMP_BRIGHTNESS,
+        this->parseSettingValue( value, &this->clock.lamp.brightness, SETTING_TYPE_INTEGER, MIN_LAMP_BRIGHTNESS,
                                  MAX_LAMP_BRIGHTNESS );
 
     } else if( this->matchSettingName( name, SETTING_NAME_DELAY, SECTION_ID_LAMP ) == true ) {
-        this->parseSettingValue( value, &this->settings.lamp.delay_off, SETTING_TYPE_INTEGER,
+        this->parseSettingValue( value, &this->clock.lamp.delay_off, SETTING_TYPE_INTEGER,
                                  MIN_LAMP_DELAY_OFF, MAX_LAMP_DELAY_OFF );
 
     } else if( this->matchSettingName( name, SETTING_NAME_DHCP, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.net_dhcp, SETTING_TYPE_BOOL );
+        this->parseSettingValue( value, &this->network.dhcp, SETTING_TYPE_BOOL );
 
     } else if( this->matchSettingName( name, SETTING_NAME_ADDRESS, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.net_ip, SETTING_TYPE_IP );
+        this->parseSettingValue( value, &this->network.ip, SETTING_TYPE_IP );
 
     } else if( this->matchSettingName( name, SETTING_NAME_MASK, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.net_mask, SETTING_TYPE_IP );
+        this->parseSettingValue( value, &this->network.mask, SETTING_TYPE_IP );
 
     } else if( this->matchSettingName( name, SETTING_NAME_GATEWAY, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.net_gateway, SETTING_TYPE_IP );
+        this->parseSettingValue( value, &this->network.gateway, SETTING_TYPE_IP );
 
     } else if( this->matchSettingName( name, SETTING_NAME_DNS, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.net_dns, SETTING_TYPE_IP );
+        this->parseSettingValue( value, &this->network.dns, SETTING_TYPE_IP );
 
     } else if( this->matchSettingName( name, SETTING_NAME_HOSTNAME, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.hostname, SETTING_TYPE_STRING, 0, MAX_HOSTNAME_LENGTH );
+        this->parseSettingValue( value, &this->network.hostname, SETTING_TYPE_STRING, 0, MAX_HOSTNAME_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_SSID, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.ssid, SETTING_TYPE_STRING, 0, MAX_SSID_LENGTH );
+        this->parseSettingValue( value, &this->network.ssid, SETTING_TYPE_STRING, 0, MAX_SSID_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_WKEY, SECTION_ID_NETWORK ) == true ) {
-        this->parseSettingValue( value, &this->settings.wkey, SETTING_TYPE_STRING, 0, MAX_WKEY_LENGTH );
+        this->parseSettingValue( value, &this->network.wkey, SETTING_TYPE_STRING, 0, MAX_WKEY_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_ENABLED, SECTION_ID_ALARM ) == true ) {
-        this->parseSettingValue( value, &this->settings.alarm_on[ this->_currentAlarmID ], SETTING_TYPE_BOOL );
+        this->parseSettingValue( value, &this->clock.alarm_on[ this->_currentAlarmID ], SETTING_TYPE_BOOL );
 
     } else if( this->matchSettingName( name, SETTING_NAME_FILENAME, SECTION_ID_ALARM ) == true ) {
         this->parseSettingValue( value, &g_alarm.profile.filename, SETTING_TYPE_STRING, 0, MAX_LENGTH_ALARM_FILENAME );
@@ -819,80 +849,80 @@ bool ConfigManager::writeNextLine()  {
 
         case SETTING_ID_CLOCK_24H:
             this->writeConfigLine( SETTING_NAME_SECTION_CLOCK, SETTING_TYPE_SECTION, NULL );
-            this->writeConfigLine( SETTING_NAME_24H, SETTING_TYPE_BOOL, &this->settings.clock_24h );
+            this->writeConfigLine( SETTING_NAME_24H, SETTING_TYPE_BOOL, &this->clock.display_24h );
             break;
 
         case SETTING_ID_CLOCK_COLOR:
-            this->writeConfigLine( SETTING_NAME_COLOR, SETTING_TYPE_INTEGER, &this->settings.clock_color );
+            this->writeConfigLine( SETTING_NAME_COLOR, SETTING_TYPE_INTEGER, &this->clock.clock_color );
             break;
 
         case SETTING_ID_CLOCK_BRIGHTNESS:
-            this->writeConfigLine( SETTING_NAME_BRIGHTNESS, SETTING_TYPE_INTEGER, &this->settings.clock_brightness );
+            this->writeConfigLine( SETTING_NAME_BRIGHTNESS, SETTING_TYPE_INTEGER, &this->clock.clock_brightness );
             break;
 
         case SETTING_ID_ALS_PRESET:
             this->writeConfigLine( SETTING_NAME_SECTION_ALS, SETTING_TYPE_SECTION, NULL );
-            this->writeConfigLine( SETTING_NAME_ALS_PRESET, SETTING_TYPE_INTEGER, &this->settings.als_preset );
+            this->writeConfigLine( SETTING_NAME_ALS_PRESET, SETTING_TYPE_INTEGER, &this->clock.als_preset );
             break;
 
         case SETTING_ID_LCD_DATEFMT:
             this->writeConfigLine( SETTING_NAME_SECTION_LCD, SETTING_TYPE_SECTION, NULL );
-            this->writeConfigLine( SETTING_NAME_DATEFMT, SETTING_TYPE_INTEGER, &this->settings.date_format );
+            this->writeConfigLine( SETTING_NAME_DATEFMT, SETTING_TYPE_INTEGER, &this->clock.date_format );
             break;
 
         case SETTING_ID_LCD_CONTRAST:
-            this->writeConfigLine( SETTING_NAME_CONTRAST, SETTING_TYPE_INTEGER, &this->settings.lcd_contrast );
+            this->writeConfigLine( SETTING_NAME_CONTRAST, SETTING_TYPE_INTEGER, &this->clock.lcd_contrast );
             break;
 
         case SETTING_ID_LAMP_COLOR:
             this->writeConfigLine( SETTING_NAME_SECTION_LAMP, SETTING_TYPE_SECTION, NULL );
-            this->writeConfigLine( SETTING_NAME_COLOR, SETTING_TYPE_INTEGER, &this->settings.lamp.color );
+            this->writeConfigLine( SETTING_NAME_COLOR, SETTING_TYPE_INTEGER, &this->clock.lamp.color );
             break;
 
         case SETTING_ID_LAMP_BRIGHTNESS:
-            this->writeConfigLine( SETTING_NAME_BRIGHTNESS, SETTING_TYPE_INTEGER, &this->settings.lamp.brightness );
+            this->writeConfigLine( SETTING_NAME_BRIGHTNESS, SETTING_TYPE_INTEGER, &this->clock.lamp.brightness );
             break;
 
         case SETTING_ID_LAMP_DELAY:
-            this->writeConfigLine( SETTING_NAME_DELAY, SETTING_TYPE_INTEGER, &this->settings.lamp.delay_off );
+            this->writeConfigLine( SETTING_NAME_DELAY, SETTING_TYPE_INTEGER, &this->clock.lamp.delay_off );
             break;
 
         case SETTING_ID_NETWORK_DHCP:
             this->writeConfigLine( SETTING_NAME_SECTION_NETWORK, SETTING_TYPE_SECTION, NULL );
-            this->writeConfigLine( SETTING_NAME_DHCP, SETTING_TYPE_BOOL, &this->settings.net_dhcp );
+            this->writeConfigLine( SETTING_NAME_DHCP, SETTING_TYPE_BOOL, &this->network.dhcp );
             break;
 
         case SETTING_ID_NETWORK_IP:
-            this->writeConfigLine( SETTING_NAME_ADDRESS, SETTING_TYPE_IP, &this->settings.net_ip );
+            this->writeConfigLine( SETTING_NAME_ADDRESS, SETTING_TYPE_IP, &this->network.ip );
             break;
 
         case SETTING_ID_NETWORK_MASK:
-            this->writeConfigLine( SETTING_NAME_MASK, SETTING_TYPE_IP, &this->settings.net_mask );
+            this->writeConfigLine( SETTING_NAME_MASK, SETTING_TYPE_IP, &this->network.mask );
             break;
 
         case SETTING_ID_NETWORK_GATEWAY:
-            this->writeConfigLine( SETTING_NAME_GATEWAY, SETTING_TYPE_IP, &this->settings.net_gateway );
+            this->writeConfigLine( SETTING_NAME_GATEWAY, SETTING_TYPE_IP, &this->network.gateway );
             break;
 
         case SETTING_ID_NETWORK_DNS:
-            this->writeConfigLine( SETTING_NAME_DNS, SETTING_TYPE_IP, &this->settings.net_dns );
+            this->writeConfigLine( SETTING_NAME_DNS, SETTING_TYPE_IP, &this->network.dns );
             break;
 
         case SETTING_ID_NETWORK_HOSTNAME:
-            this->writeConfigLine( SETTING_NAME_HOSTNAME, SETTING_TYPE_STRING, &this->settings.hostname );
+            this->writeConfigLine( SETTING_NAME_HOSTNAME, SETTING_TYPE_STRING, &this->network.hostname );
             break;
 
         case SETTING_ID_NETWORK_SSID:
-            this->writeConfigLine( SETTING_NAME_SSID, SETTING_TYPE_STRING, &this->settings.ssid );
+            this->writeConfigLine( SETTING_NAME_SSID, SETTING_TYPE_STRING, &this->network.ssid );
             break;
 
         case SETTING_ID_NETWORK_WKEY:
-            this->writeConfigLine( SETTING_NAME_WKEY, SETTING_TYPE_STRING, &this->settings.wkey );
+            this->writeConfigLine( SETTING_NAME_WKEY, SETTING_TYPE_STRING, &this->network.wkey );
             break;
 
         case SETTING_ID_ALARM_ENABLED:
             this->writeConfigLine( SETTING_NAME_SECTION_ALARM, SETTING_TYPE_SECTION, &this->_currentAlarmID );
-            this->writeConfigLine( SETTING_NAME_ENABLED, SETTING_TYPE_BOOL, &this->settings.alarm_on[ this->_currentAlarmID ] );
+            this->writeConfigLine( SETTING_NAME_ENABLED, SETTING_TYPE_BOOL, &this->clock.alarm_on[ this->_currentAlarmID ] );
             break;
 
         case SETTING_ID_ALARM_FILENAME:
