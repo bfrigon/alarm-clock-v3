@@ -1,4 +1,6 @@
 
+tzdata/cache/
+
 
 # Ignore documents cache
 *.ods#
@@ -23,6 +25,7 @@
 # Kicad files
 ##########################
 
+fp-info-cache
 *.kicad_pcb-bak
 *.bak
 *.pro
