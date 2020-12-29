@@ -42,12 +42,11 @@
 
 
 #define KEY_NONE                0x00
-#define KEY_LEFT                0x01
-#define KEY_RIGHT               0x02
-#define KEY_CENTER              0x04
+#define KEY_LEFT                0x02
+#define KEY_RIGHT               0x04
+#define KEY_CENTER              0x08
 
 #define KEY_SHIFT               0x80
-#define KEY_SWIPE               0x40
 #define KEY_MENU                KEY_LEFT
 #define KEY_ALARM               KEY_RIGHT
 #define KEY_SET                 KEY_CENTER

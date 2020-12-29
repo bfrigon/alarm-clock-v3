@@ -230,6 +230,21 @@ void Lamp::activate( struct NightLampSettings *settings, bool test_mode, bool fo
 
 /*--------------------------------------------------------------------------
  *
+ * Returns whether or not the lamp is on
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if lamp is ON, FLASE otherwise
+ */
+bool Lamp::isActive() {
+    return ( _mode != LAMP_MODE_OFF );
+}
+
+
+/*--------------------------------------------------------------------------
+ *
  * Update the visual effect animation next step delay when speed settings
  * changes.
  *

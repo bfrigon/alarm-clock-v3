@@ -34,6 +34,7 @@ TSL2591 g_als;
 BQ27441 g_battery;
 ConfigManager g_config;
 Console g_console;
+TimeZone g_timezone;
 
 
 
@@ -125,10 +126,12 @@ void setup() {
         g_config.load();
     }
 
+    /* Initialize time zone */
+    g_timezone.setTimeZone( g_config.clock.tz );
+
     /* Initialize clock display */
     g_clock.begin();
     g_lamp.begin();
-    
 
     /* Set clock display color and brightness */
     g_clock.setColorFromTable( g_config.clock.clock_color );

@@ -1022,10 +1022,14 @@ void Alarm::runTask() {
     }
 
     /* If time has changed, checks for alarms */
-    if( g_rtc.minute() != this->_rtcmin ) {
-        this->_rtcmin = g_rtc.minute();
+    if( g_rtc.now()->minute() != this->_rtcmin ) {
+        this->_rtcmin = g_rtc.now()->minute();
 
-        this->checkForAlarms( g_rtc.now() );
+        DateTime local;
+        local = g_rtc.now();
+        g_timezone.toLocal( &local );
+
+        this->checkForAlarms( &local );
     }
 
 
@@ -1295,11 +1299,11 @@ int16_t Alarm::getNextAlarmOffset( int8_t alarm_id, DateTime* currentTime, bool 
 
     /* Find out on which day the next alarm occurs */
     while( a_dayOffset < 7 ) {
-        if( a_dow > 7 ) {
-            a_dow = 1;
+        if( a_dow > 6 ) {
+            a_dow = 0;
         }
 
-        if( bitRead( profile_dow, a_dow - 1 ) ) {
+        if( bitRead( profile_dow, a_dow ) ) {
             /* Next alarm is on a different day than the current one. */
             if( a_dow != currentTime->dow() ) {
                 break;

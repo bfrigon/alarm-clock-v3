@@ -101,19 +101,12 @@ class DS3231 {
     void disableInterrupt();
     void clearAlarmFlag();
     bool processEvents();
-    struct DateTime* getTime();
+    void getTime( DateTime *dt );
     unsigned long getEpoch();
-    void setDateTime( struct DateTime ndt );
+    void setDateTime( DateTime *ndt );
     void dumpRegs();
 
-    struct DateTime* now()  { return &this->_now; }
-    
-    uint8_t hour()      { return this->_now.hour(); }
-    uint8_t minute()    { return this->_now.minute(); }
-    uint8_t second()    { return this->_now.second(); }
-    uint8_t date()      { return this->_now.date(); }
-    uint8_t month()     { return this->_now.month(); }
-    uint16_t year()     { return this->_now.year(); }
+    DateTime* now()     { return &this->_now; }
 
   private:
     uint8_t read( uint8_t reg );
@@ -123,7 +116,6 @@ class DS3231 {
     int8_t _pin_irq;
 
     struct DateTime _now;
-
 };
 
 void isr_ds3231();

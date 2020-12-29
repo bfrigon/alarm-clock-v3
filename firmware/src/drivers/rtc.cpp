@@ -63,7 +63,7 @@ void DS3231::begin() {
     this->clearAlarmFlag();
     this->enableInterrupt();
 
-    this->getTime();
+    this->getTime( &_now );
 }
 
 
@@ -187,7 +187,7 @@ bool DS3231::processEvents() {
     rtc_event = false;
 
     /* Read the current time */
-    this->getTime();
+    this->getTime( &_now );
 
 
     return true;
@@ -214,11 +214,11 @@ void DS3231::dumpRegs() {
     uint8_t i;
 
     for( i = 0; i < 18; i++ ) {
-        //Serial.print( F( "Register 0x" ) );
-        //Serial.print( i, HEX );
-        //Serial.print( F( ": " ) );
-        //Serial.print( Wire.read(), BIN );
-        //Serial.println( "" );
+        Serial.print( F( "Register 0x" ) );
+        Serial.print( i, HEX );
+        Serial.print( F( ": " ) );
+        Serial.print( Wire.read(), BIN );
+        Serial.println( "" );
     }
 }
 
@@ -229,11 +229,12 @@ void DS3231::dumpRegs() {
  *
  * Arguments
  * ---------
- *  None
+ *  - dt : Pointer to the DateTime structure where the date and time will
+ *         be stored.
  *
- * Returns : Structure containing the current date and time.
+ * Returns : Nothing
  */
-DateTime* DS3231::getTime() {
+void DS3231::getTime( DateTime *dt ) {
 
     Wire.beginTransmission( I2C_ADDR_DS3231 );
     Wire.write( DS3231_REG_SEC );
@@ -252,9 +253,7 @@ DateTime* DS3231::getTime() {
     uint8_t  m = bcd2bin( Wire.read() );
     uint16_t y = bcd2bin( Wire.read() ) + 2000;
 
-    this->_now = DateTime( y, m, d, hh, mm, ss, wd );
-
-    return &this->_now;
+    dt->set( y, m, d, hh, mm, ss );
 }
 
 
@@ -285,18 +284,18 @@ unsigned long DS3231::getEpoch() {
  *
  * Returns : Nothing
  */
-void DS3231::setDateTime( DateTime ndt ) {
+void DS3231::setDateTime( DateTime *ndt ) {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
 
     Wire.write( DS3231_REG_SEC );
 
-    Wire.write( bin2bcd( ndt.second() ) );
-    Wire.write( bin2bcd( ndt.minute() ) );
-    Wire.write( bin2bcd( ndt.hour() & ~DS3231_HOUR_24H ) );
-    Wire.write( bin2bcd( ndt.dow() ) );
-    Wire.write( bin2bcd( ndt.date() ) );
-    Wire.write( bin2bcd( ndt.month() ) );
-    Wire.write( bin2bcd( ndt.year() - 2000 ) );
+    Wire.write( bin2bcd( ndt->second() ) );
+    Wire.write( bin2bcd( ndt->minute() ) );
+    Wire.write( bin2bcd( ndt->hour() & ~DS3231_HOUR_24H ) );
+    Wire.write( bin2bcd( ndt->dow() + 1 ) );
+    Wire.write( bin2bcd( ndt->day() ) );
+    Wire.write( bin2bcd( ndt->month() ) );
+    Wire.write( bin2bcd( ndt->year() % 100 ) );
 
     Wire.endTransmission();
 }

@@ -89,6 +89,8 @@
 #define SETTING_TYPE_COMMENT        6
 #define SETTING_TYPE_TIME           7
 #define SETTING_TYPE_DOW            8
+#define SETTING_TYPE_SHORT          9
+#define SETTING_TYPE_TIMEZONE       10
 
 /* Settings names */
 #define SETTING_VALUE_FALSE         "off"
@@ -110,6 +112,8 @@ PROG_STR( SETTING_NAME_COLOR,               "color" );
 PROG_STR( SETTING_NAME_BRIGHTNESS,          "brightness" );
 PROG_STR( SETTING_NAME_DELAY,               "delay" );
 PROG_STR( SETTING_NAME_DATEFMT,             "datefmt" );
+PROG_STR( SETTING_NAME_USE_NTP,             "ntp" );
+PROG_STR( SETTING_NAME_TIMEZONE_ID,         "timezone_id" );
 PROG_STR( SETTING_NAME_ALS_PRESET,          "preset" );
 PROG_STR( SETTING_NAME_CONTRAST,            "contrast" );
 PROG_STR( SETTING_NAME_VOLUME,              "volume" );
@@ -139,38 +143,40 @@ PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 #define SETTING_ID_CLOCK_24H                1   /* Begin clock section */
 #define SETTING_ID_CLOCK_COLOR              2
 #define SETTING_ID_CLOCK_BRIGHTNESS         3
-#define SETTING_ID_ALS_PRESET               4   /* Begin ALS section */
-#define SETTING_ID_LCD_DATEFMT              5   /* Begin LCD section */
-#define SETTING_ID_LCD_CONTRAST             6
-#define SETTING_ID_LAMP_COLOR               7
-#define SETTING_ID_LAMP_BRIGHTNESS          8
-#define SETTING_ID_LAMP_DELAY               9
-#define SETTING_ID_NETWORK_DHCP             10  /* Begin network section */
-#define SETTING_ID_NETWORK_IP               11
-#define SETTING_ID_NETWORK_MASK             12
-#define SETTING_ID_NETWORK_GATEWAY          13
-#define SETTING_ID_NETWORK_DNS              14
-#define SETTING_ID_NETWORK_SSID             15
-#define SETTING_ID_NETWORK_HOSTNAME         16
-#define SETTING_ID_NETWORK_WKEY             17
+#define SETTING_ID_CLOCK_NTP                4
+#define SETTING_ID_TIMEZONE_ID              5
+#define SETTING_ID_ALS_PRESET               6   /* Begin ALS section */
+#define SETTING_ID_LCD_DATEFMT              7   /* Begin LCD section */
+#define SETTING_ID_LCD_CONTRAST             8
+#define SETTING_ID_LAMP_COLOR               9
+#define SETTING_ID_LAMP_BRIGHTNESS          10
+#define SETTING_ID_LAMP_DELAY               11
+#define SETTING_ID_NETWORK_DHCP             12  /* Begin network section */
+#define SETTING_ID_NETWORK_IP               13
+#define SETTING_ID_NETWORK_MASK             14
+#define SETTING_ID_NETWORK_GATEWAY          15
+#define SETTING_ID_NETWORK_DNS              16
+#define SETTING_ID_NETWORK_SSID             17
+#define SETTING_ID_NETWORK_HOSTNAME         18
+#define SETTING_ID_NETWORK_WKEY             19
 
-#define SETTING_ID_ALARM_BEGIN              18  /* Begin alarm section */
-#define SETTING_ID_ALARM_ENABLED            18
-#define SETTING_ID_ALARM_FILENAME           19
-#define SETTING_ID_ALARM_TIME               20
-#define SETTING_ID_ALARM_SNOOZE             21
-#define SETTING_ID_ALARM_VOLUME             22
-#define SETTING_ID_ALARM_GRADUAL            23
-#define SETTING_ID_ALARM_DOW                24
-#define SETTING_ID_ALARM_MESSAGE            25
-#define SETTING_ID_ALARM_VISUAL             26
-#define SETTING_ID_ALARM_VISUAL_SPEED       27
-#define SETTING_ID_ALARM_LAMP_MODE          28
-#define SETTING_ID_ALARM_LAMP_SPEED         29
-#define SETTING_ID_ALARM_LAMP_COLOR         30
-#define SETTING_ID_ALARM_LAMP_BRIGHTNESS    31
+#define SETTING_ID_ALARM_BEGIN              20  /* Begin alarm section */
+#define SETTING_ID_ALARM_ENABLED            20
+#define SETTING_ID_ALARM_FILENAME           21
+#define SETTING_ID_ALARM_TIME               22
+#define SETTING_ID_ALARM_SNOOZE             23
+#define SETTING_ID_ALARM_VOLUME             24
+#define SETTING_ID_ALARM_GRADUAL            25
+#define SETTING_ID_ALARM_DOW                26
+#define SETTING_ID_ALARM_MESSAGE            27
+#define SETTING_ID_ALARM_VISUAL             28
+#define SETTING_ID_ALARM_VISUAL_SPEED       29
+#define SETTING_ID_ALARM_LAMP_MODE          30
+#define SETTING_ID_ALARM_LAMP_SPEED         31
+#define SETTING_ID_ALARM_LAMP_COLOR         32
+#define SETTING_ID_ALARM_LAMP_BRIGHTNESS    33
 
-#define SETTING_ID_END                      31
+#define SETTING_ID_END                      33
 
 /* Section ID's */
 #define SECTION_ID_UNKNOWN                  0
@@ -228,6 +234,8 @@ struct AlarmProfile {
 };
 
 struct ClockSettings {
+    bool use_ntp = false;
+    uint16_t tz = 0;
     bool display_24h = false;
     bool alarm_on[2] = { false, false };
 

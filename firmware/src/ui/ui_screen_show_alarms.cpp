@@ -31,12 +31,6 @@
  */
 bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 
-    switch( key ) {
-        case KEY_SWIPE | KEY_RIGHT:
-        case KEY_SWIPE | KEY_LEFT:
-            return true;
-    }
-
     screen->exitScreen();
     return false;
 }
@@ -54,10 +48,13 @@ bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
  */
 bool showAlarmScreen_onDrawScreen( Screen *screen ) {
 
+    DateTime local;
+    local = g_rtc.now();
+    g_timezone.toLocal( &local );
 
 
     /* Get the next alarm id closest from now. */
-    int8_t alarm_id = g_alarm.getNextAlarmID( g_rtc.now(), false );
+    int8_t alarm_id = g_alarm.getNextAlarmID( &local, false );
 
     if( alarm_id == -1 ) {
 
@@ -66,7 +63,7 @@ bool showAlarmScreen_onDrawScreen( Screen *screen ) {
     }
 
     /* Get alarm next trigger time */
-    int16_t alarm_time = g_alarm.getNextAlarmOffset( alarm_id, g_rtc.now(), false );
+    int16_t alarm_time = g_alarm.getNextAlarmOffset( alarm_id, &local, false );
 
     g_lcd.printf_P( S_ALARM_IN, alarm_id + 1 );
     g_lcd.setPosition( 1, 0 );

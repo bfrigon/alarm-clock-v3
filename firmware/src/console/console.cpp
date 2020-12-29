@@ -254,7 +254,7 @@ bool Console::processInput() {
         if( isprint( ch )) {
 
             _inputbuffer[ _inputlength++ ] = ch;
-            Serial.write( ch );
+            Serial.write( _inputHidden == true ? '*' : ch );
 
         /* Backspace */
         } else if( ch == '\b' || ch == 0x7f ) {
@@ -359,6 +359,15 @@ void Console::parseCommand() {
     
     } else if( this->matchCommandName( S_COMMAND_NET_CONFIG, false ) == true ) {
         started = this->startTaskNetworkConfig();
+
+    } else if( this->matchCommandName( S_COMMAND_DATE, false ) == true ) {
+        this->printDateTime();
+        this->println();
+
+        started = false;
+
+    } else if( this->matchCommandName( S_COMMAND_SET_TIMEZONE, true ) == true ) {
+        started = this->startTaskSetTimeZone();
     
     } else if( strlen( _inputbuffer ) == 0 ) {
         started = false;
@@ -427,6 +436,10 @@ void Console::runTask() {
 
             case TASK_CONSOLE_NET_CONFIG:
                 this->runTaskNetworkConfig();
+                break;
+
+            case TASK_CONSOLE_SET_TZ:
+                this->runTaskSetTimeZone();
                 break;
         }
 

@@ -209,6 +209,7 @@ PROG_STR( S_CONSOLE_WIFI_BUSY,          "WiFi manager is busy running another re
 PROG_STR( S_CONSOLE_PROMPT,             "> " );
 PROG_STR( S_CONSOLE_USAGE,              "Usage : " );
 PROG_STR( S_CONSOLE_APPLY,              "Apply settings? " );
+PROG_STR( S_CONSOLE_DONE,               "Done!" );
 PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid parameter! Enter 'Y' or 'N'" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
@@ -249,10 +250,18 @@ PROG_STR( S_CONSOLE_NET_CFG_GATEWAY,    "Gateway address (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_DNS,        "DNS (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_APPLY,      "Apply network settings? " );
 
+PROG_STR( S_CONSOLE_TIME_CFG_TIME,      "Time (HH:MM) :" );
+PROG_STR( S_CONSOLE_TIME_CFG_DATE,      "Date (Y-M-D) :" );
+PROG_STR( S_CONSOLE_TIME_CFG_NTP,       "Syncrhonise clock automatically using NTP :" );
+PROG_STR( S_CONSOLE_TIME_CFG_APPLY,     "Apply clock settings? " );
+PROG_STR( S_CONSOLE_TIME_CURRENT_TZ,    "Current time zone : " );
+PROG_STR( S_CONSOLE_TIME_NEW_TZ,        "New time zone : " );
+PROG_STR( S_CONSOLE_TIME_ENTER_TZ,      "Enter new time zone (leave empty to keep current one) : " );
+PROG_STR( S_CONSOLE_TIME_INVALID_TZ,    "Invalid time zone" );
 
 
-
-
+PROG_STR( S_CONSOLE_DATE_FMT_UTC,       "%S %S %d %02d:%02d:%02d UTC %d\r\n" );
+PROG_STR( S_CONSOLE_DATE_FMT_LOCAL,     "%S %S %d %02d:%02d:%02d %S %d\r\n" );
 
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 

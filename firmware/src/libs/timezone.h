@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/itask.h
+// File    : src/libs/timezone.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,38 +15,36 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef I_TASK_H
-#define I_TASK_H
+#ifndef TIMEZONE_H
+#define TIMEZONE_H
 
 #include <Arduino.h>
-
-#define TASK_NONE     0
-#define TASK_SUCCESS  0
-#define TASK_FAIL     -1
-#define TASK_TIMEOUT  255
+#include <avr/pgmspace.h>
+#include "tzdata.h"
+#include "time.h"
 
 
-class ITask {
+class TimeZone {
+  public: 
+    TimeZone();
 
-  public:
+    void setTimeZone( uint16_t zone_id );
+    int16_t findTimeZoneByName( char* name );
+    const char* getCurrentZoneName();
+    const char* getCurrentZoneAbbreviation( DateTime *local );
 
-    bool isBusy();
-    virtual void runTask();
-    uint8_t getCurrentTask();
-    int getTaskError();
-    unsigned long getTaskRunningTime();
+    void toLocal( DateTime *utc );
+    void toUTC( DateTime *local );
+    long getUtcOffset();
+
+    bool isDST( DateTime *local );
 
   private:
-    uint8_t _currentTask = TASK_NONE;
-    unsigned long _timerTaskStart = 0;
-    int _taskError = 0;
+    uint16_t _id = 0;
+    TimeZoneRules _tz;
 
-  protected:
-    uint8_t startTask( uint8_t task, bool force = false );
-    void endTask( int error = TASK_SUCCESS );
-    void setTaskError( int error );
 };
 
-#endif /* I_TASK_H */
+extern TimeZone g_timezone;
 
-
+#endif /* TIMEZONE_H */

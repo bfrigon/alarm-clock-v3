@@ -391,14 +391,6 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             g_screenUpdate = true;
             break;
-
-        case KEY_SWIPE | KEY_RIGHT:
-            enableNightLamp();
-            break;
-
-        case KEY_SWIPE | KEY_LEFT:
-            disableNightLamp();
-            break;        
     }
 
 }

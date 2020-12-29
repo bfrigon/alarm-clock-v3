@@ -39,6 +39,8 @@
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))
 
 
+
+
 struct Time {
     uint8_t hour;
     uint8_t minute;
@@ -53,36 +55,51 @@ struct Date {
 class DateTime {
   public:
     DateTime();
-    DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec, uint8_t dow );
+    DateTime( DateTime *src );
+    DateTime( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec );
+        
+    void set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec );
+    void offset( long offset );
 
-    uint8_t second()    { return this->_ss; }
-    uint8_t minute()    { return this->_mm; }
-    uint8_t hour()      { return this->_hh; }
-    uint8_t date()      { return this->_d; }
-    uint8_t month()     { return this->_m; }
-    uint16_t year()     { return 2000 + this->_year; }
-    uint8_t dow()       { return this->_dow; }   /*Sunday=1 */
+    bool operator==( const DateTime &right ) const;
+    bool operator!=( const DateTime &right ) const;
+    bool operator<( const DateTime &right ) const;
+    bool operator>( const DateTime &right ) const;
+    bool operator<=( const DateTime &right ) const;
+    bool operator>=( const DateTime &right ) const;
+
+    uint8_t second()    { return _ss; }
+    uint8_t minute()    { return _mm; }
+    uint8_t hour()      { return _hh; }
+    uint8_t day()       { return _d; }
+    uint8_t month()     { return _m; }
+    uint16_t year()     { return _y; }
+    uint8_t dow();
 
     unsigned long getEpoch();
 
   protected:
-    uint8_t _year;
+    uint16_t _y;
     uint8_t _m;
     uint8_t _d;
     uint8_t _hh;
     uint8_t _mm;
     uint8_t _ss;
-    uint8_t _dow;
 };
 
 
 const char* getMonthName( uint8_t month, bool shortName );
 const char* getDayName( uint8_t day, bool shortName );
-uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day );
-uint8_t getMonthNumDays( uint8_t month, uint8_t year );
+uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day );
+uint8_t findDayByDow( uint16_t year, uint8_t month, uint8_t dow, uint8_t order );
+uint8_t getMonthNumDays( uint8_t month, uint16_t year );
+
 
 uint8_t dateToBuf( char* buffer, uint8_t format, DateTime* date );
 uint8_t timeToBuf( char* buffer, bool fmt_24h, DateTime* date );
 uint8_t timeToBuf( char* buffer, bool fmt_24h, Time* time );
+
+
+
 
 #endif /* TIME_H */

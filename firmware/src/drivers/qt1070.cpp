@@ -38,31 +38,31 @@ QT1070::QT1070( uint8_t pin_irq ) {
         this->config.nthr[i] = 0x14;
         this->config.di[i] = 0x04;
         this->config.aks[i] = {
-            0x00,       /* Adjacent key supression group 1 */
-            0x00        /* Averaging factor */
+            0x01,       /* Adjacent key supression group 1 */
+            0           /* Averaging factor */
         };
     }
 
     this->config.guardChannel = 0;
     this->config.maxCal = false;
     this->config.fastOut = false;
-    this->config.maxOn = 250;
+    this->config.maxOn = 65;
     this->config.lowPower = 2;
 
 
 
     /* Initialize Keypad touch IC */
-    this->config.nthr[3] = 20;   /* Menu */
-    this->config.aks[3] = { 0x00, 0x16 };
-    this->config.di[3] = 0x04;
+    this->config.nthr[1] = 30;   /* Menu */
+    this->config.aks[1] = { 0x01, 8 };
+    this->config.di[1] = 4;
 
-    this->config.nthr[1] = 20;   /* Alarm */
-    this->config.aks[1] = { 0x00, 0x16 };
-    this->config.di[1] = 0x04;
+    this->config.nthr[2] = 30;   /* Alarm */
+    this->config.aks[2] = { 0x01, 8 };
+    this->config.di[2] = 4;
 
-    this->config.nthr[2] = 45;   /* Set */
-    this->config.aks[2] = { 0x00, 0x16 };
-    this->config.di[2] = 0x04;
+    this->config.nthr[3] = 45;   /* Set */
+    this->config.aks[3] = { 0x01, 8 };
+    this->config.di[3] = 4;
 }
 
 
@@ -212,26 +212,7 @@ uint8_t QT1070::processEvents() {
             g_power.resetSuspendDelay();
         }
 
-
-        uint8_t i;
-
-        for( i = 1; i < 7; i++ ) {
-
-            if( this->status.keys & ( 1 << i ) ) {
-
-                /* Read the signal level and reference level of the current detected key */
-                int16_t keySignal;
-                int16_t keyRef;
-                this->read( QT1070_REG_KEYSIGNAL + ( i * 2 ), &keySignal, sizeof( keySignal ) );
-                this->read( QT1070_REG_KEYREF + ( i * 2 ), &keyRef, sizeof( keyRef ) );
-
-                if( ( keySignal - keyRef ) > strongestSignal ) {
-                    key = ( 1 << ( i - 1 ) );
-                    strongestSignal = ( keySignal - keyRef );
-                }
-            }
-        }
-
+        key = status.keys;
         this->lastEventStart = millis();
 
     } else {
@@ -277,15 +258,7 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
     /* Key up */
     if( key == 0 && this->lastKeyState != 0 ) {
 
-        if( this->firstKeyState == KEY_LEFT && this->lastKeyState == KEY_RIGHT ) {
-            key = KEY_RIGHT | KEY_SWIPE;
-
-        } else if( this->firstKeyState == KEY_RIGHT && this->lastKeyState == KEY_LEFT ) {
-            key = KEY_LEFT | KEY_SWIPE;
-
-        } else {
-            key = this->firstKeyState;
-        }
+        key = this->firstKeyState;
 
         /* Reset the states */
         this->firstKeyState = 0;

@@ -18,23 +18,41 @@
 #include "time.h"
 
 
-
 /*--------------------------------------------------------------------------
  *
- * Class constructor
+ * Initialize the DateTime class with default date and time.
  *
  * Arguments
  * ---------
  *  None
  */
 DateTime::DateTime() {
-
+    this->set( 2000, 1, 1, 0, 0, 0 );
 }
 
 
 /*--------------------------------------------------------------------------
  *
- * Class constructor. Initialize the class with a specific date/time
+ * Initialize the DateTime class with date and time from another 
+ * DateTime class.
+ *
+ * Arguments
+ * ---------
+ *  - src : source  DateTime object
+ */
+DateTime::DateTime( DateTime *src ) {
+    _y = src->year();
+    _m = src->month();
+    _d = src->day();
+    _hh = src->hour();
+    _mm = src->minute();
+    _ss = src->second();
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Initialize the DateTime class with specific date/time values
  *
  * Arguments
  * ---------
@@ -44,9 +62,29 @@ DateTime::DateTime() {
  *  - hour  : hour (0-23)
  *  - min   : Minutes (0-59)
  *  - sec   : Seconds (0-59)
- *  - dow   : Day of week (1-7 : 1=Sunday, 7=Saturday)
  */
-DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec, uint8_t dow ) {
+DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec ) {
+    this->set( year, month, date, hour, min, sec );
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Set the date and time 
+ *
+ * Arguments
+ * ---------
+ *  - year  : Year (0-99, assumes 2000)
+ *  - month : Month (1-12)
+ *  - date  : date (1-31)
+ *  - hour  : hour (0-23)
+ *  - min   : Minutes (0-59)
+ *  - sec   : Seconds (0-59)
+ * 
+ * Returns: Nothing
+ */
+void DateTime::set( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec ) {
+
     if( month == 0 ) {
         month = 1;
     }
@@ -59,20 +97,215 @@ DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, ui
         date = 1;
     }
 
-    if( year < 2000 ) {
-        year = 2000;
-    }
-    if( year > 2199 ) {
-        year = 2199;
-    }
-
-    this->_year = year - 2000;
+    this->_y = year;
     this->_m = month;
     this->_d = date;
     this->_hh = hour;
     this->_mm = min;
     this->_ss = sec;
-    this->_dow = dow;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Test if two DateTime objects are equal
+ *
+ * Arguments
+ * ---------
+ *  - right : DateTime object to compare this instance to.
+ * 
+ * Returns: TRUE if equal, FALSE otherwise
+ */
+bool DateTime::operator==(const DateTime &right) const {
+
+    return ( right._y == _y && 
+             right._m == _m &&
+             right._d == _d && 
+             right._hh == _hh && 
+             right._mm == _mm &&
+             right._ss == _ss);
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Test if two DateTime objects are not equal
+ *
+ * Arguments
+ * ---------
+ *  - right : DateTime object to compare this instance to.
+ * 
+ * Returns: TRUE if NOT equal, FALSE otherwise
+ */
+bool DateTime::operator!=( const DateTime &right ) const { 
+    return !( *this == right ); 
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Test if one DateTime is less than the other
+ *
+ * Arguments
+ * ---------
+ *  - right : DateTime object to compare this instance to.
+ * 
+ * Returns: TRUE if less, FALSE otherwise
+ */
+bool DateTime::operator<( const DateTime &right ) const {
+
+    return ( _y  < right._y ||
+            ( _y == right._y &&
+             ( _m < right._m ||
+              ( _m == right._m &&
+               ( _d < right._d ||
+                ( _d == right._d &&
+                 ( _hh < right._hh ||
+                  ( _hh == right._hh &&
+                   ( _mm < right._mm ||
+                    ( _mm == right._mm && _ss < right._ss))))))))));
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Test if one DateTime is more than the other
+ *
+ * Arguments
+ * ---------
+ *  - right : DateTime object to compare this instance to.
+ * 
+ * Returns: TRUE if more, FALSE otherwise
+ */
+bool DateTime::operator>( const DateTime &right ) const { 
+    return right < *this; 
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Test if one DateTime is less or equal than the other
+ *
+ * Arguments
+ * ---------
+ *  - right : DateTime object to compare this instance to.
+ * 
+ * Returns: TRUE if less or equal, FALSE otherwise
+ */
+bool DateTime::operator<=( const DateTime &right ) const {
+    return !(*this > right);
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Test if one DateTime is more or equal than the other
+ *
+ * Arguments
+ * ---------
+ *  - right : DateTime object to compare this instance to.
+ * 
+ * Returns: TRUE if more or equal, FALSE otherwise
+ */
+bool DateTime::operator>=( const DateTime &right ) const { 
+    return !(*this < right); 
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Adjust the date and time by the 'x' amount of seconds
+ *
+ * Arguments
+ * ---------
+ *  - offset : Number of seconds to adjust forward or backward.
+ * 
+ * Returns: Nothing
+ */
+void DateTime::offset( long offset ) {
+
+    int8_t ss = this->_ss;
+    int8_t mm = this->_mm;
+    int8_t hh = this->_hh;
+    long d = this->_d;
+    int8_t m = this->_m;
+    int16_t y = this->_y;
+
+    ss += ( offset % 60L );
+    if( ss > 59 ) {
+        mm++;
+        ss %= 60;
+    }
+    if( ss < 0 ) {
+        mm--;
+        ss += 60;
+    }
+
+    mm += (( offset % 3600L ) / 60L );
+    if( mm > 59 ) {
+        hh++;
+        mm %= 60;
+    }
+    if( mm < 0 ) {
+        hh--;
+        mm += 60;
+    }
+
+    hh +=(( offset % 86400L ) / 3600L );
+    if ( hh > 23 ) {
+        d++;
+        hh %= 24;
+    }
+    if( hh < 0 ) {
+        d--;
+        hh += 24;
+    }
+
+    d += ( offset / 86400L );
+    while(( d > getMonthNumDays( m, y )) || ( d < 1 )) {
+        
+        if( d < 1 ) {
+            m--;
+            if( m < 1 ) {
+                m = 12;
+                y--;
+            }
+
+            d += (( long )getMonthNumDays( m, y ));
+
+        } else {
+            d -= (( long )getMonthNumDays( m, y ));
+            m++;
+
+            if( m > 12 ) {
+                m = 1;
+                y++;
+            }
+        }
+    }
+
+    this->_ss = ss;
+    this->_mm = mm;
+    this->_hh = hh;
+    this->_d = d;
+    this->_m = m;
+    this->_y = y;
+}
+
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Gets the day of week from the current date.
+ *
+ * Arguments
+ * ---------
+ *  None
+ * 
+ * Returns: Day of week (0=Sunday, 1=Monday ... 6=Saturday)
+ */
+uint8_t DateTime::dow() {
+    return getDayOfWeek( _y, _m, _d);
 }
 
 
@@ -91,14 +324,14 @@ DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, ui
 unsigned long DateTime::getEpoch() {
     uint16_t days = this->_d - 1;
 
-    if( this->_year > 0 ) {
-        days += ( this->_year * 365 ) + ( ( this->_year - 1 ) / 4 ) + 1;
+    if( this->_y > 0 ) {
+        days += ( this->_y * 365 ) + ( ( this->_y - 1 ) / 4 ) + 1;
     }
 
     uint8_t i;
 
     for( i = 1; i <= this->_m - 1; i++ ) {
-        days += getMonthNumDays( i, this->_year );
+        days += getMonthNumDays( i, this->_y );
     }
 
     return EPOCH_Y2K_OFFSET + ( days * 86400L ) + ( this->_hh * 3600L ) + ( this->_mm * 60L ) + this->_ss;
@@ -146,7 +379,7 @@ const char *getMonthName( uint8_t month, bool shortName ) {
  *
  * Arguments
  * ---------
- *  - day       : The day of week (1-7)
+ *  - day       : The day of week (0-6)
  *  - shortName : TRUE to get the abreviation or False for the full name.
  *
  * Returns : The pointer to the day of week name string.
@@ -154,21 +387,17 @@ const char *getMonthName( uint8_t month, bool shortName ) {
 const char *getDayName( uint8_t day, bool shortName ) {
 
     /* Validate input */
-    if( day < 1 ) {
-        day = 1;
-    }
-
-    if( day > 7 ) {
-        day = 7;
+    if( day > 6 ) {
+        day = 6;
     }
 
     if( shortName ) {
 
-        return &_DAYS_SHORT[ day - 1 ][0];
+        return &_DAYS_SHORT[ day ][0];
 
     } else {
 
-        return &_DAYS[ day - 1 ][0];
+        return &_DAYS[ day ][0];
     }
 }
 
@@ -180,11 +409,11 @@ const char *getDayName( uint8_t day, bool shortName ) {
  * Arguments
  * ---------
  *  - month : Month (1-12) 
- *  - year  : year (0-99, assume year 2000)
+ *  - year  : year 
  *
  * Returns : The number of days
  */
-uint8_t getMonthNumDays( uint8_t month, uint8_t year ) {
+uint8_t getMonthNumDays( uint8_t month, uint16_t year ) {
 
     if( month == 0 ) {
         month = 1;
@@ -211,13 +440,13 @@ uint8_t getMonthNumDays( uint8_t month, uint8_t year ) {
  *
  * Arguments
  * ---------
- *  - year  : year (0-99, assume year 2000)
+ *  - year  : year
  *  - month : Month (1-12) 
  *  - day   : Day (1-31)
  *
  * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
  */
-uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
+uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day ) {
 
     /*
     Key value method implementation.
@@ -256,7 +485,7 @@ uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
         1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6
     };
 
-    uint8_t days;
+    uint16_t days;
     days = ( year / 4 ) + day + months_key[ month - 1 ] + 6 + year;
 
     /* If leap year and month is january or febuary, subtract 1 day */
@@ -267,14 +496,55 @@ uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
     /* day 0-6 : 0=Saturday, 6=Friday, etc. */
     days = ( days % 7 );
 
-    /* Return a value from 1 to 7 : 1=Sunday, 7=Saturday */
+    
     if( days == 0 ) {
         days = 7;
     }
 
-    return days;
+    /* Return a value from 0 to 6 : 0=Sunday, 6=Saturday */
+    return days - 1;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Find the day in the month corresponding to the 'x' occurence 
+ * of a weekday
+ *
+ * Arguments
+ * ---------
+ *  - year  : year
+ *  - month : Month (1-12)  
+ *  - dow   : Day of week to find (0=Sunday, 6=Saturday)
+ *  - order : Which occurence of the day to search for 
+ *            ( 1=first, 2=second, ..., 5=last )
+ *
+ * Returns : The day of the month matching search criteria
+ */
+uint8_t findDayByDow( uint16_t year, uint8_t month, uint8_t dow, uint8_t order ) {
+
+    if( dow > 6 ) {
+        dow = 6;
+    }
+
+    if( order < 1 ) {
+        order = 1;
+    }
+
+    int8_t day;
+    day = 1 + (dow - getDayOfWeek( year, month, 1 ));
+
+    if( day < 1 ) {
+        day += 7;
+    }
+
+    day += ( 7 * ( order - 1 ));
+    while( day > getMonthNumDays( month, year )) {
+        day -= 7;
+    }
+    
+    return day;
+}
 
 
 /*--------------------------------------------------------------------------
@@ -287,7 +557,7 @@ uint8_t getDayOfWeek( uint8_t year, uint8_t month, uint8_t day ) {
  *  - fmt_24h : TRUE for 24H time format or False for am/pm.
  *  - date    : Structure containing the date and time to print.
  *
- * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ * Returns : The number of characters written
  */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
 
@@ -309,7 +579,7 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
  *  - fmt_24h : TRUE for 24H time format or False for am/pm.
  *  - time    : Structure containing the time to print.
  *
- * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ * Returns : The number of characters written
  */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
     uint8_t length;
@@ -343,7 +613,7 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
  *  - format  : Date format to use.
  *  - date    : Structure containing the date to print
  *
- * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ * Returns : The number of characters written
  */
 uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 
@@ -354,7 +624,7 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
         case DATE_FORMAT_MMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%02d/%02d/%d" ),
                                 date->month(),
-                                date->date(),
+                                date->day(),
                                 date->year() );
             break;
 
@@ -362,12 +632,12 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
             length = sprintf_P( buffer, PSTR( "%d/%02d/%02d" ),
                                 date->year(),
                                 date->month(),
-                                date->date() );
+                                date->day() );
             break;
 
         case DATE_FORMAT_DDMMMYYYY:
             length = sprintf_P( buffer, PSTR( "%02d-%S-%d" ),
-                                date->date(),
+                                date->day(),
                                 getMonthName( date->month(), true ),
                                 date->year() );
             break;
@@ -375,7 +645,7 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
         case DATE_FORMAT_MMMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%S-%02d-%d" ),
                                 getMonthName( date->month(), true ),
-                                date->date(),
+                                date->day(),
                                 date->year() );
             break;
 
@@ -383,28 +653,28 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
             length = sprintf_P( buffer, PSTR( "%d-%S-%02d" ),
                                 date->year(),
                                 getMonthName( date->month(), true ),
-                                date->date() );
+                                date->day() );
             break;
 
         case DATE_FORMAT_WDMMMDD:
             length = sprintf_P( buffer, PSTR( "%S, %S %d" ),
                                 getDayName( date->dow(), true ),
                                 getMonthName( date->month(), true ),
-                                date->date() );
+                                date->day() );
             break;
 
         case DATE_FORMAT_WDMMMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%S, %S %d %d" ),
                                 getDayName( date->dow(), true ),
                                 getMonthName( date->month(), true ),
-                                date->date(),
+                                date->day(),
                                 date->year() );
             break;
 
         /* DATE_FORMAT_DDMMYYYY */
         default:
             length = sprintf_P( buffer, PSTR( "%02d/%02d/%d" ),
-                                date->date(),
+                                date->day(),
                                 date->month(),
                                 date->year() );
             break;

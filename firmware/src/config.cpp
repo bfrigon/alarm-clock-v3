@@ -149,6 +149,8 @@ void ConfigManager::reset() {
     this->clock.lamp.brightness = 60;
     this->clock.lamp.mode = LAMP_MODE_OFF;
     this->clock.lamp.color = COLOR_WHITE;
+    this->clock.use_ntp = true;
+    this->clock.tz = 0;
 
     strcpy_P(&this->network.hostname[0], S_DEFAULT_HOSTNAME );
 
@@ -489,6 +491,12 @@ bool ConfigManager::readNextLine() {
     } else if( this->matchSettingName( name, SETTING_NAME_DATEFMT, SECTION_ID_LCD ) == true ) {
         this->parseSettingValue( value, &this->clock.date_format, SETTING_TYPE_INTEGER, 0, MAX_DATE_FORMATS - 1 );
 
+    } else if( this->matchSettingName( name, SETTING_NAME_USE_NTP, SECTION_ID_CLOCK ) == true ) {
+        this->parseSettingValue( value, &this->clock.use_ntp, SETTING_TYPE_BOOL );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_TIMEZONE_ID, SECTION_ID_CLOCK ) == true ) {
+        this->parseSettingValue( value, &this->clock.tz, SETTING_TYPE_SHORT, 0, MAX_TIMEZONE_ID - 1 );
+
     } else if( this->matchSettingName( name, SETTING_NAME_ALS_PRESET, SECTION_ID_ALS ) == true ) {
         this->parseSettingValue( value, &this->clock.als_preset, SETTING_TYPE_INTEGER, 0, MAX_ALS_PRESETS_NAMES - 1 );
 
@@ -644,6 +652,10 @@ void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingTyp
 
         case SETTING_TYPE_INTEGER:
             *( ( uint8_t* )dest ) = constrain( atoi( src ), min, max );
+            break;
+
+        case SETTING_TYPE_SHORT:
+            *( ( uint16_t* )dest ) = constrain( atoi( src ), min, max );
             break;
 
         case SETTING_TYPE_STRING:
@@ -860,6 +872,14 @@ bool ConfigManager::writeNextLine()  {
             this->writeConfigLine( SETTING_NAME_BRIGHTNESS, SETTING_TYPE_INTEGER, &this->clock.clock_brightness );
             break;
 
+        case SETTING_ID_CLOCK_NTP:
+            this->writeConfigLine( SETTING_NAME_USE_NTP, SETTING_TYPE_BOOL, &this->clock.use_ntp );
+            break;
+
+        case SETTING_ID_TIMEZONE_ID:
+            this->writeConfigLine( SETTING_NAME_TIMEZONE_ID, SETTING_TYPE_SHORT, &this->clock.tz );
+            break;
+
         case SETTING_ID_ALS_PRESET:
             this->writeConfigLine( SETTING_NAME_SECTION_ALS, SETTING_TYPE_SECTION, NULL );
             this->writeConfigLine( SETTING_NAME_ALS_PRESET, SETTING_TYPE_INTEGER, &this->clock.als_preset );
@@ -1067,6 +1087,12 @@ void ConfigManager::writeConfigLine( const char* name, uint8_t type, void* value
 
         case SETTING_TYPE_INTEGER:
             itoa( *( ( uint8_t* )value ), buffer, 10 );
+
+            this->_sd_file.write( buffer );
+            break;
+
+        case SETTING_TYPE_SHORT:
+            itoa( *( ( uint16_t* )value ), buffer, 10 );
 
             this->_sd_file.write( buffer );
             break;

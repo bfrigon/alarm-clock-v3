@@ -52,11 +52,12 @@ NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin
  */
 void NeoClock::restoreClockDisplay() {
 
-    DateTime* now = g_rtc.now();
+    DateTime local = g_rtc.now();
+    g_timezone.toLocal( &local );
 
     this->_testMode = false;
-    this->hour = now->hour();
-    this->minute = now->minute();
+    this->hour = local.hour();
+    this->minute = local.minute();
     g_clock.hourFlashing = false;
     g_clock.minutesFlashing = false;
     g_clock.status_set = false;
@@ -166,9 +167,12 @@ void NeoClock::update() {
  */
 void NeoClock::runTask() {
 
+    DateTime now = g_rtc.now();
+    
+
     /* If time has changed, update the clock display */
-    if( g_rtc.minute() != this->_rtcmin ) {
-        this->_rtcmin = g_rtc.minute();
+    if( now.minute() != this->_rtcmin ) {
+        this->_rtcmin = now.minute();
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
             g_screenUpdate = true;
@@ -186,8 +190,10 @@ void NeoClock::runTask() {
             /* Fall-through */
 
             default:
-                this->hour = g_rtc.hour();
-                this->minute = g_rtc.minute();
+                g_timezone.toLocal( &now );
+
+                this->hour = now.hour();
+                this->minute = now.minute();
 
                 g_clockUpdate = true;
         }

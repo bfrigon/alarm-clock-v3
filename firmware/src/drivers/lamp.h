@@ -55,6 +55,7 @@ class Lamp : public NeoPixel {
     void processEvents();
     void setDelayOff( uint8_t delay );
     void update();
+    bool isActive();
 
 
   private:

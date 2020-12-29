@@ -168,24 +168,6 @@ void initScreens() {
  */
 bool onKeypress( Screen* screen, uint8_t key ) {
 
-    switch( key ) {
-
-        /* Enable/disable night light */
-        case KEY_SWIPE | KEY_LEFT:
-        case KEY_SWIPE | KEY_RIGHT:
-
-            /* Does not allow to enable/disable the night light if currently etiting lamp settings */
-            if( screen->getId() == SCREEN_ID_EDIT_ALARM_LAMP || 
-                screen->getId() == SCREEN_ID_EDIT_NIGHT_LAMP ) {
-
-                    if ( screen->isItemFullScreen() ) {
-                        return false;
-                    }
-            }
-
-        break;
-    }
-
     return true;
 }
 
@@ -428,7 +410,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
         case ID_SET_DATE_MONTH:
 
             uint8_t month_days;
-            month_days = getMonthNumDays( adjDate.month, adjDate.year );
+            month_days = getMonthNumDays( adjDate.month, adjDate.year + 2000 );
 
             if( adjDate.day > month_days ) {
 
@@ -544,11 +526,15 @@ bool onEnterScreen( Screen* screen ) {
     switch( screen->getId() ) {
 
         case SCREEN_ID_SET_TIME:
-            adjTime.hour = g_rtc.hour();
-            adjTime.minute = g_rtc.minute();
-            adjDate.day = g_rtc.date();
-            adjDate.month = g_rtc.month();
-            adjDate.year = ( uint8_t )( g_rtc.year() - 2000 );
+
+            now = g_rtc.now();
+            g_timezone.toLocal( &now );
+
+            adjTime.hour = now.hour();
+            adjTime.minute = now.minute();
+            adjDate.day = now.day();
+            adjDate.month = now.month();
+            adjDate.year = ( uint8_t )( now.year() - 2000 );
 
             g_clock.status_set = true;
             g_clockUpdate = true;
@@ -609,11 +595,14 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
                 uint8_t dow;
                 dow = getDayOfWeek( adjDate.year, adjDate.month, adjDate.day );
 
-                DateTime nDate( adjDate.year + 2000, adjDate.month, adjDate.day,
-                                adjTime.hour, adjTime.minute, 0, dow );
+                DateTime nDate( (uint16_t)adjDate.year + 2000, adjDate.month, adjDate.day,
+                                adjTime.hour, adjTime.minute, 0 );
+
+                /* Convert local time to UTC */
+                g_timezone.toUTC( &nDate );
 
                 /* Update the RTC */
-                g_rtc.setDateTime( nDate );
+                g_rtc.setDateTime( &nDate );
             }
 
             g_clock.restoreClockDisplay();
@@ -676,11 +665,3 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
     return true;
 }
 
-
-void enableNightLamp() {
-    g_lamp.activate( &g_config.clock.lamp, false, true, LAMP_MODE_NIGHTLIGHT );
-}
-
-void disableNightLamp() {
-    g_lamp.deactivate( true );
-}

@@ -40,6 +40,14 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
             screen_main_menu.activate( true, &screen_root );
             break;
 
+        case KEY_SET:
+            if( g_lamp.isActive() == false ) {
+                g_lamp.activate( &g_config.clock.lamp, false, true, LAMP_MODE_NIGHTLIGHT );
+            } else {
+                g_lamp.deactivate( true );
+            }
+            break;
+
         case KEY_SET | KEY_SHIFT:
             screen_set_time.activate( true, &screen_root );
             break;
@@ -113,12 +121,14 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
             g_lcd.print( CHAR_SPACE );
     }
 
+    DateTime now = g_rtc.now();
+    g_timezone.toLocal( &now );
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-        timeToBuf( buffer, g_config.clock.display_24h, g_rtc.now() );
+        timeToBuf( buffer, g_config.clock.display_24h, &now );
 
     } else {
-        dateToBuf( buffer, g_config.clock.date_format, g_rtc.now() );
+        dateToBuf( buffer, g_config.clock.date_format, &now );
     }
 
     g_lcd.setPosition( 1, 0 );

@@ -26,7 +26,7 @@
 
 #define INPUT_BUFFER_LENGTH         128
 
-#define CONSOLE_COMMANDS_COUNT      10
+#define CONSOLE_COMMANDS_COUNT      12
 
 #define TASK_CONSOLE_PRINT_HELP     1
 #define TASK_CONSOLE_NET_RESTART    2
@@ -37,6 +37,7 @@
 #define TASK_CONSOLE_NET_CONFIG     7
 #define TASK_CONSOLE_NET_START      8
 #define TASK_CONSOLE_NET_STOP       9
+#define TASK_CONSOLE_SET_TZ         10
 
 
 
@@ -46,7 +47,10 @@ PROG_STR( S_CONSOLE_WELCOME_2,        "www.bfrigon.com");
 
 PROG_STR( S_COMMAND_HELP,             "help" );
 PROG_STR( S_COMMAND_REBOOT,           "reboot" );
-PROG_STR( S_COMMAND_SET_DATE,         "set time" );
+PROG_STR( S_COMMAND_SET_TIMEZONE,     "set timezone" );
+PROG_STR( S_COMMAND_DATE_SET,         "set date" );
+PROG_STR( S_COMMAND_DATE,             "date" );
+PROG_STR( S_COMMAND_NTPDATE,          "ntpdate" );
 PROG_STR( S_COMMAND_PRINT_LOGS,       "print logs" );
 PROG_STR( S_COMMAND_NET_STATUS,       "net status" );
 PROG_STR( S_COMMAND_NET_CONFIG,       "net config" );
@@ -61,7 +65,10 @@ PROG_STR( S_COMMAND_FACTORY_RESET,    "config defaults" );
 
 PROG_STR( S_HELP_HELP,                "Display this message." );
 PROG_STR( S_HELP_REBOOT,              "Restart the firmware." );
-PROG_STR( S_HELP_SET_DATE,            "Set the clock." );
+PROG_STR( S_HELP_DATE_SET,            "Set the clock." );
+PROG_STR( S_HELP_DATE,                "Display the current time and time zone" );
+PROG_STR( S_HELP_SET_TIMEZONE,        "Set the time zone." );
+PROG_STR( S_HELP_NTPDATE,             "Query the NTP time server" );
 PROG_STR( S_HELP_PRINT_LOGS,          "Print the event log stored on SD card." );
 PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection." );
 PROG_STR( S_HELP_NET_CONFIG,          "Configure the network settings.");
@@ -75,7 +82,10 @@ PROG_STR( S_USAGE_PING,               "ping [host]" );
 
 const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_HELP,
-    S_COMMAND_SET_DATE,
+    S_COMMAND_DATE,
+    S_COMMAND_DATE_SET,
+    S_COMMAND_SET_TIMEZONE,
+    S_COMMAND_NTPDATE,
     S_COMMAND_PRINT_LOGS,
     S_COMMAND_NET_STATUS,
     S_COMMAND_NET_CONFIG,
@@ -87,7 +97,10 @@ const char* const S_COMMANDS[] PROGMEM = {
 };
 const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_HELP,
-    S_HELP_SET_DATE,
+    S_HELP_DATE,
+    S_HELP_DATE_SET,
+    S_HELP_SET_TIMEZONE,
+    S_HELP_NTPDATE,
     S_HELP_PRINT_LOGS,
     S_HELP_NET_STATUS,
     S_HELP_NET_CONFIG,
@@ -135,6 +148,11 @@ class Console : public IPrint, ITask {
     void runTaskPing();
     bool startTaskNetworkConfig();
     void runTaskNetworkConfig();
+    bool startTaskDateSet();
+    void runTaskDateSet();
+    void printDateTime();
+    bool startTaskSetTimeZone();
+    void runTaskSetTimeZone();
 
 
 
@@ -142,8 +160,7 @@ class Console : public IPrint, ITask {
     char* _inputParameter= NULL;
     uint8_t _inputlength = 0;
     bool _inputenabled = false;
-    
-    
+    bool _inputHidden = false;
 
     uint16_t _taskIndex = 0;
 };

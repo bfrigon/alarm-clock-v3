@@ -488,6 +488,8 @@ void Console::runTaskNetworkConfig() {
         /* Display WiFi password prompt */
         case 2:
             this->print_P( S_CONSOLE_NET_CFG_KEY );
+
+            _inputHidden = true;
             break;
 
         /* Validate WiFi password prompt */
@@ -495,6 +497,8 @@ void Console::runTaskNetworkConfig() {
             if( _inputlength > 0 ) {
                 strncpy( g_config.network.wkey, _inputbuffer, MAX_WKEY_LENGTH );
             }
+
+            _inputHidden = false;
             break;
 
         /* Display use DHCP prompt */
