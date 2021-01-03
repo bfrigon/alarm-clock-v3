@@ -35,6 +35,31 @@
 #define DATE_FORMAT_WDMMMDD         6
 #define DATE_FORMAT_WDMMMDDYYYY     7
 
+#define M_JAN       1
+#define M_FEB       2
+#define M_MAR       3
+#define M_APR       4
+#define M_MAY       5
+#define M_JUN       6
+#define M_JUL       7
+#define M_AUG       8
+#define M_SEP       9
+#define M_OCT       10
+#define M_NOV       11
+#define M_DEC       12
+
+#define D_SUN       0
+#define D_MON       1
+#define D_TUE       2
+#define D_WED       3
+#define D_THU       4
+#define D_FRI       5
+#define D_SAT       6
+
+
+
+const char TZ_NULL[] PROGMEM = { "" };
+
 
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))
 
@@ -50,6 +75,26 @@ struct Date {
     uint8_t day;
     uint8_t month;
     uint8_t year;
+};
+
+struct TimeZoneRules {
+    const char *name;
+
+    int16_t std_offset;
+    uint8_t std_month: 4;
+    uint8_t std_week: 3;
+    uint8_t std_dow: 6;
+    uint8_t std_hour: 5;
+    uint8_t std_min: 6;
+    const char *std_abbvr;
+
+    int16_t dst_offset;
+    uint8_t dst_month: 4;
+    uint8_t dst_week: 3;
+    uint8_t dst_dow: 6;
+    uint8_t dst_hour: 5;
+    uint8_t dst_min: 6;
+    const char *dst_abbvr;
 };
 
 class DateTime {

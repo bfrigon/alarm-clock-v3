@@ -124,7 +124,9 @@ void ConfigManager::apply( uint8_t section ) {
         g_clock.setBrightness( this->clock.clock_brightness );
         g_lcd.setContrast( this->clock.lcd_contrast );
 
-        g_clockUpdate = true;
+        g_timezone.setTimezoneByName( g_config.clock.timezone );
+
+        g_clock.restoreClockDisplay();
     }
 
     if( section & EEPROM_SECTION_NETWORK ) {
@@ -150,8 +152,8 @@ void ConfigManager::reset() {
     this->clock.lamp.mode = LAMP_MODE_OFF;
     this->clock.lamp.color = COLOR_WHITE;
     this->clock.use_ntp = true;
-    this->clock.tz = 0;
 
+    strcpy_P(&this->clock.timezone[0], TZ_ETC_UTC );
     strcpy_P(&this->network.hostname[0], S_DEFAULT_HOSTNAME );
 
 
@@ -494,8 +496,8 @@ bool ConfigManager::readNextLine() {
     } else if( this->matchSettingName( name, SETTING_NAME_USE_NTP, SECTION_ID_CLOCK ) == true ) {
         this->parseSettingValue( value, &this->clock.use_ntp, SETTING_TYPE_BOOL );
 
-    } else if( this->matchSettingName( name, SETTING_NAME_TIMEZONE_ID, SECTION_ID_CLOCK ) == true ) {
-        this->parseSettingValue( value, &this->clock.tz, SETTING_TYPE_SHORT, 0, MAX_TIMEZONE_ID - 1 );
+    } else if( this->matchSettingName( name, SETTING_NAME_TIMEZONE, SECTION_ID_CLOCK ) == true ) {
+        this->parseSettingValue( value, &this->clock.timezone, SETTING_TYPE_STRING, 0, MAX_TZ_NAME_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_ALS_PRESET, SECTION_ID_ALS ) == true ) {
         this->parseSettingValue( value, &this->clock.als_preset, SETTING_TYPE_INTEGER, 0, MAX_ALS_PRESETS_NAMES - 1 );
@@ -827,13 +829,7 @@ uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
 
     /* Add NULL character */
     if( name[ nameLength ] != 0 )   { name[ nameLength++ ] = 0; }
-
     if( value[ valueLength ] != 0 ) { value[ valueLength++ ] = 0; }
-
-
-    // Serial.println( name );
-    // Serial.println( value );
-    // Serial.println();
 
     return type;
 }
@@ -876,8 +872,8 @@ bool ConfigManager::writeNextLine()  {
             this->writeConfigLine( SETTING_NAME_USE_NTP, SETTING_TYPE_BOOL, &this->clock.use_ntp );
             break;
 
-        case SETTING_ID_TIMEZONE_ID:
-            this->writeConfigLine( SETTING_NAME_TIMEZONE_ID, SETTING_TYPE_SHORT, &this->clock.tz );
+        case SETTING_ID_TIMEZONE:
+            this->writeConfigLine( SETTING_NAME_TIMEZONE, SETTING_TYPE_STRING, &this->clock.timezone );
             break;
 
         case SETTING_ID_ALS_PRESET:

@@ -366,8 +366,16 @@ void Console::parseCommand() {
 
         started = false;
 
-    } else if( this->matchCommandName( S_COMMAND_SET_TIMEZONE, true ) == true ) {
+    } else if( this->matchCommandName( S_COMMAND_SET_TIMEZONE, true ) == true ||
+               this->matchCommandName( S_COMMAND_TZ_SET, true ) == true ) {
+
         started = this->startTaskSetTimeZone();
+
+    } else if( this->matchCommandName( S_COMMAND_TZ_INFO, false ) == true ) {
+        this->showTimezoneInfo();
+        this->println();
+
+        started = false;
     
     } else if( strlen( _inputbuffer ) == 0 ) {
         started = false;

@@ -51,6 +51,10 @@ void Console::printDateTime() {
     const char *month;
     const char *dow;
     const char *abbvr;
+
+    this->print_P( S_CONSOLE_TIME_CURRENT_TZ );
+    this->println_P( g_timezone.getName() );
+    this->println();
     
     now = g_rtc.now();
     month = getMonthName( now.month(), true );
@@ -61,17 +65,11 @@ void Console::printDateTime() {
     
     g_timezone.toLocal( &now );
 
-    abbvr = g_timezone.getCurrentZoneAbbreviation( &now );
+    abbvr = g_timezone.getAbbreviation( &now );
     month = getMonthName( now.month(), true );
     dow = getDayName( now.dow(), true );
 
     this->printf_P( S_CONSOLE_DATE_FMT_LOCAL, dow, month, now.day(), now.hour(), now.minute(), now.second(), abbvr, now.year() );
-
-    this->println();
-    this->print_P( S_CONSOLE_TIME_CURRENT_TZ );
-    this->println_P( g_timezone.getCurrentZoneName() );
-    
-
 }
 
 
@@ -94,7 +92,7 @@ bool Console::startTaskSetTimeZone() {
     if( param_tz_name == 0 ) {
 
         this->print_P( S_CONSOLE_TIME_CURRENT_TZ );
-        this->println_P( g_timezone.getCurrentZoneName() );
+        this->println_P( g_timezone.getName() );
         this->println();
 
         this->print_P( S_CONSOLE_TIME_ENTER_TZ );
@@ -134,11 +132,11 @@ void Console::runTaskSetTimeZone() {
         }
 
         
-        id = g_timezone.findTimeZoneByName( _inputbuffer );
+        id = g_timezone.findTimezoneByName( _inputbuffer );
 
     /* Timezone provided as a parameter */
     } else {
-        id = g_timezone.findTimeZoneByName( param_tz_name );
+        id = g_timezone.findTimezoneByName( param_tz_name );
     }
 
     if( id < 0 )  {
@@ -149,16 +147,105 @@ void Console::runTaskSetTimeZone() {
     }
 
     /* Set new time zone and save config */
-    g_timezone.setTimeZone( id );
-    g_config.clock.tz = id;
+    g_timezone.setTimezoneByID( id );
+    
     g_config.save( EEPROM_SECTION_CLOCK );
 
     this->print_P( S_CONSOLE_TIME_NEW_TZ );
-    this->println_P( g_timezone.getCurrentZoneName() );
+    this->println_P( g_timezone.getName() );
 
     /* Refresh clock display */
     g_clock.restoreClockDisplay();
-    g_screenUpdate = true;
 
     this->endTask( TASK_SUCCESS );
+}
+
+
+
+void Console::showTimezoneInfo() {
+    this->printDateTime();
+    this->println();
+
+    DateTime now = g_rtc.now();
+    g_timezone.toLocal( &now );
+
+    bool isDst = g_timezone.isDST( &now );
+    
+    int16_t std_offset, dst_offset, current_offset;
+    std_offset = g_timezone.getStdUtcOffset();
+    dst_offset = g_timezone.getDstUtcOffset();
+    current_offset = ( isDst == true ) ? dst_offset : std_offset;
+
+    DateTime std, dst;
+    g_timezone.getStdTransition( g_rtc.now()->year(), &std );
+    g_timezone.getDstTransition( g_rtc.now()->year(), &dst );
+
+
+
+    /* Print whether the local time is equal, ahead or behind UTC */
+    if( current_offset == 0 ) {
+        this->print_P( S_CONSOLE_TZ_EQUAL_UTC );
+    } else if( current_offset > 0 ) {
+        this->print_P( S_CONSOLE_TZ_AHEAD_UTC_PRE );
+        this->printTimeInterval( abs( current_offset * 60L ), S_DATETIME_SEPARATOR_AND );
+        this->print_P( S_CONSOLE_TZ_AHEAD_UTC );
+    } else {
+        this->print_P( S_CONSOLE_TZ_BEHIND_UTC_PRE );
+        this->printTimeInterval( abs( current_offset * 60L ), S_DATETIME_SEPARATOR_AND );
+        this->print_P( S_CONSOLE_TZ_BEHIND_UTC );
+    }
+
+    
+    if( dst == std ) {
+
+        /* DST not observed in this time zone */
+        this->print_P( S_CONSOLE_TZ_NO_DST );
+
+    } else {
+
+        this->printf_P( S_CONSOLE_TZ_IS_DST, (isDst == true ) ? S_YES : S_NO );
+
+
+        bool show_dst_first = ( std > dst );
+
+        for( uint8_t i = 0; i < 2; i++ ) {
+
+            if( show_dst_first == true ) {
+                this->println();
+                this->printf_P( S_CONSOLE_TZ_DST_TRANS, 
+                                getDayName( dst.dow(), false ),
+                                getMonthName( dst.month(), false ),
+                                dst.day(),
+                                dst.year(),
+                                dst.hour(),
+                                dst.minute() );
+
+                this->printTimeInterval( abs( dst_offset - std_offset ) * 60, S_DATETIME_SEPARATOR_AND );
+                this->println();
+                
+                show_dst_first = false;
+                continue;
+            }
+
+            if( show_dst_first == false ) {
+
+                this->println();
+                this->printf_P( S_CONSOLE_TZ_STD_TRANS, 
+                                getDayName( std.dow(), false ),
+                                getMonthName( std.month(), false ),
+                                std.day(),
+                                std.year(),
+                                std.hour(),
+                                std.minute() );
+
+                this->printTimeInterval( abs( std_offset - dst_offset ) * 60, S_DATETIME_SEPARATOR_AND );
+                this->println();
+                
+                show_dst_first = true;
+                continue;
+            }
+        }
+
+        
+    }
 }

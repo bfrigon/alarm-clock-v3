@@ -20,7 +20,7 @@
 
 #include <avr/pgmspace.h>
 
-#define FW_VERSION      "2020.12"
+#define FW_VERSION      "2021.1"
 
 
 //--------------------------------------------------------------------------
@@ -75,11 +75,28 @@ const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 PROG_STR( S_DATETIME_DHM,               "%dd, %dh. %d min." );
 PROG_STR( S_DATETIME_HM,                "%dh. %d min." );
 PROG_STR( S_DATETIME_MS,                "%d min. %d sec." );
-PROG_STR( S_DATETIME_M,                 "%d minutes" );
-PROG_STR( S_DATETIME_1M,                "1 minute" );
-PROG_STR( S_DATETIME_1D,                "24 hours" );
-PROG_STR( S_DATETIME_D,                 "%d days" );
-PROG_STR( S_DATETIME_S,                 "%d seconds" );
+
+PROG_STR( S_DATETIME_1M,                "1m" );
+PROG_STR( S_DATETIME_1MM,               "1 minute" );
+PROG_STR( S_DATETIME_M,                 "%dm" );
+PROG_STR( S_DATETIME_MM,                "%d minutes" );
+PROG_STR( S_DATETIME_1H,                "1h" );
+PROG_STR( S_DATETIME_1HH,               "1 hour" );
+PROG_STR( S_DATETIME_H,                 "%dh" );
+PROG_STR( S_DATETIME_HH,                "%d hours" );
+PROG_STR( S_DATETIME_1S,                "1s" );
+PROG_STR( S_DATETIME_S,                 "%ds" );
+PROG_STR( S_DATETIME_1SS,               "1 second" );
+PROG_STR( S_DATETIME_SS,                "%d seconds" );
+PROG_STR( S_DATETIME_1D,                "1d" );
+PROG_STR( S_DATETIME_D,                 "%dd" );
+PROG_STR( S_DATETIME_1DD,               "1 day" );
+PROG_STR( S_DATETIME_DD,                "%d days" );
+PROG_STR( S_DATETIME_24H,               "24 hours" );
+
+PROG_STR( S_DATETIME_SEPARATOR_COMMA,   ", " );
+PROG_STR( S_DATETIME_SEPARATOR_AND,     " and " );
+PROG_STR( S_DATETIME_SEPARATOR_SPACE,   " " );
 
 
 /* Dialog strings */
@@ -262,6 +279,16 @@ PROG_STR( S_CONSOLE_TIME_INVALID_TZ,    "Invalid time zone" );
 
 PROG_STR( S_CONSOLE_DATE_FMT_UTC,       "%S %S %d %02d:%02d:%02d UTC %d\r\n" );
 PROG_STR( S_CONSOLE_DATE_FMT_LOCAL,     "%S %S %d %02d:%02d:%02d %S %d\r\n" );
+PROG_STR( S_CONSOLE_TZ_IS_DST,          "Currently on daylight saving time: %S\r\n");
+PROG_STR( S_CONSOLE_TZ_NO_DST,          "Daylight saving time not observed\r\n");
+PROG_STR( S_CONSOLE_TZ_EQUAL_UTC,       "Local time is the same as UTC/GMT\r\n");
+PROG_STR( S_CONSOLE_TZ_BEHIND_UTC_PRE,  "Local time is ");
+PROG_STR( S_CONSOLE_TZ_BEHIND_UTC,      " behind UTC/GMT\r\n");
+PROG_STR( S_CONSOLE_TZ_AHEAD_UTC_PRE,   "Local time is ");
+PROG_STR( S_CONSOLE_TZ_AHEAD_UTC,       " ahead of UTC/GMT\r\n");
+
+PROG_STR( S_CONSOLE_TZ_DST_TRANS,       "Daylight saving time starts on %S, %S %d %d\r\nAt %02d:%02d local time, turn clock forward ");
+PROG_STR( S_CONSOLE_TZ_STD_TRANS,       "Daylight saving time ends on %S, %S %d %d\r\nAt %02d:%02d local time, turn clock back ");
 
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 
@@ -286,7 +313,7 @@ const char _MONTHS_SHORT[ 12 ][ 4 ] PROGMEM = {
 };
 
 const char _MONTHS[ 12 ][ 10 ] PROGMEM = {
-    "January", "Febuary", "March", "April", "May", "June"
+    "January", "Febuary", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 };
 

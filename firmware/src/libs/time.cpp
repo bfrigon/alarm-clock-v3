@@ -56,15 +56,16 @@ DateTime::DateTime( DateTime *src ) {
  *
  * Arguments
  * ---------
- *  - year  : Year (0-99, assumes 2000)
+ *  - year  : Year
  *  - month : Month (1-12)
- *  - date  : date (1-31)
+ *  - day   : day of the month (1-31*). If above the number of days 
+ *            of the month, it sets the day to the last.
  *  - hour  : hour (0-23)
  *  - min   : Minutes (0-59)
  *  - sec   : Seconds (0-59)
  */
-DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec ) {
-    this->set( year, month, date, hour, min, sec );
+DateTime::DateTime( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec ) {
+    this->set( year, month, day, hour, min, sec );
 }
 
 
@@ -74,16 +75,17 @@ DateTime::DateTime( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, ui
  *
  * Arguments
  * ---------
- *  - year  : Year (0-99, assumes 2000)
+ *  - year  : Year
  *  - month : Month (1-12)
- *  - date  : date (1-31)
+ *  - day   : day of the month (1-31*). If above the number of days 
+ *            of the month, it sets the day to the last.
  *  - hour  : hour (0-23)
  *  - min   : Minutes (0-59)
  *  - sec   : Seconds (0-59)
  * 
  * Returns: Nothing
  */
-void DateTime::set( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, uint8_t min, uint8_t sec ) {
+void DateTime::set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec ) {
 
     if( month == 0 ) {
         month = 1;
@@ -93,13 +95,29 @@ void DateTime::set( uint16_t year, uint8_t month, uint8_t date, uint8_t hour, ui
         month = 12;
     }
 
-    if( date == 0 ) {
-        date = 1;
+    if( day == 0 ) {
+        day = 1;
+    }
+
+    if( day > getMonthNumDays( month, year )) {
+        day = getMonthNumDays( month, year );
+    }
+
+    if( hour > 23 ) {
+        hour = 23;
+    }
+
+    if( min > 59 ) {
+        min = 59;
+    }
+
+    if( sec > 59 ) {
+        sec = 59;
     }
 
     this->_y = year;
     this->_m = month;
-    this->_d = date;
+    this->_d = day;
     this->_hh = hour;
     this->_mm = min;
     this->_ss = sec;
@@ -346,11 +364,11 @@ unsigned long DateTime::getEpoch() {
  * Arguments
  * ---------
  *  - month     : The month (1-12)
- *  - shortName : TRUE to get the abreviation or False for the full name.
+ *  - shortName : TRUE to get the abbreviation or False for the full name.
  *
  * Returns : The pointer to the month name string.
  */
-const char *getMonthName( uint8_t month, bool shortName ) {
+const char* getMonthName( uint8_t month, bool shortName ) {
 
     /* Validate input */
     if( month < 1 ) {
@@ -380,11 +398,11 @@ const char *getMonthName( uint8_t month, bool shortName ) {
  * Arguments
  * ---------
  *  - day       : The day of week (0-6)
- *  - shortName : TRUE to get the abreviation or False for the full name.
+ *  - shortName : TRUE to get the abbreviation or False for the full name.
  *
  * Returns : The pointer to the day of week name string.
  */
-const char *getDayName( uint8_t day, bool shortName ) {
+const char* getDayName( uint8_t day, bool shortName ) {
 
     /* Validate input */
     if( day > 6 ) {

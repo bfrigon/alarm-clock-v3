@@ -19,6 +19,7 @@
 #define I_PRINT_H
 
 #include <Arduino.h>
+#include "../resources.h"
 
 #define TEXT_ALIGN_LEFT     0
 #define TEXT_ALIGN_CENTER   1
@@ -43,6 +44,8 @@ class IPrint {
     uint8_t println_P( const char *str, uint8_t length, uint8_t align );
     uint8_t printf_P( const char *format, ... );
 
+    uint8_t printTimeInterval( long seconds, const char *separator = S_DATETIME_SEPARATOR_SPACE, bool compact = false );
+    
   private:
     FILE _stream = {0};
     static int _cb_putchar( char ch, FILE *stream );

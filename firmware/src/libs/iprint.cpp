@@ -430,3 +430,78 @@ uint8_t IPrint::printf_P( const char *format, ... ) {
 
     return length;
 }
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Prints a formated time interval
+ *
+ * Arguments
+ * ---------
+ *  - time      : Number of seconds
+ *  - separator : String in program memory to use to separate components
+ *  - compact   : TRUE prints a compact representation of the inteval, FALSE otherwise
+ *
+ * Returns : Number of characters printed.
+ */
+uint8_t IPrint::printTimeInterval( long time, const char *separator, bool compact ) {
+
+    /* Treat positive and negative interval the same */
+    time = abs( time );
+
+    uint8_t seconds, minutes, hours;
+    seconds = ( time % 60L );
+    minutes = (( time % 3600 ) / 60L );
+    hours = (( time % 86400 ) / 3600L );
+
+    uint16_t days;
+    days = ( time / 86400L );
+
+    /* Prints the number of days, if any */
+    if( days == 1 ) {
+        this->print_P( (compact == true) ? S_DATETIME_1D : S_DATETIME_1DD );
+    } else if ( days > 1 && compact == true ) {
+        this->printf_P( S_DATETIME_D, days );
+    } else if ( days > 1 && compact == false ) {
+        this->printf_P( S_DATETIME_DD, days );
+    }
+
+    if( days > 0 && ( hours > 0 || minutes > 0 || seconds > 0 )) {
+        this->print_P( separator );
+    }
+
+    /* Prints the number of hours, if any */
+    if( hours == 1 ) {
+        this->print_P( (compact == true) ? S_DATETIME_1H : S_DATETIME_1HH );
+    } else if ( hours > 1 && compact == true ) {
+        this->printf_P( S_DATETIME_H, hours );
+    } else if ( hours > 1 && compact == false ) {
+        this->printf_P( S_DATETIME_HH, hours );
+    }
+
+    if( hours > 0 && ( minutes > 0 || seconds > 0 )) {
+        this->print_P( separator );
+    }
+
+    /* Prints the number of minutes, if any */
+    if( minutes == 1 ) {
+        this->print_P( (compact == true) ? S_DATETIME_1M : S_DATETIME_1MM );
+    } else if ( minutes > 1 && compact == true ) {
+        this->printf_P( S_DATETIME_M, minutes );
+    } else if ( minutes > 1 && compact == false ) {
+        this->printf_P( S_DATETIME_MM, minutes );
+    }
+
+    if( minutes > 0 && ( seconds > 0 )) {
+        this->print_P( separator );
+    }
+
+    /* Prints the number of seconds, if any */
+    if( seconds == 1 ) {
+        this->print_P( (compact == true) ? S_DATETIME_1S : S_DATETIME_1SS );
+    } else if ( seconds > 1 && compact == true ) {
+        this->printf_P( S_DATETIME_S, seconds );
+    } else if ( seconds > 1 && compact == false ) {
+        this->printf_P( S_DATETIME_SS, seconds );
+    }
+}

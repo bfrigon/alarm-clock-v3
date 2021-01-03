@@ -127,7 +127,7 @@ void setup() {
     }
 
     /* Initialize time zone */
-    g_timezone.setTimeZone( g_config.clock.tz );
+    g_timezone.setTimezoneByName( g_config.clock.timezone );
 
     /* Initialize clock display */
     g_clock.begin();

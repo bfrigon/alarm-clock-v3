@@ -64,6 +64,7 @@ void NeoClock::restoreClockDisplay() {
 
 
     g_clockUpdate = true;
+    g_screenUpdate = true;
 }
 
 

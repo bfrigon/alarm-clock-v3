@@ -73,19 +73,19 @@ bool showAlarmScreen_onDrawScreen( Screen *screen ) {
         g_lcd.printf_P( S_DATETIME_DHM, alarm_time / 1440, ( alarm_time % 1440 ) / 60, alarm_time % 60 );
 
     } else if( ( alarm_time == 1440 ) ) {
-        g_lcd.print_P( S_DATETIME_1D );
+        g_lcd.print_P( S_DATETIME_24H );
 
     } else if( ( alarm_time % 1440 ) == 0 ) {
-        g_lcd.printf_P( S_DATETIME_D, alarm_time / 1440 );
+        g_lcd.printf_P( S_DATETIME_DD, alarm_time / 1440 );
 
     } else if( alarm_time > 60 ) {
         g_lcd.printf_P( S_DATETIME_HM, alarm_time / 60, alarm_time % 60 );
 
     } else if( alarm_time > 1 ) {
-        g_lcd.printf_P( S_DATETIME_M, alarm_time % 60 );
+        g_lcd.printf_P( S_DATETIME_MM, alarm_time % 60 );
 
     } else {
-        g_lcd.print_P( S_DATETIME_1M );
+        g_lcd.print_P( S_DATETIME_1MM );
     }
 
     return false;

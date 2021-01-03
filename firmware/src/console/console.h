@@ -50,6 +50,8 @@ PROG_STR( S_COMMAND_REBOOT,           "reboot" );
 PROG_STR( S_COMMAND_SET_TIMEZONE,     "set timezone" );
 PROG_STR( S_COMMAND_DATE_SET,         "set date" );
 PROG_STR( S_COMMAND_DATE,             "date" );
+PROG_STR( S_COMMAND_TZ_INFO,          "tz info" );
+PROG_STR( S_COMMAND_TZ_SET,           "tz set" );   /* alias of "set timezone" */
 PROG_STR( S_COMMAND_NTPDATE,          "ntpdate" );
 PROG_STR( S_COMMAND_PRINT_LOGS,       "print logs" );
 PROG_STR( S_COMMAND_NET_STATUS,       "net status" );
@@ -153,6 +155,7 @@ class Console : public IPrint, ITask {
     void printDateTime();
     bool startTaskSetTimeZone();
     void runTaskSetTimeZone();
+    void showTimezoneInfo();
 
 
 

@@ -66,6 +66,7 @@
 #define MAX_ALARM_VOLUME                100
 #define MIN_ALARM_VISUAL_EFFECT_SPEED   1
 #define MAX_ALARM_VISUAL_EFFECT_SPEED   10
+#define MAX_TZ_NAME_LENGTH              40
 
 /* EEPROM addresses */
 #define EEPROM_ADDR_MAGIC               0
@@ -113,7 +114,7 @@ PROG_STR( SETTING_NAME_BRIGHTNESS,          "brightness" );
 PROG_STR( SETTING_NAME_DELAY,               "delay" );
 PROG_STR( SETTING_NAME_DATEFMT,             "datefmt" );
 PROG_STR( SETTING_NAME_USE_NTP,             "ntp" );
-PROG_STR( SETTING_NAME_TIMEZONE_ID,         "timezone_id" );
+PROG_STR( SETTING_NAME_TIMEZONE,            "timezone" );
 PROG_STR( SETTING_NAME_ALS_PRESET,          "preset" );
 PROG_STR( SETTING_NAME_CONTRAST,            "contrast" );
 PROG_STR( SETTING_NAME_VOLUME,              "volume" );
@@ -144,7 +145,7 @@ PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 #define SETTING_ID_CLOCK_COLOR              2
 #define SETTING_ID_CLOCK_BRIGHTNESS         3
 #define SETTING_ID_CLOCK_NTP                4
-#define SETTING_ID_TIMEZONE_ID              5
+#define SETTING_ID_TIMEZONE                 5
 #define SETTING_ID_ALS_PRESET               6   /* Begin ALS section */
 #define SETTING_ID_LCD_DATEFMT              7   /* Begin LCD section */
 #define SETTING_ID_LCD_CONTRAST             8
@@ -235,7 +236,7 @@ struct AlarmProfile {
 
 struct ClockSettings {
     bool use_ntp = false;
-    uint16_t tz = 0;
+    char timezone[ MAX_TZ_NAME_LENGTH + 1];
     bool display_24h = false;
     bool alarm_on[2] = { false, false };
 
