@@ -24,10 +24,12 @@
 #include "../libs/itask.h"
 #include "../libs/iprint.h"
 
+
 #define INPUT_BUFFER_LENGTH         128
 
-#define CONSOLE_COMMANDS_COUNT      12
-
+// ----------------------------------------
+// Console tasks ID's
+// ----------------------------------------
 #define TASK_CONSOLE_PRINT_HELP     1
 #define TASK_CONSOLE_NET_RESTART    2
 #define TASK_CONSOLE_NET_STATUS     3
@@ -38,17 +40,19 @@
 #define TASK_CONSOLE_NET_START      8
 #define TASK_CONSOLE_NET_STOP       9
 #define TASK_CONSOLE_SET_TZ         10
+#define TASK_CONSOLE_CONFIG_BACKUP  11
+#define TASK_CONSOLE_CONFIG_RESTORE 12
+#define TASK_CONSOLE_FACTORY_RESET  13
+#define TASK_CONSOLE_SET_DATE       14
 
 
-
-
-PROG_STR( S_CONSOLE_WELCOME_1,        "Alarm clock V3 (firmware " FW_VERSION ")" );
-PROG_STR( S_CONSOLE_WELCOME_2,        "www.bfrigon.com");
-
+// ----------------------------------------
+// Command names
+// ----------------------------------------
 PROG_STR( S_COMMAND_HELP,             "help" );
 PROG_STR( S_COMMAND_REBOOT,           "reboot" );
 PROG_STR( S_COMMAND_SET_TIMEZONE,     "set timezone" );
-PROG_STR( S_COMMAND_DATE_SET,         "set date" );
+PROG_STR( S_COMMAND_SET_DATE,         "set date" );
 PROG_STR( S_COMMAND_DATE,             "date" );
 PROG_STR( S_COMMAND_TZ_INFO,          "tz info" );
 PROG_STR( S_COMMAND_TZ_SET,           "tz set" );   /* alias of "set timezone" */
@@ -63,13 +67,17 @@ PROG_STR( S_COMMAND_NET_NSLOOKUP,     "nslookup" );
 PROG_STR( S_COMMAND_NET_PING,         "ping" );
 PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
 PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
-PROG_STR( S_COMMAND_FACTORY_RESET,    "config defaults" );
+PROG_STR( S_COMMAND_FACTORY_RESET,    "factory reset" );
 
+
+// ----------------------------------------
+// Command help strings
+// ----------------------------------------
 PROG_STR( S_HELP_HELP,                "Display this message." );
 PROG_STR( S_HELP_REBOOT,              "Restart the firmware." );
-PROG_STR( S_HELP_DATE_SET,            "Set the clock." );
-PROG_STR( S_HELP_DATE,                "Display the current time and time zone" );
 PROG_STR( S_HELP_SET_TIMEZONE,        "Set the time zone." );
+PROG_STR( S_HELP_SET_DATE,            "Set the clock." );
+PROG_STR( S_HELP_DATE,                "Display the current time and time zone" );
 PROG_STR( S_HELP_NTPDATE,             "Query the NTP time server" );
 PROG_STR( S_HELP_PRINT_LOGS,          "Print the event log stored on SD card." );
 PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection." );
@@ -78,14 +86,26 @@ PROG_STR( S_HELP_NET_RESTART,         "Restart the WiFi manager." );
 PROG_STR( S_HELP_NET_STOP,            "Stop the WiFi manager." );
 PROG_STR( S_HELP_NET_NSLOOKUP,        "Query the nameserver for the IP address of the given host." );
 PROG_STR( S_HELP_NET_PING,            "Test the reachability of a given host." );
+PROG_STR( S_HELP_SETTING_BACKUP,      "Save settings to a file on the SD card." );
+PROG_STR( S_HELP_SETTING_RESTORE,     "Restore settings from a file on the SD card." );
+PROG_STR( S_HELP_FACTORY_RESET,       "Restore settings to their default values." );
 
+
+// ----------------------------------------
+// Command usage help
+// ----------------------------------------
 PROG_STR( S_USAGE_NSLOOKUP,           "nslookup [hostname]" );
 PROG_STR( S_USAGE_PING,               "ping [host]" );
 
+
+// ----------------------------------------
+// Commands listed on the help menu
+// ----------------------------------------
+#define CONSOLE_HELP_MENU_ITEMS       16
 const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_HELP,
     S_COMMAND_DATE,
-    S_COMMAND_DATE_SET,
+    S_COMMAND_SET_DATE,
     S_COMMAND_SET_TIMEZONE,
     S_COMMAND_NTPDATE,
     S_COMMAND_PRINT_LOGS,
@@ -95,12 +115,15 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_NET_STOP,
     S_COMMAND_NET_NSLOOKUP,
     S_COMMAND_NET_PING,
+    S_COMMAND_SETTING_BACKUP,
+    S_COMMAND_SETTING_RESTORE,
+    S_COMMAND_FACTORY_RESET,
     S_COMMAND_REBOOT,
 };
 const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_HELP,
     S_HELP_DATE,
-    S_HELP_DATE_SET,
+    S_HELP_SET_DATE,
     S_HELP_SET_TIMEZONE,
     S_HELP_NTPDATE,
     S_HELP_PRINT_LOGS,
@@ -110,6 +133,9 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_NET_STOP,
     S_HELP_NET_NSLOOKUP,
     S_HELP_NET_PING,
+    S_HELP_SETTING_BACKUP,
+    S_HELP_SETTING_RESTORE,
+    S_HELP_FACTORY_RESET,
     S_HELP_REBOOT,
 };
 
@@ -126,6 +152,17 @@ class Console : public IPrint, ITask {
     void runTask();
 
   private:
+
+    char _inputbuffer[ INPUT_BUFFER_LENGTH + 1 ];
+    char* _inputParameter= NULL;
+    uint8_t _inputlength = 0;
+    uint8_t _inputBufferLimit = INPUT_BUFFER_LENGTH;
+    bool _inputenabled = false;
+    bool _inputHidden = false;
+
+    uint16_t _taskIndex = 0;
+
+
     bool processInput();
     void trimInput();
     void parseCommand();
@@ -136,36 +173,67 @@ class Console : public IPrint, ITask {
     void displayPrompt();
     uint8_t _print( char c );
 
+    // ----------------------------------------
+    // Commands
+    // ----------------------------------------
+
+    /* 'help' command */
     bool startTaskPrintHelp();
     void runTaskPrintHelp();
+    
+    /* 'net restart' command */
     bool startTaskNetRestart();
     void runTaskNetRestart();
+
+    /* 'net start' command */
     bool startTaskNetStart();
+
+    /* 'net stop' command */
     bool startTaskNetStop();
     void runTaskNetStop();
+
+    /* 'net status' command */
     void printNetStatus();
+
+    /* 'nslookup' command */
     bool startTaskNslookup();
     void runTaskNsLookup();
+
+    /* 'ping' command */
     bool startTaskPing();
     void runTaskPing();
+
+    /* 'net config' command */
     bool startTaskNetworkConfig();
     void runTaskNetworkConfig();
-    bool startTaskDateSet();
-    void runTaskDateSet();
+    
+    /* 'set date' command */
+    bool startTaskSetDate();
+    void runTaskSetDate();
+
+    /* 'date' command */
     void printDateTime();
+
+    /* 'set timezone' and 'tz set' command */
     bool startTaskSetTimeZone();
     void runTaskSetTimeZone();
+
+    /* 'tz info' command */
     void showTimezoneInfo();
+    
+    /* 'config backup' command */
+    bool startTaskConfigBackup();
+    void runTaskConfigBackup();
+    void showTaskConfigError();
 
+    /* 'config restore' command */
+    bool startTaskConfigRestore();
+    void runTaskConfigRestore();
 
+    /* 'factory reset' command */
+    bool startTaskFactoryReset();
+    void runTaskFactoryReset();
 
-    char _inputbuffer[ INPUT_BUFFER_LENGTH + 1 ];
-    char* _inputParameter= NULL;
-    uint8_t _inputlength = 0;
-    bool _inputenabled = false;
-    bool _inputHidden = false;
-
-    uint16_t _taskIndex = 0;
 };
 
 extern Console g_console;

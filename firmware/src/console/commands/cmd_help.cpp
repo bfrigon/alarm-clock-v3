@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/help.cpp
+// File    : src/console/commands/cmd_help.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -20,7 +20,7 @@
 
 /*--------------------------------------------------------------------------
  *
- * Starts the help screen print task
+ * Starts the 'help' command task
  *
  * Arguments
  * ---------
@@ -41,7 +41,7 @@ bool Console::startTaskPrintHelp() {
 
 /*--------------------------------------------------------------------------
  *
- * Print the next line of the help screen
+ * Run the 'help' command task
  *
  * Arguments
  * ---------
@@ -57,7 +57,7 @@ void Console::runTaskPrintHelp() {
 
     _taskIndex++;
 
-    if( _taskIndex >= CONSOLE_COMMANDS_COUNT ) {
+    if( _taskIndex >= CONSOLE_HELP_MENU_ITEMS ) {
         this->endTask( TASK_SUCCESS );
     }
 }

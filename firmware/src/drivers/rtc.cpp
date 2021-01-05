@@ -63,7 +63,7 @@ void DS3231::begin() {
     this->clearAlarmFlag();
     this->enableInterrupt();
 
-    this->getTime( &_now );
+    this->readTime( &_now );
 }
 
 
@@ -174,7 +174,7 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
  * ---------
  *  None
  *
- * Returns : TRUE if an alarm event occuredor False otherwise.
+ * Returns : TRUE if an alarm event occured or False otherwise.
  */
 bool DS3231::processEvents() {
 
@@ -186,10 +186,7 @@ bool DS3231::processEvents() {
     this->enableInterrupt();
     rtc_event = false;
 
-    /* Read the current time */
-    this->getTime( &_now );
-
-
+    this->readTime( &_now );
     return true;
 }
 
@@ -234,7 +231,7 @@ void DS3231::dumpRegs() {
  *
  * Returns : Nothing
  */
-void DS3231::getTime( DateTime *dt ) {
+void DS3231::readTime( DateTime *dt ) {
 
     Wire.beginTransmission( I2C_ADDR_DS3231 );
     Wire.write( DS3231_REG_SEC );
@@ -284,20 +281,22 @@ unsigned long DS3231::getEpoch() {
  *
  * Returns : Nothing
  */
-void DS3231::setDateTime( DateTime *ndt ) {
+void DS3231::writeTime( DateTime *new_dt ) {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
 
     Wire.write( DS3231_REG_SEC );
 
-    Wire.write( bin2bcd( ndt->second() ) );
-    Wire.write( bin2bcd( ndt->minute() ) );
-    Wire.write( bin2bcd( ndt->hour() & ~DS3231_HOUR_24H ) );
-    Wire.write( bin2bcd( ndt->dow() + 1 ) );
-    Wire.write( bin2bcd( ndt->day() ) );
-    Wire.write( bin2bcd( ndt->month() ) );
-    Wire.write( bin2bcd( ndt->year() % 100 ) );
+    Wire.write( bin2bcd( new_dt->second() ) );
+    Wire.write( bin2bcd( new_dt->minute() ) );
+    Wire.write( bin2bcd( new_dt->hour() & ~DS3231_HOUR_24H ) );
+    Wire.write( bin2bcd( new_dt->dow() ) );
+    Wire.write( bin2bcd( new_dt->day() ) );
+    Wire.write( bin2bcd( new_dt->month() ) );
+    Wire.write( bin2bcd( new_dt->year() % 100 ) );
 
     Wire.endTransmission();
+
+    _now = new_dt;
 }
 
 

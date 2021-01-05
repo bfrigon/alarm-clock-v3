@@ -1,0 +1,446 @@
+//******************************************************************************
+//
+// Project : Alarm Clock V3
+// File    : src/console/commands/cmd_settings.cpp
+// Author  : Benoit Frigon <www.bfrigon.com>
+//
+// -----------------------------------------------------------------------------
+//
+// This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+// International License. To view a copy of this license, visit
+//
+// http://creativecommons.org/licenses/by-sa/4.0/
+//
+// or send a letter to Creative Commons,
+// PO Box 1866, Mountain View, CA 94042, USA.
+//
+//******************************************************************************
+#include "../console.h"
+#include "../../config.h"
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Print the error returned by the config backup or config restore tasks
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
+void Console::showTaskConfigError() {
+
+    this->println();
+
+    switch( g_config.getTaskError() ) {
+
+        case TASK_ERROR_NO_SDCARD:
+            this->println_P( S_STATUS_ERROR_NO_SDCARD );
+            break;
+
+        case TASK_ERROR_CANT_OPEN:
+        case TASK_ERROR_WRITE:
+            this->println_P( S_STATUS_ERROR_WRITE );
+            break;
+
+        case TASK_ERROR_READ:
+            this->println_P( S_STATUS_ERROR_READ );
+            break;
+
+        case TASK_ERROR_NOT_FOUND:
+            this->println_P( S_STATUS_ERROR_NOTFOUND );
+            break;
+    }
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Starts the 'config backup' command task
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successful, FALSE if another task is already running.
+ *           
+ */
+bool Console::startTaskConfigBackup() {
+    _taskIndex = 0;
+    
+
+    this->startTask( TASK_CONSOLE_CONFIG_BACKUP );
+    return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Monitor the 'config backup' command task. Display prompts and validate 
+ * responses required before executing the task.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
+void Console::runTaskConfigBackup() {
+
+    /* Even index display the prompt, odd index process user input */
+    if( _taskIndex % 2 ) {
+
+        if( this->processInput() == false ) {
+            return;
+        }
+
+        this->trimInput();
+    }
+
+    /* Check for a filename in the command parameters */
+    if( _taskIndex == 0 ) {
+        char *filename;
+        filename = this->getInputParameter();
+
+        if( filename != 0 ) {
+            memmove( _inputbuffer, filename, strlen( filename ) + 1);
+
+            /* Skip filename prompt if a filename is provided in the command parameter */
+            _taskIndex = 1;
+        }
+    }
+
+    switch( _taskIndex++ ) {
+
+        /* Display filename prompt */
+        case 0:
+            _inputBufferLimit = INPUT_BUFFER_LENGTH - 4;
+
+            this->print_P( S_CONSOLE_CFG_SAVE_FILENAME );
+            break;
+
+        /* Validate filename prompt */
+        case 1:
+
+            /* If filename is empty, use the default one */
+            if( strlen( _inputbuffer ) == 0 ) {
+                strcpy( _inputbuffer, CONFIG_BACKUP_FILENAME );
+            }
+
+            /* Start the backup task */
+            if( g_config.startBackup( _inputbuffer, false ) == false ) {
+
+                if( g_config.getTaskError() == TASK_ERROR_FILE_EXISTS ) {
+
+                    /* Move filename to an unused area of the input buffer */
+                    memmove( _inputbuffer + 4, _inputbuffer, strlen( _inputbuffer ) + 1 );
+
+                    /* Continue on step 2, display overwrite prompt */
+                    _taskIndex = 2;
+                    
+                } else {
+
+                    this->showTaskConfigError();
+                    this->endTask( g_config.getTaskError() );
+                    return;
+                }
+
+            } else {
+
+                /* Backup started, skip overwrite prompt */
+                _taskIndex = 4;
+
+                this->println();
+                this->println_P( S_CONSOLE_CFG_SAVING );
+            }
+
+            break;
+
+
+        /* Display overwrite prompt if file exists */
+        case 2:
+            _inputBufferLimit = 1;
+
+            this->printf_P( S_CONSOLE_CFG_FILE_EXISTS, _inputbuffer + 4 );
+            break;
+
+        /* Validate overwrite file prompt */
+        case 3:
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+                
+                /* Start backup */
+                g_config.startBackup( _inputbuffer + 4, true );
+
+                this->println();
+                this->println_P( S_CONSOLE_CFG_SAVING );
+
+                _taskIndex = 4;
+
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+                this->endTask( TASK_SUCCESS );
+                return;
+
+            } else {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+                this->println();
+
+                /* try again */
+                _taskIndex = 2;
+            }
+            break;
+
+        /* Monitor the task */
+        default:
+            _taskIndex = 4;
+
+            /* Check if settings backup task is done */
+            if( g_config.getCurrentTask() == TASK_NONE ) {
+
+                if( g_config.getTaskError() == TASK_SUCCESS) {
+
+                    this->println_P( S_STATUS_DONE );
+                    this->endTask( TASK_SUCCESS );
+
+                } else {
+                    this->showTaskConfigError();
+                    this->endTask( g_config.getTaskError() );
+                }
+            }
+
+            return;
+    }
+
+    this->resetInput();
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Starts the 'config restore' command task
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successful, FALSE if another task is already running.
+ *           
+ */
+bool Console::startTaskConfigRestore() {
+    _taskIndex = 0;
+
+    this->startTask( TASK_CONSOLE_CONFIG_RESTORE );
+    return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Monitor the 'config restore' command task. Display prompts and validate 
+ * responses required before executing the task.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
+void Console::runTaskConfigRestore() {
+
+    /* Even index display the prompt, odd index process user input */
+    if( _taskIndex % 2 ) {
+
+        if( this->processInput() == false ) {
+            return;
+        }
+
+        this->trimInput();
+    }
+
+    /* Check for a filename in the command parameters */
+    if( _taskIndex == 0 ) {
+        char *filename;
+        filename = this->getInputParameter();
+
+        if( filename != 0 ) {
+            memmove( _inputbuffer, filename, strlen( filename ) + 1);
+
+            /* Skip filename prompt if a filename is provided in the command parameter */
+            _taskIndex = 1;
+        }
+    }
+
+    switch( _taskIndex++ ) {
+
+        /* Display filename prompt */
+        case 0:
+            _inputBufferLimit = INPUT_BUFFER_LENGTH - 4;
+
+            this->print_P( S_CONSOLE_CFG_LOAD_FILENAME );
+            break;
+
+        /* Validate filename prompt */
+        case 1:
+
+            /* If filename is empty, use the default one */
+            if( strlen( _inputbuffer ) == 0 ) {
+                strcpy( _inputbuffer, CONFIG_BACKUP_FILENAME );
+            }
+
+            /* Move filename to an unused area of the input buffer */
+            memmove( _inputbuffer + 4, _inputbuffer, strlen( _inputbuffer ) + 1 );
+
+            this->println();
+            this->println_P( S_CONSOLE_CFG_RESTORE_MSG );
+            break;
+
+        /* Display overwrite prompt if file exists */
+        case 2:
+            _inputBufferLimit = 1;
+
+            this->print_P( S_CONSOLE_CONTINUE );
+            break;
+
+        /* Validate overwrite file prompt */
+        case 3:
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+                
+                /* Start the restore task */
+                if( g_config.startRestore( _inputbuffer + 4 ) == false ) {
+
+                    this->showTaskConfigError();
+                    this->endTask( g_config.getTaskError() );
+                    return;
+                }
+
+                this->println();
+                this->println_P( S_CONSOLE_CFG_RESTORING );
+
+                _taskIndex = 4;
+
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+                this->endTask( TASK_SUCCESS );
+                return;
+
+            } else {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+                this->println();
+
+                /* try again */
+                _taskIndex = 2;
+            }
+            break;
+
+        /* Monitor the task */
+        default:
+            _taskIndex = 4;
+
+            /* Check if settings backup task is done */
+            if( g_config.getCurrentTask() == TASK_NONE ) {
+
+                if( g_config.getTaskError() == TASK_SUCCESS) {
+
+                    this->println_P( S_STATUS_DONE );
+                    this->endTask( TASK_SUCCESS );
+
+                } else {
+                    this->showTaskConfigError();
+                    this->endTask( g_config.getTaskError() );
+                }
+            }
+
+            return;
+    }
+
+    this->resetInput();
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Starts the 'factory reset' command task
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successful, FALSE if another task is already running.
+ *           
+ */
+bool Console::startTaskFactoryReset() {
+    _taskIndex = 0;
+
+    this->println();
+    this->println_P( S_CONSOLE_CFG_RESET_MSG );
+
+    this->startTask( TASK_CONSOLE_FACTORY_RESET );
+    return true;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Monitor the 'factory reset' command task. Display prompts and validate 
+ * responses required before executing the task.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
+void Console::runTaskFactoryReset() {
+    
+    /* Even index display the prompt, odd index process user input */
+    if( _taskIndex % 2 ) {
+
+        if( this->processInput() == false ) {
+            return;
+        }
+
+        this->trimInput();
+    }
+
+    switch( _taskIndex++ ) {
+
+        /* Display do you want to continue prompt */
+        case 0:
+            _inputBufferLimit = 1;
+
+            this->print_P( S_CONSOLE_CONTINUE );
+            break;
+
+        /* Validate overwrite file prompt */
+        case 1:
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+
+                this->println();
+                this->println_P( S_CONSOLE_CFG_RESETTING );
+                this->println();
+                
+                /* Factory reset */
+                g_config.formatEeprom();
+                g_power.reboot();
+                return;
+
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+                this->endTask( TASK_SUCCESS );
+                return;
+
+            } else {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+                this->println();
+
+                /* try again */
+                _taskIndex = 0;
+            }
+            break;
+    }
+
+    this->resetInput();
+
+}

@@ -275,7 +275,7 @@ void ConfigManager::runTask() {
  *
  * Returns : TRUE if successfuly started or FALSE otherwise.
  */
-bool ConfigManager::startBackup( bool overwrite ) {
+bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
 
     /* Checks if another task is already running. */
     if( this->startTask( TASK_BACKUP_CONFIG ) != TASK_BACKUP_CONFIG ) {
@@ -295,10 +295,22 @@ bool ConfigManager::startBackup( bool overwrite ) {
         this->_sd_file.close();
     }
 
+    if( _sd_file.openCwd() == false ) {
+        this->endBackup( TASK_ERROR_CANT_OPEN );
+        return false;
+    }
+
+    if( overwrite == false && this->_sd_file.exists( filename ) == true ) {
+        this->endBackup( TASK_ERROR_FILE_EXISTS );
+        return false;
+    }
+
+    this->_sd_file.close();
+
     uint8_t flags;
     flags = O_CREAT | O_WRITE | ( overwrite == true ? O_TRUNC : O_EXCL );
 
-    if( this->_sd_file.open( CONFIG_BACKUP_FILENAME, flags ) == false ) {
+    if( this->_sd_file.open( filename, flags ) == false ) {
         this->endBackup( TASK_ERROR_CANT_OPEN );
         return false;
     }
@@ -306,9 +318,6 @@ bool ConfigManager::startBackup( bool overwrite ) {
     /* Write file header */
     this->writeConfigLine( NULL, SETTING_TYPE_COMMENT, ( void* )COMMENT_FILE_HEADER );
     this->_sd_file.sync();
-
-
-    g_screenUpdate = true;
 
     return true;
 }
@@ -344,7 +353,7 @@ void ConfigManager::endBackup( int error ) {
  *
  * Returns : TRUE if successfuly started or FALSE otherwise.
  */
-bool ConfigManager::startRestore() {
+bool ConfigManager::startRestore( const char *filename) {
     if( this->startTask( TASK_RESTORE_CONFIG ) != TASK_RESTORE_CONFIG ) {
         return false;
     }
@@ -358,12 +367,11 @@ bool ConfigManager::startRestore() {
     this->_currentSettingID = 0;
     this->_currentAlarmID = -1;
 
-    if( this->_sd_file.open( CONFIG_BACKUP_FILENAME, O_READ ) == false ) {
+    if( this->_sd_file.open( filename, O_READ ) == false ) {
         this->endBackup( TASK_ERROR_NOT_FOUND );
         return false;
     }
 
-    g_screenUpdate = true;
     return true;
 }
 

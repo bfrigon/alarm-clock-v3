@@ -700,3 +700,154 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 
     return length;
 }
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Parse an integer value from a given array of character
+ *
+ * Arguments
+ * ---------
+ *  - buf    : Pointer to the string to parse.
+ *  - dest   : Pointer to an integer which hold the result.
+ *  - min    : lower acceptable limit of the integer to parse.
+ *  - max    : upper acceptable limit of the integer to parse.
+ *  - digits : Maximum number of digits the integer must have.
+ *
+ * Returns : The pointer on the character array at the position where the number
+ *           ends if successful. Returns NULL when the buffer does not contain a 
+ *           valid number or if the parsed number is outside the defined range.
+ */
+const char* parse_int( const char *buf, int *dest, int min, int max, uint8_t digits )  {
+
+    int result = 0; 
+    unsigned char ch; 
+
+
+  
+    ch = *buf; 
+    if (ch < '0' || ch > '9') {
+        return NULL; 
+    }
+ 
+    do { 
+        result *= 10; 
+        result += ch - '0'; 
+        digits--;
+        ch = *++buf; 
+    } while (( result * 10 <= max ) && digits && ch >= '0' && ch <= '9'); 
+ 
+    if (result < min || result > max) {
+        return NULL; 
+    }
+ 
+    *dest = result; 
+    return buf; 
+} 
+
+
+/*--------------------------------------------------------------------------
+ *
+ * convert a character array representation of time to a DateTime structure
+ *
+ * Arguments
+ * ---------
+ *  - buf  : Pointer to the character array to convert.
+ *  - fmt  : Pointer to a character array containing the format used to 
+ *           parse the date/time string
+ *  - dest : DateTime object to store the results to
+ *
+ * Returns : Pointer to the first character not processed by this function. 
+ *           Returns NULL if it fails to match all of the format string.
+ */
+const char* strptime( const char *buf, const char *fmt, DateTime* dest ) {
+    uint16_t year = dest->year();
+    uint8_t month = dest->month();
+    uint8_t day = dest->day();
+    uint8_t hour = dest->hour();
+    uint8_t min = dest->minute();
+    uint8_t sec = dest->second();
+    int res;
+
+    
+    
+    while(( *fmt != '\0' ) && ( buf != NULL )) {
+
+        if( isspace( *fmt )) {
+            while( isspace( *buf++ ));
+            continue;
+        }
+
+        if( *fmt != '%' ) {
+            if( *fmt != *buf++ ) {
+                return NULL;
+            }
+            
+            fmt++;
+            continue;
+        } 
+
+        switch( *++fmt ) {
+
+            /* Match the '%' character */
+            case '%':
+                if( *fmt != *buf++ ) {
+                    return NULL;
+                }
+
+                fmt++;
+                continue;
+
+            /* Year */
+            case 'Y':
+                buf = parse_int( buf, &res, 0, 9999, 4 );
+                year = res;
+                break;
+
+            /* Month (1-12) */
+            case 'm':
+                buf = parse_int( buf, &res, 1, 12, 2);
+                month = res;
+                break;
+
+            /* Day (1-31) */
+            case 'd':
+                buf = parse_int( buf, &res, 1, 31, 2);
+                day = res;
+                break;
+
+            /* Hour (0-23) */
+            case 'H':
+                buf = parse_int( buf, &res, 0, 23, 2);
+                hour = res;
+                break;
+
+            /* Minute (0-59) */
+            case 'M':
+                buf = parse_int( buf, &res, 0, 59, 2);
+                min = res;
+                break;
+
+            /* Seconds (0-59) */
+            case 'S':
+                buf = parse_int( buf, &res, 0, 59, 2);
+                sec = res;
+                break;
+
+            /* Unsuppoted conversion */
+            default: 
+                return NULL;
+
+        }
+
+        fmt++;
+    }
+
+    if( buf == NULL ) {
+        return NULL;
+    }
+
+    dest->set( year, month, day, hour, min, sec );
+
+    return buf;
+}

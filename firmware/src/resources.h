@@ -71,11 +71,13 @@ const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 // Progmem strings
 //
 //--------------------------------------------------------------------------
+PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
+PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 
+/* Date/time formatting */
 PROG_STR( S_DATETIME_DHM,               "%dd, %dh. %d min." );
 PROG_STR( S_DATETIME_HM,                "%dh. %d min." );
 PROG_STR( S_DATETIME_MS,                "%d min. %d sec." );
-
 PROG_STR( S_DATETIME_1M,                "1m" );
 PROG_STR( S_DATETIME_1MM,               "1 minute" );
 PROG_STR( S_DATETIME_M,                 "%dm" );
@@ -93,11 +95,9 @@ PROG_STR( S_DATETIME_D,                 "%dd" );
 PROG_STR( S_DATETIME_1DD,               "1 day" );
 PROG_STR( S_DATETIME_DD,                "%d days" );
 PROG_STR( S_DATETIME_24H,               "24 hours" );
-
 PROG_STR( S_DATETIME_SEPARATOR_COMMA,   ", " );
 PROG_STR( S_DATETIME_SEPARATOR_AND,     " and " );
 PROG_STR( S_DATETIME_SEPARATOR_SPACE,   " " );
-
 
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
@@ -114,11 +114,6 @@ PROG_STR( S_ALARMS_OFF,                 "Alarms off" );
 PROG_STR( S_ALARM_IN,                   "Alarm #%d in" );
 PROG_STR( S_ALARM_NUM1,                 "1." );
 PROG_STR( S_ALARM_NUM2,                 "2." );
-
-
-PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
-
-
 
 /* Main menu strings */
 PROG_STR( S_MAIN_MENU_SET_ALARMS,       "Set alarms" );
@@ -219,6 +214,8 @@ PROG_STR( S_BATT_NO_POWER,              "Pwr: n/a" );
 PROG_STR( S_NETINFO_IP,                 "%d.%d.%d.%d" );
 PROG_STR( S_SSID,                       "SSID" );
 
+PROG_STR( S_CONSOLE_WELCOME_1,          "Alarm clock V3 (firmware " FW_VERSION ")" );
+PROG_STR( S_CONSOLE_WELCOME_2,          "www.bfrigon.com");
 
 PROG_STR( S_CONSOLE_INIT,               "Initializing..." );
 PROG_STR( S_CONSOLE_BUSY,               "Console is busy running another task!" );
@@ -227,8 +224,9 @@ PROG_STR( S_CONSOLE_PROMPT,             "> " );
 PROG_STR( S_CONSOLE_USAGE,              "Usage : " );
 PROG_STR( S_CONSOLE_APPLY,              "Apply settings? " );
 PROG_STR( S_CONSOLE_DONE,               "Done!" );
+PROG_STR( S_CONSOLE_CONTINUE,           "Do you want to continue? " );
 PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
-PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid parameter! Enter 'Y' or 'N'" );
+PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid input! Enter 'Y' or 'N'" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_SUB,  "Invalid subnet mask" );
 PROG_STR( S_CONSOLE_MISSING_PARAMATER,  "Missing parameter!" );
@@ -267,14 +265,18 @@ PROG_STR( S_CONSOLE_NET_CFG_GATEWAY,    "Gateway address (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_DNS,        "DNS (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_APPLY,      "Apply network settings? " );
 
-PROG_STR( S_CONSOLE_TIME_CFG_TIME,      "Time (HH:MM) :" );
-PROG_STR( S_CONSOLE_TIME_CFG_DATE,      "Date (Y-M-D) :" );
-PROG_STR( S_CONSOLE_TIME_CFG_NTP,       "Syncrhonise clock automatically using NTP :" );
+PROG_STR( S_CONSOLE_TIME_SET_INSTR,     "Set date/time\r\nLeave the field empty to keep existing settings.");
+PROG_STR( S_CONSOLE_TIME_CFG_TIME,      "Time (%02d:%02d): " );
+PROG_STR( S_CONSOLE_TIME_CFG_DATE,      "Date (%d-%02d-%02d): " );
+PROG_STR( S_CONSOLE_TIME_CFG_NTP,       "Syncrhonise clock automatically using NTP (%s): " );
 PROG_STR( S_CONSOLE_TIME_CFG_APPLY,     "Apply clock settings? " );
 PROG_STR( S_CONSOLE_TIME_CURRENT_TZ,    "Current time zone : " );
 PROG_STR( S_CONSOLE_TIME_NEW_TZ,        "New time zone : " );
 PROG_STR( S_CONSOLE_TIME_ENTER_TZ,      "Enter new time zone (leave empty to keep current one) : " );
 PROG_STR( S_CONSOLE_TIME_INVALID_TZ,    "Invalid time zone" );
+PROG_STR( S_CONSOLE_INVALID_DATE_FMT,   "Invalid date! (expects YYYY-MM-DD)" );
+PROG_STR( S_CONSOLE_INVALID_TIME_FMT,   "Invalid time! (expects HH:MM)" );
+
 
 
 PROG_STR( S_CONSOLE_DATE_FMT_UTC,       "%S %S %d %02d:%02d:%02d UTC %d\r\n" );
@@ -290,9 +292,14 @@ PROG_STR( S_CONSOLE_TZ_AHEAD_UTC,       " ahead of UTC/GMT\r\n");
 PROG_STR( S_CONSOLE_TZ_DST_TRANS,       "Daylight saving time starts on %S, %S %d %d\r\nAt %02d:%02d local time, turn clock forward ");
 PROG_STR( S_CONSOLE_TZ_STD_TRANS,       "Daylight saving time ends on %S, %S %d %d\r\nAt %02d:%02d local time, turn clock back ");
 
-PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
-
-
+PROG_STR( S_CONSOLE_CFG_SAVING,         "Saving settings..." );
+PROG_STR( S_CONSOLE_CFG_RESTORING,      "Restoring settings..." );
+PROG_STR( S_CONSOLE_CFG_RESETTING,      "Restoring default settings..." );
+PROG_STR( S_CONSOLE_CFG_SAVE_FILENAME,  "File name to save the settings to (default: 'config.txt') : " );
+PROG_STR( S_CONSOLE_CFG_LOAD_FILENAME,  "File name to restore the settings from (default: 'config.txt') : " );
+PROG_STR( S_CONSOLE_CFG_FILE_EXISTS,    "File '%s' already exists. Do you want to overwrite it? " );
+PROG_STR( S_CONSOLE_CFG_RESTORE_MSG,    "WARNING! This will overwrite all current settings.");
+PROG_STR( S_CONSOLE_CFG_RESET_MSG,      "WARNING! This will revert all settings to their default values. ");
 
 
 

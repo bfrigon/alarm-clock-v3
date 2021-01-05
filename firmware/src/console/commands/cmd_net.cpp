@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/net.cpp
+// File    : src/console/commands/cmd_net.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -22,7 +22,7 @@
 
 /*--------------------------------------------------------------------------
  *
- * Starts a network reconnect task
+ * Starts the 'net restart' command task
  *
  * Arguments
  * ---------
@@ -52,7 +52,7 @@ bool Console::startTaskNetRestart() {
 
 /*--------------------------------------------------------------------------
  *
- * Monitor the network reconnect task
+ * Monitor the 'net restart' command task
  *
  * Arguments
  * ---------
@@ -95,7 +95,7 @@ void Console::runTaskNetRestart() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts a network connection task
+ * Starts the 'net start' command task
  *
  * Arguments
  * ---------
@@ -123,7 +123,7 @@ bool Console::startTaskNetStart() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts a network disconnect task
+ * Starts the 'net stop' command task
  *
  * Arguments
  * ---------
@@ -156,7 +156,7 @@ bool Console::startTaskNetStop() {
 
 /*--------------------------------------------------------------------------
  *
- * Monitor the network disconnect task
+ * Monitor the 'net stop' command task
  *
  * Arguments
  * ---------
@@ -177,7 +177,7 @@ void Console::runTaskNetStop() {
 
 /*--------------------------------------------------------------------------
  *
- * Print status of the WiFi connection
+ * Print status of the WiFi connection to the console
  *
  * Arguments
  * ---------
@@ -226,7 +226,7 @@ void Console::printNetStatus() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts a DNS resolve task
+ * Starts the 'nslookup' command task
  *
  * Arguments
  * ---------
@@ -280,7 +280,8 @@ bool Console::startTaskNslookup() {
 
 /*--------------------------------------------------------------------------
  *
- * Monitor the DNS resolve task
+ * Monitor the 'nslookup' command task. Display prompts and validate 
+ * response required before executing the task. 
  *
  * Arguments
  * ---------
@@ -309,7 +310,7 @@ void Console::runTaskNsLookup() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts a host ping task
+ * Starts the 'ping' command task
  *
  * Arguments
  * ---------
@@ -376,7 +377,7 @@ bool Console::startTaskPing() {
 
 /*--------------------------------------------------------------------------
  *
- * Monitor the host ping task
+ * Monitor the 'ping' command task. 
  *
  * Arguments
  * ---------
@@ -432,7 +433,7 @@ void Console::runTaskPing() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts the network configuration task
+ * Starts the 'net config' command task
  *
  * Arguments
  * ---------
@@ -458,6 +459,18 @@ bool Console::startTaskNetworkConfig() {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Run the 'net config' command task. Display prompts and validate 
+ * responses required before executing the task.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
 void Console::runTaskNetworkConfig() {
     IPAddress addr;
 
@@ -503,18 +516,20 @@ void Console::runTaskNetworkConfig() {
 
         /* Display use DHCP prompt */
         case 4:
+            _inputBufferLimit = 1;
+
             this->printf_P( S_CONSOLE_NET_CFG_DHCP, (g_config.network.dhcp == true ? "Y" : "N" ));
             break;
 
         /* Validate use DHCP answer */
         case 5:
-            if( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
                 g_config.network.dhcp = true;
 
                 /* Skips static ip settings */
                 _taskIndex = 14;
 
-            } else if ( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
                 g_config.network.dhcp = false;
 
             } else if ( _inputlength > 0 ) {
@@ -535,6 +550,8 @@ void Console::runTaskNetworkConfig() {
 
         /* Display local ip address prompt */
         case 6:
+            _inputBufferLimit = INPUT_BUFFER_LENGTH;
+
             addr = g_config.network.ip;
             this->printf_P( S_CONSOLE_NET_CFG_IP, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
             break;
@@ -619,6 +636,8 @@ void Console::runTaskNetworkConfig() {
 
         /* Display apply settings prompt */
         case 14:
+            _inputBufferLimit = 1;
+
             this->println();
             this->print_P( S_CONSOLE_NET_CFG_APPLY );
             break;
@@ -626,13 +645,15 @@ void Console::runTaskNetworkConfig() {
         /* Validate apply settings answer */
         case 15:
 
-            if( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+
+                /* Save and apply the new network configuration */
                 g_config.save( EEPROM_SECTION_NETWORK );
                 g_config.apply( EEPROM_SECTION_NETWORK );
 
                 g_wifimanager.setAutoReconnect( true );
 
-            } else if ( _inputlength == 1 && tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
                 g_config.load( EEPROM_SECTION_NETWORK );
 
             } else {

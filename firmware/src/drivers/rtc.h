@@ -101,9 +101,9 @@ class DS3231 {
     void disableInterrupt();
     void clearAlarmFlag();
     bool processEvents();
-    void getTime( DateTime *dt );
+    void readTime( DateTime *dt );
     unsigned long getEpoch();
-    void setDateTime( DateTime *ndt );
+    void writeTime( DateTime *ndt );
     void dumpRegs();
 
     DateTime* now()     { return &this->_now; }

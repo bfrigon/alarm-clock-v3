@@ -602,7 +602,7 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
                 g_timezone.toUTC( &nDate );
 
                 /* Update the RTC */
-                g_rtc.setDateTime( &nDate );
+                g_rtc.writeTime( &nDate );
             }
 
             g_clock.restoreClockDisplay();

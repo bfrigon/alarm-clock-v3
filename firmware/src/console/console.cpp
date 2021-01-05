@@ -253,6 +253,11 @@ bool Console::processInput() {
         /* Printable character */
         if( isprint( ch )) {
 
+            /* If limit has been reach, discard the character */
+            if( _inputlength >= _inputBufferLimit ) {
+                continue;
+            }
+
             _inputbuffer[ _inputlength++ ] = ch;
             Serial.write( _inputHidden == true ? '*' : ch );
 
@@ -278,13 +283,6 @@ bool Console::processInput() {
 
             return true;
         } 
-
-            
-        /* Reached the end of buffer, reject input */
-        if( _inputlength >= INPUT_BUFFER_LENGTH ) {
-            _inputlength = 0;
-            return false;
-        }
     }
 
     return false;
@@ -330,56 +328,86 @@ void Console::parseCommand() {
 
     this->trimInput();
 
+    /* 'help' command */
     if( this->matchCommandName( S_COMMAND_HELP ) == true ) {
         started = this->startTaskPrintHelp();
 
+    /* 'reboot' command */
     } else if( this->matchCommandName( S_COMMAND_REBOOT ) == true ) {
         g_power.reboot();
 
+    /* 'net restart' command */
     } else if( this->matchCommandName( S_COMMAND_NET_RESTART ) == true ) {
         started = this->startTaskNetRestart();
 
+    /* 'net start' command */
     } else if( this->matchCommandName( S_COMMAND_NET_START ) == true ) {
         started = this->startTaskNetStart();
 
+    /* 'net stop' command */
     } else if( this->matchCommandName( S_COMMAND_NET_STOP ) == true ) {
         started = this->startTaskNetStop();
 
+    /* 'net status' command */
     } else if( this->matchCommandName( S_COMMAND_NET_STATUS ) == true ) {
         this->printNetStatus();
         this->println();
 
         started = false;
 
+    /* 'nslookup' command */
     } else if( this->matchCommandName( S_COMMAND_NET_NSLOOKUP, true ) == true ) {
         started = this->startTaskNslookup();
     
+    /* 'ping' command */
     } else if( this->matchCommandName( S_COMMAND_NET_PING, true ) == true ) {
         started = this->startTaskPing();
     
+    /* 'net config' command */
     } else if( this->matchCommandName( S_COMMAND_NET_CONFIG, false ) == true ) {
         started = this->startTaskNetworkConfig();
 
+    /* 'date' command */
     } else if( this->matchCommandName( S_COMMAND_DATE, false ) == true ) {
         this->printDateTime();
         this->println();
 
         started = false;
 
+    /* 'set date' command */
+    } else if( this->matchCommandName( S_COMMAND_SET_DATE, false ) == true ) {
+        started = this->startTaskSetDate();
+
+    /* 'set timezone' and 'tz set' command */
     } else if( this->matchCommandName( S_COMMAND_SET_TIMEZONE, true ) == true ||
                this->matchCommandName( S_COMMAND_TZ_SET, true ) == true ) {
 
         started = this->startTaskSetTimeZone();
 
+    /* 'tz info' command */
     } else if( this->matchCommandName( S_COMMAND_TZ_INFO, false ) == true ) {
         this->showTimezoneInfo();
         this->println();
 
         started = false;
-    
+
+    /* 'config backup' command */
+    } else if( this->matchCommandName( S_COMMAND_SETTING_BACKUP, true ) == true ) {
+        started = this->startTaskConfigBackup();
+
+    /* 'config restore' command */
+    } else if( this->matchCommandName( S_COMMAND_SETTING_RESTORE, true ) == true ) {
+        started = this->startTaskConfigRestore();
+
+    /* 'factory reset' command */
+    } else if( this->matchCommandName( S_COMMAND_FACTORY_RESET, false ) == true ) {
+        started = this->startTaskFactoryReset();
+
+    /* No command entered, display the prompt again */
     } else if( strlen( _inputbuffer ) == 0 ) {
         started = false;
 
+    /* Unknown command */
     } else {
         this->println_P( S_CONSOLE_INVALID_COMMAND );
         this->println();
@@ -387,10 +415,13 @@ void Console::parseCommand() {
         started = false;
     }
 
+    /* If command was not executed, display the prompt on a new line
+       and wait for another command  */
     if( started == false ) {
         this->displayPrompt();
     }
 
+    /* Reset the input buffer for the next command */    
     this->resetInput();
 }
 
@@ -408,6 +439,10 @@ void Console::parseCommand() {
 void Console::runTask() {
 
     if( this->getCurrentTask() == TASK_NONE ) {
+
+        /* Reset input buffer limit to it's maximum */
+        _inputBufferLimit = INPUT_BUFFER_LENGTH;
+        _inputHidden = false;
 
         /* If no task is running, process the input buffer */
         if( this->processInput() == true ) {
@@ -448,6 +483,22 @@ void Console::runTask() {
 
             case TASK_CONSOLE_SET_TZ:
                 this->runTaskSetTimeZone();
+                break;
+
+            case TASK_CONSOLE_SET_DATE:
+                this->runTaskSetDate();
+                break;
+
+            case TASK_CONSOLE_CONFIG_BACKUP:
+                this->runTaskConfigBackup();
+                break;
+
+            case TASK_CONSOLE_CONFIG_RESTORE:
+                this->runTaskConfigRestore();
+                break;
+
+            case TASK_CONSOLE_FACTORY_RESET:
+                this->runTaskFactoryReset();
                 break;
         }
 

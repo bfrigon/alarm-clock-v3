@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/net.cpp
+// File    : src/console/commands/cmd_time.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -24,19 +24,179 @@
 
 
 static char* param_tz_name;
+static DateTime cmd_time_adj;
 
-bool Console::startTaskDateSet() {
+/*--------------------------------------------------------------------------
+ *
+ * Starts the 'set date' task
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if successful, FALSE otherwise
+ *           
+ */
+bool Console::startTaskSetDate() {
+    _taskIndex = 0;
 
-}
+    cmd_time_adj = g_rtc.now();
+    g_timezone.toLocal( &cmd_time_adj );
 
-void Console::runTaskDateSet() {
+    this->println();
+    this->println_P( S_CONSOLE_TIME_SET_INSTR );
 
+    this->startTask( TASK_CONSOLE_SET_DATE );
+    return true;
 }
 
 
 /*--------------------------------------------------------------------------
  *
- * Print the date and time to the console
+ * Run the 'set date' task. Display prompts and validate 
+ * responses required before executing the task.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
+void Console::runTaskSetDate() {
+    
+
+    /* Even index display the prompt, odd index process user input */
+    if( _taskIndex % 2 ) {
+
+        if( this->processInput() == false ) {
+            return;
+        }
+
+        this->trimInput();
+    }
+    
+
+    switch( _taskIndex++ ) {
+
+        /* Display 'synchronize with ntp' prompt */
+        case 0:
+            _inputBufferLimit = 1;
+
+            this->println();
+            this->printf_P( S_CONSOLE_TIME_CFG_NTP, ( g_config.clock.use_ntp == true ) ? "Y" : "N" );
+            break;
+
+        /* Validate 'synchronize with ntp' response */
+        case 1:
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+
+                g_config.clock.use_ntp = true;
+                _taskIndex = 6;
+
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+
+                g_config.clock.use_ntp = false;
+
+            } else if( _inputlength == 0 ) {
+
+                /* If using ntp, skip manual time set */
+                if( g_config.clock.use_ntp == true ) {
+                    _taskIndex = 6;
+                }
+
+            } else {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+
+                /* try again */
+                _taskIndex = 0;
+            }
+            break;
+
+        /* Display 'enter date' prompt */
+        case 2:
+            _inputBufferLimit = INPUT_BUFFER_LENGTH;
+
+            this->printf_P( S_CONSOLE_TIME_CFG_DATE, cmd_time_adj.year(), cmd_time_adj.month(), cmd_time_adj.day() );
+            break;
+
+        /* Validate 'enter date' response */
+        case 3:
+            
+            if( _inputlength > 0 && ( strptime( _inputbuffer, "%Y-%m-%d", &cmd_time_adj ) == NULL )) {
+                this->println_P( S_CONSOLE_INVALID_DATE_FMT );
+                this->println();
+
+                /* try again */
+                _taskIndex = 2;
+            }
+            break;
+
+        /* Display 'enter time' prompt */
+        case 4:
+            _inputBufferLimit = INPUT_BUFFER_LENGTH;
+
+            this->printf_P( S_CONSOLE_TIME_CFG_TIME, cmd_time_adj.hour(), cmd_time_adj.minute() );
+            break;
+
+        /* Validate 'enter time' response */
+        case 5:
+            if( _inputlength > 0 && ( strptime( _inputbuffer, "%H:%M", &cmd_time_adj ) == NULL )) {
+                this->println_P( S_CONSOLE_INVALID_TIME_FMT );
+                this->println();
+
+                /* try again */
+                _taskIndex = 4;
+            }
+
+            break;
+
+        /* Display 'apply settings' prompt */
+        case 6:
+            _inputBufferLimit = 1;
+
+            this->println();
+            this->print_P( S_CONSOLE_TIME_CFG_APPLY );
+
+            break;
+
+        /* Validate 'apply settings' response */
+        case 7:
+            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+
+                /* Convert local time to UTC */
+                g_timezone.toUTC( &cmd_time_adj );
+
+                /* Update the RTC */
+                g_rtc.writeTime( &cmd_time_adj );
+
+                /* Update clock display */
+                g_clock.restoreClockDisplay();
+
+                this->endTask( TASK_SUCCESS );
+
+            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+
+                this->endTask( TASK_SUCCESS );
+                return;
+
+            } else {
+                this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
+                
+
+                /* try again */
+                _taskIndex = 6;
+            }
+            break;
+    }
+
+    this->resetInput();
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Print the current date and time to the console
  *
  * Arguments
  * ---------
@@ -75,7 +235,7 @@ void Console::printDateTime() {
 
 /*--------------------------------------------------------------------------
  *
- * Starts a set timezone task
+ * Starts the 'set timezone' task
  *
  * Arguments
  * ---------
@@ -105,7 +265,8 @@ bool Console::startTaskSetTimeZone() {
 
 /*--------------------------------------------------------------------------
  *
- * Run the set timezone task
+ * Run the 'set timezone' task. Display prompts and validate 
+ * responses required before executing the task.
  *
  * Arguments
  * ---------
@@ -161,7 +322,17 @@ void Console::runTaskSetTimeZone() {
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Print current timezone information to the console.
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ *           
+ */
 void Console::showTimezoneInfo() {
     this->printDateTime();
     this->println();
@@ -245,7 +416,5 @@ void Console::showTimezoneInfo() {
                 continue;
             }
         }
-
-        
     }
 }

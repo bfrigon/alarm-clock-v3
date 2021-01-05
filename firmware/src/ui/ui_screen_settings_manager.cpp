@@ -24,21 +24,42 @@ uint8_t menuSettings_selectedItem = 0;
 bool confirm_action = false;
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when an item on the screen change it's value
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *  - item   : Pointer to the item that changed it's value
+ *
+ * Returns : Nothing
+ */
 void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
+    
     menuSettings_selectedItem = item->getId();
 }
 
 
-
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when entering the screen
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : TRUE to continue loading the screenor False otherwise
+ */
 bool settingsManager_onEnterScreen( Screen* screen ) {
 
     screen->setTimeout( 0 );
     confirm_action = false;
 
     if( menuSettings_selectedItem == ID_SETTINGS_BACKUP ) {
-        g_config.startBackup( false );
+        g_config.startBackup( CONFIG_BACKUP_FILENAME, false );
 
-        if( g_config.getTaskError() != TASK_SUCCESS && g_config.getTaskError() != TASK_ERROR_CANT_OPEN ) {
+        if( g_config.getTaskError() != TASK_SUCCESS && g_config.getTaskError() != TASK_ERROR_FILE_EXISTS ) {
             confirm_action = true;
         }
     }
@@ -47,6 +68,16 @@ bool settingsManager_onEnterScreen( Screen* screen ) {
 }
 
 
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when updating the screen.
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *
+ * Returns : TRUE to allow default screen updateor False to override.
+ */
 bool settingsManager_onDrawScreen( Screen* screen ) {
 
     if( confirm_action == false ) {
@@ -114,6 +145,18 @@ bool settingsManager_onDrawScreen( Screen* screen ) {
     return false;
 }
 
+
+/*--------------------------------------------------------------------------
+ *
+ * Event raised when a key press occurs
+ *
+ * Arguments
+ * ---------
+ *  - screen : Pointer to the screen where the event occured.
+ *  - key    : Detected key press.
+ *
+ * Returns : TRUE to allow default key press processingor False to override.
+ */
 bool settingsManager_onKeypress( Screen* screen, uint8_t key ) {
 
     if( g_config.isBusy() ) {
@@ -139,17 +182,18 @@ bool settingsManager_onKeypress( Screen* screen, uint8_t key ) {
     switch( menuSettings_selectedItem ) {
 
         case ID_SETTINGS_BACKUP:
-            g_config.startBackup( true );
+            g_config.startBackup( CONFIG_BACKUP_FILENAME, true );
+            g_screenUpdate = true;
             break;
 
         case ID_SETTINGS_RESTORE:
-            g_config.startRestore();
+            g_config.startRestore( CONFIG_BACKUP_FILENAME );
+            g_screenUpdate = true;
             break;
-
 
         case ID_SETTINGS_FACTORY_RESET:
             g_config.formatEeprom();
-            g_power.cpuReset();
+            g_power.reboot();
             break;
 
     }

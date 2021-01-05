@@ -124,6 +124,8 @@ class DateTime {
     unsigned long getEpoch();
 
   protected:
+    
+
     uint16_t _y;
     uint8_t _m;
     uint8_t _d;
@@ -143,7 +145,8 @@ uint8_t getMonthNumDays( uint8_t month, uint16_t year );
 uint8_t dateToBuf( char* buffer, uint8_t format, DateTime* date );
 uint8_t timeToBuf( char* buffer, bool fmt_24h, DateTime* date );
 uint8_t timeToBuf( char* buffer, bool fmt_24h, Time* time );
-
+const char* strptime( const char *buf, const char *fmt, DateTime* dest );
+const char* parse_int( const char *buf, int *dest, int min, int max, uint8_t digits );
 
 
 

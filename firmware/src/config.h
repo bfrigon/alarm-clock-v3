@@ -206,6 +206,7 @@ PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 #define TASK_ERROR_NOT_FOUND                3
 #define TASK_ERROR_READ                     4
 #define TASK_ERROR_CANT_OPEN                5
+#define TASK_ERROR_FILE_EXISTS              6
 
 
 //**************************************************************************
@@ -276,8 +277,8 @@ class ConfigManager : public ITask {
     void apply( uint8_t section = EEPROM_SECTION_ALL );
     bool isEepromValid();
     void formatEeprom();
-    bool startRestore();
-    bool startBackup( bool overwrite = true );
+    bool startRestore( const char *filename );
+    bool startBackup( const char *filename, bool overwrite = true );
     void endBackup( int error = TASK_SUCCESS );
     void endRestore( int error = TASK_SUCCESS );
     void runTask();
