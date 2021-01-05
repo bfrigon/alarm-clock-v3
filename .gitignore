@@ -28,7 +28,6 @@ cache/
 fp-info-cache
 *.kicad_pcb-bak
 *.bak
-*.pro
 _autosave-*
 
 
