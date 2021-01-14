@@ -80,15 +80,12 @@ Screen screen_batt_status( SCREEN_ID_BATT_STATUS, NULL,
 Screen screen_net_status( SCREEN_ID_NET_STATUS, NULL,
                            NULL, &netStatus_onEnterScreen, NULL );
 
-/*--------------------------------------------------------------------------
+
+
+/*! ------------------------------------------------------------------------
  *
- * Initialize screens settings.
+ * @brief   Initialize screens settings.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns :
  */
 void initScreens() {
 
@@ -157,35 +154,35 @@ void initScreens() {
     g_screenClear = true;
 }
 
-/*--------------------------------------------------------------------------
+
+/*! ------------------------------------------------------------------------
  *
- * Event raised when a key press occurs
+ * @brief	Event raised when a key press occurs
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - key    : Detected key press.
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   key       Detected key press.
  *
- * Returns : TRUE to allow default key press processing or False to override.
+ * @return  TRUE to allow default key press processing, FALSE to override.
+ * 
  */
 bool onKeypress( Screen* screen, uint8_t key ) {
 
     return true;
 }
 
-/*--------------------------------------------------------------------------
+
+/*! ------------------------------------------------------------------------
  *
- * Event raised when drawing an item.
+ * @brief	Event raised when drawing an item.
  *
- * Arguments
- * ---------
- *  - screen     : Pointer to the screen where the event occured.
- *  - item       : Item being drawn.
- *  - isSelected : TRUE if the item is currently selectedor False otherwise.
- *  - row        :  Zero-based Y position where the item is located.
- *  - col        :  Zero-based X position where the item is located.
+ * @param   screen        Pointer to the screen where the event occured.
+ * @param   item          Item being drawn.
+ * @param   isSelected    TRUE if the item is currently selectedor False otherwise.
+ * @param   row           Zero-based Y position where the item is located.
+ * @param   col           Zero-based X position where the item is located.
  *
- * Returns : TRUE to allow default item drawingor False to override.
+ * @return  TRUE to allow default item drawing, FALSE to override.
+ * 
  */
 bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col ) {
     uint8_t length;
@@ -252,19 +249,16 @@ bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row,
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when the cursor on the currently selected item has changed
- * position or when another item is selected.
+ * @brief	Event raised when the cursor on the currently selected 
+ *          item has changed position or when another item is selected.
  *
- * Arguments
- * ---------
- *  - screen     : Pointer to the screen where the event occured.
- *  - item       : Item currently selected.
- *  - fieldPos   : Cursor position within the selected item.
- *  - fullscreen : TRUE if the item is shown full screenor False otherwise.
- *
- * Returns : Nothing
+ * @param   screen        Pointer to the screen where the event occured.
+ * @param   item          Item currently selected.
+ * @param   fieldPos      Cursor position within the selected item.
+ * @param   fullscreen    TRUE if the item is shown full screenor False otherwise.
+ * 
  */
 void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen ) {
 
@@ -362,16 +356,13 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Raised when a screen item value changes.
+ * @brief	Raised when a screen item value changes.
  *
- * Arguments
- * ---------
- *  - screen     : Pointer to the screen where the event occured.
- *  - item       : Item currently selected.
- *
- * Returns : Nothing
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   item      Item currently selected.
+ * 
  */
 void onValueChange( Screen* screen, ScreenItem* item ) {
 
@@ -511,15 +502,14 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when entering the screen
+ * @brief	Event raised when entering the screen
  *
- * Arguments
- * ---------
- *  - screen     : Pointer to the new screen.
+ * @param   screen    Pointer to the new screen.
  *
- * Returns : TRUE to allow loading the screenor False to override.
+ * @return  TRUE to allow loading the screen, FALSE to override.
+ * 
  */
 bool onEnterScreen( Screen* screen ) {
 
@@ -564,16 +554,15 @@ bool onEnterScreen( Screen* screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when leaving the screen
+ * @brief	Event raised when leaving the screen
  *
- * Arguments
- * ---------
- *  - currentScreen : Current screen.
- *  - newScreen     : The new screen to be loaded.
+ * @param   currentScreen    Current screen.
+ * @param   newScreen        The new screen to be loaded.
  *
- * Returns : TRUE to allow leaving the screenor False to override.
+ * @return  TRUE to allow leaving the screen, FALSE to override.
+ * 
  */
 bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
@@ -685,4 +674,3 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
     return true;
 }
-

@@ -27,16 +27,15 @@
 #include "../../ui/ui.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief   Class constructor
  *
- * Arguments
- * ---------
- *  - pin_cs    : Module select pin
- *  - pin_xdcs  : Interrupt request pin
- *  - pin_dreq  : Module reset pin.
- *  - pin_reset : Module enable pin.
+ * @param   pin_cs       Module select pin
+ * @param   pin_xdcs     Interrupt request pin
+ * @param   pin_dreq     Module reset pin.
+ * @param   pin_reset    Module enable pin.
+ * 
  */
 WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
 
@@ -47,15 +46,10 @@ WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the WiFi module and establish connection
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief   Initialize the WiFi module and establish connection
+ * 
  */
 void WiFi::begin() {
     if( _init == false ) {
@@ -66,15 +60,10 @@ void WiFi::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * De-init the WiFi module
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief   De-init the WiFi module
+ * 
  */
 void WiFi::end() {
     if( _init == false ) {
@@ -98,15 +87,10 @@ void WiFi::end() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the WiFi module
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief   Initialize the WiFi module
+ * 
  */
 int WiFi::init() {
     
@@ -157,15 +141,12 @@ int WiFi::init() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Re-establish the connection to the WiFi network. 
+ * @brief   Re-establish the connection to the WiFi network. 
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : WL_IDLE_STATUS if successful or error otherwise.
+ * @return  WL_IDLE_STATUS if successful or error otherwise.
+ * 
  */
 wl_status_t WiFi::reconnect() {
 
@@ -196,31 +177,25 @@ wl_status_t WiFi::reconnect() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets whether or not the WiFi manager should attempt to reconnect when
- * it loses connection.
+ * @brief   Sets whether or not the WiFi manager should attempt to reconnect 
+ *          when it loses connection.
  *
- * Arguments
- * ---------
- *  - autoReconnect: TRUE to enable auto-reconnect, FALSE otherwise
- *
- * Returns : Nothing
+ * @param   autoReconnect    TRUE to enable auto-reconnect, FALSE otherwise
+ * 
  */
 void WiFi::setAutoReconnect( bool autoReconnect ) {
     _autoReconnect = autoReconnect;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Connect to the WiFi network set in config.
+ * @brief   Connect to the WiFi network set in config.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : WL_IDLE_STATUS if successful or error otherwise.
+ * @return  WL_IDLE_STATUS if successful or error otherwise.
+ * 
  */
 wl_status_t WiFi::connect() {
 
@@ -297,15 +272,10 @@ wl_status_t WiFi::connect() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disconnects currently established connection.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief   Disconnects currently established connection.
+ * 
  */
 void WiFi::disconnect() {
 
@@ -326,16 +296,13 @@ void WiFi::disconnect() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the local IP address assigned by the DHCP or configured ip address if 
- * not using DHCP.
+ * @brief   Gets the local IP address assigned by the DHCP or configured 
+ *          ip address if not using DHCP.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Local IP address 
+ * @return  Local IP address 
+ * 
  */
 uint32_t WiFi::getLocalIP() 
 {
@@ -343,16 +310,13 @@ uint32_t WiFi::getLocalIP()
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the gateway address set by the DHCP or configured gateway if not
- * using DHCP.
+ * @brief   Gets the gateway address set by the DHCP or configured 
+ *          gateway if not using DHCP.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Gateway address 
+ * @return  Gateway address 
+ * 
  */
 uint32_t WiFi::getGateway()
 {
@@ -360,16 +324,13 @@ uint32_t WiFi::getGateway()
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the subnet mask set by the DHCP or configured mask if not
- * using DHCP.
+ * @brief   Gets the subnet mask set by the DHCP or configured mask 
+ *          if not using DHCP.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Subnet mask
+ * @return  Subnet mask
+ * 
  */
 uint32_t WiFi::getSubmask()
 {
@@ -377,16 +338,13 @@ uint32_t WiFi::getSubmask()
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the primary DNS assigned by DHCP or configured DNS address if not
- * using DHCP.
+ * @brief   Gets the primary DNS assigned by DHCP or configured DNS address 
+ *          if not using DHCP.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : DNS address 
+ * @return  DNS address 
+ * 
  */
 uint32_t WiFi::getDNS()
 {
@@ -394,16 +352,13 @@ uint32_t WiFi::getDNS()
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * WiFi module notification handler
+ * @brief   WiFi module notification handler
  *
- * Arguments
- * ---------
- *  u8MsgType : Message type
- *  pvMsg     : Pointer to message data
- *
- * Returns : Nothing
+ * @param   u8MsgType    Message type
+ * @param   pvMsg        Pointer to message data
+ * 
  */
 void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
 {
@@ -482,16 +437,13 @@ void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * DNS resolution handler
+ * @brief   DNS resolution handler
  *
- * Arguments
- * ---------
- *  - hostName : Domain name of the host
- *  - hostIp   : IP address of the host
- *
- * Returns : Nothing
+ * @param   hostName    Domain name of the host
+ * @param   hostIp      IP address of the host
+ * 
  */
 void WiFi::handleResolve( uint8 *hostName, uint32_t hostIp )
 {
@@ -516,17 +468,14 @@ void WiFi::handleResolve( uint8 *hostName, uint32_t hostIp )
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Ping result callback
+ * @brief   Ping result callback
  *
- * Arguments
- * ---------
- *  - ip      : Destination IP.
- *  - rtt     : Round trip time.
- *  - error   : Error code or PING_ERR_SUCCESS if successful.
- *
- * Returns : Nothing
+ * @param   ip       Destination IP.
+ * @param   rtt      Round trip time.
+ * @param   error    Error code or PING_ERR_SUCCESS if successful.
+ * 
  */
 void WiFi::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
 
@@ -559,15 +508,12 @@ void WiFi::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Called when power management driver changes the current power mode
+ * @brief   Called when power management driver changes the current power mode
  *
- * Arguments
- * ---------
- *  - state : New power state
- *
- * Returns : Nothing
+ * @param   state : New power state
+ * 
  */
 void WiFi::onPowerStateChange( uint8_t state ) {
 
@@ -583,15 +529,11 @@ void WiFi::onPowerStateChange( uint8_t state ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Check if the connection is established
+ * @brief   Check if the connection is established
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if connection is established, FALSE otherwise. 
+ * @return  TRUE if connection is established, FALSE otherwise. 
  *           If using DHCP, returns TRUE only once a valid DHCP response 
  *           has been received.
  *           
@@ -601,15 +543,11 @@ bool WiFi::isConnected() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Returns the connection status or error.
+ * @brief   Returns the connection status or error.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Connection status or error
+ * @return  Connection status or error
  *           
  */
 wl_status_t WiFi::status() {
@@ -617,15 +555,13 @@ wl_status_t WiFi::status() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts a hostname resolve request on the WiFi module.
+ * @brief   Starts a hostname resolve request on the WiFi module.
  *
- * Arguments
- * ---------
- *  - hostname : Hostname to resolve
+ * @param   hostname    Hostname to resolve
  *
- * Returns : TRUE if successful, FALSE if a resolve request is already running 
+ * @return  TRUE if successful, FALSE if a resolve request is already running 
  *           or an invalid hostname is provided
  *           
  */
@@ -657,15 +593,13 @@ bool WiFi::startHostnameResolve( const char *hostname ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the result of the last resolve request.
+ * @brief   Gets the result of the last resolve request.
  *
- * Arguments
- * ---------
- *  - result : IPADDRESS structure to write the result to.
+ * @param   result    IPADDRESS structure to write the result to.
  *
- * Returns : TRUE if successful, FALSE if a resolve request is still running
+ * @return  TRUE if successful, FALSE if a resolve request is still running
  *           
  */
 bool WiFi::getHostnameResolveResults( IPAddress &result ) {
@@ -684,15 +618,13 @@ bool WiFi::getHostnameResolveResults( IPAddress &result ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts a ping request on the WiFi module using a hostname.
+ * @brief   Starts a ping request on the WiFi module using a hostname.
  *
- * Arguments
- * ---------
- *  - hostname : Hostname to ping
+ * @param   hostname    Hostname to ping
  *
- * Returns : TRUE if successful, FALSE if another request is already running 
+ * @return  TRUE if successful, FALSE if another request is already running 
  *           or an invalid hostname is provided
  *           
  */
@@ -721,15 +653,13 @@ bool WiFi::startPing( const char* hostname ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts a ping request on the WiFi module using an IP address.
+ * @brief   Starts a ping request on the WiFi module using an IP address.
  *
- * Arguments
- * ---------
- *  - host : IP address to ping
+ * @param   host    IP address to ping
  *
- * Returns : TRUE if successful, FALSE if another request is already running 
+ * @return  TRUE if successful, FALSE if another request is already running 
  *           or an invalid hostname is provided
  *           
  */
@@ -758,15 +688,13 @@ bool WiFi::startPing( IPAddress host ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the result of the last resolve request.
+ * @brief   Gets the result of the last resolve request.
  *
- * Arguments
- * ---------
- *  - result : IPADDRESS structure to write the result to.
+ * @param   result    IPADDRESS structure to write the result to.
  *
- * Returns : 0 if request is still running, < 0 if an error
+ * @return  0 if request is still running, < 0 if an error
  *           occured or round trip time is ping was successful.
  *           
  */
@@ -790,15 +718,9 @@ int32_t WiFi::getPingResult( IPAddress &dest ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Handle WiFi module events and process running tasks.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief   Handle WiFi module events and process running tasks.
  * 
  */
 void WiFi::runTask() {
@@ -897,15 +819,14 @@ void WiFi::runTask() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the date/time on the wifi module
+ * @brief   Set the date/time on the wifi module
  *
- * Arguments
- * ---------
- *  - ntd : DateTime object containing the current UTC time 
+ * @param   ntd    Pointer to a DateTime object containing the 
+ *                 current UTC time 
  *
- * Returns : TRUE if successful, FALSE otherwise.
+ * @return  TRUE if successful, FALSE otherwise.
  * 
  */
 bool WiFi::setSystemTime( DateTime *ndt ) {
@@ -919,16 +840,12 @@ bool WiFi::setSystemTime( DateTime *ndt ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * WiFi notification callback
+ * @brief   WiFi notification callback
  *
- * Arguments
- * ---------
- *  - u8MsgType : Message type
- *  - pvMsg     : Pointer to message structure
- *
- * Returns : Nothing
+ * @param   u8MsgType    Message type
+ * @param   pvMsg        Pointer to message structure
  * 
  */
 static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
@@ -937,16 +854,12 @@ static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * DNS resolution callback
+ * @brief   DNS resolution callback
  *
- * Arguments
- * ---------
- *  - hostName : Domain name of the host
- *  - hostIp   : IP address of the host
- *
- * Returns : Nothing
+ * @param   hostName    Domain name of the host
+ * @param   hostIp      IP address of the host
  * 
  */
 static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp ) 
@@ -955,17 +868,13 @@ static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp )
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Socket event callback
+ * @brief   Socket event callback
  *
- * Arguments
- * ---------
- *  - sock    : Socket ID
- *  - u8Msg   : Event type
- *  - pvMsg   : Pointer to message structure
- *
- * Returns : Nothing
+ * @param   sock      Socket ID
+ * @param   u8Msg     Event type
+ * @param   pvMsg     Pointer to message structure
  * 
  */
 static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
@@ -974,17 +883,13 @@ static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Ping result callback
+ * @brief   Ping result callback
  *
- * Arguments
- * ---------
- *  - ip      : Destination IP.
- *  - rtt     : Round trip time.
- *  - error   : Error code or PING_ERR_SUCCESS if successful.
- *
- * Returns : Nothing
+ * @param   ip       Destination IP.
+ * @param   rtt      Round trip time.
+ * @param   error    Error code or PING_ERR_SUCCESS if successful.
  * 
  */
 static void wifimanager_ping_cb( uint32 ip, uint32 rtt, uint8 error ) {

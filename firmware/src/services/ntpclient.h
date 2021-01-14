@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/services/ntpsync.h
+// File    : src/services/ntpclient.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------

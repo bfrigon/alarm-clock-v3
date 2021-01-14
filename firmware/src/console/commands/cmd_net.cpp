@@ -20,16 +20,12 @@
 #include "../../config.h"
 
 
-/*--------------------------------------------------------------------------
- *
- * Starts the 'net restart' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Starts the 'net restart' command task
+ * 
+ * @return  TRUE if successful, FALSE if another task is already running.
+ * 
  */
 bool Console::startTaskNetRestart() {
 
@@ -50,16 +46,12 @@ bool Console::startTaskNetRestart() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Monitor the 'net restart' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Monitor the 'net restart' command task
+ * 
+ * @return  TRUE if successful, FALSE if another task is already running.
+ * 
  */
 void Console::runTaskNetRestart() {
 
@@ -93,16 +85,12 @@ void Console::runTaskNetRestart() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Starts the 'net start' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Starts the 'net start' command task
+ * 
+ * @return  TRUE if successful, FALSE if another task is already running.
+ * 
  */
 bool Console::startTaskNetStart() {
     if( g_wifi.isConnected() == true ) {
@@ -121,16 +109,12 @@ bool Console::startTaskNetStart() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Starts the 'net stop' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Starts the 'net stop' command task
+ * 
+ * @return  TRUE if successful, FALSE if another task is already running.
+ * 
  */
 bool Console::startTaskNetStop() {
     if( g_wifi.isConnected() == false ) {
@@ -154,16 +138,10 @@ bool Console::startTaskNetStop() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Monitor the 'net stop' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Monitor the 'net stop' command task
+ * 
  */
 void Console::runTaskNetStop() {
     
@@ -175,16 +153,10 @@ void Console::runTaskNetStop() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Print status of the WiFi connection to the console
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Print the status of the WiFi connection to the console
+ * 
  */
 void Console::printNetStatus() {
 
@@ -224,17 +196,13 @@ void Console::printNetStatus() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Starts the 'nslookup' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running or
- *           an invalid parameter is provided.
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Starts the 'nslookup' command task
+ * 
+ * @return  TRUE if successful, FALSE if another task is already running or
+ *          an invalid parameter is provided.
+ * 
  */
 bool Console::startTaskNslookup() {
 
@@ -283,17 +251,11 @@ bool Console::startTaskNslookup() {
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Monitor the 'nslookup' command task. Display prompts and validate 
- * response required before executing the task. 
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Monitor the 'nslookup' command task. Display prompts and validate 
+ *          input required before executing the task. 
+ * 
  */
 void Console::runTaskNsLookup() {
     
@@ -313,17 +275,10 @@ void Console::runTaskNsLookup() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'ping' command task
+ * @brief	Starts the 'ping' command task
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running or
- *           an invalid parameter is provided.
- *           
  */
 bool Console::startTaskPing() {
 
@@ -380,15 +335,9 @@ bool Console::startTaskPing() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Monitor the 'ping' command task. 
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Monitor the 'ping' command task. 
  *           
  */
 void Console::runTaskPing() {
@@ -436,15 +385,9 @@ void Console::runTaskPing() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'net config' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
+ * @brief	Starts the 'net config' command task
  *           
  */
 bool Console::startTaskNetworkConfig() {
@@ -464,19 +407,14 @@ bool Console::startTaskNetworkConfig() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run the 'net config' command task. Display prompts and validate 
- * responses required before executing the task.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
+ * @brief	Run the 'net config' command task. Display prompts and validate 
+ *          responses required before executing the task.
+ * 
  */
 void Console::runTaskNetworkConfig() {
+    
     IPAddress addr;
 
     /* Even index display the prompt, odd index process user input */

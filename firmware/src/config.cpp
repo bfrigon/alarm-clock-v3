@@ -25,15 +25,12 @@
 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Load settings from EEPROM
+ * @brief   Load settings from EEPROM
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns :
+ * @param   section    Which block of the EEPROM configuration to load
+ * 
  */
 void ConfigManager::load( uint8_t section ) {
     uint8_t c;
@@ -69,15 +66,12 @@ void ConfigManager::load( uint8_t section ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Save settings to EEPROM
+ * @brief	Save settings to EEPROM
+ * 
+ * @param   section    Which block of the EEPROM configuration to load
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns :
  */
 void ConfigManager::save( uint8_t section ) {
     uint8_t c;
@@ -107,15 +101,12 @@ void ConfigManager::save( uint8_t section ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Apply the settings to the different modules.
+ * @brief	Apply the settings to the different modules.
+ * 
+ * @param   section    Which block of the EEPROM configuration to load
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns :
  */
 void ConfigManager::apply( uint8_t section ) {
 
@@ -140,15 +131,10 @@ void ConfigManager::apply( uint8_t section ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Restore default settings or initialize EEPROM contents.
+ * @brief	Restore default settings or initialize EEPROM contents.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns :
  */
 void ConfigManager::reset() {
     this->network.ssid[0] = 0;
@@ -191,16 +177,13 @@ void ConfigManager::reset() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Look for the magic code at the start of EEPROM to determine if the
- * config is present
+ * @brief	Look for the magic code at the start of EEPROM to determine if 
+ *          the config is present
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if config found or FALSE otherwise.
+ * @return  TRUE if config found, FALSE otherwise.
+ * 
  */
 bool ConfigManager::isEepromValid() {
 
@@ -215,16 +198,14 @@ bool ConfigManager::isEepromValid() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Destroy the configuration by writing the magic code 0xDEAD at the start
- * of EEPROM. On the next reboot, the default configuration will be restored.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Set the config erase flag in the EEPROM configuration block.
+ * 
+ * @details Destroy the configuration stored in EEPROM by writing the magic code 
+ *          0xDEAD at the start of EEPROM configuration block. On the next reboot, 
+ *          the default configuration will be restored.
+ * 
  */
 void ConfigManager::formatEeprom() {
 
@@ -233,15 +214,10 @@ void ConfigManager::formatEeprom() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run tasks for the configuration manager
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Run tasks for the configuration manager
+ * 
  */
 void ConfigManager::runTask() {
 
@@ -270,16 +246,15 @@ void ConfigManager::runTask() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the configuration backup task.
+ * @brief	Starts the configuration backup task.
  *
- * Arguments
- * ---------
- *  - overwrite : TRUE to overwrite backup file if already present, FALSE will
- *                fail if file exists.
+ * @param   overwrite    TRUE to allow overwriting file if already present, 
+ *                       FALSE to fail if file exists.
  *
- * Returns : TRUE if successfuly started or FALSE otherwise.
+ * @return  TRUE if successfuly started, FALSE otherwise.
+ * 
  */
 bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
 
@@ -329,15 +304,12 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Stops the configuration backup task.
+ * @brief	Stops the configuration backup task.
  *
- * Arguments
- * ---------
- *  - error : Task result
- *
- * Returns : Nothing
+ * @param   error    Task result
+ * 
  */
 void ConfigManager::endBackup( int error ) {
     if( this->_sd_file.isOpen() == true ) {
@@ -349,15 +321,12 @@ void ConfigManager::endBackup( int error ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the configuration restore task.
+ * @brief	Starts the configuration restore task.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successfuly started or FALSE otherwise.
+ * @return  TRUE if successfuly started, FALSE otherwise.
+ * 
  */
 bool ConfigManager::startRestore( const char *filename) {
     if( this->startTask( TASK_CONFIG_RESTORE ) != TASK_CONFIG_RESTORE ) {
@@ -382,15 +351,12 @@ bool ConfigManager::startRestore( const char *filename) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Stops the configuration restore task.
+ * @brief	Stops the configuration restore task.
  *
- * Arguments
- * ---------
- *  - error : Task result
- *
- * Returns : Nothing
+ * @param   error    Task result
+ * 
  */
 void ConfigManager::endRestore( int error ) {
     if( this->_sd_file.isOpen() == true ) {
@@ -410,16 +376,13 @@ void ConfigManager::endRestore( int error ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Reads the next line in the backup file and set the corresponding setting
- * value.
+ * @brief	Reads the next line in the backup file and set the corresponding 
+ *          setting value.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful or FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool ConfigManager::readNextLine() {
 
@@ -610,43 +573,40 @@ bool ConfigManager::readNextLine() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Checks if the settings name on the current line in the config file matches
- * the provided name. Also checks if the settings belongs in to specified
- * section.
+ * @brief	Checks if the settings name on the current line in the config 
+ *          file matches the provided name. 
+ * 
+ * @details Also checks if the settings belongs in to specified section.
  *
- * Arguments
- * ---------
- *  - currentName : Setting's name parsed from the current line in the backup
- *                  file.
- *  - name        : Setting's name to match against.
- *  - section     : Section ID to match against. Use SECTION_ID_ANY to match
- *                  regardless of current section.
+ * @param   currentName    Setting's name parsed from the current line in 
+ *                         the backup file.
+ * @param   name           Setting's name to match against.
+ * @param   section        Section ID to match against. Use SECTION_ID_ANY to match
+ *                         regardless of current section.
  *
- * Returns : TRUE if matching or FALSE otherwise.
+ * @return  TRUE if matching, FALSE otherwise.
+ * 
  */
 inline bool ConfigManager::matchSettingName( char* currentName, const char* name, uint8_t section ) {
     return ( strcmp_P( currentName, name ) == 0 && ( this->_currentSectionID == section || section == SECTION_ID_ANY ) );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Converts the user readable format from the backup file and copy it to
- * the specified memory location.
+ * @brief	Converts the user readable format from the backup file and copy 
+ *          it to the specified memory location.
  *
- * Arguments
- * ---------
- *  - src  : Value string from the backup file
- *  - dest : Pointer to the memory location where the setting
- *           must be copied to.
- *  - type : Variable type to parse
- *  - min  : Minimum value.
- *  - max  : Maximum value. If the setting is a STRING type, it defines
- *           the maximum characters to be copied.
- *
- * Returns : Nothing
+ * @param   src     Value string from the backup file
+ * @param   dest    Pointer to the memory location where the setting
+ *                  must be copied to.
+ * @param   type    Variable type to parse
+ * @param   min     Minimum value.
+ * @param   max     Maximum value. If the setting is a STRING type, it defines
+ *                  the maximum characters to be copied.
+ * 
  */
 void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingType, uint8_t min,
                                        uint8_t max ) {
@@ -750,16 +710,15 @@ void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingTyp
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Parse the current line in the backup file.
+ * @brief	Parse the current line in the backup file.
  *
- * Arguments
- * ---------
- *  - name  : Pointer to the buffer where to copy the setting's name.
- *  - value : Pointer to the buffer where to copy the setting's value.
+ * @param   name     Pointer to the buffer where to copy the setting's name.
+ * @param   value    Pointer to the buffer where to copy the setting's value.
  *
- * Returns : The type of setting parsed.
+ * @return  The type of setting parsed.
+ * 
  */
 uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
     uint8_t chr;
@@ -852,15 +811,12 @@ uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Write the next setting line to the backup file.
+ * @brief	Write the next setting line to the backup file.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
  */
 bool ConfigManager::writeNextLine()  {
 
@@ -1040,17 +996,14 @@ bool ConfigManager::writeNextLine()  {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Converts the setting value from memory to an user readable format.
+ * @brief	Converts the setting value from memory to an user readable format.
  *
- * Arguments
- * ---------
- *  - name  : Name of the setting.
- *  - type  : Type of setting to convert.
- *  - value : Settings value to convert.
+ * @param   name     Name of the setting.
+ * @param   type     Type of setting to convert.
+ * @param   value    Settings value to convert.
  *
- * Returns : Nothing.
  */
 void ConfigManager::writeConfigLine( const char* name, uint8_t type, void* value ) {
 

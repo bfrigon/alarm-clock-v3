@@ -18,16 +18,15 @@
 #include "ui.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when a key press occurs
+ * @brief	Event raised when a key press occurs
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - key    : Detected key press.
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   key       Detected key press.
  *
- * Returns : TRUE to allow default key press processingor False to override.
+ * @return  TRUE to allow default key press processing, FALSE to override.
+ * 
  */
 bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 
@@ -36,15 +35,14 @@ bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when updating the screen.
+ * @brief	Event raised when updating the screen.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to allow default screen updateor False to override.
+ * @return  TRUE to allow default screen updat, FALSE to override.
+ * 
  */
 bool showAlarmScreen_onDrawScreen( Screen *screen ) {
 

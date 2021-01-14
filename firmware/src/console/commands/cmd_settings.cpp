@@ -20,15 +20,11 @@
 #include "../../drivers/power.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'config backup' command task
+ * @brief	Starts the 'config backup' command task
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
+ * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
 bool Console::startTaskConfigBackup() {
@@ -40,16 +36,10 @@ bool Console::startTaskConfigBackup() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Monitor the 'config backup' command task. Display prompts and validate 
- * responses required before executing the task.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Monitor the 'config backup' command task. Display prompts and validate 
+ *          responses required before executing the task.
  *           
  */
 void Console::runTaskConfigBackup() {
@@ -179,15 +169,11 @@ void Console::runTaskConfigBackup() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'config restore' command task
+ * @brief	Starts the 'config restore' command task
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
+ * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
 bool Console::startTaskConfigRestore() {
@@ -198,16 +184,10 @@ bool Console::startTaskConfigRestore() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Monitor the 'config restore' command task. Display prompts and validate 
- * responses required before executing the task.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Monitor the 'config restore' command task. Display prompts and validate 
+ *          responses required before executing the task.
  *           
  */
 void Console::runTaskConfigRestore() {
@@ -320,15 +300,11 @@ void Console::runTaskConfigRestore() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'factory reset' command task
+ * @brief	Starts the 'factory reset' command task
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
+ * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
 bool Console::startTaskFactoryReset() {
@@ -342,16 +318,10 @@ bool Console::startTaskFactoryReset() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Monitor the 'factory reset' command task. Display prompts and validate 
- * responses required before executing the task.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Monitor the 'factory reset' command task. Display prompts and validate 
+ *          responses required before executing the task.
  *           
  */
 void Console::runTaskFactoryReset() {

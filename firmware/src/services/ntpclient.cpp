@@ -23,13 +23,10 @@
 #include "../console/console.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize class
+ * @brief	Initialize class
  *
- * Arguments
- * ---------
- *  None
  */
 NtpClient::NtpClient() {
 
@@ -37,17 +34,16 @@ NtpClient::NtpClient() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Begin the synchronization request
+ * @brief	Begin the synchronization request
  *
- * Arguments
- * ---------
- *  - verbose : TRUE to display messages
+ * @param   verbose    TRUE to display messages
  *
- * Returns : TRUE if the request was successfuly started or FALSE otherwise. 
- *           Completion of the synchronization should be monitored with
- *           the isBusy() function. Use getTaskError() to get the error ID.
+ * @return  TRUE if the request was successfuly started or FALSE otherwise. 
+ *          Completion of the synchronization should be monitored with
+ *          the isBusy() function. Use getTaskError() to get the error ID.
+ * 
  */
 bool NtpClient::sync( bool verbose ) {
 
@@ -115,15 +111,12 @@ bool NtpClient::sync( bool verbose ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Request a socket bind to the NTP port 123
+ * @brief	Request a socket bind to the NTP port 123
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if the request was successful or FALSE otherwise. 
+ * @return  TRUE if the request was successful or FALSE otherwise. 
+ * 
  */
 bool NtpClient::requestBind() {
     this->startTask( TASK_NTPCLIENT_SOCKET_BIND, true );
@@ -141,15 +134,12 @@ bool NtpClient::requestBind() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Format the NTP request packet and sent it
+ * @brief	Format the NTP request packet and sent it
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if the request was successful or FALSE otherwise. 
+ * @return  TRUE if the request was successful or FALSE otherwise. 
+ * 
  */
 bool NtpClient::sendNtpPacket() {
 
@@ -202,16 +192,13 @@ bool NtpClient::sendNtpPacket() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Check if a response was received. If so, decode the NTP response packet and
- * update the clock accordingly
+ * @brief	Check if a response was received. If so, decode the NTP response 
+ *          packet and update the clock accordingly
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if a response was received and processed or FALSE otherwise. 
+ * @return  TRUE if a response was received and processed or FALSE otherwise. 
+ * 
  */
 bool NtpClient::readNtpResponse() {
 
@@ -317,16 +304,13 @@ bool NtpClient::readNtpResponse() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable/disable the automatic time synchronization
+ * @brief	Enable/disable the automatic time synchronization
  *
- * Arguments
- * ---------
- *  - enabled : Enable the auto-sync feature
- *  - verbose : Display messages on the console 
- *
- * Returns : Nothing
+ * @param   enabled    Enable the auto-sync feature
+ * @param   verbose    Display messages on the console 
+ * 
  */
 void NtpClient::setAutoSync( bool enabled, bool verbose ) {
 
@@ -357,15 +341,10 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Monitor the different stages of the request.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Monitor the different stages of the request.
+ * 
  */
 void NtpClient::runTask() {
 

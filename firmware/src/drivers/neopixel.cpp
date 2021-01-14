@@ -20,14 +20,13 @@
 #include "../resources.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  - pin_leds : Pin ID connected to the neopixel data line.
- *  - pin_shdn : Pin ID connected to the neopixel power MOSFET.
+ * @param   pin_leds    Pin ID connected to the neopixel data line.
+ * @param   pin_shdn    Pin ID connected to the neopixel power MOSFET.
+ * 
  */
 NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
     this->_pin_leds = pin_leds;
@@ -35,15 +34,10 @@ NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize pins for the LED string.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Initialize pins for the LED string.
+ * 
  */
 void NeoPixel::begin() {
     if( this->_init == true ) {
@@ -62,15 +56,10 @@ void NeoPixel::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disable power for the LED string.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Disable power for the LED string.
+ * 
  */
 void NeoPixel::end() {
     if( this->_init == false ) {
@@ -85,15 +74,13 @@ void NeoPixel::end() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disable/enable power for the leds based on the current system power state
+ * @brief	Disable/enable power for the leds based on the current system 
+ *          power state
  *
- * Arguments
- * ---------
- *  - state : Current power state
- *
- * Returns : Nothing
+ * @param   state    Current power state
+ * 
  */
 void NeoPixel::onPowerStateChange( uint8_t state ) {
 
@@ -109,16 +96,15 @@ void NeoPixel::onPowerStateChange( uint8_t state ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Calculate the pixel brightness and apply gamma correction for an 
- * individual color channel.
+ * @brief	Calculate the pixel brightness and apply gamma correction for an 
+ *          individual color channel.
  *
- * Arguments
- * ---------
- *  - color : Color channel value.
+ * @param   color    Color channel value.
  *
- * Returns : The corrected brightness value.
+ * @return  The corrected brightness value.
+ * 
  */
 inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 
@@ -139,15 +125,13 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Send the data to each pixels.
+ * @brief	Send the data to each pixels.
  *
- * Arguments
- * ---------
- *  - pixmap     : Pointer to the pixel data buffer ( 1 bit per pixel )
- *  - num_pixels : Number of pixels contained in the pixel map.
- * Returns : Nothing
+ * @param   pixmap        Pointer to the pixel data buffer ( 1 bit per pixel )
+ * @param   num_pixels    Number of pixels contained in the pixel map.
+ * 
  */
 void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 
@@ -261,17 +245,15 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set/clear pixel within the pixel map.
+ * @brief	Set/clear pixel within the pixel map.
  *
- * Arguments
- * ---------
- *  - pixmap : Pointer to the pixel map data.
- *  - pos    : Pixel position to modify.
- *  - state  : State to assign to the pixel. (True for ON, false otherwise)
+ * @param   pixmap    Pointer to the pixel map data.
+ * @param   pos       Pixel position to modify.
+ * @param   state     State to assign to the pixel. 
+ *                    (TRUE for ON, FALSE otherwise)
  * 
- * Returns : Nothing
  */
 void NeoPixel::setPixel( uint8_t *pixmap, uint8_t pos, bool state ) {
 
@@ -285,15 +267,12 @@ void NeoPixel::setPixel( uint8_t *pixmap, uint8_t pos, bool state ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the brightness of the pixel string.
+ * @brief	Sets the brightness of the pixel string.
  *
- * Arguments
- * ---------
- *  - brightness : Brighness value 0-100 %
- *
- * Returns : Nothing
+ * @param   brightness    Brighness value 0-100 %
+ * 
  */
 void NeoPixel::setBrightness( uint8_t brightness ) {
     if( brightness > 100 ) {
@@ -304,17 +283,14 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the pixel string color using an RGB value.
+ * @brief	Sets the pixel string color using an RGB value.
  *
- * Arguments
- * ---------
- *  - r: Red component
- *  - g: Green component
- *  - b: Blue component
- *
- * Returns : Nothing
+ * @param   r    Red component
+ * @param   g    Green component
+ * @param   b    Blue component
+ * 
  */
 void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
     this->_r = r;
@@ -323,15 +299,12 @@ void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the pixel string color using the RGB table color ID.
+ * @brief	Sets the pixel string color using the RGB table color ID.
  *
- * Arguments
- * ---------
- *  - id : value 0-12 (use color table in ressource.h)
- *
- * Returns : Nothing
+ * @param   id    value 0-12 (use color table in ressource.h)
+ * 
  */
 void NeoPixel::setColorFromTable( uint8_t id ) {
 

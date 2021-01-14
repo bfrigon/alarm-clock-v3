@@ -18,27 +18,23 @@
 #include "time.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the DateTime class with default date and time.
+ * @brief	Initialize the DateTime class with default date and time.
  *
- * Arguments
- * ---------
- *  None
  */
 DateTime::DateTime() {
     this->set( 2000, 1, 1, 0, 0, 0 );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the DateTime class with date and time from another 
- * DateTime class.
+ * @brief	Initialize the DateTime class with date and time from another 
+ *          DateTime class.
  *
- * Arguments
- * ---------
- *  - src : source  DateTime object
+ * @param   src    source  DateTime object
+ * 
  */
 DateTime::DateTime( DateTime *src ) {
     _y = src->year();
@@ -50,40 +46,36 @@ DateTime::DateTime( DateTime *src ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the DateTime class with specific date/time values
+ * @brief	Initialize the DateTime class with specific date/time values
  *
- * Arguments
- * ---------
- *  - year  : Year
- *  - month : Month (1-12)
- *  - day   : day of the month (1-31*). If above the number of days 
- *            of the month, it sets the day to the last.
- *  - hour  : hour (0-23)
- *  - min   : Minutes (0-59)
- *  - sec   : Seconds (0-59)
+ * @param   year     Year
+ * @param   month    Month (1-12)
+ * @param   day      day of the month (1-31*). If above the number of days 
+ *                   of the month, it sets the day to the last.
+ * @param   hour     hour (0-23)
+ * @param   min      Minutes (0-59)
+ * @param   sec      Seconds (0-59)
+ * 
  */
 DateTime::DateTime( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec ) {
     this->set( year, month, day, hour, min, sec );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the date and time 
+ * @brief	Set the date and time 
  *
- * Arguments
- * ---------
- *  - year  : Year
- *  - month : Month (1-12)
- *  - day   : day of the month (1-31*). If above the number of days 
- *            of the month, it sets the day to the last.
- *  - hour  : hour (0-23)
- *  - min   : Minutes (0-59)
- *  - sec   : Seconds (0-59)
+ * @param   year     Year
+ * @param   month    Month (1-12)
+ * @param   day      day of the month (1-31*). If above the number of days 
+ *                   of the month, it sets the day to the last.
+ * @param   hour     hour (0-23)
+ * @param   min      Minutes (0-59)
+ * @param   sec      Seconds (0-59)
  * 
- * Returns: Nothing
  */
 void DateTime::set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec ) {
 
@@ -124,15 +116,14 @@ void DateTime::set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Test if two DateTime objects are equal
+ * @brief	Test if two DateTime objects are equal
  *
- * Arguments
- * ---------
- *  - right : DateTime object to compare this instance to.
+ * @param   right    DateTime object to compare this instance to.
  * 
- * Returns: TRUE if equal, FALSE otherwise
+ * @return  TRUE if equal, FALSE otherwise
+ * 
  */
 bool DateTime::operator==(const DateTime &right) const {
 
@@ -145,30 +136,28 @@ bool DateTime::operator==(const DateTime &right) const {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Test if two DateTime objects are not equal
+ * @brief	Test if two DateTime objects are not equal
  *
- * Arguments
- * ---------
- *  - right : DateTime object to compare this instance to.
+ * @param   right    DateTime object to compare this instance to.
  * 
- * Returns: TRUE if NOT equal, FALSE otherwise
+ * @return  TRUE if NOT equal, FALSE otherwise
+ * 
  */
 bool DateTime::operator!=( const DateTime &right ) const { 
     return !( *this == right ); 
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Test if one DateTime is less than the other
+ * @brief	Test if one DateTime is less than the other
  *
- * Arguments
- * ---------
- *  - right : DateTime object to compare this instance to.
+ * @param   right    DateTime object to compare this instance to.
  * 
- * Returns: TRUE if less, FALSE otherwise
+ * @return  TRUE if less, FALSE otherwise
+ * 
  */
 bool DateTime::operator<( const DateTime &right ) const {
 
@@ -185,60 +174,54 @@ bool DateTime::operator<( const DateTime &right ) const {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Test if one DateTime is more than the other
+ * @brief	Test if one DateTime is more than the other
  *
- * Arguments
- * ---------
- *  - right : DateTime object to compare this instance to.
+ * @param   right    DateTime object to compare this instance to.
  * 
- * Returns: TRUE if more, FALSE otherwise
+ * @return  TRUE if more, FALSE otherwise
+ * 
  */
 bool DateTime::operator>( const DateTime &right ) const { 
     return right < *this; 
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Test if one DateTime is less or equal than the other
+ * @brief	Test if one DateTime is less or equal than the other
  *
- * Arguments
- * ---------
- *  - right : DateTime object to compare this instance to.
+ * @param   right    DateTime object to compare this instance to.
  * 
- * Returns: TRUE if less or equal, FALSE otherwise
+ * @return  TRUE if less or equal, FALSE otherwise
+ * 
  */
 bool DateTime::operator<=( const DateTime &right ) const {
     return !(*this > right);
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Test if one DateTime is more or equal than the other
+ * @brief	Test if one DateTime is more or equal than the other
  *
- * Arguments
- * ---------
- *  - right : DateTime object to compare this instance to.
+ * @param   right    DateTime object to compare this instance to.
  * 
- * Returns: TRUE if more or equal, FALSE otherwise
+ * @return  TRUE if more or equal, FALSE otherwise
+ * 
  */
 bool DateTime::operator>=( const DateTime &right ) const { 
     return !(*this < right); 
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Adjust the date and time by the 'x' amount of seconds
+ * @brief	Adjust the date and time by the 'x' amount of seconds
  *
- * Arguments
- * ---------
- *  - offset : Number of seconds to adjust forward or backward.
+ * @param   offset    Number of seconds to adjust forward or backward.
  * 
- * Returns: Nothing
  */
 void DateTime::offset( long offset ) {
 
@@ -316,32 +299,28 @@ void DateTime::offset( long offset ) {
 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the day of week from the current date.
+ * @brief	Gets the day of week from the current date.
  *
- * Arguments
- * ---------
- *  None
+ * @return  Day of week (0=Sunday, 1=Monday ... 6=Saturday)
  * 
- * Returns: Day of week (0=Sunday, 1=Monday ... 6=Saturday)
  */
 uint8_t DateTime::dow() {
     return getDayOfWeek( _y, _m, _d);
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * This function interpolate the unix time based on the date and time stored 
- * in the DateTime structure. It accounts for leap year but Ignores
- * time zone. It always assume it is UTC.
+ * @brief	Calculate the unix epoch
+ * 
+ * @details This function interpolate the unix time based on the date and 
+ *          time stored in the DateTime structure. It accounts for leap year 
+ *          but Ignores time zone. It always assume it is UTC.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : The unix time.
+ * @return  The unix epoch.
+ * 
  */
 unsigned long DateTime::getEpoch() {
 
@@ -368,17 +347,17 @@ unsigned long DateTime::getEpoch() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the pointer to the string stored in program memory which represents 
- * the given month.
+ * @brief	Get the pointer to the string stored in program memory which 
+ *          represents the given month.
  *
- * Arguments
- * ---------
- *  - month     : The month (1-12)
- *  - shortName : TRUE to get the abbreviation or False for the full name.
+ * @param   month        The month (1-12)
+ * @param   shortName    TRUE to get the abbreviation or False for the 
+ *                       full name.
  *
- * Returns : The pointer to the month name string.
+ * @return  The pointer to the month name string.
+ * 
  */
 const char* getMonthName( uint8_t month, bool shortName ) {
 
@@ -402,17 +381,17 @@ const char* getMonthName( uint8_t month, bool shortName ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the pointer to the string stored in program memory which represents 
- * the given day of week.
+ * @brief	Get the pointer to the string stored in program memory which 
+ *          represents the given day of week.
  *
- * Arguments
- * ---------
- *  - day       : The day of week (0-6)
- *  - shortName : TRUE to get the abbreviation or False for the full name.
+ * @param   day          The day of week (0-6)
+ * @param   shortName    TRUE to get the abbreviation or False for the 
+ *                       full name.
  *
- * Returns : The pointer to the day of week name string.
+ * @return  The pointer to the day of week name string.
+ * 
  */
 const char* getDayName( uint8_t day, bool shortName ) {
 
@@ -432,16 +411,15 @@ const char* getDayName( uint8_t day, bool shortName ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the number of day in a given month
+ * @brief	Get the number of day in a given month
  *
- * Arguments
- * ---------
- *  - month : Month (1-12) 
- *  - year  : year 
+ * @param   month    Month (1-12) 
+ * @param   year     year 
  *
- * Returns : The number of days
+ * @return  The number of days
+ * 
  */
 uint8_t getMonthNumDays( uint8_t month, uint16_t year ) {
 
@@ -464,17 +442,16 @@ uint8_t getMonthNumDays( uint8_t month, uint16_t year ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the day of week from a given date. 
+ * @brief	Get the day of week from a given date. 
  *
- * Arguments
- * ---------
- *  - year  : year
- *  - month : Month (1-12) 
- *  - day   : Day (1-31)
+ * @param   year     year
+ * @param   month    Month (1-12) 
+ * @param   day      Day (1-31)
  *
- * Returns : The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ * @return  The day of week index from 1 to 7. (1=Sunday, 7=Saturday)
+ * 
  */
 uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day ) {
 
@@ -536,20 +513,19 @@ uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Find the day in the month corresponding to the 'x' occurence 
- * of a weekday
+ * @brief	Find the day in the month corresponding to the 'x' occurence 
+ *          of a weekday
  *
- * Arguments
- * ---------
- *  - year  : year
- *  - month : Month (1-12)  
- *  - dow   : Day of week to find (0=Sunday, 6=Saturday)
- *  - order : Which occurence of the day to search for 
- *            ( 1=first, 2=second, ..., 5=last )
+ * @param   year     year
+ * @param   month    Month (1-12)  
+ * @param   dow      Day of week to find (0=Sunday, 6=Saturday)
+ * @param   order    Which occurence of the day to search for 
+ *                   ( 1=first, 2=second, ..., 5=last )
  *
- * Returns : The day of the month matching search criteria
+ * @return  The day of the month matching search criteria
+ * 
  */
 uint8_t findDayByDow( uint16_t year, uint8_t month, uint8_t dow, uint8_t order ) {
 
@@ -577,17 +553,16 @@ uint8_t findDayByDow( uint16_t year, uint8_t month, uint8_t dow, uint8_t order )
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Prints the time from a given date/time structure into a string.
+ * @brief	Prints the time from a given date/time structure into a string.
  *
- * Arguments
- * ---------
- *  - buffer  : Pointer to the string to write to.
- *  - fmt_24h : TRUE for 24H time format or False for am/pm.
- *  - date    : Structure containing the date and time to print.
+ * @param   buffer     Pointer to the string to write to.
+ * @param   fmt_24h    TRUE for 24H time format or False for am/pm.
+ * @param   date       Structure containing the date and time to print.
  *
- * Returns : The number of characters written
+ * @return  The number of characters written
+ * 
  */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
 
@@ -599,17 +574,16 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Prints the given time into a string.
+ * @brief	Prints the given time into a string.
  *
- * Arguments
- * ---------
- *  - buffer  : Pointer to the string to write to.
- *  - fmt_24h : TRUE for 24H time format or False for am/pm.
- *  - time    : Structure containing the time to print.
+ * @param   buffer     Pointer to the string to write to.
+ * @param   fmt_24h    TRUE for 24H time format or False for am/pm.
+ * @param   time       Structure containing the time to print.
  *
- * Returns : The number of characters written
+ * @return  The number of characters written
+ * 
  */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
     uint8_t length;
@@ -632,18 +606,17 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Prints the date from a given date/time structure into a string unsign
- * a specific format.
+ * @brief	Prints the date from a given date/time structure into a string 
+ *          unsign a specific format.
  *
- * Arguments
- * ---------
- *  - buffer  : Pointer to the string to write to.
- *  - format  : Date format to use.
- *  - date    : Structure containing the date to print
+ * @param   buffer     Pointer to the string to write to.
+ * @param   format     Date format to use.
+ * @param   date       Structure containing the date to print
  *
- * Returns : The number of characters written
+ * @return  The number of characters written
+ * 
  */
 uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 
@@ -714,21 +687,20 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Parse an integer value from a given array of character
+ * @brief	Parse an integer value from a given array of character
  *
- * Arguments
- * ---------
- *  - buf    : Pointer to the string to parse.
- *  - dest   : Pointer to an integer which hold the result.
- *  - min    : lower acceptable limit of the integer to parse.
- *  - max    : upper acceptable limit of the integer to parse.
- *  - digits : Maximum number of digits the integer must have.
+ * @param   buf       Pointer to the string to parse.
+ * @param   dest      Pointer to an integer which hold the result.
+ * @param   min       lower acceptable limit of the integer to parse.
+ * @param   max       upper acceptable limit of the integer to parse.
+ * @param   digits    Maximum number of digits the integer must have.
  *
- * Returns : The pointer on the character array at the position where the number
- *           ends if successful. Returns NULL when the buffer does not contain a 
- *           valid number or if the parsed number is outside the defined range.
+ * @return  The pointer on the character array at the position where the number
+ *          ends if successful. Returns NULL when the buffer does not contain a 
+ *          valid number or if the parsed number is outside the defined range.
+ * 
  */
 const char* parse_int( const char *buf, int *dest, int min, int max, uint8_t digits )  {
 
@@ -758,19 +730,19 @@ const char* parse_int( const char *buf, int *dest, int min, int max, uint8_t dig
 } 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * convert a character array representation of time to a DateTime structure
+ * @brief	convert a character array representation of time to a DateTime 
+ *          structure
  *
- * Arguments
- * ---------
- *  - buf  : Pointer to the character array to convert.
- *  - fmt  : Pointer to a character array containing the format used to 
- *           parse the date/time string
- *  - dest : DateTime object to store the results to
+ * @param   buf     Pointer to the character array to convert.
+ * @param   fmt     Pointer to a character array containing the format used to 
+ *                  parse the date/time string
+ * @param   dest    DateTime object to store the results to
  *
- * Returns : Pointer to the first character not processed by this function. 
- *           Returns NULL if it fails to match all of the format string.
+ * @return  Pointer to the first character not processed by this function 
+ *          or NULL if it fails to match all of the format string.
+ * 
  */
 const char* strptime( const char *buf, const char *fmt, DateTime* dest ) {
     uint16_t year = dest->year();

@@ -19,14 +19,11 @@
 #include "../hardware.h"
 #include "../services/ntpclient.h"
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  None
-  */
+ */
 Console::Console() {
     memset( _inputbuffer, 0, INPUT_BUFFER_LENGTH + 1);
 
@@ -35,31 +32,26 @@ Console::Console() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * IPrint interface callback for printing a single character. Sends the 
- * output to the serial port.
+ * @brief	IPrint interface callback for printing a single character. Sends the 
+ *          output to the serial port.
+ * 
+ * @param   c   character to print
  *
- * Arguments
- * ---------
- *  - c : Character to print
- *
- * Returns : Number of bytes written
+ * @return  Number of bytes written
  */
 uint8_t Console::_print( char c ) {
     return Serial.write( c );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the console
+ * @brief	Initialize the console
  *
- * Arguments
- * ---------
- *  - baud : Speed of the serial port
- *
- * Returns : Nothing
+ * @param   baud    Speed of the serial port
+ * 
  */
 void Console::begin( unsigned long baud ) {
 
@@ -75,15 +67,10 @@ void Console::begin( unsigned long baud ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Discard the user input from the serial port
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Discard the user input from the serial port
+ * 
  */
 void Console::resetInput() {
 
@@ -93,15 +80,10 @@ void Console::resetInput() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable user input
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Enable user input
+ * 
  */
 void Console::enableInput() {
     this->resetInput();
@@ -111,30 +93,26 @@ void Console::enableInput() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Inhibit user input
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Inhibit user input
+ * 
  */
 void Console::disableInput() {
     _inputenabled = false;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Check if the input buffer contains the specified command
+ * @brief	Check if the input buffer contains the specified command
  *
- * Arguments
- * ---------
- *  - hasParameter : TRUE if the command expects a parameter, false otherwise
+ * @param   command         Command name to find
+ * @param   hasParameter    TRUE if the command expects a parameter, 
+ *                          FALSE otherwise
  *
- * Returns : TRUE if command name is matching, FALSE otherwise
+ * @return  TRUE if command name is matching, FALSE otherwise
+ * 
  */
 bool Console::matchCommandName( const char *command, bool hasParameter ) {
     _inputParameter = NULL;
@@ -169,15 +147,12 @@ bool Console::matchCommandName( const char *command, bool hasParameter ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Returns the pointer to the start of the parameter in the input buffer
+ * @brief	Returns the pointer to the start of the parameter in the input buffer
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Pointer to the parameter start, 0 if none is found.
+ * @return  Pointer to the parameter start, 0 if none is found.
+ * 
  */
 char* Console::getInputParameter() {
     if( _inputParameter == NULL ) {
@@ -194,15 +169,10 @@ char* Console::getInputParameter() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Remove leading and trailing white spaces from the input buffer
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Remove leading and trailing white spaces from the input buffer
+ * 
  */
 void Console::trimInput() {
     uint8_t i;
@@ -229,16 +199,13 @@ void Console::trimInput() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Process incomming character from the serial port and echo the 
- * input back on the serial port accordingly.
+ * @brief	Process incomming character from the serial port and echo the 
+ *          input back on the serial port accordingly.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if end of line is detected, FALSE otherwise
+ * @return  TRUE if end of line is detected, FALSE otherwise
+ * 
  */
 bool Console::processInput() {
     
@@ -289,30 +256,20 @@ bool Console::processInput() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Display an input prompt
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Display an input prompt
+ * 
  */
 void Console::displayPrompt() {
     this->print_P( S_CONSOLE_PROMPT );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Scan the input buffer for known commands and run them accordingly.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Scan the input buffer for known commands and run them accordingly.
+ * 
  */
 void Console::parseCommand() {
     bool started;
@@ -330,7 +287,8 @@ void Console::parseCommand() {
 
     /* 'help' command */
     if( this->matchCommandName( S_COMMAND_HELP ) == true ) {
-        started = this->startTaskPrintHelp();
+        this->startTaskPrintHelp();
+        started = true;
 
     /* 'reboot' command */
     } else if( this->matchCommandName( S_COMMAND_REBOOT ) == true ) {
@@ -430,15 +388,10 @@ void Console::parseCommand() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run current tasks
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Run current tasks
+ * 
  */
 void Console::runTask() {
 

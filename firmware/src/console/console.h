@@ -178,7 +178,7 @@ class Console : public IPrint, ITask {
     // ----------------------------------------
 
     /* 'help' command */
-    bool startTaskPrintHelp();
+    void startTaskPrintHelp();
     void runTaskPrintHelp();
     
     /* 'net restart' command */

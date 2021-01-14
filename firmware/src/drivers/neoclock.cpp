@@ -25,14 +25,13 @@
 #include "../resources.h"
 #include "../ui/ui.h"
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  - pin_leds : Pin ID connected to the neopixel data line.
- *  - pin_shdn : Pin ID connected to the neopixel power MOSFET.
+ * @param   pin_leds    Pin ID connected to the neopixel data line.
+ * @param   pin_shdn    Pin ID connected to the neopixel power MOSFET.
+ * 
  */
 NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin_shdn ) {
 
@@ -40,15 +39,10 @@ NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the clock display back to it's default state.
+ * @brief	Set the clock display back to it's default state.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns :
  */
 void NeoClock::restoreClockDisplay() {
 
@@ -68,15 +62,10 @@ void NeoClock::restoreClockDisplay() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Refresh the lamp NeoPixel data.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Refresh the lamp NeoPixel data.
+ * 
  */
 void NeoClock::update() {
 
@@ -156,15 +145,10 @@ void NeoClock::update() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Check if the pixels needs to be updated.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Check if the pixels needs to be updated.
+ * 
  */
 void NeoClock::runTask() {
 
@@ -201,17 +185,15 @@ void NeoClock::runTask() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets pixel for a given segment digit position. Each digits contains 7 pixels.
+ * @brief	Sets pixel for a given segment digit position. Each digits 
+ *          contains 7 pixels.
  *
- * Arguments
- * ---------
- *  - pixmap : Pointer to the pixel buffer ( 1 bit per pixel )
- *  - pos    : Position in the string where the segment digit begins.
- *  - value  : Value to assign to digit.
- *
- * Returns : Nothing
+ * @param   pixmap    Pointer to the pixel buffer ( 1 bit per pixel )
+ * @param   pos       Position in the string where the segment digit begins.
+ * @param   value     Value to assign to digit.
+ * 
  */
 void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
 
@@ -223,31 +205,25 @@ void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Turn on all the leds on the display.
+ * @brief	Turn on all the leds on the display.
  *
- * Arguments
- * ---------
- *  - testMode : True to enable pixel test mdoe.
- *
- * Returns : Nothing
+ * @param   testMode    True to enable pixel test mdoe.
  */
 void NeoClock::setTestMode( bool testMode ) {
     this->_testMode = testMode;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Request a clock display update. It only accepts the request when the 
- * current screen is neither the clock set screen or the alarm display screen
+ * @brief	Request a clock display update. It only accepts the request 
+ *          when the current screen is neither the clock set screen or the 
+ *          alarm display screen
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if the request is accepted, FALSE otherwise
+ * @return  TRUE if the request is accepted, FALSE otherwise
+ * 
  */
 bool NeoClock::requestDisplayUpdate() {
 

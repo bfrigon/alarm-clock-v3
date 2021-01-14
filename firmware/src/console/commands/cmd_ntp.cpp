@@ -19,17 +19,34 @@
 #include "../../services/ntpclient.h"
 
 
-
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Starts the 'ntp sync' command task
+ * 
+ * @return  TRUE if successful, FALSE otherwise
+ * 
+ */
 bool Console::startTaskNtpSync() {
 
-    g_ntp.sync( true );
-
     this->startTask( TASK_CONSOLE_NTP_SYNC );
+
+    if( g_ntp.sync( true ) == false ) {
+
+        this->endTask( g_ntp.getTaskError() );
+        return false;
+    }
+    
     return true;
 }
 
 
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Monitor the 'ntp sync' task
+ * 
+ */
 void Console::runTaskNtpSync() {
+
     if( g_ntp.isBusy() == true ) {
         return;
     }

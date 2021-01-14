@@ -20,13 +20,12 @@
 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  - pin_irq : QT1070 interrupt pin
+ * @param   pin_irq     QT1070 interrupt pin
+ * 
  */
 QT1070::QT1070( uint8_t pin_irq ) {
 
@@ -66,15 +65,10 @@ QT1070::QT1070( uint8_t pin_irq ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the touch IC.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Initialize the touch IC.
+ * 
  */
 void QT1070::begin() {
 
@@ -92,15 +86,10 @@ void QT1070::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable key change interrupt.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Enable key change interrupt.
+ * 
  */
 void QT1070::enableInterrupt() {
 
@@ -109,15 +98,10 @@ void QT1070::enableInterrupt() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disable key change interrupt.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Disable key change interrupt.
+ * 
  */
 void QT1070::disableInterrupt() {
 
@@ -125,14 +109,12 @@ void QT1070::disableInterrupt() {
 }
 
 
-/*--------------------------------------------------------------------------
- * Reads the two status bytes from the touch IC.
+/*! ------------------------------------------------------------------------
  *
- * Arguments
- * ---------
- *  None
+ * @brief	Reads the two status bytes from the touch IC.
  *
- * Returns : True if the read was successful.
+ * @return  TRUE if the read was successful, FALSE otherwise.
+ * 
  */
 bool QT1070::readStatus() {
 
@@ -144,14 +126,12 @@ bool QT1070::readStatus() {
 }
 
 
-/*--------------------------------------------------------------------------
- * Write configuration block to the touch IC.
+/*! ------------------------------------------------------------------------
  *
- * Arguments
- * ---------
- *  None
+ * @brief	Write configuration block to the touch IC.
  *
- * Returns : True if the write was successful.
+ * @return  TRUE if the write was successful, FALSE otherwise.
+ * 
  */
 bool QT1070::writeConfig() {
 
@@ -163,16 +143,12 @@ bool QT1070::writeConfig() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Process the touche events to detect which key was pressed or held or if
- * a swipe left or swipe right occured
+ * @brief	Process the touche events to detect which key was pressed.
  *
- * Arguments
- * ---------
- * - None
- *
- * Returns : The pressed key ID, false otherwize.
+ * @return  The pressed key ID, false otherwize.
+ * 
  */
 uint8_t QT1070::processEvents() {
 
@@ -228,17 +204,16 @@ uint8_t QT1070::processEvents() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Process key event using the standard mode meaning that holding the key down
- * will be considered a SHIFT+KEY press.
+ * @brief	Process key event using the standard mode meaning that holding 
+ *          the key down will be considered a SHIFT+KEY press.
  *
- * Arguments
- * ---------
- * - key            : Detected key
- * - lastEventDelay : Delay in ms since the last event.
+ * @param   key               Detected key
+ * @param   lastEventDelay    Delay in ms since the last event.
  *
- * Returns : The pressed key ID or KEY_NONE otherwise.
+ * @return  The pressed key ID or KEY_NONE otherwise.
+ * 
  */
 uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 
@@ -280,23 +255,19 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
         return KEY_NONE;
     }
 
-
-
-
     return KEY_NONE;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Process key event using the repeat mode.
+ * @brief	Process key event using the repeat mode.
  *
- * Arguments
- * ---------
- * - key            : Detected key
- * - lastEventDelay : Delay in ms since the last event.
+ * @param   key               Detected key
+ * @param   lastEventDelay    Delay in ms since the last event.
  *
- * Returns : The pressed key ID or KEY_NONE otherwise.
+ * @return  The pressed key ID or KEY_NONE otherwise.
+ * 
  */
 uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 
@@ -350,22 +321,22 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Transmit data to the touch IC.
+ * @brief	Transmit data to the touch IC.
  *
- * Arguments
- * ---------
- *  - reg  : Register address to start writing to.
- *  - data : Pointer to the data to be written.
- *  - size : Size of the data.
+ * @param   reg     Register address to start writing to.
+ * @param   data    Pointer to the data to be written.
+ * @param   size    Size of the data.
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 uint8_t QT1070::write( uint8_t reg, void *data, uint8_t size ) {
     uint8_t res;
@@ -381,17 +352,16 @@ uint8_t QT1070::write( uint8_t reg, void *data, uint8_t size ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Read data from the touch IC.
+ * @brief	Read data from the touch IC.
  *
- * Arguments
- * ---------
- *  - reg  : Register address to start reading from.
- *  - data : Pointer to the buffer.
- *  - size : Size of the data.
+ * @param   reg     Register address to start reading from.
+ * @param   data    Pointer to the buffer.
+ * @param   size    Size of the data.
  *
- * Returns : The number of bytes read.
+ * @return  The number of bytes read.
+ * 
  */
 uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
     uint8_t length = 0;
@@ -412,13 +382,10 @@ uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Interrupt service routine for the key change event.
+ * @brief	Interrupt service routine for the key change event.
  *
- * None
- *
- * Returns : Nothing
  */
 void isr_qt1070() {
     g_keypad.disableInterrupt();

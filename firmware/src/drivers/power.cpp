@@ -21,16 +21,16 @@
 #include "../alarm.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  - pin_onbatt : Pin which detect when the system is running
- *                  on battery power.
- *  - pin_sysoff : Pin connected to BQ24075 system off pin
- *  - pin_cfgrst : Pin which is connected to the reset/factory reset button.
+ * @param   pin_onbatt    Pin which detect when the system is running
+ *                        on battery power.
+ * @param   pin_sysoff    Pin connected to BQ24075 system off pin
+ * @param   pin_cfgrst    Pin which is connected to the reset/factory 
+ *                        reset button.
+ * 
  */
 Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst ) {
 
@@ -40,15 +40,10 @@ Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the power management class
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Initialize the power management class
+ * 
  */
 void Power::begin() {
 
@@ -64,30 +59,26 @@ void Power::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the current power state.
+ * @brief	Get the current power state.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Current power state value.
+ * @return  Current power state value.
+ * 
  */
 uint8_t Power::getPowerMode() {
     return this->_mode;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the power state
+ * @brief	Set the power state
  *
- * Arguments
- * ---------
- *  - mode : The new power state
+ * @param   mode    The new power state
  *
- * Returns : New power state.
+ * @return  The current power state.
+ * 
  */
 uint8_t Power::setPowerMode( uint8_t mode ) {
     uint8_t prevMode = this->_mode;
@@ -123,15 +114,10 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run power management tasks.
+ * @brief	Run power management tasks.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : New power state.
  */
 void Power::runTask() {
 
@@ -149,15 +135,13 @@ void Power::runTask() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Detect the state of the 'on battery' pin and set power mode accordingly.
+ * @brief	Detect the state of the 'on battery' pin and set power mode 
+ *          accordingly.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : New power state.
+ * @return  Detected power state
+ * 
  */
 uint8_t Power::detectPowerState() {
 
@@ -186,45 +170,32 @@ uint8_t Power::detectPowerState() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Detect the state of the 'on battery' pin.
+ * @brief	Detect the state of the 'on battery' pin.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : New power state.
+ * @return  TRUE if currently running on battery power, FALSE otherwise
+ * 
  */
 bool Power::isOnBatteryPower() {
     return ( digitalRead( this->_pin_onbatt ) == HIGH );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Resets the suspend timer.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : New power state.
+ * @brief	Resets the suspend timer.
+ * 
  */
 void Power::resetSuspendDelay() {
     this->_lpwrTimerStart = millis();
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enter CPU sleep mode.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Enter CPU sleep mode.
+ * 
  */
 void Power::enterSleep() {
 
@@ -270,16 +241,11 @@ void Power::enterSleep() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Pull the reset pin low from the "factory config/reset" pin to reset 
- * the processor.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Pull the reset pin low from the "factory config/reset" pin to reset 
+ *          the processor.
+ * 
  */
 void Power::cpuReset() {
 
@@ -295,15 +261,10 @@ void Power::cpuReset() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gracefuly reset the clock
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Gracefuly reboot
+ * 
  */
 void Power::reboot() {
     g_alarm.end();
@@ -316,15 +277,12 @@ void Power::reboot() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Checkd the state of the "factory config/reset" button
+ * @brief	Check the state of the "factory config/reset" button
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if the button is pressed or FALSE otherwise.
+ * @return  TRUE if the button is pressed or FALSE otherwise.
+ * 
  */
 bool Power::detectConfigResetButton() {
     if( this->_pin_cfgrst == -1 ) {
@@ -335,15 +293,10 @@ bool Power::detectConfigResetButton() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable watchdog timer.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Enable the watchdog timer.
+ * 
  */
 void Power::enableWatchdog() {
     /* Enable watchdog timer, 8 seconds timeout */
@@ -352,15 +305,10 @@ void Power::enableWatchdog() {
     this->_wdt = true;
 }
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disable watchdog timer.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Disable the watchdog timer.
+ * 
  */
 void Power::disableWatchdog() {
 
@@ -369,15 +317,10 @@ void Power::disableWatchdog() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Reset watchdog timer.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Reset the watchdog timer.
+ * 
  */
 void Power::resetWatchdog() {
     // wtd_reset();

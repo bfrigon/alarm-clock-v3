@@ -21,15 +21,14 @@ bool showHelpMsg = false;
 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when entering the screen
+ * @brief	Event raised when entering the screen
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to continue loading the screenor False otherwise
+ * @return  TRUE to continue loading the screen, FALSE otherwise
+ * 
  */
 bool alarmScreen_onEnterScreen( Screen *screen ) {
 
@@ -39,16 +38,15 @@ bool alarmScreen_onEnterScreen( Screen *screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when a key press occurs
+ * @brief	Event raised when a key press occurs
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - key    : Detected key press.
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   key       Detected key press.
  *
- * Returns : TRUE to allow default key press processingor False to override.
+ * @return  TRUE to allow default key press processing, FALSE to override.
+ * 
  */
 bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
     uint8_t mode = g_alarm.getPlayMode();
@@ -89,15 +87,14 @@ bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when updating the screen.
+ * @brief	Event raised when updating the screen.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to allow default screen updateor False to override.
+ * @return  TRUE to allow default screen updateor False to override.
+ * 
  */
 bool alarmScreen_onDrawScreen( Screen *screen ) {
     uint8_t mode = g_alarm.getPlayMode();
@@ -164,15 +161,11 @@ bool alarmScreen_onDrawScreen( Screen *screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when the exit screen timeout delay has elapsed.
+ * @brief	Event raised when the exit screen timeout delay has elapsed.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *
- * Returns : Nothing
+ * @param   screen    Pointer to the screen where the event occured.
  */
 void alarmScreen_onTimeout( Screen *screen ) {
     if( showHelpMsg == true ) {

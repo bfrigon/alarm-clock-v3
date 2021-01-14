@@ -18,23 +18,65 @@
 #include "itask.h"
 
 
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Checks if a task is currently running.
+ *
+ * @return  TRUE if task running, FALSE otherwise.
+ * 
+ */
 bool ITask::isBusy() {
     return this->_currentTask != TASK_NONE;
 }
 
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Get the current running task ID
+ *
+ * @return  Task ID
+ * 
+ */
 uint8_t ITask::getCurrentTask() {
     return this->_currentTask;
 }
 
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Get the previous task exit error code.
+ *
+ * @return  Error code
+ * 
+ */
 int ITask::getTaskError() {
     return this->_taskError;
 }
 
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Get the time in milliseconds the task has been running.
+ *
+ * @return  Time elapsed
+ * 
+ */
 unsigned long ITask::getTaskRunningTime() {
     return millis() - this->_timerTaskStart;
 }
 
 
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Starts a new task.
+ *
+ * @param   task     Task ID
+ * @param   force    Cancel the previous task if one is currently running.
+ *
+ * @return  Current running task ID. Will return the new task ID or the
+ *          previous task ID if one is still running.
+ * 
+ */
 uint8_t ITask::startTask( uint8_t task, bool force ) {
 
     if( this->_currentTask != TASK_NONE && force == false ) {
@@ -47,6 +89,14 @@ uint8_t ITask::startTask( uint8_t task, bool force ) {
     return task;
 }
 
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Ends the current task
+ *
+ * @param   error    Error code 
+ * 
+ */
 void ITask::endTask( int error ) {
     
     this->_currentTask = TASK_NONE;
@@ -57,6 +107,14 @@ void ITask::endTask( int error ) {
     }
 }
 
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief	Sets the error code of the running task
+ *
+ * @param   error    Error code 
+ * 
+ */
 void ITask::setTaskError( int error ) {
     this->_taskError = error;
 }

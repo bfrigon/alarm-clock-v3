@@ -29,29 +29,23 @@ const char* g_currentCustomCharacterSet = NULL;
 unsigned long g_enterScreenTime = 0;
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor for ScreenItem class.
+ * @brief	Class constructor for ScreenItem class.
  *
- * Arguments
- * ---------
- *  None
  */
 ScreenItem::ScreenItem() {
     this->unload();  
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Load a screen item from program memory.
+ * @brief	Load a screen item from program memory.
  *
- * Arguments
- * ---------
- *  - item : Pointer to the screen item structure contained in program
- *           memory
- *
- * Returns : Nothing
+ * @param   item    Pointer to the screen item structure contained in 
+ *                  program memory
+ * 
  */
 void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
 
@@ -72,15 +66,10 @@ void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Unload the screen item
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Unload the screen item
+ * 
  */
 void ScreenItem::unload() {
 
@@ -98,30 +87,27 @@ void ScreenItem::unload() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor for Screen class.
+ * @brief	Class constructor for Screen class.
  *
- * Arguments
- * ---------
- *  - id : Screen ID
+ * @param   id    Screen ID
  */
 Screen::Screen( uint8_t id ) {
     this->_id = id;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor for Screen class with events pre-defined.
+ * @brief	Class constructor for Screen class with events pre-defined.
  *
- * Arguments
- * ---------
- *  - id : Screen ID
- *  - items : Screen items
- *  - eventValueChange : Pointer to a function called when an item's value changes.
- *  - eventEnterScreen : Pointer to a function called when entering the screen.
- *  - eventExitScreen  : Pointer to a function called when leaving the screen.
+ * @param   id                  Screen ID
+ * @param   items               Screen items
+ * @param   eventValueChange    Pointer to a function called when an item's value changes.
+ * @param   eventEnterScreen    Pointer to a function called when entering the screen.
+ * @param   eventExitScreen     Pointer to a function called when leaving the screen.
+ * 
  */
 Screen::Screen( uint8_t id, const struct ScreenItemBase* items, pfcbValueChange _eventValueChange,
                 pfcbEnterScreen _eventEnterScreen, pfcbExitScreen _eventExitScreen ) {
@@ -134,15 +120,10 @@ Screen::Screen( uint8_t id, const struct ScreenItemBase* items, pfcbValueChange 
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run task for this screen
+ * @brief	Run task for this screen
  *
- * Arguments
- * ---------
- *  - None
- *
- * Returns : Nothing
  */
 void Screen::runTask() {
 
@@ -168,16 +149,13 @@ void Screen::runTask() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Update the screen contents on the LCD.
+ * @brief	Update the screen contents on the LCD.
  *
- * Arguments
- * ---------
- *  - force : Update the screen contents event if it's not the current
- *            active screen.
- *
- * Returns : Nothing
+ * @param   force    Update the screen contents event if it's not the current
+ *                   active screen.
+ * 
  */
 void Screen::update( bool force ) {
 
@@ -285,15 +263,12 @@ void Screen::update( bool force ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Process key press events.
+ * @brief	Process key press events.
  *
- * Arguments
- * ---------
- *  - key : detected key press
- *
- * Returns : Nothing
+ * @param   key    detected key press
+ * 
  */
 void Screen::processKeypadEvent( uint8_t key ) {
 
@@ -396,15 +371,10 @@ void Screen::processKeypadEvent( uint8_t key ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Reset the timeout timer.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Reset the timeout timer.
+ * 
  */
 void Screen::resetTimeout( int16_t timeout ) {
 
@@ -416,15 +386,12 @@ void Screen::resetTimeout( int16_t timeout ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Returns whether or not the timeout delay has elapsed.
+ * @brief	Returns whether or not the timeout delay has elapsed.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if the screen has timed out or FALSE otherwise.
+ * @return  TRUE if the screen has timed out, FALSE otherwise.
+ * 
  */
 bool Screen::hasScreenTimedOut() {
 
@@ -436,15 +403,10 @@ bool Screen::hasScreenTimedOut() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Exits the current screen and returns to the parent screen.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Exits the current screen and returns to the parent screen.
+ * 
  */
 void Screen::exitScreen() {
     if( this->_parent == NULL ) {
@@ -469,19 +431,16 @@ void Screen::exitScreen() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Leave the current screen and activate this one.
+ * @brief	Leave the current screen and activate this one.
  *
- * Arguments
- * ---------
- *  - selectFirstItem : TRUE to select the first item or False to leave the
- *                      previously selected item the last time the screen
- *                      was active
- *  - parent          : Sets which screen will be activated when leaving
- *                      this screen.
- *
- * Returns : Nothing
+ * @param   selectFirstItem    TRUE to select the first item or False to leave 
+ *                             the previously selected item the last time the 
+ *                             screen was active
+ * @param   parent             Sets which screen will be activated when 
+ *                             leaving this screen.
+ * 
  */
 void Screen::activate( bool selectFirstItem, Screen* parent ) {
 
@@ -524,18 +483,17 @@ void Screen::activate( bool selectFirstItem, Screen* parent ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Update a screen item display on the LCD
+ * @brief	Update a screen item display on the LCD
  *
- * Arguments
- * ---------
- *  - item       : Pointer to a screen item.
- *  - isSelected : TRUE if item is currently selectedor False otherwise.
- *  - row        :  Zero-based Y position where the item is located on the LCD.
- *  - col        :  Zero-based X position where the item is located on the LCD.
- *
- * Returns : Nothing
+ * @param   item          Pointer to a screen item.
+ * @param   isSelected    TRUE if item is currently selectedor False otherwise.
+ * @param   row           Zero-based Y position where the item is located 
+ *                        on the LCD.
+ * @param   col           Zero-based X position where the item is located 
+ *                        on the LCD.
+ * 
  */
 void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t col ) {
 
@@ -810,15 +768,14 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Returns whether or not a given item can be viewed full screen.
+ * @brief	Returns whether or not a given item can be viewed full screen.
  *
- * Arguments
- * ---------
- *  - item : Pointer to a screen item.
+ * @param   item    Pointer to a screen item.
  *
- * Returns : TRUE if the item can be viewed full screenor False otherwise.
+ * @return  TRUE if the item can be viewed full screen, FALSE otherwise.
+ * 
  */
 bool Screen::isItemFullScreenEditable( ScreenItem* item ) {
 
@@ -835,15 +792,14 @@ bool Screen::isItemFullScreenEditable( ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Prints a given item's caption on the LCD.
+ * @brief	Prints a given item's caption on the LCD.
  *
- * Arguments
- * ---------
- *  - item : Pointer to a screen item.
+ * @param   item    Pointer to a screen item.
  *
- * Returns : The number of character printed.
+ * @return  The number of character printed.
+ * 
  */
 uint8_t Screen::printItemCaption( ScreenItem* item ) {
 
@@ -868,15 +824,10 @@ uint8_t Screen::printItemCaption( ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Selects the first item on the screen.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Selects the first item on the screen.
+ * 
  */
 void Screen::selectFirstItem() {
     this->_scroll = 0;
@@ -887,15 +838,10 @@ void Screen::selectFirstItem() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Resets the screen selection.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Resets the screen selection.
+ * 
  */
 void Screen::clearSelection() {
 
@@ -918,15 +864,12 @@ void Screen::clearSelection() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Selects a given item from it's index position.
+ * @brief	Selects a given item from it's index position.
  *
- * Arguments
- * ---------
- *  - index : zero-based index of the item to select.
- *
- * Returns : Nothing
+ * @param   index    zero-based index of the item to select.
+ * 
  */
 void Screen::selectItem( uint8_t index ) {
 
@@ -1008,16 +951,11 @@ void Screen::selectItem( uint8_t index ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets which keys on the keypad are repeatable when held down based on the
- * current screen state and selected item.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Sets which keys on the keypad are repeatable when held down 
+ *          based on the current screen state and selected item.
+ * 
  */
 void Screen::updateKeypadRepeatMode() {
 
@@ -1051,15 +989,14 @@ void Screen::updateKeypadRepeatMode() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Returns a given item's maximum value length.
+ * @brief	Returns a given item's maximum value length.
  *
- * Arguments
- * ---------
- *  - item : Pointer to a screen item.
+ * @param   item    Pointer to a screen item.
  *
- * Returns : The field length.
+ * @return  The field length.
+ * 
  */
 uint8_t Screen::calcFieldLength( ScreenItem* item ) {
     uint8_t length = 0;
@@ -1108,15 +1045,10 @@ uint8_t Screen::calcFieldLength( ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Update the cursor position on the LCD.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Update the cursor position on the LCD.
+ * 
  */
 void Screen::updateCursorPosition() {
 
@@ -1227,15 +1159,12 @@ void Screen::updateCursorPosition() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Revert an item to it's default value.
+ * @brief	Revert an item to it's default value.
  *
- * Arguments
- * ---------
- *  - item : Pointer to a screen item.
- *
- * Returns : Nothing
+ * @param   item    Pointer to a screen item.
+ * 
  */
 void Screen::clearItemValue( ScreenItem* item ) {
 
@@ -1290,16 +1219,15 @@ void Screen::clearItemValue( ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Converts the item's value to the number of bars to be displayed for
- * ITEM_TYPE_BAR items.
+ * @brief	Converts the item's value to the number of bars to be displayed 
+ *          for ITEM_TYPE_BAR items.
  *
- * Arguments
- * ---------
- *  - item : Pointer to a screen item.
+ * @param   item    Pointer to a screen item.
  *
- * Returns : The number of bars to display
+ * @return  The number of bars to display
+ * 
  */
 uint8_t Screen::itemValueToBars( ScreenItem* item ) {
 
@@ -1322,16 +1250,14 @@ uint8_t Screen::itemValueToBars( ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Increment a given item's value
+ * @brief	Increment a given item's value
  *
- * Arguments
- * ---------
- *  - item  : Pointer to a screen item.
- *  - shift : TRUE to use an alternate increment valueor False to increment by one.
- *
- * Returns : Nothing
+ * @param   item     Pointer to a screen item.
+ * @param   shift    TRUE to use an alternate increment valueor False to 
+ *                   increment by one.
+ * 
  */
 void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
 
@@ -1541,15 +1467,14 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the next valid character when incrementing a text box item
+ * @brief	Get the next valid character when incrementing a text box item
  *
- * Arguments
- * ---------
- *  - current : Current character to start from
+ * @param   current    Current character to start from
  *
- * Returns : The next valid character.
+ * @return  The next valid character.
+ * 
  */
 inline char Screen::nextValidCharacter( char current ) {
 
@@ -1591,18 +1516,14 @@ inline char Screen::nextValidCharacter( char current ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Increments an item's value while keeping it in the valid range.
+ * @brief	Increments an item's value while keeping it in the valid range.
  *
- * Arguments
- * ---------
- *  - value : Pointer to the item's value
- *  - pos   : Zero-based digit position
- *  - max   : Maximum value
- *  - min   : Minimum value
- *
- * Returns : Nothing
+ * @param   value    Pointer to the item's value
+ * @param   pos      Zero-based digit position
+ * @param   max      Maximum value
+ * @param   min      Minimum value
  */
 void Screen::incDigit( uint8_t* value, uint8_t pos, uint8_t max, uint8_t min ) {
 
@@ -1636,15 +1557,12 @@ void Screen::incDigit( uint8_t* value, uint8_t pos, uint8_t max, uint8_t min ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Returns the number of digits in a given number.
+ * @brief	Returns the number of digits in a given number.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : The number of digits.
+ * @return  The number of digits.
+ * 
  */
 inline uint8_t Screen::getNumDigits( uint8_t number ) {
     if( number < 10 ) {

@@ -18,37 +18,23 @@
 #include "../console.h"
 
 
-/*--------------------------------------------------------------------------
- *
- * Starts the 'help' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE if another task is already running.
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Starts the 'help' command task
+ * 
  */
-bool Console::startTaskPrintHelp() {
+void Console::startTaskPrintHelp() {
     _taskIndex = 0;
     
     this->startTask( TASK_CONSOLE_PRINT_HELP );
     this->println();
-
-    return true;
 }
 
 
-/*--------------------------------------------------------------------------
- *
- * Run the 'help' command task
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
+/*! ------------------------------------------------------------------------
+ * 
+ * @brief	Run the 'help' command task
+ * 
  */
 void Console::runTaskPrintHelp() {
     this->print_P( (const char *)pgm_read_word( &( S_COMMANDS[ _taskIndex ])), 16, TEXT_ALIGN_LEFT );

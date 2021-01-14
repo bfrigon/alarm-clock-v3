@@ -23,15 +23,14 @@
 uint8_t g_battStatusPage = 0;
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when updating the screen.
+ * @brief	Event raised when updating the screen.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to allow default screen updateor False to override.
+ * @return  TRUE to allow default screen update, FALSE to override.
+ * 
  */
 bool battStatus_onDrawScreen( Screen* screen ) {
 
@@ -148,16 +147,15 @@ bool battStatus_onDrawScreen( Screen* screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - key    : Detected key press.
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   key       Detected key press.
  *
- * Returns : TRUE to allow default key press processingor False to override.
+ * @return  TRUE to allow default key press processing, FALSE to override.
+ * 
  */
 bool battStatus_onKeypress( Screen* screen, uint8_t key ) {
 
@@ -178,15 +176,11 @@ bool battStatus_onKeypress( Screen* screen, uint8_t key ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when the exit screen timeout delay has elapsed.
+ * @brief	Event raised when the exit screen timeout delay has elapsed.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *
- * Returns : Nothing
+ * @param   screen    Pointer to the screen where the event occured.
  */
 void battStatus_onTimeout( Screen* screen ) {
 
@@ -195,15 +189,14 @@ void battStatus_onTimeout( Screen* screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
  * Event raised when entering the screen
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to continue loading the screenor False otherwise
+ * @return  TRUE to continue loading the screenor False otherwise
+ * 
  */
 bool battStatus_onEnterScreen( Screen* screen ) {
     g_battStatusPage = 0;

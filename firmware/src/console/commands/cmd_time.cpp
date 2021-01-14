@@ -27,15 +27,11 @@
 static char* param_tz_name;
 static DateTime cmd_time_adj;
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'set date' task
+ * @brief	Starts the 'set date' task
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
  *           
  */
 bool Console::startTaskSetDate() {
@@ -52,16 +48,10 @@ bool Console::startTaskSetDate() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run the 'set date' task. Display prompts and validate 
- * responses required before executing the task.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Run the 'set date' task. Display prompts and validate 
+ *          responses required before executing the task.
  *           
  */
 void Console::runTaskSetDate() {
@@ -232,15 +222,9 @@ void Console::runTaskSetDate() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Print the current date and time to the console
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Print the current date and time to the console
  *           
  */
 void Console::printDateTime() {
@@ -273,15 +257,11 @@ void Console::printDateTime() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Starts the 'set timezone' task
+ * @brief	Starts the 'set timezone' task
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
  *           
  */
 bool Console::startTaskSetTimeZone() {
@@ -303,16 +283,10 @@ bool Console::startTaskSetTimeZone() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Run the 'set timezone' task. Display prompts and validate 
- * responses required before executing the task.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Run the 'set timezone' task. Display prompts and validate 
+ *          responses required before executing the task.
  *           
  */
 void Console::runTaskSetTimeZone() {
@@ -362,15 +336,9 @@ void Console::runTaskSetTimeZone() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Print current timezone information to the console.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Print current timezone information to the console.
  *           
  */
 void Console::showTimezoneInfo() {

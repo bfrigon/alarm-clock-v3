@@ -27,13 +27,12 @@ volatile bool rtc_event = false;
 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  - pin_irq : DS3231 interrupt pin
+ * @param   pin_irq     DS3231 interrupt pin
+ * 
  */
 DS3231::DS3231( int8_t pin_irq ) {
     _pin_irq = pin_irq;
@@ -42,15 +41,10 @@ DS3231::DS3231( int8_t pin_irq ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the RTC IC.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Initialize the RTC IC.
+ * 
  */
 void DS3231::begin() {
 
@@ -73,15 +67,10 @@ void DS3231::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable the alarm interrupt.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Enable the alarm interrupt.
+ * 
  */
 void DS3231::enableInterrupt() {
     uint8_t control = this->read( DS3231_REG_CONTROL );
@@ -94,30 +83,20 @@ void DS3231::enableInterrupt() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disable the alarm interrupt.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Disable the alarm interrupt.
+ * 
  */
 void DS3231::disableInterrupt() {
     detachInterrupt( digitalPinToInterrupt( this->_pin_irq ) );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Clear the alarm flag.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Clear the alarm flag.
+ * 
  */
 void DS3231::clearAlarmFlag() {
     uint8_t status = this->read( DS3231_REG_STATUS );
@@ -127,15 +106,13 @@ void DS3231::clearAlarmFlag() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the frequency at which the alarm interrupt is raised.
+ * @brief	Set the frequency at which the alarm interrupt is raised.
  *
- * Arguments
- * ---------
- *  - freq : RTC_ALARM_EVERY_HOUR, RTC_ALARM_EVERY_MINUTE or RTC_ALARM_EVERY_SECOND
- *
- * Returns : Nothing
+ * @param   freq    RTC_ALARM_EVERY_HOUR, RTC_ALARM_EVERY_MINUTE 
+ *                  or RTC_ALARM_EVERY_SECOND
+ * 
  */
 void DS3231::setAlarmFrequency( uint8_t freq ) {
 
@@ -171,16 +148,13 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Check if an alarm event occured. If so, it will reset the alarm flag and
- * rearm the interrupt.
+ * @brief	Check if an alarm event occured. If so, it will reset the 
+ *          alarm flag and rearm the interrupt.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if an alarm event occured or False otherwise.
+ * @return  TRUE if an alarm event occured or False otherwise.
+ * 
  */
 bool DS3231::processEvents() {
 
@@ -210,15 +184,10 @@ bool DS3231::processEvents() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * For debugging purposes. Prints the contents of all registers
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	For debugging purposes. Prints the contents of all registers
+ * 
  */
 void DS3231::dumpRegs() {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
@@ -239,16 +208,13 @@ void DS3231::dumpRegs() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the current date and time.
+ * @brief	Get the current date and time.
  *
- * Arguments
- * ---------
- *  - dt : Pointer to the DateTime structure where the date and time will
- *         be stored.
- *
- * Returns : Nothing
+ * @param   dt    Pointer to the DateTime structure where the date and time 
+ *                will be written to.
+ * 
  */
 void DS3231::readTime( DateTime *dt ) {
 
@@ -277,32 +243,28 @@ void DS3231::readTime( DateTime *dt ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the current unix time. This function interpolate the unix time based
- * on the date and time stored in the RTC. It accounts for leap year but Ignores
- * time zone. It always assume the time zone is UTC.
+ * @brief	Get the current unix time. 
+ * 
+ * @details This function interpolate the unix time based on the date and 
+ *          time stored in the RTC. It accounts for leap year but Ignores
+ *          time zone. It always assume the time zone is UTC.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : The unix time.
+ * @return  The unix time.
+ * 
  */
 unsigned long DS3231::getEpoch() {
     return this->_now.getEpoch();
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the date and time on the RTC IC.
+ * @brief	Sets the date and time on the RTC IC.
  *
- * Arguments
- * ---------
- *  - ndt : Structure containing the date and time.
- *
- * Returns : Nothing
+ * @param   ndt    Structure containing the date and time.
+ * 
  */
 void DS3231::writeTime( DateTime *new_dt ) {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
@@ -324,15 +286,12 @@ void DS3231::writeTime( DateTime *new_dt ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Read data from the RTC IC.
+ * @brief	Read data from the RTC IC.
  *
- * Arguments
- * ---------
- *  - reg : Register address to read data from.
- *
- * Returns : Nothing
+ * @param   reg    Register address to read data from.
+ * 
  */
 uint8_t DS3231::read( uint8_t reg ) {
 
@@ -348,16 +307,13 @@ uint8_t DS3231::read( uint8_t reg ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Write data to the RTC IC.
+ * @brief	Write data to the RTC IC.
  *
- * Arguments
- * ---------
- *  - reg   : Register address to write data to.
- *  - value : Data to write
- *
- * Returns : Nothing
+ * @param   reg      Register address to write data to.
+ * @param   value    Data to write
+ * 
  */
 void DS3231::write( uint8_t reg, uint8_t value ) {
     Wire.beginTransmission( I2C_ADDR_DS3231 );
@@ -371,30 +327,22 @@ void DS3231::write( uint8_t reg, uint8_t value ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Reset the milliseconds counter
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Reset the milliseconds counter
+ * 
  */
 void DS3231::resetMillis() {
     _secStart = millis();
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the number of milliseconds since the beginning of the current second
+ * @brief	Get the number of milliseconds since the beginning of the current second
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Number of milliseconds elapsed
+ * @return  Number of milliseconds elapsed
+ * 
  */
 uint16_t DS3231::getMillis() {
     uint16_t ret;
@@ -404,17 +352,14 @@ uint16_t DS3231::getMillis() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Register a delayed clock adjustment
+ * @brief	Register a delayed clock adjustment
  *
- * Arguments
- * ---------
- *  - ndt   : DateTime structure containing the new date/time
- *  - delay : Number of milliseconds to wait before writing the new
- *            date/time
- *
- * Returns : Nothing
+ * @param   ndt      DateTime structure containing the new date/time
+ * @param   delay    Number of milliseconds to wait before writing the 
+ *                   new date/time
+ * 
  */
 void DS3231::adjustClock( DateTime *ndt, int16_t delay ) {
     _delayStart = millis();
@@ -423,15 +368,10 @@ void DS3231::adjustClock( DateTime *ndt, int16_t delay ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Interrupt service routine for the alarm event.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Interrupt service routine for the alarm event.
+ * 
  */
 void isr_ds3231() {
     rtc_event = true;

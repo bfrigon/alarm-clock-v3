@@ -23,15 +23,14 @@ BQ27441::BQ27441() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the IC.
+ * @brief	Initialize the IC.
  *
- * Arguments
- * ---------
- *  - capacity : Design capacity of the battery.
+ * @param   capacity    Design capacity of the battery.
  *
- * Returns :
+ * @return  TRUE if successful, FALSE if another task is already running.
+ * 
  */
 bool BQ27441::begin( uint16_t capacity ) {
 
@@ -82,15 +81,12 @@ bool BQ27441::begin( uint16_t capacity ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable config update mode.
+ * @brief	Enable config update mode.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::enterConfig() {
     if( this->_init == false ) {
@@ -107,15 +103,12 @@ bool BQ27441::enterConfig() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Exits config update mode.
+ * @brief	Exits config update mode.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::exitConfig() {
     if( this->_init == false ) {
@@ -132,15 +125,12 @@ bool BQ27441::exitConfig() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Un-seal memory access.
+ * @brief	Un-seal memory access.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::unseal() {
     if( this->_init == false ) {
@@ -154,15 +144,12 @@ bool BQ27441::unseal() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Re-seal memory access.
+ * @brief	Re-seal memory access.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::seal() {
     if( this->_init == false ) {
@@ -175,15 +162,12 @@ bool BQ27441::seal() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Checks if the battery monitor has finished initializing.
+ * @brief	Checks if the battery monitor has finished initializing.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if ready or FALSE otherwise.
+ * @return  TRUE if ready or FALSE otherwise.
+ * 
  */
 bool BQ27441::isReady() {
     if( this->_init == false ) {
@@ -198,15 +182,12 @@ bool BQ27441::isReady() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Checks if a battery has been detected.
+ * @brief	Checks if a battery has been detected.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if present or FALSE otherwise.
+ * @return  TRUE if present or FALSE otherwise.
+ * 
  */
 bool BQ27441::isBatteryPresent() {
     if( this->_init == false ) {
@@ -217,45 +198,36 @@ bool BQ27441::isBatteryPresent() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Checks if the battery is currently discharging.
+ * @brief	Checks if the battery is currently discharging.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if discharging or FALSE otherwise.
+ * @return  TRUE if discharging or FALSE otherwise.
+ * 
  */
 bool BQ27441::isDischarging() {
     return ( this->getAvgPower() < 0 );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Check if the battery is currently charging.
+ * @brief	Check if the battery is currently charging.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if charging or FALSE otherwise.
+ * @return  TRUE if charging or FALSE otherwise.
+ * 
  */
 bool BQ27441::isCharging() {
     return ( this->getAvgPower() > 0 );
 }
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the average power being consumed or stored in the battery.
+ * @brief	Gets the average power being consumed or stored in the battery.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : The average power in milliwatts (mW). power > 0 if battery 
+ * @return  The average power in milliwatts (mW). power > 0 if battery 
  *           is being charged or power < 0 if discharged.
+ * 
  */
 int16_t BQ27441::getAvgPower() {
     if( this->_init == false ) {
@@ -266,16 +238,13 @@ int16_t BQ27441::getAvgPower() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the average current being consumed or stored in the battery.
+ * @brief	Gets the average current being consumed or stored in the battery.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : The average current in milliamps (mA). current > 0 if battery 
+ * @return  The average current in milliamps (mA). current > 0 if battery 
  *           is being charged or current < 0 if discharged.
+ * 
  */
 int16_t BQ27441::getAvgCurrent() {
     if( this->_init == false ) {
@@ -286,20 +255,19 @@ int16_t BQ27441::getAvgCurrent() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the state of the battery.
+ * @brief	Gets the state of the battery.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : - BATTERY_STATE_READY          : Battery is detected, fully charged
- *           - BATTERY_STATE_NOT_PRESENT    : No battery detected
- *           - BATTERY_STATE_CHARGING       : Currently charging
- *           - BATTERY_STATE_DISCHARGE_FULL : Discahrging, above full threshold (FC)
- *           - BATTERY_STATE_DISCHARGE_HALF : Discharging, bellow full threshold (FC)
- *           - BATTERY_STATE_DISCHARGE_LOW  : Discharging, bellow low threshold (SOCL)
+ * @return  Value representing the current battery state
+ * 
+ * @retval  BATTERY_STATE_READY           Battery is detected, fully charged
+ * @retval  BATTERY_STATE_NOT_PRESENT     No battery detected
+ * @retval  BATTERY_STATE_CHARGING        Currently charging
+ * @retval  BATTERY_STATE_DISCHARGE_FULL  Discahrging, above full threshold (FC)
+ * @retval  BATTERY_STATE_DISCHARGE_HALF  Discharging, bellow full threshold (FC)
+ * @retval  BATTERY_STATE_DISCHARGE_LOW   Discharging, bellow low threshold (SOCL)
+ * 
  */
 uint8_t BQ27441::getBatteryState() {
     if( this->_init == false ) {
@@ -333,15 +301,14 @@ uint8_t BQ27441::getBatteryState() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the estimated remaining battery capacity.
+ * @brief	Gets the estimated remaining battery capacity.
  *
- * Arguments
- * ---------
- *  - Filtered : 
+ * @param   Filtered
  *
- * Returns : Remaining capacity in milliamps-hour (mAh)
+ * @return  Remaining capacity in milliamps-hour (mAh)
+ * 
  */
 uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
     if( this->_init == false ) {
@@ -352,15 +319,14 @@ uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the fully charged battery capacity.
+ * @brief	Gets the fully charged battery capacity.
  *
- * Arguments
- * ---------
- *  - Filtered : 
+ * @param   Filtered
  *
- * Returns : Fully charged capacity in milliamps-hour (mAh)
+ * @return  Fully charged capacity in milliamps-hour (mAh)
+ * 
  */
 uint16_t BQ27441::getFullCapacity( bool filtered ) {
     if( this->_init == false ) {
@@ -371,15 +337,12 @@ uint16_t BQ27441::getFullCapacity( bool filtered ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the battery voltage.
+ * @brief	Gets the battery voltage.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Battery voltage in millivolts (mV).
+ * @return  Battery voltage in millivolts (mV).
+ * 
  */
 uint16_t BQ27441::getVoltage() {
     if( this->_init == false ) {
@@ -390,16 +353,13 @@ uint16_t BQ27441::getVoltage() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the battery health percentage.
+ * @brief	Gets the battery health percentage.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Calculated battery health in percent or -1 if monitor is not 
- *           ready or if battery was not detected.
+ * @return  Calculated battery health in percent or -1 if monitor is not 
+ *          ready or if battery was not detected.
+ * 
  */
 int8_t BQ27441::getStateOfHealth() {
     if( this->_init == false ) {
@@ -426,15 +386,14 @@ int8_t BQ27441::getStateOfHealth() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Gets the calculated state of charge
+ * @brief	Gets the calculated state of charge
  *
- * Arguments
- * ---------
- *  - Filtered : 
+ * @param   Filtered
  *
- * Returns : State of charge in percent.
+ * @return  State of charge in percent.
+ * 
  */
 uint8_t BQ27441::getStateOfCharge( bool filtered ) {
     if( this->_init == false ) {
@@ -445,22 +404,22 @@ uint8_t BQ27441::getStateOfCharge( bool filtered ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Transmit data to the monitor IC.
+ * @brief	Transmit data to the monitor IC.
  *
- * Arguments
- * ---------
- *  - reg  : Register address to start writing to.
- *  - data : Pointer to the data to be written.
- *  - size : Size of the data.
+ * @param   reg     Register address to start writing to.
+ * @param   data    Pointer to the data to be written.
+ * @param   size    Size of the data.
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 uint8_t BQ27441::write( uint8_t reg, void* data, uint8_t size ) {
     uint8_t res;
@@ -476,38 +435,37 @@ uint8_t BQ27441::write( uint8_t reg, void* data, uint8_t size ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Transmit a single byte to the monitor IC.
+ * @brief	Transmit a single byte to the monitor IC.
  *
- * Arguments
- * ---------
- *  - reg  : Register address to write to.
- *  - data : byte to write.
+ * @param   reg     Register address to write to.
+ * @param   data    byte to write.
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 uint8_t BQ27441::write( uint8_t reg, uint8_t data ) {
     return this->write( reg, &data, sizeof( data ) );
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Read data from the monitor IC.
+ * @brief	Read data from the monitor IC.
  *
- * Arguments
- * ---------
- *  - reg  : Register address to start reading from.
- *  - data : Pointer to the buffer.
- *  - size : Size of the data.
+ * @param   reg     Register address to start reading from.
+ * @param   data    Pointer to the buffer.
+ * @param   size    Size of the data.
  *
- * Returns : The number of bytes read.
+ * @return  The number of bytes read.
+ * 
  */
 uint8_t BQ27441::read( uint8_t reg, void* data, uint8_t size ) {
     uint8_t length = 0;
@@ -530,15 +488,14 @@ uint8_t BQ27441::read( uint8_t reg, void* data, uint8_t size ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Read a 2-bytes (word) value from the monitor IC
+ * @brief	Read a 2-bytes (word) value from the monitor IC
  *
- * Arguments
- * ---------
- *  - reg  : Register address where to read the word from.
+ * @param   reg     Register address where to read the word from.
  *
- * Returns : Word value (2 bytes)
+ * @return  Word value (2 bytes)
+ * 
  */
 uint16_t BQ27441::readWord( uint8_t reg ) {
 
@@ -549,15 +506,14 @@ uint16_t BQ27441::readWord( uint8_t reg ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Execute a control function and read the return value.
+ * @brief	Execute a control function and read the return value.
  *
- * Arguments
- * ---------
- *  - function  : Function to execute.
+ * @param   function    Function to execute.
  *
- * Returns : Function result (2 bytes)
+ * @return  Function result (2 bytes)
+ * 
  */
 uint16_t BQ27441::readControlData( uint8_t function ) {
     if( this->executeControlCommand( function ) == false ) {
@@ -568,15 +524,14 @@ uint16_t BQ27441::readControlData( uint8_t function ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Execute a control function..
+ * @brief	Execute a control function..
  *
- * Arguments
- * ---------
- *  - function  : Function to execute.
+ * @param   function    Function to execute.
  *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::executeControlCommand( uint8_t function ) {
     uint8_t data[2] = { function & 0x00FF, function >> 8};
@@ -585,18 +540,17 @@ bool BQ27441::executeControlCommand( uint8_t function ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Read a data block when in update config mode.
+ * @brief	Read a data block when in update config mode.
  *
- * Arguments
- * ---------
- *  - classID  : Data class ID to access.
- *  - offset   : Offset in the datab class to start reading from.
- *  - data     : Pointer to a memory location where to store the read data.
- *  - size     : Size of the data to read.
+ * @param   classID     Data class ID to access.
+ * @param   offset      Offset in the datab class to start reading from.
+ * @param   data        Pointer to a memory location where to store the read data.
+ * @param   size        Size of the data to read.
  *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::readDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_t length ) {
     if( this->_init == false ) {
@@ -627,18 +581,17 @@ bool BQ27441::readDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Write to a data block when in config update mode.
+ * @brief	Write to a data block when in config update mode.
  *
- * Arguments
- * ---------
- *  - classID  : Data class ID to access.
- *  - offset   : Offset in the datab class to start reading from.
- *  - data     : Pointer to the data to write.
- *  - size     : Size of the data to write.
+ * @param   classID     Data class ID to access.
+ * @param   offset      Offset in the datab class to start reading from.
+ * @param   data        Pointer to the data to write.
+ * @param   size        Size of the data to write.
  *
- * Returns : TRUE if successful or FALSE otherwise.
+ * @return  TRUE if successful or FALSE otherwise.
+ * 
  */
 bool BQ27441::writeDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_t length ) {
     if( this->_init == false ) {
@@ -680,14 +633,12 @@ bool BQ27441::writeDataBlock( uint8_t classID, uint8_t offset, void* data, uint8
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Calculate the checksum of the 32 bytes block currently accessed.
+ * @brief	Calculate the checksum of the 32 bytes block currently accessed.
  *
- * Arguments
- * ---------
- *
- * Returns : CRC value.
+ * @return  CRC value.
+ * 
  */
 uint8_t BQ27441::calcBlockChecksum() {
 

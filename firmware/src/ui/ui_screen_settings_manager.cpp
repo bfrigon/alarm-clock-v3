@@ -24,16 +24,12 @@ uint8_t menuSettings_selectedItem = 0;
 bool confirm_action = false;
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when an item on the screen change it's value
+ * @brief	Event raised when an item on the screen change it's value
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - item   : Pointer to the item that changed it's value
- *
- * Returns : Nothing
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   item      Pointer to the item that changed it's value
  */
 void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
     
@@ -41,15 +37,13 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when entering the screen
+ * @brief	Event raised when entering the screen
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to continue loading the screenor False otherwise
+ * @return  TRUE to continue loading the screen, FALSE otherwise
  */
 bool settingsManager_onEnterScreen( Screen* screen ) {
 
@@ -68,15 +62,14 @@ bool settingsManager_onEnterScreen( Screen* screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when updating the screen.
+ * @brief	Event raised when updating the screen.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to allow default screen updateor False to override.
+ * @return  TRUE to allow default screen update, FALSE to override.
+ * 
  */
 bool settingsManager_onDrawScreen( Screen* screen ) {
 
@@ -146,16 +139,15 @@ bool settingsManager_onDrawScreen( Screen* screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when a key press occurs
+ * @brief	Event raised when a key press occurs
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - key    : Detected key press.
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   key       Detected key press.
  *
- * Returns : TRUE to allow default key press processingor False to override.
+ * @return  TRUE to allow default key press processing, FALSE to override.
+ * 
  */
 bool settingsManager_onKeypress( Screen* screen, uint8_t key ) {
 

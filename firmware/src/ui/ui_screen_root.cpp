@@ -22,16 +22,15 @@
 uint8_t g_prevBattState = 0;
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when a key press occurs
+ * @brief	Event raised when a key press occurs
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *  - key    : Detected key press.
+ * @param   screen    Pointer to the screen where the event occured.
+ * @param   key       Detected key press.
  *
- * Returns : TRUE to allow default key press processing or False to override.
+ * @return  TRUE to allow default key press processing, FALSE to override.
+ * 
  */
 bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
 
@@ -68,15 +67,14 @@ bool rootScreen_onKeypress( Screen* screen, uint8_t key ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when updating the screen.
+ * @brief	Event raised when updating the screen.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
+ * @param   screen    Pointer to the screen where the event occured.
  *
- * Returns : TRUE to allow default screen updateor False to override.
+ * @return  TRUE to allow default screen updateor False to override.
+ * 
  */
 bool rootScreen_onDrawScreen( Screen* screen ) {
 
@@ -138,15 +136,11 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Event raised when the exit screen timeout delay has elapsed.
+ * @brief	Event raised when the exit screen timeout delay has elapsed.
  *
- * Arguments
- * ---------
- *  - screen : Pointer to the screen where the event occured.
- *
- * Returns : Nothing
+ * @param   screen    Pointer to the screen where the event occured.
  */
 void rootScreen_onTimeout( Screen *screen ) {
 

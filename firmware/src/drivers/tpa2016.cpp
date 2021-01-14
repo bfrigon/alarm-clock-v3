@@ -18,16 +18,13 @@
 #include "tpa2016.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
- *
- * Arguments
- * ---------
- *  None
+ * @brief	Class constructor
  *
  */
 TPA2016::TPA2016() {
+
     _control = TPA2016_CTRL_NG_ON | TPA2016_CTRL_LSPK_OFF | TPA2016_CTRL_RSPK_OFF;
     _attackTime = 5;
     _releaseTime = 11;
@@ -42,30 +39,22 @@ TPA2016::TPA2016() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set hardware pins
+ * @brief	Set hardware pins
  *
- * Arguments
- * ---------
- *  - pin_shutdown
- *
- * Returns : Nothing
+ * @param   pin_shutdown    Shutdown pin of the TPA2016
+ * 
  */
 void TPA2016::setPins( int8_t pin_shutdown ) {
     this->_pin_shutdown = pin_shutdown;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize the amplifier IC
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Initialize the amplifier IC
+ * 
  */
 void TPA2016::begin() {
     _init = true;
@@ -88,15 +77,10 @@ void TPA2016::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Deinitialize the amplifier IC
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : 
+ * @brief	Deinitialize the amplifier IC
+ * 
  */
 void TPA2016::end() {
 
@@ -113,15 +97,12 @@ void TPA2016::end() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Enable left and right speaker outputs.
+ * @brief	Enable left and right speaker outputs.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
  */
 bool TPA2016::enableOutputs() {
 
@@ -136,15 +117,12 @@ bool TPA2016::enableOutputs() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Disable left and right speaker outputs.
+ * @brief	Disable left and right speaker outputs.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
  */
 bool TPA2016::disableOutputs() {
 
@@ -159,15 +137,14 @@ bool TPA2016::disableOutputs() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the fixed gain of the amplifier.
+ * @brief	Sets the fixed gain of the amplifier.
  *
- * Arguments
- * ---------
- *  - db : Gain value in decibel. Valid range -28dB to +30dB
+ * @param   db     Gain value in decibel. Valid range -28dB to +30dB
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setFixedGain( int8_t db ) {
 
@@ -189,15 +166,15 @@ bool TPA2016::setFixedGain( int8_t db ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the auto gain control attack time.
+ * @brief	Sets the auto gain control attack time.
  *
- * Arguments
- * ---------
- *  - time : Number of steps 0-63. Each steps represents 0.1067 milliseconds.
+ * @param   time     Number of steps 0-63. Each steps represents 
+ *                   0.1067 milliseconds.
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setAttackTime( int8_t time ) {
 
@@ -215,15 +192,15 @@ bool TPA2016::setAttackTime( int8_t time ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the auto gain control release time.
+ * @brief	Sets the auto gain control release time.
  *
- * Arguments
- * ---------
- *  - time : Number of steps 0-63. Each steps represents 0.0137 seconds.
+ * @param   time     Number of steps 0-63. Each steps represents 
+ *                   0.0137 seconds.
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setReleaseTime( int8_t time ) {
 
@@ -241,15 +218,15 @@ bool TPA2016::setReleaseTime( int8_t time ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the auto gain control hold time.
+ * @brief	Sets the auto gain control hold time.
  *
- * Arguments
- * ---------
- *  - time : Number of steps 0-63. Each steps represents 0.0137 seconds.
+ * @param   time     Number of steps 0-63. Each steps represents 
+ *                   0.0137 seconds.
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setHoldTime( int8_t time ) {
 
@@ -268,15 +245,14 @@ bool TPA2016::setHoldTime( int8_t time ) {
 
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the maximum gain the auto gain control can acheive.
+ * @brief	Sets the maximum gain the auto gain control can acheive.
  *
- * Arguments
- * ---------
- - db : Value in decibel. Valid range from 18 dB to 30 dB
+ * @param   db     Value in decibel. Valid range from 18 dB to 30 dB
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setMaxGain( int8_t db ) {
 
@@ -300,15 +276,14 @@ bool TPA2016::setMaxGain( int8_t db ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the AGC compression ratio
+ * @brief	Sets the AGC compression ratio
  *
- * Arguments
- * ---------
- *  - compression : 0=Off, 1=2:1, 2=4:1, 3=8:1
+ * @param   compression     0=Off, 1=2:1, 2=4:1, 3=8:1
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setCompression( uint8_t compression ) {
 
@@ -331,18 +306,17 @@ bool TPA2016::setCompression( uint8_t compression ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the output limiter level. 
+ * @brief	Sets the output limiter level. 
  *
- * Arguments
- * ---------
- *  - disabled : TRUE to disable the output limiter function, otherwise
- *               enabled by default.
- *  - level    : Limiter level in 0.5 dB steps from -6.5 dBV. 
- *               0=-6.5dBV, 31=+9dBV
+ * @param   disabled    TRUE to disable the output limiter function, otherwise
+ *                      enabled by default.
+ * @param   level       Limiter level in 0.5 dB steps from -6.5 dBV. 
+ *                      0=-6.5dBV, 31=+9dBV
  * 
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::setLimiter( bool disabled, int8_t level ) {
 
@@ -365,15 +339,10 @@ bool TPA2016::setLimiter( bool disabled, int8_t level ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Prints the contents of the config register to the serial port
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Prints the contents of the config register to the serial port
+ * 
  */
 void TPA2016::dumpRegs() {
 
@@ -395,16 +364,15 @@ void TPA2016::dumpRegs() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Write data to a config register
+ * @brief	Write data to a config register
  *
- * Arguments
- * ---------
- *  - reg  : Register address
- *  - data : Data to write
+ * @param   reg     Register address
+ * @param   data    Data to write
  *
- * Returns : TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise
+ * 
  */
 bool TPA2016::write( uint8_t reg, uint8_t data ) {
 

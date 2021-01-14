@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : main.ino
+// File    : firmware.ino
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -22,36 +22,31 @@
 #include "src/services/ntpclient.h"
 
 
-Alarm g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
-               PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
-WiFi g_wifi( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
-NeoClock g_clock( PIN_NEOCLOCK, PIN_PIX_SHDN );
-Lamp g_lamp( PIN_PIX_LAMP );
-QT1070 g_keypad( PIN_INT_KEYPAD );
-US2066 g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET );
-Power g_power( PIN_ON_BATTERY, PIN_SYSOFF, PIN_FACTORY_RESET );
-DS3231 g_rtc( PIN_INT_RTC );
-TSL2591 g_als;
-BQ27441 g_battery;
-ConfigManager g_config;
-Console g_console;
-TimeZone g_timezone;
-NtpClient g_ntp;
+Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
+                         PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
+WiFi            g_wifi( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
+NeoClock        g_clock( PIN_NEOCLOCK, PIN_PIX_SHDN );
+Lamp            g_lamp( PIN_PIX_LAMP );
+QT1070          g_keypad( PIN_INT_KEYPAD );
+US2066          g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET );
+Power           g_power( PIN_ON_BATTERY, PIN_SYSOFF, PIN_FACTORY_RESET );
+DS3231          g_rtc( PIN_INT_RTC );
+TSL2591         g_als;
+BQ27441         g_battery;
+ConfigManager   g_config;
+Console         g_console;
+TimeZone        g_timezone;
+NtpClient       g_ntp;
 
 
-
-
-
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Checks if the check button is held after reset or if EEPROM contains an
- * invalid magic code. In that case, all settings are restored to default.
+ * @brief	Checks if the check button is held after reset or if EEPROM 
+ *          contains an invalid magic code. In that case, all settings are 
+ *          restored to default.
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : TRUE if settings were reset to default or False otherwise.
+ * @return  TRUE if settings were reset to default, FALSE otherwise.
+ * 
  */
 bool checkFactoryReset() {
 
@@ -96,9 +91,9 @@ bool checkFactoryReset() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialization
+ * @brief	Initialize drivers
  *
  */
 void setup() {
@@ -172,9 +167,9 @@ void setup() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Main loop
+ * @brief	Main loop
  *
  */
 void loop() {

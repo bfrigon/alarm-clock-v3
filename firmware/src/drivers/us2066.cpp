@@ -18,14 +18,13 @@
 #include "us2066.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Class constructor
+ * @brief	Class constructor
  *
- * Arguments
- * ---------
- *  - address   : I2C address of the OLED module
- *  - pin_reset : Pin connected to the OLED reset line
+ * @param   address      I2C address of the OLED module
+ * @param   pin_reset    Pin connected to the OLED reset line
+ * 
  */
 US2066::US2066( uint8_t address, uint8_t pin_reset ) {
     this->_address = address;
@@ -36,15 +35,10 @@ US2066::US2066( uint8_t address, uint8_t pin_reset ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Perform proper power-up sequence and initialize the LCD module.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Perform proper power-up sequence and initialize the LCD module.
+ * 
  */
 void US2066::begin() {
     if( this->_init == true ) {
@@ -115,15 +109,10 @@ void US2066::begin() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Shutdown LCD module.
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Shutdown the LCD module.
+ * 
  */
 void US2066::end() {
     if( this->_init == false ) {
@@ -139,16 +128,13 @@ void US2066::end() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Selects instruction set.
+ * @brief	Selects the display instruction set.
  *
- * Arguments
- * ---------
- *  - iset : Instruction set (US2066_ISET_STANDARD, US2066_ISET_SPECIAL,
- *           US2066_ISET_EXTENDED or US2066_ISET_OLED).
- *
- * Returns : Nothing
+ * @param   iset    Instruction set (US2066_ISET_STANDARD, US2066_ISET_SPECIAL,
+ *                  US2066_ISET_EXTENDED or US2066_ISET_OLED).
+ * 
  */
 void US2066::selectInstructions( uint8_t iset ) {
     uint8_t fset;
@@ -207,20 +193,20 @@ void US2066::selectInstructions( uint8_t iset ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sends a single byte command to the LCD module.
+ * @brief	Sends a single byte command to the LCD module.
  *
- * Arguments
- * ---------
- *  - cmd : Command to send
+ * @param   cmd     Command to send
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 uint8_t US2066::sendCommand( uint8_t cmd ) {
 
@@ -234,21 +220,21 @@ uint8_t US2066::sendCommand( uint8_t cmd ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Send a two bytes command to the LCD module (cmd + data)
+ * @brief	Send a two bytes command to the LCD module (cmd + data)
  *
- * Arguments
- * ---------
- *  - cmd  : Command to send
- *  - data : Data (single byte)
+ * @param   cmd     Command to send
+ * @param   data    Data (single byte)
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
     Wire.beginTransmission( this->_address );
@@ -264,20 +250,21 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Write custom characters to the LCD CGRAM.
+ * @brief	Write custom characters to the LCD CGRAM.
  *
- * Arguments
- * ---------
- *  - pchrmap  : Pointer to the array containing the characters (8x8 bytes).
+ * @param   pchrmap    Pointer to the array containing the 
+ *                     characters (8x8 bytes).
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
 
@@ -315,16 +302,13 @@ uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the DDRAM address corresponding to the specified row and column.
+ * @brief	Set the DDRAM address corresponding to the specified 
+ *          row and column.
  *
- * Arguments
- * ---------
- *  - row : Row number (0 based)
- *  - col : Column number (0 based)
- *
- * Returns : Nothing
+ * @param   row     Row number (0 based)
+ * @param   col     Column number (0 based)
  */
 void US2066::setPosition( uint8_t row, uint8_t col ) {
     if( this->_init == false ) {
@@ -337,13 +321,10 @@ void US2066::setPosition( uint8_t row, uint8_t col ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Clear the display
+ * 
  */
 void US2066::clear() {
     if( this->_init == false ) {
@@ -354,13 +335,11 @@ void US2066::clear() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Arguments
- * ---------
- *  - contrast : Contrast value (0-255)
- *
- * Returns : Nothing
+ * @brief	Set the display contrast
+ * 
+ * @param   contrast    Contrast value (0-255)
  */
 void US2066::setContrast( uint8_t contrast ) {
     if( this->_init == false ) {
@@ -380,16 +359,12 @@ void US2066::setContrast( uint8_t contrast ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the cursor state of the LCD module.
+ * @brief	Sets the cursor state of the LCD module.
  *
- * Arguments
- * ---------
- *  - underline : Underline cursor ON or OFF.
- *  - blinking  : Blinking cursor (block).
- *
- * Returns : Nothing
+ * @param   underline    Underline cursor ON or OFF.
+ * @param   blinking     Blinking cursor (block).
  */
 void US2066::setCursor( bool underline, bool blinking ) {
     if( this->_init == false ) {
@@ -403,16 +378,12 @@ void US2066::setCursor( bool underline, bool blinking ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Turn the display ON or OFF.
+ * @brief	Turn the display ON or OFF.
  *
- * Arguments
- * ---------
- *  - on      : Turn display On or OFF.
- *  - reverse : Reverse all pixels on the display.
- *
- * Returns : Nothing
+ * @param   on          Turn display On or OFF.
+ * @param   reverse     Reverse all pixels on the display.
  */
 void US2066::setDisplay( bool on, bool reverse ) {
     if( this->_init == false ) {
@@ -427,15 +398,11 @@ void US2066::setDisplay( bool on, bool reverse ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Update the display control register on the LCD. (display ON/OFF, cursor)
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
+ * @brief	Update the display control register on the LCD. 
+ *          (display ON/OFF, cursor)
+ * 
  */
 void US2066::updateDisplayState() {
     uint8_t state = this->_state.blink |
@@ -456,21 +423,21 @@ void US2066::updateDisplayState() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Fills the LCD with the specified number of characters
+ * @brief	Fills the LCD with the specified number of characters
  *
- * Arguments
- * ---------
- *  - c   : Character to print
- *  - num : Number of times to print the character
+ * @param   c       Character to print
+ * @param   num     Number of times to print the character
  *
- * Returns : Status of the transmission
- *   0: Success
- *   1: Data too long to fit in transmit buffer
- *   2: Received NACK on transmit of address
- *   3: Received NACK on transmit of data
- *   4: Other error
+ * @return  Status of the transmission
+ * 
+ * @retval  0   Success
+ * @retval  1   Data too long to fit in transmit buffer
+ * @retval  2   Received NACK on transmit of address
+ * @retval  3   Received NACK on transmit of data
+ * @retval  4   Other error
+ * 
  */
 void US2066::fill( char c, uint8_t num ) {
     if( this->_init == false ) {
@@ -487,16 +454,15 @@ void US2066::fill( char c, uint8_t num ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * IPrint interface callback for printing a single character. Sends the 
- * output to the LCD module at the current coordinates.
+ * @brief	IPrint interface callback for printing a single character. 
+ *          Sends the output to the LCD module at the current coordinates.
  *
- * Arguments
- * ---------
- *  - c : Character to print
+ * @param   c    Character to print
  *
- * Returns : Number of bytes written
+ * @return  Number of bytes written
+ * 
  */
 uint8_t US2066::_print( char c ) {
     if( this->_init == false ) {

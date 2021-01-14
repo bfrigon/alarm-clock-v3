@@ -21,8 +21,11 @@
 
 
 
-
-
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Print the error message of the last command.
+ *
+ */
 void Console::printCommandError() {
 
     switch( this->getTaskError() ) {

@@ -20,13 +20,10 @@
 #include "../config.h"
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Initialize class with UTC as the default timezone
+ * @brief	Initialize class with UTC as the default timezone
  *
- * Arguments
- * ---------
- *  None
  */
 TimeZone::TimeZone() {
     _id = 0;
@@ -36,15 +33,12 @@ TimeZone::TimeZone() {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the current timezone ID
+ * @brief	Sets the current timezone ID
  *
- * Arguments
- * ---------
- *  - zone_id : Timezone index in the timezone table
- *
- * Returns : Nothing
+ * @param   zone_id    Timezone index in the timezone table
+ * 
  */
 bool TimeZone::setTimezoneByID( uint16_t id ) {
 
@@ -61,15 +55,14 @@ bool TimeZone::setTimezoneByID( uint16_t id ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Sets the current timezone by name
+ * @brief	Sets the current timezone by name
  *
- * Arguments
- * ---------
- *  - name : Name of the timezone.
+ * @param   name    Name of the timezone.
  *
- * Returns : TRUE if timezone is found, FALSE otherwise
+ * @return  TRUE if timezone is found, FALSE otherwise
+ * 
  */
 bool TimeZone::setTimezoneByName( char *name ) {
     int16_t id;
@@ -83,16 +76,15 @@ bool TimeZone::setTimezoneByName( char *name ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Find a timezone index in the table from it's name.
+ * @brief	Find a timezone index in the table from it's name.
  *
- * Arguments
- * ---------
- *  - name : Pointer to an array of character containg the name to 
- *           search for
+ * @param   name   Pointer to an array of character containg the name 
+ *                 to search for
  *
- * Returns : The timezone index in the table
+ * @return  The timezone index in the table
+ * 
  */
 int16_t TimeZone::findTimezoneByName( char* name ) {
 
@@ -110,33 +102,29 @@ int16_t TimeZone::findTimezoneByName( char* name ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the current timezone name
+ * @brief	Get the current timezone name
  *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Pointer to the array of character in program memory containing
- *           the name of the timezone.
+ * @return  Pointer to the array of character in program memory containing
+ *          the name of the timezone.
+ * 
  */
 const char* TimeZone::getName() {
     return _tz.name;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the current timezone abbreviation whether it is currently on standard
- * time or daylight saving time.
+ * @brief	Get the current timezone abbreviation whether it is currently 
+ *          on standard time or daylight saving time.
  *
- * Arguments
- * ---------
- *  local : Pointer to a DateTime object containing local time.
+ * @param   local    Pointer to a DateTime object containing local time.
  *
- * Returns : Pointer to the array of character in program memory containing
+ * @return  Pointer to the array of character in program memory containing
  *           the STD or DST abbreviation.
+ * 
  */
 const char* TimeZone::getAbbreviation( DateTime *local ) {
 
@@ -148,15 +136,13 @@ const char* TimeZone::getAbbreviation( DateTime *local ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Convert a DateTime object from UTC to local time for the current timezone
+ * @brief	Convert a DateTime object from UTC to local time for the 
+ *          current timezone
  *
- * Arguments
- * ---------
- *  utc : Pointer to a DateTime object containing UTC time.
- *
- * Returns : Nothing
+ * @param   utc    Pointer to a DateTime object containing UTC time.
+ * 
  */
 void TimeZone::toLocal( DateTime *utc ) {
 
@@ -187,15 +173,13 @@ void TimeZone::toLocal( DateTime *utc ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Convert a DateTime object from local time to UTC for the current timezone
+ * @brief	Convert a DateTime object from local time to UTC for the 
+ *          current timezone
  *
- * Arguments
- * ---------
- *  utc : Pointer to a DateTime object containing local time time.
- *
- * Returns : Nothing
+ * @param   utc    Pointer to a DateTime object containing local time time.
+ * 
  */
 void TimeZone::toUTC( DateTime *local ) {
     DateTime utc;
@@ -218,16 +202,15 @@ void TimeZone::toUTC( DateTime *local ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Determine whether or not the local time is currently in a daylight 
- * saving period
+ * @brief	Determine whether or not the local time is currently 
+ *          in a daylight saving period
  *
- * Arguments
- * ---------
- *  local : Pointer to a DateTime object containing local time.
+ * @param   local    Pointer to a DateTime object containing local time.
  *
- * Returns : TRUE if local time is on daylight saving time, FALSE otherwise
+ * @return  TRUE if local time is on daylight saving time, FALSE otherwise
+ * 
  */
 bool TimeZone::isDST( DateTime *local ) {
 
@@ -252,17 +235,14 @@ bool TimeZone::isDST( DateTime *local ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the specified DateTime object to the DST->STD transition for this
- * timezone
+ * @brief	Set the specified DateTime object to the DST->STD transition 
+ *          for this timezone.
  *
- * Arguments
- * ---------
- *  year : Current year
- *  std  : DateTime object to write the result to
- *
- * Returns : Nothing
+ * @param   year    Current year
+ * @param   std     DateTime object to write the result to
+ * 
  */
 void TimeZone::getStdTransition( int16_t year, DateTime *std ) {
     uint8_t std_day;
@@ -280,17 +260,14 @@ void TimeZone::getStdTransition( int16_t year, DateTime *std ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Set the specified DateTime object to the STD->DST transition for this
- * timezone
+ * @brief	Set the specified DateTime object to the STD->DST transition 
+ *          for this timezone.
  *
- * Arguments
- * ---------
- *  year : Current year
- *  std  : DateTime object to write the result to
- *
- * Returns : Nothing
+ * @param   year    Current year
+ * @param   std     DateTime object to write the result to
+ * 
  */
 void TimeZone::getDstTransition( int16_t year, DateTime *dst ) {
     uint8_t dst_day;
@@ -308,30 +285,24 @@ void TimeZone::getDstTransition( int16_t year, DateTime *dst ) {
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the standard time offset from UTC
+ * @brief	Get the standard time offset from UTC
  *
- * Arguments
- * ---------
- *  - None
- *
- * Returns : Offset in minutes
+ * @return  Offset in minutes
+ * 
  */
 int16_t TimeZone::getStdUtcOffset() {
     return _tz.std_offset;
 }
 
 
-/*--------------------------------------------------------------------------
+/*! ------------------------------------------------------------------------
  *
- * Get the daylight saving time offset from UTC
+ * @brief	Get the daylight saving time offset from UTC
  *
- * Arguments
- * ---------
- *  - None
- *
- * Returns : Offset in minutes
+ * @return  Offset in minutes
+ * 
  */
 int16_t TimeZone::getDstUtcOffset() {
     return _tz.dst_offset;
