@@ -19,6 +19,7 @@
 #include "../../libs/time.h"
 #include "../../libs/timezone.h"
 #include "../../drivers/neoclock.h"
+#include "../../services/ntpclient.h"
 #include "../../ui/ui.h"
 #include "../../config.h"
 
@@ -164,18 +165,44 @@ void Console::runTaskSetDate() {
         case 7:
             if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
 
-                /* Convert local time to UTC */
-                g_timezone.toUTC( &cmd_time_adj );
+                /* Save configuration */
+                g_config.save( EEPROM_SECTION_CLOCK );
+                g_screenUpdate = true;
 
-                /* Update the RTC */
-                g_rtc.writeTime( &cmd_time_adj );
+                if( g_config.clock.use_ntp == true ) {
 
-                /* Update clock display */
-                g_clock.restoreClockDisplay();
+                    /* Enable auto sync and synchronize now */
+                    g_ntp.setAutoSync( true, true );
+
+                    _taskIndex = 8;
+                    break;
+
+                } else {
+
+                    /* Disable auto sync */
+                    g_ntp.setAutoSync( false );
+
+                    /* Convert local time to UTC */
+                    g_timezone.toUTC( &cmd_time_adj );
+
+                    /* Update the RTC */
+                    g_rtc.writeTime( &cmd_time_adj );
+
+                    /* Update the time on the wifi module */
+                    g_wifi.setSystemTime( &cmd_time_adj );
+
+                    /* Request clock display update */
+                    g_clock.requestDisplayUpdate();
+                }
 
                 this->endTask( TASK_SUCCESS );
+                return;
 
             } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+
+                /* Restore configuration */
+                g_config.load( EEPROM_SECTION_CLOCK );
+                g_config.apply( EEPROM_SECTION_CLOCK );
 
                 this->endTask( TASK_SUCCESS );
                 return;
@@ -188,6 +215,17 @@ void Console::runTaskSetDate() {
                 _taskIndex = 6;
             }
             break;
+
+        /* Monitor NTP sync completion */
+        case 8:
+
+            if( g_ntp.isBusy() == false ) {
+
+                this->endTask( g_ntp.getTaskError() );
+                return;
+            }
+
+            _taskIndex = 8;
     }
 
     this->resetInput();
@@ -217,10 +255,12 @@ void Console::printDateTime() {
     this->println();
     
     now = g_rtc.now();
+    uint16_t ms = g_rtc.getMillis();
+
     month = getMonthName( now.month(), true );
     dow = getDayName( now.dow(), true );
 
-    this->printf_P( S_CONSOLE_DATE_FMT_UTC, dow, month, now.day(), now.hour(), now.minute(), now.second(), now.year() );
+    this->printf_P( S_CONSOLE_DATE_FMT_UTC, dow, month, now.day(), now.hour(), now.minute(), now.second(), ms, now.year() );
 
     
     g_timezone.toLocal( &now );
@@ -229,7 +269,7 @@ void Console::printDateTime() {
     month = getMonthName( now.month(), true );
     dow = getDayName( now.dow(), true );
 
-    this->printf_P( S_CONSOLE_DATE_FMT_LOCAL, dow, month, now.day(), now.hour(), now.minute(), now.second(), abbvr, now.year() );
+    this->printf_P( S_CONSOLE_DATE_FMT_LOCAL, dow, month, now.day(), now.hour(), now.minute(), now.second(), ms, abbvr, now.year() );
 }
 
 
@@ -303,7 +343,7 @@ void Console::runTaskSetTimeZone() {
     if( id < 0 )  {
         this->println_P( S_CONSOLE_TIME_INVALID_TZ );
 
-        this->endTask( TASK_FAIL );
+        this->endTask( ERR_TASK_FAIL );
         return;
     }
 
@@ -315,8 +355,8 @@ void Console::runTaskSetTimeZone() {
     this->print_P( S_CONSOLE_TIME_NEW_TZ );
     this->println_P( g_timezone.getName() );
 
-    /* Refresh clock display */
-    g_clock.restoreClockDisplay();
+    /* Request clock display update */
+    g_clock.requestDisplayUpdate();
 
     this->endTask( TASK_SUCCESS );
 }

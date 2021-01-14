@@ -43,7 +43,7 @@ bool netStatus_onDrawScreen( Screen* screen ) {
             g_lcd.setPosition( 0, 0 );
             g_lcd.print_P( S_MENU_NETWORK_IP );
 
-            addr = g_wifimanager.getLocalIP();
+            addr = g_wifi.getLocalIP();
 
             break;
 
@@ -51,7 +51,7 @@ bool netStatus_onDrawScreen( Screen* screen ) {
             g_lcd.setPosition( 0, 0 );
             g_lcd.print_P( S_MENU_NETWORK_GATEWAY );
 
-            addr = g_wifimanager.getGateway();
+            addr = g_wifi.getGateway();
 
             break;
 
@@ -59,7 +59,7 @@ bool netStatus_onDrawScreen( Screen* screen ) {
             g_lcd.setPosition( 0, 0 );
             g_lcd.print_P( S_MENU_NETWORK_MASK );
 
-            addr = g_wifimanager.getSubmask();
+            addr = g_wifi.getSubmask();
 
             break;
 
@@ -67,7 +67,7 @@ bool netStatus_onDrawScreen( Screen* screen ) {
             g_lcd.setPosition( 0, 0 );
             g_lcd.print_P( S_MENU_NETWORK_DNS );
 
-            addr = g_wifimanager.getDNS();
+            addr = g_wifi.getDNS();
 
             break;
 

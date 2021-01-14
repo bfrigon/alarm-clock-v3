@@ -17,8 +17,11 @@
 //******************************************************************************
 #include "rtc.h"
 #include "power.h"
-#include "../libs/time.h"
+#include "neoclock.h"
+#include "wifi/wifi.h"
 
+#include "../libs/time.h"
+#include "../console/console.h"
 
 volatile bool rtc_event = false;
 
@@ -33,7 +36,9 @@ volatile bool rtc_event = false;
  *  - pin_irq : DS3231 interrupt pin
  */
 DS3231::DS3231( int8_t pin_irq ) {
-    this->_pin_irq = pin_irq;
+    _pin_irq = pin_irq;
+    _adjustDelay = -1;
+    _delayStart = 0;
 }
 
 
@@ -64,6 +69,7 @@ void DS3231::begin() {
     this->enableInterrupt();
 
     this->readTime( &_now );
+    this->resetMillis();
 }
 
 
@@ -178,6 +184,19 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
  */
 bool DS3231::processEvents() {
 
+    if( _adjustDelay >= 0 && millis() - _delayStart >= _adjustDelay ) {
+        
+        this->writeTime( &_adjust );
+        _now = _adjust;
+        _adjustDelay = -1;
+
+        /* Request clock display update */
+        g_clock.requestDisplayUpdate();
+
+        /* Update the time on the wifi module */
+        g_wifi.setSystemTime( &_now );
+    }
+
     if( rtc_event == false ) {
         return false;
     }
@@ -250,7 +269,11 @@ void DS3231::readTime( DateTime *dt ) {
     uint8_t  m = bcd2bin( Wire.read() );
     uint16_t y = bcd2bin( Wire.read() ) + 2000;
 
-    dt->set( y, m, d, hh, mm, ss );
+    _now.set( y, m, d, hh, mm, ss );
+
+    if( dt != NULL ) {
+        *dt = _now;
+    }
 }
 
 
@@ -297,6 +320,7 @@ void DS3231::writeTime( DateTime *new_dt ) {
     Wire.endTransmission();
 
     _now = new_dt;
+    this->resetMillis();
 }
 
 
@@ -349,6 +373,58 @@ void DS3231::write( uint8_t reg, uint8_t value ) {
 
 /*--------------------------------------------------------------------------
  *
+ * Reset the milliseconds counter
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Nothing
+ */
+void DS3231::resetMillis() {
+    _secStart = millis();
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Get the number of milliseconds since the beginning of the current second
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : Number of milliseconds elapsed
+ */
+uint16_t DS3231::getMillis() {
+    uint16_t ret;
+    ret = millis() - _secStart;
+
+    return ( ret > 999 ) ? 999 : ret;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Register a delayed clock adjustment
+ *
+ * Arguments
+ * ---------
+ *  - ndt   : DateTime structure containing the new date/time
+ *  - delay : Number of milliseconds to wait before writing the new
+ *            date/time
+ *
+ * Returns : Nothing
+ */
+void DS3231::adjustClock( DateTime *ndt, int16_t delay ) {
+    _delayStart = millis();
+    _adjustDelay = delay;
+    _adjust = ndt;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
  * Interrupt service routine for the alarm event.
  *
  * Arguments
@@ -360,5 +436,6 @@ void DS3231::write( uint8_t reg, uint8_t value ) {
 void isr_ds3231() {
     rtc_event = true;
 
+    g_rtc.resetMillis();
     g_rtc.disableInterrupt();
 }

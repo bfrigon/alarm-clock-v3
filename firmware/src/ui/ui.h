@@ -40,7 +40,8 @@
 #define ID_MAIN_EDIT_DISPLAY        4
 #define ID_MAIN_EDIT_LAMP           5
 #define ID_MAIN_EDIT_NETWORK        6
-#define ID_MAIN_SETTINGS            7
+#define ID_MAIN_TIME_AUTOSYNC       7
+#define ID_MAIN_SETTINGS            8
 
 /* --- Set alarms screen --- */
 #define ID_ALARM_ON_1               10
@@ -379,7 +380,8 @@ PROGMEM const struct ScreenItemBase ITEMS_MAIN_MENU[] = {
     ITEM_LINK( ID_MAIN_EDIT_DISPLAY, 3, 0, S_MAIN_MENU_DISPLAY, &screen_display, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_EDIT_LAMP, 4, 0, S_MAIN_MENU_LAMP, &screen_edit_night_lamp, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_EDIT_NETWORK, 5, 0, S_MAIN_MENU_NETWORK, &screen_network, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_SETTINGS, 6, 0, S_MAIN_MENU_SETTINGS, &screen_menu_settings, ITEM_NORMAL ),
+    ITEM_TOGGLE( ID_MAIN_TIME_AUTOSYNC, 6, 0, S_MAIN_MENU_TIME_AUTOSYNC, &g_config.clock.use_ntp, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_SETTINGS, 7, 0, S_MAIN_MENU_SETTINGS, &screen_menu_settings, ITEM_NORMAL ),
     ITEM_END()
 };
 

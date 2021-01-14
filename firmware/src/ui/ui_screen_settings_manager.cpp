@@ -59,7 +59,7 @@ bool settingsManager_onEnterScreen( Screen* screen ) {
     if( menuSettings_selectedItem == ID_SETTINGS_BACKUP ) {
         g_config.startBackup( CONFIG_BACKUP_FILENAME, false );
 
-        if( g_config.getTaskError() != TASK_SUCCESS && g_config.getTaskError() != TASK_ERROR_FILE_EXISTS ) {
+        if( g_config.getTaskError() != TASK_SUCCESS && g_config.getTaskError() != ERR_CONFIG_FILE_EXISTS ) {
             confirm_action = true;
         }
     }
@@ -99,11 +99,11 @@ bool settingsManager_onDrawScreen( Screen* screen ) {
         g_lcd.clear();
 
         switch( g_config.getCurrentTask() ) {
-            case TASK_RESTORE_CONFIG:
+            case TASK_CONFIG_RESTORE:
                 g_lcd.print_P( S_STATUS_RESTORING, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
                 break;
 
-            case TASK_BACKUP_CONFIG:
+            case TASK_CONFIG_BACKUP:
                 g_lcd.print_P( S_STATUS_SAVING, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
                 break;
 
@@ -111,20 +111,20 @@ bool settingsManager_onDrawScreen( Screen* screen ) {
 
                 /* Print the task result */
                 switch( g_config.getTaskError() ) {
-                    case TASK_ERROR_NO_SDCARD:
+                    case ERR_CONFIG_NO_SDCARD:
                         g_lcd.print_P( S_STATUS_ERROR_NO_SDCARD, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
                         break;
 
-                    case TASK_ERROR_CANT_OPEN:
-                    case TASK_ERROR_WRITE:
+                    case ERR_CONFIG_FILE_CANT_OPEN:
+                    case ERR_CONFIG_FILE_WRITE:
                         g_lcd.print_P( S_STATUS_ERROR_WRITE, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
                         break;
 
-                    case TASK_ERROR_READ:
+                    case ERR_CONFIG_FILE_READ:
                         g_lcd.print_P( S_STATUS_ERROR_READ, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
                         break;
 
-                    case TASK_ERROR_NOT_FOUND:
+                    case ERR_CONFIG_FILE_NOT_FOUND:
                         g_lcd.print_P( S_STATUS_ERROR_NOTFOUND, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
                         break;
 

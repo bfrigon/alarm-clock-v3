@@ -172,32 +172,14 @@ void NeoClock::runTask() {
     
 
     /* If time has changed, update the clock display */
-    if( now.minute() != this->_rtcmin ) {
-        this->_rtcmin = now.minute();
+    if( now != this->_prevDate ) {
+        this->_prevDate = now;
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
             g_screenUpdate = true;
         }
 
-        switch( g_currentScreen->getId() ) {
-            case SCREEN_ID_SET_TIME:
-            case SCREEN_ID_SHOW_ALARMS:
-                /* Don't update clock display on these screens */
-                break;
-
-            case SCREEN_ID_ROOT:
-                g_screenUpdate = true;
-
-            /* Fall-through */
-
-            default:
-                g_timezone.toLocal( &now );
-
-                this->hour = now.hour();
-                this->minute = now.minute();
-
-                g_clockUpdate = true;
-        }
+        this->requestDisplayUpdate();
     }
 
     /* Update the clock display when blinking state changes */
@@ -253,4 +235,45 @@ void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
  */
 void NeoClock::setTestMode( bool testMode ) {
     this->_testMode = testMode;
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Request a clock display update. It only accepts the request when the 
+ * current screen is neither the clock set screen or the alarm display screen
+ *
+ * Arguments
+ * ---------
+ *  None
+ *
+ * Returns : TRUE if the request is accepted, FALSE otherwise
+ */
+bool NeoClock::requestDisplayUpdate() {
+
+    DateTime now = g_rtc.now();
+
+    switch( g_currentScreen->getId() ) {
+        case SCREEN_ID_SET_TIME:
+        case SCREEN_ID_SHOW_ALARMS:
+        
+            /* Don't update clock display on these screens */
+            break;
+
+        case SCREEN_ID_ROOT:
+            g_screenUpdate = true;
+
+        /* Fall-through */
+
+        default:
+            g_timezone.toLocal( &now );
+
+            this->hour = now.hour();
+            this->minute = now.minute();
+
+            g_clockUpdate = true;
+            return true;
+    }
+
+    return false;
 }

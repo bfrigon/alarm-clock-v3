@@ -16,7 +16,7 @@
 //
 //******************************************************************************
 #include "../console.h"
-#include "../../drivers/wifimanager.h"
+#include "../../drivers/wifi/wifi.h"
 #include "../../config.h"
 
 
@@ -33,7 +33,7 @@
  */
 bool Console::startTaskNetRestart() {
 
-     if( g_wifimanager.isBusy() && g_wifimanager.isConnected() ) {
+     if( g_wifi.isBusy() && g_wifi.isConnected() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
         this->println();
         return false;
@@ -43,8 +43,8 @@ bool Console::startTaskNetRestart() {
     this->startTask( TASK_CONSOLE_NET_RESTART, true );
 
     this->printf_P( S_CONSOLE_NET_RECONNECTING, g_config.network.ssid );
-    g_wifimanager.reconnect();
-    g_wifimanager.setAutoReconnect( true );
+    g_wifi.reconnect();
+    g_wifi.setAutoReconnect( true );
 
     return true;
 }
@@ -63,25 +63,25 @@ bool Console::startTaskNetRestart() {
  */
 void Console::runTaskNetRestart() {
 
-    if( g_wifimanager.isBusy() == true ) {
+    if( g_wifi.isBusy() == true ) {
         return;
     }
 
     wl_status_t status;
-    status = g_wifimanager.status();
+    status = g_wifi.status();
 
     switch( status ) {
 
         /* Connection successful */
-        case WL_CONNECTED:
+        case WIFI_STATUS_CONNECTED:
             this->println_P( S_CONSOLE_NET_CONNECTED );
             this->endTask( TASK_SUCCESS );
             break;
 
         /* Connection failure */
-        case WL_DISCONNECTED:
-        case WL_CONNECT_FAILED:
-        case WL_NO_SSID_AVAIL:
+        case WIFI_STATUS_DISCONNECTED:
+        case WIFI_STATUS_CONNECT_FAILED:
+        case WIFI_STATUS_NO_SSID_AVAIL:
             this->printf_P( S_CONSOLE_NET_CONNECT_FAIL, status );
             this->endTask( status );
             break;
@@ -105,7 +105,7 @@ void Console::runTaskNetRestart() {
  *           
  */
 bool Console::startTaskNetStart() {
-    if( g_wifimanager.isConnected() == true ) {
+    if( g_wifi.isConnected() == true ) {
         this->println_P( S_CONSOLE_NET_ALREADY_CONN );
         this->println();
         return false;
@@ -114,8 +114,8 @@ bool Console::startTaskNetStart() {
     this->startTask( TASK_CONSOLE_NET_START, true );
 
     this->printf_P( S_CONSOLE_NET_CONNECTING, g_config.network.ssid );
-    g_wifimanager.connect();
-    g_wifimanager.setAutoReconnect( true );
+    g_wifi.connect();
+    g_wifi.setAutoReconnect( true );
 
     return true;
 }
@@ -133,13 +133,13 @@ bool Console::startTaskNetStart() {
  *           
  */
 bool Console::startTaskNetStop() {
-    if( g_wifimanager.isConnected() == false ) {
+    if( g_wifi.isConnected() == false ) {
         this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
         this->println();
         return false;
     }
 
-    if( g_wifimanager.isBusy() && g_wifimanager.isConnected() ) {
+    if( g_wifi.isBusy() && g_wifi.isConnected() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
         this->println();
         return false;
@@ -147,8 +147,8 @@ bool Console::startTaskNetStop() {
     
     this->startTask( TASK_CONSOLE_NET_STOP, true );
 
-    g_wifimanager.setAutoReconnect( false );
-    g_wifimanager.disconnect();
+    g_wifi.setAutoReconnect( false );
+    g_wifi.disconnect();
 
     return true;
 }
@@ -167,7 +167,7 @@ bool Console::startTaskNetStop() {
  */
 void Console::runTaskNetStop() {
     
-    if( g_wifimanager.isConnected() == false ) {
+    if( g_wifi.isConnected() == false ) {
         this->println_P( S_CONSOLE_NET_DISCONNECTED );
 
         this->endTask( TASK_SUCCESS );
@@ -193,7 +193,7 @@ void Console::printNetStatus() {
     /* Print connection status */
     this->print_P( S_CONSOLE_NET_STATUS );
 
-    if( g_wifimanager.isConnected() == true ) {
+    if( g_wifi.isConnected() == true ) {
         this->println_P( S_CONSOLE_NET_CONNECTED );
     } else {
         this->println_P( S_CONSOLE_NET_DISCONNECTED );
@@ -207,19 +207,19 @@ void Console::printNetStatus() {
     this->println_P( g_config.network.dhcp == true ? S_YES : S_NO );
 
     /* Print local IP address */
-    addr = g_wifimanager.getLocalIP();
+    addr = g_wifi.getLocalIP();
     this->printf_P( S_CONSOLE_NET_IP, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 
     /* Print subnet mask */
-    addr = g_wifimanager.getSubmask();
+    addr = g_wifi.getSubmask();
     this->printf_P( S_CONSOLE_NET_MASK, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 
     /* Print gateway address */
-    addr = g_wifimanager.getGateway();
+    addr = g_wifi.getGateway();
     this->printf_P( S_CONSOLE_NET_GATEWAY, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 
     /* Print DNS server address */
-    addr = g_wifimanager.getDNS();
+    addr = g_wifi.getDNS();
     this->printf_P( S_CONSOLE_NET_DNS, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 }
 
@@ -251,21 +251,26 @@ bool Console::startTaskNslookup() {
         return false;
     }
 
-    if( g_wifimanager.isConnected() == false ) {
-        this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
-        this->println();
-        return false;
-    }
-
-    if( g_wifimanager.isBusy() ) {
+    if( g_wifi.isBusy() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
         this->println();
+
         return false;
     }
 
-    if( g_wifimanager.startHostnameResolve( hostname ) == false ) {
-        this->println_P( S_CONSOLE_NET_INVALID_HOST );
-        this->println();
+    if( g_wifi.startHostnameResolve( hostname ) == false ) {
+        switch( g_wifi.getTaskError() ) {
+            case ERR_WIFI_NOT_CONNECTED:
+                this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
+                this->println();
+                break;
+
+            case ERR_WIFI_INVALID_HOSTNAME:
+                this->println_P( S_CONSOLE_NET_INVALID_HOST );
+                this->println();
+                break;
+        }
+
         return false;
     }
 
@@ -293,7 +298,7 @@ bool Console::startTaskNslookup() {
 void Console::runTaskNsLookup() {
     
     IPAddress result;
-    if( g_wifimanager.getHostnameResolveResults( result )) {
+    if( g_wifi.getHostnameResolveResults( result )) {
 
         if( result != 0 ) {
             result.printTo( Serial );
@@ -335,13 +340,13 @@ bool Console::startTaskPing() {
         return false;
     }
 
-    if( g_wifimanager.isConnected() == false ) {
+    if( g_wifi.isConnected() == false ) {
         this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
         this->println();
         return false;
     }
 
-    if( g_wifimanager.isBusy() ) {
+    if( g_wifi.isBusy() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
         this->println();
         return false;
@@ -353,12 +358,12 @@ bool Console::startTaskPing() {
 
     bool ret;
     if( addr != 0 ) {
-        ret = g_wifimanager.startPing( addr );
+        ret = g_wifi.startPing( addr );
         this->printf_P( S_CONSOLE_NET_PING_IP, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
         this->println();
 
     } else {
-        ret = g_wifimanager.startPing( host );
+        ret = g_wifi.startPing( host );
         this->printf_P( S_CONSOLE_NET_PING_HOSTNAME, host );
         this->println();
     }
@@ -391,7 +396,7 @@ void Console::runTaskPing() {
     IPAddress ip;
     int32_t rtt;
 
-    rtt = g_wifimanager.getPingResult( ip );
+    rtt = g_wifi.getPingResult( ip );
 
     /* Ping is still running */
     if( rtt == 0 ) {
@@ -408,19 +413,19 @@ void Console::runTaskPing() {
     } else {
 
         switch( rtt ) {
-            case WL_PING_DEST_UNREACHABLE:
+            case ERR_WIFI_NETWORK_UNREACHABLE:
                 this->println_P( S_CONSOLE_NET_PING_UNREACH );
                 break;
 
-            case WL_PING_ERROR:
+            case ERR_WIFI_PING_ERROR:
                 this->println_P( S_CONSOLE_NET_PING_ERROR );
                 break;
 
-            case WL_PING_TIMEOUT:
+            case ERR_WIFI_PING_TIMEOUT:
                 this->println_P( S_CONSOLE_NET_PING_TIMEOUT );
                 break;
 
-            case WL_PING_UNKNOWN_HOST:
+            case ERR_WIFI_UNKNOWN_HOSTNAME:
                 this->println_P( S_CONSOLE_NET_PING_UNKNOWN );
                 break;
         }
@@ -453,7 +458,7 @@ bool Console::startTaskNetworkConfig() {
     this->startTask( TASK_CONSOLE_NET_CONFIG );
 
     /* Disable auto-reconnect while entering settings */
-    g_wifimanager.setAutoReconnect( false );
+    g_wifi.setAutoReconnect( false );
 
     return true;
 }
@@ -489,12 +494,15 @@ void Console::runTaskNetworkConfig() {
         /* Display network SSID prompt */
         case 0:
             this->printf_P( S_CONSOLE_NET_CFG_SSID, g_config.network.ssid );
+
+            _inputBufferLimit = MAX_SSID_LENGTH;
             break;
 
         /* Validate network SSID input */
         case 1:
             if( _inputlength > 0 ) {
                 strncpy( g_config.network.ssid, _inputbuffer, MAX_SSID_LENGTH );
+                g_config.network.ssid[ MAX_SSID_LENGTH ] = '\0';
             }
             break;
 
@@ -502,6 +510,7 @@ void Console::runTaskNetworkConfig() {
         case 2:
             this->print_P( S_CONSOLE_NET_CFG_KEY );
 
+            _inputBufferLimit = MAX_WKEY_LENGTH;
             _inputHidden = true;
             break;
 
@@ -509,14 +518,14 @@ void Console::runTaskNetworkConfig() {
         case 3:
             if( _inputlength > 0 ) {
                 strncpy( g_config.network.wkey, _inputbuffer, MAX_WKEY_LENGTH );
+                g_config.network.wkey[ MAX_WKEY_LENGTH ] = '\0';
             }
-
-            _inputHidden = false;
             break;
 
         /* Display use DHCP prompt */
         case 4:
             _inputBufferLimit = 1;
+            _inputHidden = false;
 
             this->printf_P( S_CONSOLE_NET_CFG_DHCP, (g_config.network.dhcp == true ? "Y" : "N" ));
             break;
@@ -619,10 +628,18 @@ void Console::runTaskNetworkConfig() {
             this->printf_P( S_CONSOLE_NET_CFG_DNS, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
             break;
 
-        /* Validate local ip address prompt */
+        /* Validate DNS address prompt */
         case 13:
             if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
                 IPADDRESS_TO_ARRAY( addr, g_config.network.dns );
+
+                /* Skip hostname since dhcp is not used */
+                _taskIndex = 16;
+
+            } else if( _inputlength == 0 ) {
+
+                /* Skip hostname since dhcp is not used */
+                _taskIndex = 16;
                 
             } else if( _inputlength > 0 ) {
                 this->println_P( S_CONSOLE_INVALID_INPUT_IP );
@@ -632,10 +649,43 @@ void Console::runTaskNetworkConfig() {
                 _taskIndex = 12;
 
             }
-            break;   
+            break;
+
+        /* Display hostname prompt */
+        case 14:
+            _inputBufferLimit = MAX_HOSTNAME_LENGTH;
+
+            addr = g_config.network.gateway;
+            this->printf_P( S_CONSOLE_NET_CFG_HOSTNAME, g_config.network.hostname );
+            break;
+
+        /* Validate hostname prompt */
+        case 15:
+            if( _inputlength > 0 ) {
+                strncpy( g_config.network.hostname, _inputbuffer, MAX_HOSTNAME_LENGTH );
+                g_config.network.hostname[ MAX_HOSTNAME_LENGTH ] = '\0';
+            }
+            break;     
+
+        /* Display ntp server prompt */
+        case 16:
+            _inputBufferLimit = MAX_NTPSERVER_LENGTH;
+
+            addr = g_config.network.gateway;
+            this->printf_P( S_CONSOLE_NET_CFG_NTPSERVER, g_config.network.ntpserver );
+            break;
+
+        /* Validate hostname prompt */
+        case 17:
+            if( _inputlength > 0 ) {
+                strncpy( g_config.network.ntpserver, _inputbuffer, MAX_NTPSERVER_LENGTH );
+                g_config.network.ntpserver[ MAX_NTPSERVER_LENGTH ] = '\0';
+            }
+            break;  
+
 
         /* Display apply settings prompt */
-        case 14:
+        case 18:
             _inputBufferLimit = 1;
 
             this->println();
@@ -643,15 +693,13 @@ void Console::runTaskNetworkConfig() {
             break;
 
         /* Validate apply settings answer */
-        case 15:
+        case 19:
 
             if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
 
                 /* Save and apply the new network configuration */
                 g_config.save( EEPROM_SECTION_NETWORK );
                 g_config.apply( EEPROM_SECTION_NETWORK );
-
-                g_wifimanager.setAutoReconnect( true );
 
             } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
                 g_config.load( EEPROM_SECTION_NETWORK );
@@ -660,7 +708,7 @@ void Console::runTaskNetworkConfig() {
                 this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
 
                 /* try again */
-                _taskIndex = 14;
+                _taskIndex = 18;
             }
             break;
             
@@ -669,11 +717,11 @@ void Console::runTaskNetworkConfig() {
     this->resetInput();    
 
     
-    if (_taskIndex > 15 ) {
+    if (_taskIndex > 19 ) {
         this->endTask( TASK_SUCCESS );
 
-        if( g_wifimanager.isConnected() == true ) {
-            g_wifimanager.setAutoReconnect( true );
+        if( g_wifi.isConnected() == true ) {
+            g_wifi.setAutoReconnect( true );
         }
     }
 }

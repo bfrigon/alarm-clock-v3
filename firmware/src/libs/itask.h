@@ -20,10 +20,12 @@
 
 #include <Arduino.h>
 
-#define TASK_NONE     0
-#define TASK_SUCCESS  0
-#define TASK_FAIL     -1
-#define TASK_TIMEOUT  255
+#define TASK_NONE       0
+
+
+#define TASK_SUCCESS      0
+#define ERR_TASK_FAIL     (-1)
+#define ERR_TASK_TIMEOUT  (-2)
 
 
 class ITask {

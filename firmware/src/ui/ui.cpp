@@ -16,7 +16,7 @@
 //
 //******************************************************************************
 #include "ui.h"
-
+#include "../services/ntpclient.h"
 
 
 bool g_clockUpdate = true;
@@ -91,6 +91,8 @@ Screen screen_net_status( SCREEN_ID_NET_STATUS, NULL,
  * Returns :
  */
 void initScreens() {
+
+    screen_main_menu.setConfirmChanges( true );
 
     screen_alarm.setCbDrawScreen( &alarmScreen_onDrawScreen );
     screen_alarm.setCbKeypress( &alarmScreen_onKeypress );
@@ -588,6 +590,17 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
 
     switch( currentScreen->getId() ) {
 
+        case SCREEN_ID_MAIN_MENU:
+
+            if( save == true ) {
+                g_config.save( EEPROM_SECTION_CLOCK );
+                g_config.apply( EEPROM_SECTION_CLOCK );
+                
+            } else {
+                g_config.load( EEPROM_SECTION_CLOCK );
+            }
+            break;
+
         case SCREEN_ID_SET_TIME:
 
             if( save == true ) {
@@ -598,11 +611,19 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
                 DateTime nDate( (uint16_t)adjDate.year + 2000, adjDate.month, adjDate.day,
                                 adjTime.hour, adjTime.minute, 0 );
 
+                /* Disable ntp auto-sync when setting the time manually */
+                g_config.clock.use_ntp = false;
+                g_ntp.setAutoSync( false );
+                g_config.save( EEPROM_SECTION_CLOCK );
+
                 /* Convert local time to UTC */
                 g_timezone.toUTC( &nDate );
 
                 /* Update the RTC */
                 g_rtc.writeTime( &nDate );
+
+                /* Update the time on the wifi module */
+                g_wifi.setSystemTime( &nDate );
             }
 
             g_clock.restoreClockDisplay();

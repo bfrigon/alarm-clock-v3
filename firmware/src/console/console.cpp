@@ -16,7 +16,8 @@
 //
 //******************************************************************************
 #include "console.h"
-
+#include "../hardware.h"
+#include "../services/ntpclient.h"
 
 /*--------------------------------------------------------------------------
  *
@@ -65,10 +66,9 @@ void Console::begin( unsigned long baud ) {
     Serial.begin( baud );
     while (!Serial);
     
-
     this->println();
-    this->println_P( S_CONSOLE_WELCOME_1 );
-    this->println_P( S_CONSOLE_WELCOME_2 );
+    this->println_P( S_CONSOLE_WELCOME );
+    this->println();
     this->println();
 
     this->resetInput();
@@ -403,6 +403,10 @@ void Console::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_FACTORY_RESET, false ) == true ) {
         started = this->startTaskFactoryReset();
 
+    /* 'factory reset' command */
+    } else if( this->matchCommandName( S_COMMAND_NTPSYNC, false ) == true ) {
+        started = this->startTaskNtpSync();
+
     /* No command entered, display the prompt again */
     } else if( strlen( _inputbuffer ) == 0 ) {
         started = false;
@@ -500,10 +504,19 @@ void Console::runTask() {
             case TASK_CONSOLE_FACTORY_RESET:
                 this->runTaskFactoryReset();
                 break;
+
+            case TASK_CONSOLE_NTP_SYNC:
+                this->runTaskNtpSync();
+                break;
         }
 
         /* If task is done, displays the prompt and reset input buffer */
         if( this->getCurrentTask() == TASK_NONE ) {
+
+
+            if( this->getTaskError() != TASK_SUCCESS ) {
+                this->printCommandError();
+            }
             
             this->println();
             this->displayPrompt();

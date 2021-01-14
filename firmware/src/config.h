@@ -18,6 +18,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <SdFat.h>
@@ -39,6 +40,7 @@
 
 #define CONFIG_BACKUP_FILENAME          "config.txt"
 
+
 /* Limits */
 #define MAX_LENGTH_SETTING_NAME         32
 #define MAX_LENGTH_SETTING_VALUE        96
@@ -47,6 +49,7 @@
 #define MAX_LENGTH_ALARM_MESSAGE        16
 #define MAX_SSID_LENGTH                 32
 #define MAX_HOSTNAME_LENGTH             64
+#define MAX_NTPSERVER_LENGTH            64
 #define MAX_WKEY_LENGTH                 63
 #define MIN_CLOCK_BRIGHTNESS            10
 #define MAX_CLOCK_BRIGHTNESS            80
@@ -68,6 +71,7 @@
 #define MAX_ALARM_VISUAL_EFFECT_SPEED   10
 #define MAX_TZ_NAME_LENGTH              40
 
+
 /* EEPROM addresses */
 #define EEPROM_ADDR_MAGIC               0
 #define EEPROM_ADDR_FIRMWARE_VER        4
@@ -75,33 +79,38 @@
 #define EEPROM_ADDR_NETWORK_CONFIG      EEPROM_ADDR_CLOCK_CONFIG + ( sizeof( ClockSettings ) )
 #define EEPROM_ADDR_PROFILES            EEPROM_ADDR_NETWORK_CONFIG + ( sizeof( NetworkSettings ) )
 
+
 /* EEPROM settings sections */
 #define EEPROM_SECTION_CLOCK            0x01
 #define EEPROM_SECTION_NETWORK          0x02
 #define EEPROM_SECTION_ALL              EEPROM_SECTION_CLOCK | EEPROM_SECTION_NETWORK
 
+
 /* Settings type */
-#define SETTING_TYPE_UNKNOWN        0
-#define SETTING_TYPE_BOOL           1
-#define SETTING_TYPE_STRING         2
-#define SETTING_TYPE_SECTION        3
-#define SETTING_TYPE_INTEGER        4
-#define SETTING_TYPE_IP             5
-#define SETTING_TYPE_COMMENT        6
-#define SETTING_TYPE_TIME           7
-#define SETTING_TYPE_DOW            8
-#define SETTING_TYPE_SHORT          9
-#define SETTING_TYPE_TIMEZONE       10
+enum {
+    SETTING_TYPE_UNKNOWN = 0,
+    SETTING_TYPE_BOOL,
+    SETTING_TYPE_STRING,
+    SETTING_TYPE_SECTION,
+    SETTING_TYPE_INTEGER,
+    SETTING_TYPE_IP,
+    SETTING_TYPE_COMMENT,
+    SETTING_TYPE_TIME,
+    SETTING_TYPE_DOW,
+    SETTING_TYPE_SHORT,
+    SETTING_TYPE_TIMEZONE,
+};
 
-/* Settings names */
-#define SETTING_VALUE_FALSE         "off"
-#define SETTING_VALUE_TRUE          "on"
 
-PROG_STR( COMMENT_FILE_HEADER,
-          "; -----------------------\r\n"
-          "; Alarm clock V3 settings\r\n"
-          "; -----------------------\r\n" );
+#define SETTING_VALUE_FALSE                 "off"
+#define SETTING_VALUE_TRUE                  "on"
 
+
+PROG_STR( COMMENT_FILE_HEADER,              "; -----------------------\r\n"
+                                            "; Alarm clock V3 settings\r\n"
+                                            "; -----------------------\r\n" );
+
+/* Settings labels */
 PROG_STR( SETTING_NAME_SECTION_CLOCK,       "clock" );
 PROG_STR( SETTING_NAME_SECTION_ALS,         "als" );
 PROG_STR( SETTING_NAME_SECTION_LCD,         "lcd" );
@@ -132,6 +141,7 @@ PROG_STR( SETTING_NAME_GATEWAY,             "gateway" );
 PROG_STR( SETTING_NAME_DNS,                 "dns" );
 PROG_STR( SETTING_NAME_SSID,                "ssid" );
 PROG_STR( SETTING_NAME_HOSTNAME,            "hostname" );
+PROG_STR( SETTING_NAME_NTPSERVER,           "ntpserver" );
 PROG_STR( SETTING_NAME_WKEY,                "passphrase" );
 PROG_STR( SETTING_NAME_ENABLED,             "enabled" );
 PROG_STR( SETTING_NAME_SNOOZE,              "snooze" );
@@ -140,80 +150,101 @@ PROG_STR( SETTING_NAME_LAMP_MODE,           "lamp-mode" );
 PROG_STR( SETTING_NAME_LAMP_SPEED,          "lamp-speed" );
 PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 
+
 /* Settings ID's */
-#define SETTING_ID_CLOCK_24H                1   /* Begin clock section */
-#define SETTING_ID_CLOCK_COLOR              2
-#define SETTING_ID_CLOCK_BRIGHTNESS         3
-#define SETTING_ID_CLOCK_NTP                4
-#define SETTING_ID_TIMEZONE                 5
-#define SETTING_ID_ALS_PRESET               6   /* Begin ALS section */
-#define SETTING_ID_LCD_DATEFMT              7   /* Begin LCD section */
-#define SETTING_ID_LCD_CONTRAST             8
-#define SETTING_ID_LAMP_COLOR               9
-#define SETTING_ID_LAMP_BRIGHTNESS          10
-#define SETTING_ID_LAMP_DELAY               11
-#define SETTING_ID_NETWORK_DHCP             12  /* Begin network section */
-#define SETTING_ID_NETWORK_IP               13
-#define SETTING_ID_NETWORK_MASK             14
-#define SETTING_ID_NETWORK_GATEWAY          15
-#define SETTING_ID_NETWORK_DNS              16
-#define SETTING_ID_NETWORK_SSID             17
-#define SETTING_ID_NETWORK_HOSTNAME         18
-#define SETTING_ID_NETWORK_WKEY             19
+enum {
 
-#define SETTING_ID_ALARM_BEGIN              20  /* Begin alarm section */
-#define SETTING_ID_ALARM_ENABLED            20
-#define SETTING_ID_ALARM_FILENAME           21
-#define SETTING_ID_ALARM_TIME               22
-#define SETTING_ID_ALARM_SNOOZE             23
-#define SETTING_ID_ALARM_VOLUME             24
-#define SETTING_ID_ALARM_GRADUAL            25
-#define SETTING_ID_ALARM_DOW                26
-#define SETTING_ID_ALARM_MESSAGE            27
-#define SETTING_ID_ALARM_VISUAL             28
-#define SETTING_ID_ALARM_VISUAL_SPEED       29
-#define SETTING_ID_ALARM_LAMP_MODE          30
-#define SETTING_ID_ALARM_LAMP_SPEED         31
-#define SETTING_ID_ALARM_LAMP_COLOR         32
-#define SETTING_ID_ALARM_LAMP_BRIGHTNESS    33
+    /* Clock section */
+    SETTING_ID_CLOCK_24H = 1,
+    SETTING_ID_CLOCK_COLOR,
+    SETTING_ID_CLOCK_BRIGHTNESS,
+    SETTING_ID_CLOCK_NTP,
+    SETTING_ID_TIMEZONE,
 
-#define SETTING_ID_END                      33
+    /* ALS section */
+    SETTING_ID_ALS_PRESET, 
+    SETTING_ID_LCD_DATEFMT,
 
-/* Section ID's */
-#define SECTION_ID_UNKNOWN                  0
-#define SECTION_ID_ANY                      0
-#define SECTION_ID_CLOCK                    1
-#define SECTION_ID_ALS                      2
-#define SECTION_ID_LCD                      3
-#define SECTION_ID_LAMP                     4
-#define SECTION_ID_NETWORK                  5
-#define SECTION_ID_ALARM                    6
+    /* Begin LCD section */
+    SETTING_ID_LCD_CONTRAST,
+    SETTING_ID_LAMP_COLOR,
+    SETTING_ID_LAMP_BRIGHTNESS,
+    SETTING_ID_LAMP_DELAY,
 
-/* Setting parser token types */
-#define TOKEN_NAME                          0
-#define TOKEN_VALUE                         1
-#define TOKEN_WHITESPACE                    2
-#define TOKEN_COMMENT                       3
-#define TOKEN_LIST                          4
+    /* Network section */
+    SETTING_ID_NETWORK_DHCP,
+    SETTING_ID_NETWORK_IP,
+    SETTING_ID_NETWORK_MASK,
+    SETTING_ID_NETWORK_GATEWAY,
+    SETTING_ID_NETWORK_DNS,
+    SETTING_ID_NETWORK_SSID,
+    SETTING_ID_NETWORK_HOSTNAME,
+    SETTING_ID_NETWORK_WKEY,
+    SETTING_ID_NETWORK_NTPSERVER,
 
-/* Tasks */
-#define TASK_BACKUP_CONFIG                  1
-#define TASK_RESTORE_CONFIG                 2
+    /* Alarm section */
+    SETTING_ID_ALARM_ENABLED,
+    SETTING_ID_ALARM_FILENAME,
+    SETTING_ID_ALARM_TIME,
+    SETTING_ID_ALARM_SNOOZE,
+    SETTING_ID_ALARM_VOLUME,
+    SETTING_ID_ALARM_GRADUAL,
+    SETTING_ID_ALARM_DOW,
+    SETTING_ID_ALARM_MESSAGE,
+    SETTING_ID_ALARM_VISUAL,
+    SETTING_ID_ALARM_VISUAL_SPEED,
+    SETTING_ID_ALARM_LAMP_MODE,
+    SETTING_ID_ALARM_LAMP_SPEED,
+    SETTING_ID_ALARM_LAMP_COLOR,
+    SETTING_ID_ALARM_LAMP_BRIGHTNESS
+};
 
-/* Task error status */
-#define TASK_ERROR_NO_SDCARD                1
-#define TASK_ERROR_WRITE                    2
-#define TASK_ERROR_NOT_FOUND                3
-#define TASK_ERROR_READ                     4
-#define TASK_ERROR_CANT_OPEN                5
-#define TASK_ERROR_FILE_EXISTS              6
+#define SETTING_ID_ALARM_BEGIN              SETTING_ID_ALARM_ENABLED  
+#define SETTING_ID_END                      SETTING_ID_ALARM_LAMP_BRIGHTNESS
 
 
-//**************************************************************************
-//
-// Structure containing settings */
-//
-//**************************************************************************
+/* Settings file section ID's */
+enum {
+    SECTION_ID_UNKNOWN = 0,
+    SECTION_ID_ANY = 0,
+    SECTION_ID_CLOCK,
+    SECTION_ID_ALS,
+    SECTION_ID_LCD,
+    SECTION_ID_LAMP,
+    SECTION_ID_NETWORK,
+    SECTION_ID_ALARM,
+};
+
+
+/* Settings parser token types */
+enum {
+    TOKEN_NAME = 0,
+    TOKEN_VALUE,
+    TOKEN_WHITESPACE,
+    TOKEN_COMMENT,
+    TOKEN_LIST,
+};
+
+
+/* Tasks ID's */
+enum {
+    TASK_CONFIG_BACKUP = 1,
+    TASK_CONFIG_RESTORE
+};
+
+
+/* Task errors */
+enum {
+    ERR_CONFIG_NO_SDCARD = (-40),
+    ERR_CONFIG_FILE_WRITE,
+    ERR_CONFIG_FILE_NOT_FOUND,
+    ERR_CONFIG_FILE_READ,
+    ERR_CONFIG_FILE_CANT_OPEN,
+    ERR_CONFIG_FILE_EXISTS,
+};
+
+
+/* Night lamp settings */
 struct NightLampSettings {
     uint8_t color;
     uint8_t brightness;
@@ -222,6 +253,8 @@ struct NightLampSettings {
     uint8_t mode;
 };
 
+
+/* Alarm profile settings */
 struct AlarmProfile {
     char filename[ MAX_LENGTH_ALARM_FILENAME + 1 ];
     char message[ MAX_LENGTH_ALARM_MESSAGE + 1 ];
@@ -235,6 +268,8 @@ struct AlarmProfile {
     struct NightLampSettings lamp;
 };
 
+
+/* Clock settings */
 struct ClockSettings {
     bool use_ntp = false;
     char timezone[ MAX_TZ_NAME_LENGTH + 1];
@@ -250,6 +285,8 @@ struct ClockSettings {
     struct NightLampSettings lamp;
 };
 
+
+/* Network settings */
 struct NetworkSettings {
     bool dhcp = true;
     uint8_t ip[4] = { 0, 0, 0, 0 };
@@ -260,12 +297,13 @@ struct NetworkSettings {
     char ssid[ MAX_SSID_LENGTH + 1 ];
     char wkey[ MAX_WKEY_LENGTH + 1 ];
     char hostname[ MAX_HOSTNAME_LENGTH + 1 ];
+    char ntpserver[ MAX_NTPSERVER_LENGTH + 1];
 };
 
 
 //**************************************************************************
 //
-// Configuration manager class
+// Configuration manager
 //
 //**************************************************************************
 class ConfigManager : public ITask {

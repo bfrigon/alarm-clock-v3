@@ -19,11 +19,12 @@
 #include "src/console/console.h"
 #include "src/ui/ui.h"
 #include "src/config.h"
+#include "src/services/ntpclient.h"
 
 
 Alarm g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
                PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
-WiFiManager g_wifimanager( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
+WiFi g_wifi( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
 NeoClock g_clock( PIN_NEOCLOCK, PIN_PIX_SHDN );
 Lamp g_lamp( PIN_PIX_LAMP );
 QT1070 g_keypad( PIN_INT_KEYPAD );
@@ -35,6 +36,9 @@ BQ27441 g_battery;
 ConfigManager g_config;
 Console g_console;
 TimeZone g_timezone;
+NtpClient g_ntp;
+
+
 
 
 
@@ -158,8 +162,12 @@ void setup() {
     g_power.enableWatchdog();
 
     /* Initialize WIFI driver */
-    g_wifimanager.begin();
+    g_wifi.begin();
+    g_wifi.setSystemTime( g_rtc.now() );
+
     
+    g_ntp.setAutoSync( g_config.clock.use_ntp );
+
     g_console.enableInput();
 }
 
@@ -212,8 +220,11 @@ void loop() {
     g_als.runTask();
 
     /* Process WIFI driver events */
-    g_wifimanager.runTask();
+    g_wifi.runTask();
 
     /* Process serial console inputs */
     g_console.runTask();
+
+    /* Run NTP client tasks */
+    g_ntp.runTask();
 }

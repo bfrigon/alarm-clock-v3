@@ -101,10 +101,14 @@ class DS3231 {
     void disableInterrupt();
     void clearAlarmFlag();
     bool processEvents();
-    void readTime( DateTime *dt );
+    void readTime( DateTime *dt = NULL );
     unsigned long getEpoch();
     void writeTime( DateTime *ndt );
     void dumpRegs();
+    uint16_t getMillis();
+    void resetMillis();
+
+    void adjustClock( DateTime *ndt, int16_t delay );
 
     DateTime* now()     { return &this->_now; }
 
@@ -115,7 +119,11 @@ class DS3231 {
     bool _init = false;
     int8_t _pin_irq;
 
-    struct DateTime _now;
+    unsigned long _secStart;
+    unsigned long _delayStart;
+    DateTime _now;
+    DateTime _adjust;
+    int16_t _adjustDelay;
 };
 
 void isr_ds3231();

@@ -22,7 +22,9 @@
 #include <avr/pgmspace.h>
 
 #include "../libs/itask.h"
+#include "../libs/time.h"
 #include "neopixel.h"
+
 
 
 
@@ -70,6 +72,7 @@ class NeoClock : public NeoPixel {
     void update();
     void setTestMode( bool testMode );
     void restoreClockDisplay();
+    bool requestDisplayUpdate();
     void runTask();
     
 
@@ -78,7 +81,7 @@ class NeoClock : public NeoPixel {
     uint32_t _flashTimerStart = 0;
     bool _flashState = false;
     bool _testMode = false;
-    int8_t _rtcmin = -1;
+    DateTime _prevDate;
 
     void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
 

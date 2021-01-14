@@ -242,6 +242,10 @@ bool DateTime::operator>=( const DateTime &right ) const {
  */
 void DateTime::offset( long offset ) {
 
+    if( offset == 0 ) {
+        return;
+    }
+
     int8_t ss = this->_ss;
     int8_t mm = this->_mm;
     int8_t hh = this->_hh;
@@ -340,19 +344,27 @@ uint8_t DateTime::dow() {
  * Returns : The unix time.
  */
 unsigned long DateTime::getEpoch() {
-    uint16_t days = this->_d - 1;
 
-    if( this->_y > 0 ) {
-        days += ( this->_y * 365 ) + ( ( this->_y - 1 ) / 4 ) + 1;
-    }
+    unsigned long days;
+    
+    /* Number of days since 1970 */
+    days = (( this->_y - 1970 ) * 365 );        
 
+    /* Add number of leap years since 1972 */
+    days += (( this->_y - 1972 ) / 4 );         
+    days += ( this->_y % 4 ) ? 1 : 0;           
+
+    /* Add number of days since the begining of the current year 
+       until the start of the current month */
     uint8_t i;
-
     for( i = 1; i <= this->_m - 1; i++ ) {
         days += getMonthNumDays( i, this->_y );
     }
 
-    return EPOCH_Y2K_OFFSET + ( days * 86400L ) + ( this->_hh * 3600L ) + ( this->_mm * 60L ) + this->_ss;
+    /* Add number of days in the current month */
+    days += ( this->_d - 1 );                   
+
+    return ( days * 86400L ) + ( this->_hh * 3600L ) + ( this->_mm * 60L ) + this->_ss;
 }
 
 

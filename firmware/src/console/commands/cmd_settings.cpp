@@ -17,43 +17,7 @@
 //******************************************************************************
 #include "../console.h"
 #include "../../config.h"
-
-
-/*--------------------------------------------------------------------------
- *
- * Print the error returned by the config backup or config restore tasks
- *
- * Arguments
- * ---------
- *  None
- *
- * Returns : Nothing
- *           
- */
-void Console::showTaskConfigError() {
-
-    this->println();
-
-    switch( g_config.getTaskError() ) {
-
-        case TASK_ERROR_NO_SDCARD:
-            this->println_P( S_STATUS_ERROR_NO_SDCARD );
-            break;
-
-        case TASK_ERROR_CANT_OPEN:
-        case TASK_ERROR_WRITE:
-            this->println_P( S_STATUS_ERROR_WRITE );
-            break;
-
-        case TASK_ERROR_READ:
-            this->println_P( S_STATUS_ERROR_READ );
-            break;
-
-        case TASK_ERROR_NOT_FOUND:
-            this->println_P( S_STATUS_ERROR_NOTFOUND );
-            break;
-    }
-}
+#include "../../drivers/power.h"
 
 
 /*--------------------------------------------------------------------------
@@ -133,7 +97,7 @@ void Console::runTaskConfigBackup() {
             /* Start the backup task */
             if( g_config.startBackup( _inputbuffer, false ) == false ) {
 
-                if( g_config.getTaskError() == TASK_ERROR_FILE_EXISTS ) {
+                if( g_config.getTaskError() == ERR_CONFIG_FILE_EXISTS ) {
 
                     /* Move filename to an unused area of the input buffer */
                     memmove( _inputbuffer + 4, _inputbuffer, strlen( _inputbuffer ) + 1 );
@@ -143,7 +107,6 @@ void Console::runTaskConfigBackup() {
                     
                 } else {
 
-                    this->showTaskConfigError();
                     this->endTask( g_config.getTaskError() );
                     return;
                 }
@@ -205,7 +168,6 @@ void Console::runTaskConfigBackup() {
                     this->endTask( TASK_SUCCESS );
 
                 } else {
-                    this->showTaskConfigError();
                     this->endTask( g_config.getTaskError() );
                 }
             }
@@ -311,7 +273,6 @@ void Console::runTaskConfigRestore() {
                 /* Start the restore task */
                 if( g_config.startRestore( _inputbuffer + 4 ) == false ) {
 
-                    this->showTaskConfigError();
                     this->endTask( g_config.getTaskError() );
                     return;
                 }
@@ -347,7 +308,7 @@ void Console::runTaskConfigRestore() {
                     this->endTask( TASK_SUCCESS );
 
                 } else {
-                    this->showTaskConfigError();
+                    
                     this->endTask( g_config.getTaskError() );
                 }
             }

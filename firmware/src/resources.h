@@ -20,8 +20,6 @@
 
 #include <avr/pgmspace.h>
 
-#define FW_VERSION      "2021.1"
-
 
 //--------------------------------------------------------------------------
 //
@@ -73,6 +71,7 @@ const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 //--------------------------------------------------------------------------
 PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
+PROG_STR( S_DEFAULT_NTPSERVER,          "pool.ntp.org" );
 
 /* Date/time formatting */
 PROG_STR( S_DATETIME_DHM,               "%dd, %dh. %d min." );
@@ -123,6 +122,7 @@ PROG_STR( S_MAIN_MENU_NETWORK,          "Network" );
 PROG_STR( S_MAIN_MENU_LAMP,             "Night lamp" );
 PROG_STR( S_MAIN_MENU_PROFILES,         "Profiles" );
 PROG_STR( S_MAIN_MENU_SETTINGS,         "Settings" );
+PROG_STR( S_MAIN_MENU_TIME_AUTOSYNC,    "NTP Sync" );
 
 /* Network menu srings */
 PROG_STR( S_MENU_NETWORK_DHCP,          "DHCP" );
@@ -196,6 +196,7 @@ PROG_STR( S_STATUS_ERROR_NOTFOUND,      "File not found!" );
 PROG_STR( S_STATUS_ERROR_READ,          "Read error!" );
 PROG_STR( S_STATUS_ERROR_UNKNOWN,       "Unknown error!" );
 
+
 /* Battery status screen */
 PROG_STR( S_BATT_VOLTAGE,               "%d.%03d V" );
 PROG_STR( S_BATT_CAPACITY,              "%d mAh (%d%%)" );
@@ -214,8 +215,10 @@ PROG_STR( S_BATT_NO_POWER,              "Pwr: n/a" );
 PROG_STR( S_NETINFO_IP,                 "%d.%d.%d.%d" );
 PROG_STR( S_SSID,                       "SSID" );
 
-PROG_STR( S_CONSOLE_WELCOME_1,          "Alarm clock V3 (firmware " FW_VERSION ")" );
-PROG_STR( S_CONSOLE_WELCOME_2,          "www.bfrigon.com");
+PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw date: " __DATE__ ")\r\n" \
+                                        "https://github.com/bfrigon/alarm-clock-v3\r\n"
+                                        "\r\n"
+                                        "Type 'help' for a list of commands\r\n" );
 
 PROG_STR( S_CONSOLE_INIT,               "Initializing..." );
 PROG_STR( S_CONSOLE_BUSY,               "Console is busy running another task!" );
@@ -225,6 +228,7 @@ PROG_STR( S_CONSOLE_USAGE,              "Usage : " );
 PROG_STR( S_CONSOLE_APPLY,              "Apply settings? " );
 PROG_STR( S_CONSOLE_DONE,               "Done!" );
 PROG_STR( S_CONSOLE_CONTINUE,           "Do you want to continue? " );
+PROG_STR( S_CONSOLE_UNKNOWN_ERROR,      "Unknown error! (%d)" );
 PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid input! Enter 'Y' or 'N'" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
@@ -263,6 +267,8 @@ PROG_STR( S_CONSOLE_NET_CFG_IP,         "Local IP address (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_SUBNET,     "Subnet mask (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_GATEWAY,    "Gateway address (%d.%d.%d.%d): " );
 PROG_STR( S_CONSOLE_NET_CFG_DNS,        "DNS (%d.%d.%d.%d): " );
+PROG_STR( S_CONSOLE_NET_CFG_HOSTNAME,   "Hostname (%s): " );
+PROG_STR( S_CONSOLE_NET_CFG_NTPSERVER,  "NTP server address (%s): " );
 PROG_STR( S_CONSOLE_NET_CFG_APPLY,      "Apply network settings? " );
 
 PROG_STR( S_CONSOLE_TIME_SET_INSTR,     "Set date/time\r\nLeave the field empty to keep existing settings.");
@@ -279,8 +285,8 @@ PROG_STR( S_CONSOLE_INVALID_TIME_FMT,   "Invalid time! (expects HH:MM)" );
 
 
 
-PROG_STR( S_CONSOLE_DATE_FMT_UTC,       "%S %S %d %02d:%02d:%02d UTC %d\r\n" );
-PROG_STR( S_CONSOLE_DATE_FMT_LOCAL,     "%S %S %d %02d:%02d:%02d %S %d\r\n" );
+PROG_STR( S_CONSOLE_DATE_FMT_UTC,       "%S %S %d %02d:%02d:%02d.%03d UTC %d\r\n" );
+PROG_STR( S_CONSOLE_DATE_FMT_LOCAL,     "%S %S %d %02d:%02d:%02d.%03d %S %d\r\n" );
 PROG_STR( S_CONSOLE_TZ_IS_DST,          "Currently on daylight saving time: %S\r\n");
 PROG_STR( S_CONSOLE_TZ_NO_DST,          "Daylight saving time not observed\r\n");
 PROG_STR( S_CONSOLE_TZ_EQUAL_UTC,       "Local time is the same as UTC/GMT\r\n");
@@ -301,8 +307,16 @@ PROG_STR( S_CONSOLE_CFG_FILE_EXISTS,    "File '%s' already exists. Do you want t
 PROG_STR( S_CONSOLE_CFG_RESTORE_MSG,    "WARNING! This will overwrite all current settings.");
 PROG_STR( S_CONSOLE_CFG_RESET_MSG,      "WARNING! This will revert all settings to their default values. ");
 
-
-
+PROG_STR( S_CONSOLE_NTP_SEND_FAIL,      "NTP packet send fail!");
+PROG_STR( S_CONSOLE_NTP_INVALID_RESP,   "Invalid response from NTP server!");
+PROG_STR( S_CONSOLE_NTP_NO_RESP,        "No response from NTP server!");
+PROG_STR( S_CONSOLE_NTP_BIND_FAIL,      "Socket bind fail!");
+PROG_STR( S_CONSOLE_NTP_UNKNOWN_HOST,   "The NTP server address '%s' could not be resolved!" );
+PROG_STR( S_CONSOLE_NTP_LAST_SYNC,      "Clock last synchronized on : " );
+PROG_STR( S_CONSOLE_NTP_SYNC_WITH,      "Synchronize with %s");
+PROG_STR( S_CONSOLE_NTP_SENDING,        "Sending request (%d.%d.%d.%d)...");
+PROG_STR( S_CONSOLE_NTP_ADJUST,         "Adjust clock %c%ld.%03ld seconds");
+PROG_STR( S_CONSOLE_NTP_AUTOSYNC_ON,    "Clock auto syncronize is ON");
 
 //--------------------------------------------------------------------------
 //

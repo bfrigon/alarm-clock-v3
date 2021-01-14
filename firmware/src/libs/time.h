@@ -24,7 +24,8 @@
 
 
 
-#define EPOCH_Y2K_OFFSET            946684800
+#define EPOCH_NTP_OFFSET            2208988800
+
 
 #define DATE_FORMAT_DDMMYYYY        0
 #define DATE_FORMAT_MMDDYYYY        1

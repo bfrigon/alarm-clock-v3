@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/drivers/WiFiManager.h
+// File    : src/drivers/wifi/wifi.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,19 +15,57 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef WiFiManager_H
-#define WiFiManager_H
+#ifndef WIFI_H
+#define WIFI_H
 
 #include <Arduino.h>
-#include <WiFi101.h>
-#include "../libs/itask.h"
+#include <IPAddress.h>
+#include <winc1500api.h>
+#include "wifisocket.h"
+
+#include "../../libs/itask.h"
+#include "../../libs/time.h"
 
 
-#define TASK_WIFIMANAGER_CONNECT        1
-#define TASK_WIFIMANAGER_RECONNECT      2
-#define TASK_WIFIMANAGER_RESOLVE        3
-#define TASK_WIFIMANAGER_PING           4
-#define TASK_WIFIMANAGER_PING_HOSTNAME  5
+extern "C" {
+	#include "driver/include/m2m_wifi.h"
+  #include "bsp/include/nm_bsp.h"
+  #include "bsp/include/nm_bsp_arduino.h"
+  #include "driver/include/m2m_periph.h"
+  #include "driver/include/m2m_ssl.h"
+  #include "driver/include/m2m_wifi.h"
+}
+
+enum {
+    TASK_WIFI_CONNECT = 1,
+    TASK_WIFI_RECONNECT,
+    TASK_WIFI_RESOLVE,
+    TASK_WIFI_PING,
+    TASK_WIFI_PING_HOSTNAME,
+};
+
+/* Task errors */
+enum {
+    ERR_WIFI_BUSY = (-15),
+    ERR_WIFI_NOT_CONNECTED,
+    ERR_WIFI_INVALID_HOSTNAME,
+    ERR_WIFI_UNKNOWN_HOSTNAME,
+    ERR_WIFI_NETWORK_UNREACHABLE,
+    ERR_WIFI_PING_TIMEOUT,
+    ERR_WIFI_PING_ERROR,
+};
+
+/* WiFi module status */
+typedef enum {
+    WIFI_STATUS_IDLE = 0,
+    WIFI_STATUS_NO_SSID_AVAIL,
+    WIFI_STATUS_SCAN_COMPLETED,
+    WIFI_STATUS_CONNECTED,
+    WIFI_STATUS_CONNECT_FAILED,
+    WIFI_STATUS_CONNECTION_LOST,
+    WIFI_STATUS_DISCONNECTED,
+} wl_status_t;
+
 
 #define WIFI_RECONNECT_DELAY            15000   
 #define WIFI_RESOLVE_TIMEOUT            5000
@@ -40,10 +78,17 @@ static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp );
 static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg );
 static void wifimanager_ping_cb( uint32 u32IPAddr, uint32 u32RTT, uint8 u8ErrorCode );
 
-class WiFiManager : public ITask {
+
+
+//**************************************************************************
+//
+// Winc1500 WiFi driver
+//
+//**************************************************************************
+class WiFi : public ITask {
   public:
     
-    WiFiManager( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en );
+    WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en );
 
     void begin();
     void end();
@@ -71,6 +116,8 @@ class WiFiManager : public ITask {
     bool startPing( IPAddress host );
     int32_t getPingResult( IPAddress &dest );
 
+    bool setSystemTime( DateTime *ndt );
+
   private:
     int init();
     void getConnectionInfo();
@@ -92,6 +139,6 @@ class WiFiManager : public ITask {
     unsigned long _lastConnectAttempt;
 };
 
-extern WiFiManager g_wifimanager;
+extern WiFi g_wifi;
 
-#endif /* WiFiManager_H */
+#endif /* WIFI_H */

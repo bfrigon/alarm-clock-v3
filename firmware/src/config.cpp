@@ -21,6 +21,7 @@
 #include "screen.h"
 #include "drivers/lamp.h"
 #include "drivers/neoclock.h"
+#include "services/ntpclient.h"
 
 
 
@@ -126,11 +127,15 @@ void ConfigManager::apply( uint8_t section ) {
 
         g_timezone.setTimezoneByName( g_config.clock.timezone );
 
-        g_clock.restoreClockDisplay();
+        g_clock.requestDisplayUpdate();
+
+        g_ntp.setAutoSync( g_config.clock.use_ntp );
+
+        g_screenUpdate = true;
     }
 
     if( section & EEPROM_SECTION_NETWORK ) {
-        g_wifimanager.reconnect();
+        g_wifi.reconnect();
     }
 }
 
@@ -153,8 +158,9 @@ void ConfigManager::reset() {
     this->clock.lamp.color = COLOR_WHITE;
     this->clock.use_ntp = true;
 
-    strcpy_P(&this->clock.timezone[0], TZ_ETC_UTC );
-    strcpy_P(&this->network.hostname[0], S_DEFAULT_HOSTNAME );
+    strcpy_P( this->clock.timezone, TZ_ETC_UTC );
+    strcpy_P( this->network.hostname, S_DEFAULT_HOSTNAME );
+    strcpy_P( this->network.ntpserver, S_DEFAULT_NTPSERVER );
 
 
     /* Store default config */
@@ -241,14 +247,14 @@ void ConfigManager::runTask() {
 
     switch( this->getCurrentTask() ) {
 
-        case TASK_BACKUP_CONFIG:
+        case TASK_CONFIG_BACKUP:
             if( this->writeNextLine() == false ) {
                 this->endBackup();
             }
 
             break;
 
-        case TASK_RESTORE_CONFIG:
+        case TASK_CONFIG_RESTORE:
             if( this->readNextLine() == false ) {
                 this->endRestore();
             }
@@ -278,12 +284,12 @@ void ConfigManager::runTask() {
 bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
 
     /* Checks if another task is already running. */
-    if( this->startTask( TASK_BACKUP_CONFIG ) != TASK_BACKUP_CONFIG ) {
+    if( this->startTask( TASK_CONFIG_BACKUP ) != TASK_CONFIG_BACKUP ) {
         return false;
     }
 
     if( g_alarm.isSDCardPresent() == false ) {
-        this->endBackup( TASK_ERROR_NO_SDCARD );
+        this->endBackup( ERR_CONFIG_NO_SDCARD );
         return false;
     }
 
@@ -296,12 +302,12 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
     }
 
     if( _sd_file.openCwd() == false ) {
-        this->endBackup( TASK_ERROR_CANT_OPEN );
+        this->endBackup( ERR_CONFIG_FILE_CANT_OPEN );
         return false;
     }
 
     if( overwrite == false && this->_sd_file.exists( filename ) == true ) {
-        this->endBackup( TASK_ERROR_FILE_EXISTS );
+        this->endBackup( ERR_CONFIG_FILE_EXISTS );
         return false;
     }
 
@@ -311,7 +317,7 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
     flags = O_CREAT | O_WRITE | ( overwrite == true ? O_TRUNC : O_EXCL );
 
     if( this->_sd_file.open( filename, flags ) == false ) {
-        this->endBackup( TASK_ERROR_CANT_OPEN );
+        this->endBackup( ERR_CONFIG_FILE_CANT_OPEN );
         return false;
     }
 
@@ -354,12 +360,12 @@ void ConfigManager::endBackup( int error ) {
  * Returns : TRUE if successfuly started or FALSE otherwise.
  */
 bool ConfigManager::startRestore( const char *filename) {
-    if( this->startTask( TASK_RESTORE_CONFIG ) != TASK_RESTORE_CONFIG ) {
+    if( this->startTask( TASK_CONFIG_RESTORE ) != TASK_CONFIG_RESTORE ) {
         return false;
     }
 
     if( g_alarm.isSDCardPresent() == false ) {
-        this->endBackup( TASK_ERROR_NO_SDCARD );
+        this->endBackup( ERR_CONFIG_NO_SDCARD );
         return false;
     }
 
@@ -368,7 +374,7 @@ bool ConfigManager::startRestore( const char *filename) {
     this->_currentAlarmID = -1;
 
     if( this->_sd_file.open( filename, O_READ ) == false ) {
-        this->endBackup( TASK_ERROR_NOT_FOUND );
+        this->endBackup( ERR_CONFIG_FILE_NOT_FOUND );
         return false;
     }
 
@@ -430,7 +436,7 @@ bool ConfigManager::readNextLine() {
 
     if( this->_sd_file.getError() != 0 ) {
 
-        this->setTaskError( TASK_ERROR_READ );
+        this->setTaskError( ERR_CONFIG_FILE_READ );
         return false;
     }
 
@@ -542,6 +548,9 @@ bool ConfigManager::readNextLine() {
 
     } else if( this->matchSettingName( name, SETTING_NAME_HOSTNAME, SECTION_ID_NETWORK ) == true ) {
         this->parseSettingValue( value, &this->network.hostname, SETTING_TYPE_STRING, 0, MAX_HOSTNAME_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_NTPSERVER, SECTION_ID_NETWORK ) == true ) {
+        this->parseSettingValue( value, &this->network.ntpserver, SETTING_TYPE_STRING, 0, MAX_NTPSERVER_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_SSID, SECTION_ID_NETWORK ) == true ) {
         this->parseSettingValue( value, &this->network.ssid, SETTING_TYPE_STRING, 0, MAX_SSID_LENGTH );
@@ -936,6 +945,10 @@ bool ConfigManager::writeNextLine()  {
             this->writeConfigLine( SETTING_NAME_HOSTNAME, SETTING_TYPE_STRING, &this->network.hostname );
             break;
 
+        case SETTING_ID_NETWORK_NTPSERVER:
+            this->writeConfigLine( SETTING_NAME_NTPSERVER, SETTING_TYPE_STRING, &this->network.ntpserver );
+            break;
+
         case SETTING_ID_NETWORK_SSID:
             this->writeConfigLine( SETTING_NAME_SSID, SETTING_TYPE_STRING, &this->network.ssid );
             break;
@@ -1005,7 +1018,7 @@ bool ConfigManager::writeNextLine()  {
     this->_sd_file.sync();
 
     if( this->_sd_file.getError() != 0 ) {
-        this->setTaskError( TASK_ERROR_WRITE );
+        this->setTaskError( ERR_CONFIG_FILE_WRITE );
         return false;
     }
 
@@ -1034,8 +1047,8 @@ bool ConfigManager::writeNextLine()  {
  * Arguments
  * ---------
  *  - name  : Name of the setting.
- *  - type  : Type of setting
- *  -
+ *  - type  : Type of setting to convert.
+ *  - value : Settings value to convert.
  *
  * Returns : Nothing.
  */

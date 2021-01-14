@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/drivers/WiFiManager.cpp
+// File    : src/drivers/wifi.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // Credit  : This file contains large portions of code from the WiFi101
@@ -20,16 +20,11 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "WiFiManager.h"
-#include "../hardware.h"
-#include "../config.h"
-#include "../ui/ui.h"
-#include "utility/WiFiSocket.h"
 
-extern "C" {
-    #include "bsp/include/nm_bsp_arduino.h"
-    #include "driver/include/m2m_ssl.h"
-}
+#include "wifi.h"
+#include "../../hardware.h"
+#include "../../config.h"
+#include "../../ui/ui.h"
 
 
 /*--------------------------------------------------------------------------
@@ -43,7 +38,7 @@ extern "C" {
  *  - pin_dreq  : Module reset pin.
  *  - pin_reset : Module enable pin.
  */
-WiFiManager::WiFiManager( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
+WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
 
 	gi8Winc1501CsPin = pin_cs;
 	gi8Winc1501IntnPin = pin_irq;
@@ -62,7 +57,7 @@ WiFiManager::WiFiManager( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t 
  *
  * Returns : Nothing
  */
-void WiFiManager::begin() {
+void WiFi::begin() {
     if( _init == false ) {
 		init();
 	}
@@ -81,12 +76,12 @@ void WiFiManager::begin() {
  *
  * Returns : Nothing
  */
-void WiFiManager::end() {
+void WiFi::end() {
     if( _init == false ) {
 		return;
 	}
 
-    _status = WL_IDLE_STATUS;
+    _status = WIFI_STATUS_IDLE;
     _init = false;        
 
     
@@ -113,7 +108,7 @@ void WiFiManager::end() {
  *
  * Returns : Nothing
  */
-int WiFiManager::init() {
+int WiFi::init() {
     
     tstrWifiInitParam param;
 	int8_t ret;
@@ -134,9 +129,10 @@ int WiFiManager::init() {
 
     /* Register socket callback routines */
 	registerSocketCallback( wifimanager_socket_cb, wifimanager_resolve_cb );
+    
 
 	_init = true;
-	_status = WL_IDLE_STATUS;
+	_status = WIFI_STATUS_IDLE;
 	_localip = 0;
 	_submask = 0;
 	_gateway = 0;
@@ -156,6 +152,7 @@ int WiFiManager::init() {
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA256 );
 	}
 
+
     return ret;
 }
 
@@ -170,25 +167,25 @@ int WiFiManager::init() {
  *
  * Returns : WL_IDLE_STATUS if successful or error otherwise.
  */
-wl_status_t WiFiManager::reconnect() {
+wl_status_t WiFi::reconnect() {
 
 	if( _init == false ) {
 		init();
 	}
 
-    if( _status == WL_CONNECTED ) {
+    if( _status == WIFI_STATUS_CONNECTED ) {
         if( this->getCurrentTask() != TASK_NONE ) {
-            this->endTask( WL_DISCONNECTED );
+            this->endTask( WIFI_STATUS_DISCONNECTED );
         }
         
-        this->startTask( TASK_WIFIMANAGER_RECONNECT );
+        this->startTask( TASK_WIFI_RECONNECT );
 
         /* Sends disconnect request */
         this->disconnect();
 
         /* Status remains IDLE until a disconnect event is 
            received. Then, runTask will send a connect request. */
-        return WL_IDLE_STATUS;
+        return WIFI_STATUS_IDLE;
 
     } else {
 
@@ -210,7 +207,7 @@ wl_status_t WiFiManager::reconnect() {
  *
  * Returns : Nothing
  */
-void WiFiManager::setAutoReconnect( bool autoReconnect ) {
+void WiFi::setAutoReconnect( bool autoReconnect ) {
     _autoReconnect = autoReconnect;
 }
 
@@ -225,7 +222,7 @@ void WiFiManager::setAutoReconnect( bool autoReconnect ) {
  *
  * Returns : WL_IDLE_STATUS if successful or error otherwise.
  */
-wl_status_t WiFiManager::connect() {
+wl_status_t WiFi::connect() {
 
     tstrM2MIPConfig conf;
 
@@ -234,16 +231,16 @@ wl_status_t WiFiManager::connect() {
 	}
     
     /* Connection already established */
-    if( _status == WL_CONNECTED ) {
-        return WL_CONNECTED;
+    if( _status == WIFI_STATUS_CONNECTED ) {
+        return WIFI_STATUS_CONNECTED;
     }
 
     if( this->getCurrentTask() != TASK_NONE ) {
-        this->endTask( WL_DISCONNECTED );
+        this->endTask( WIFI_STATUS_DISCONNECTED );
     }
 
     /* Starts a task to monitor connection progress */
-    this->startTask( TASK_WIFIMANAGER_CONNECT );
+    this->startTask( TASK_WIFI_CONNECT );
 
     /* Reset the last connection attempt timer */
     _lastConnectAttempt = millis();
@@ -281,7 +278,7 @@ wl_status_t WiFiManager::connect() {
 
     /* Start connection to the WiFi network */
     if( m2m_wifi_connect( (char*)ssid, strlen(ssid), M2M_WIFI_SEC_WPA_PSK, (void*)pvAuthInfo, M2M_WIFI_CH_ALL) < 0 ) {
-		_status = WL_CONNECT_FAILED;
+		_status = WIFI_STATUS_CONNECT_FAILED;
 
         this->endTask( _status );
 		return _status;
@@ -294,7 +291,7 @@ wl_status_t WiFiManager::connect() {
 
     /* Status remains idle until DHCP response has been received or a connection 
        is established if the address is static */
-    _status = WL_IDLE_STATUS;
+    _status = WIFI_STATUS_IDLE;
 
     return _status;
 }
@@ -310,19 +307,19 @@ wl_status_t WiFiManager::connect() {
  *
  * Returns : Nothing
  */
-void WiFiManager::disconnect() {
+void WiFi::disconnect() {
 
     if( _init == false ) {
 		return;
 	}
 
-    if( _status != WL_CONNECTED ) {
+    if( _status != WIFI_STATUS_CONNECTED ) {
         return;
     }
 
     /* Close sockets to clean state */
 	for( int i = 0; i < MAX_SOCKET; i++ ) {
-		WiFiSocket.close( i );
+		g_wifisocket.close( i );
 	}
 
 	m2m_wifi_disconnect();
@@ -340,7 +337,7 @@ void WiFiManager::disconnect() {
  *
  * Returns : Local IP address 
  */
-uint32_t WiFiManager::getLocalIP() 
+uint32_t WiFi::getLocalIP() 
 {
     return this->_localip;
 }
@@ -357,7 +354,7 @@ uint32_t WiFiManager::getLocalIP()
  *
  * Returns : Gateway address 
  */
-uint32_t WiFiManager::getGateway()
+uint32_t WiFi::getGateway()
 {
     return this->_gateway;
 }
@@ -374,7 +371,7 @@ uint32_t WiFiManager::getGateway()
  *
  * Returns : Subnet mask
  */
-uint32_t WiFiManager::getSubmask()
+uint32_t WiFi::getSubmask()
 {
     return this->_submask;
 }
@@ -391,7 +388,7 @@ uint32_t WiFiManager::getSubmask()
  *
  * Returns : DNS address 
  */
-uint32_t WiFiManager::getDNS()
+uint32_t WiFi::getDNS()
 {
     return this->_dns;
 }
@@ -408,27 +405,26 @@ uint32_t WiFiManager::getDNS()
  *
  * Returns : Nothing
  */
-void WiFiManager::handleEvent(uint8_t u8MsgType, void *pvMsg)
+void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
 {
     switch( u8MsgType ) {
-		case M2M_WIFI_RESP_CON_STATE_CHANGED: 
-        {
+		case M2M_WIFI_RESP_CON_STATE_CHANGED: {
 
             tstrM2mWifiStateChanged *pstrWifiState = (tstrM2mWifiStateChanged *)pvMsg;
 			if( pstrWifiState->u8CurrState == M2M_WIFI_CONNECTED ) {
 
                 if( _dhcp == false ) {
-                    _status = WL_CONNECTED;
+                    _status = WIFI_STATUS_CONNECTED;
                 }
 
 
             } else {
 
-                if( this->getCurrentTask() == TASK_WIFIMANAGER_CONNECT ) {
-                    this->endTask( WL_DISCONNECTED );
+                if( this->getCurrentTask() == TASK_WIFI_CONNECT ) {
+                    this->endTask( WIFI_STATUS_DISCONNECTED );
                 }
 
-                _status = WL_DISCONNECTED;
+                _status = WIFI_STATUS_DISCONNECTED;
 
                 if ( _dhcp == true ) {
                     _localip = 0;
@@ -438,25 +434,47 @@ void WiFiManager::handleEvent(uint8_t u8MsgType, void *pvMsg)
                 }
                 
                 for (int i = 0; i < MAX_SOCKET; i++) {
-                    WiFiSocket.close(i);
+                    g_wifisocket.close(i);
                 }
             }
         }
         break;
 
-        case M2M_WIFI_REQ_DHCP_CONF: 
-        {
+        case M2M_WIFI_REQ_DHCP_CONF: {
             tstrM2MIPConfig *pstrIPCfg = (tstrM2MIPConfig *)pvMsg;
             _localip = pstrIPCfg->u32StaticIP;
             _submask = pstrIPCfg->u32SubnetMask;
             _gateway = pstrIPCfg->u32Gateway;
             _dns = pstrIPCfg->u32DNS;
             
-            _status = WL_CONNECTED;
+            _status = WIFI_STATUS_CONNECTED;
 
             
         }
         break;
+
+
+        // case M2M_WIFI_RESP_GET_SYS_TIME: {
+
+            
+        //     tstrSystemTime *dt = (tstrSystemTime *)pvMsg; 
+
+        //     Serial.print( "WiFi module time : ");
+        //     Serial.print( dt->u16Year );
+        //     Serial.print( "-");
+        //     Serial.print( dt->u8Month );
+        //     Serial.print( "-");
+        //     Serial.print( dt->u8Day );
+        //     Serial.print( " ");
+        //     Serial.print( dt->u8Hour );
+        //     Serial.print( ":");
+        //     Serial.print( dt->u8Minute );
+        //     Serial.print( ":");
+        //     Serial.print( dt->u8Second );
+        //     Serial.println();
+
+        // }
+        // break;
 
     	default:
 		break;
@@ -475,18 +493,18 @@ void WiFiManager::handleEvent(uint8_t u8MsgType, void *pvMsg)
  *
  * Returns : Nothing
  */
-void WiFiManager::handleResolve( uint8 *hostName, uint32_t hostIp )
+void WiFi::handleResolve( uint8 *hostName, uint32_t hostIp )
 {
     _resolve = hostIp;  
 
-    if( this->getCurrentTask() == TASK_WIFIMANAGER_RESOLVE ) {
+    if( this->getCurrentTask() == TASK_WIFI_RESOLVE ) {
         this->endTask( TASK_SUCCESS );
     }
 
-    if( this->getCurrentTask() == TASK_WIFIMANAGER_PING_HOSTNAME ) {
+    if( this->getCurrentTask() == TASK_WIFI_PING_HOSTNAME ) {
 
         if( _resolve == 0 ) {
-            _rtt = WL_PING_UNKNOWN_HOST;
+            _rtt = ERR_WIFI_UNKNOWN_HOSTNAME;
             this->endTask( _rtt );
         } else {
 
@@ -510,7 +528,8 @@ void WiFiManager::handleResolve( uint8 *hostName, uint32_t hostIp )
  *
  * Returns : Nothing
  */
-void WiFiManager::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
+void WiFi::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
+
 
 	if( error == PING_ERR_SUCCESS ) {
 
@@ -521,20 +540,20 @@ void WiFiManager::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
 		} else {
 
 			/* Another network device replied to the our ICMP request */
-			_rtt = (int32_t) WL_PING_DEST_UNREACHABLE;
+			_rtt = (int32_t) ERR_WIFI_NETWORK_UNREACHABLE;
 		}
 
 	} else if( error == PING_ERR_DEST_UNREACH ) {
-		_rtt = (uint32_t) WL_PING_DEST_UNREACHABLE;
+		_rtt = (uint32_t) ERR_WIFI_NETWORK_UNREACHABLE;
 
 	} else if( error == PING_ERR_TIMEOUT ) {
-		_rtt = (uint32_t) WL_PING_TIMEOUT;
+		_rtt = (uint32_t) ERR_WIFI_PING_TIMEOUT;
 
 	} else {
-		_rtt = (uint32_t) WL_PING_ERROR;
+		_rtt = (uint32_t) ERR_WIFI_PING_ERROR;
 	}
 
-    if( this->getCurrentTask() == TASK_WIFIMANAGER_PING ) {
+    if( this->getCurrentTask() == TASK_WIFI_PING ) {
         this->endTask(( _rtt > 0 ) ? TASK_SUCCESS : _rtt );
     }
 }
@@ -550,7 +569,7 @@ void WiFiManager::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
  *
  * Returns : Nothing
  */
-void WiFiManager::onPowerStateChange( uint8_t state ) {
+void WiFi::onPowerStateChange( uint8_t state ) {
 
     if( _init == false ) {
 		init();
@@ -577,8 +596,8 @@ void WiFiManager::onPowerStateChange( uint8_t state ) {
  *           has been received.
  *           
  */
-bool WiFiManager::isConnected() {
-    return ( _status == WL_CONNECTED );
+bool WiFi::isConnected() {
+    return ( _status == WIFI_STATUS_CONNECTED );
 }
 
 
@@ -593,7 +612,7 @@ bool WiFiManager::isConnected() {
  * Returns : Connection status or error
  *           
  */
-wl_status_t WiFiManager::status() {
+wl_status_t WiFi::status() {
     return _status;
 }
 
@@ -610,22 +629,29 @@ wl_status_t WiFiManager::status() {
  *           or an invalid hostname is provided
  *           
  */
-bool WiFiManager::startHostnameResolve( const char *hostname ) {
+bool WiFi::startHostnameResolve( const char *hostname ) {
     if( _init == false ) {
 		return false;
 	}
 
-    if( this->isBusy() || this->_status != WL_CONNECTED ) {
+    if( this->startTask( TASK_WIFI_RESOLVE ) != TASK_WIFI_RESOLVE ) {
+        
+        return false;
+    }
+
+    if( this->_status != WIFI_STATUS_CONNECTED ) {
+
+        this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
 
     _resolve = 0;
 
     if( gethostbyname( (uint8 *)hostname ) != SOCK_ERR_NO_ERROR ) {
+
+        this->endTask( ERR_WIFI_INVALID_HOSTNAME );
         return false;
     }
-
-    this->startTask( TASK_WIFIMANAGER_RESOLVE );
 
     return true;
 }
@@ -642,12 +668,12 @@ bool WiFiManager::startHostnameResolve( const char *hostname ) {
  * Returns : TRUE if successful, FALSE if a resolve request is still running
  *           
  */
-bool WiFiManager::getHostnameResolveResults( IPAddress &result ) {
+bool WiFi::getHostnameResolveResults( IPAddress &result ) {
     if( _init == false ) {
 		return false;
 	}
 
-    if( this->getCurrentTask() == TASK_WIFIMANAGER_RESOLVE ) {
+    if( this->getCurrentTask() == TASK_WIFI_RESOLVE ) {
         return false;
     }
 
@@ -670,19 +696,22 @@ bool WiFiManager::getHostnameResolveResults( IPAddress &result ) {
  *           or an invalid hostname is provided
  *           
  */
-bool WiFiManager::startPing( const char* hostname ) {
+bool WiFi::startPing( const char* hostname ) {
     if( _init == false ) {
 		return false;
 	}
 
-    if( this->isBusy() || this->_status != WL_CONNECTED ) {
+    if( this->startTask( TASK_WIFI_PING_HOSTNAME ) != TASK_WIFI_PING_HOSTNAME ) {
+        return false;
+    }
+
+    if( this->_status != WIFI_STATUS_CONNECTED ) {
+        this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
 
     _resolve = 0;
     _rtt = 0;
-
-    startTask( TASK_WIFIMANAGER_PING_HOSTNAME );
 
     if( gethostbyname( (uint8 *)hostname ) != SOCK_ERR_NO_ERROR ) {
         return false;
@@ -704,12 +733,17 @@ bool WiFiManager::startPing( const char* hostname ) {
  *           or an invalid hostname is provided
  *           
  */
-bool WiFiManager::startPing( IPAddress host ) {
+bool WiFi::startPing( IPAddress host ) {
     if( _init == false ) {
 		return false;
 	}
 
-    if( this->isBusy() || this->_status != WL_CONNECTED ) {
+    if( this->startTask( TASK_WIFI_PING ) != TASK_WIFI_PING ) {
+        return false;
+    }
+
+    if( this->_status != WIFI_STATUS_CONNECTED ) {
+        this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
 
@@ -719,8 +753,6 @@ bool WiFiManager::startPing( IPAddress host ) {
     if( m2m_ping_req( (uint32_t)host, 128, &wifimanager_ping_cb ) < 0 ) {
         return false;
     }
-
-    startTask( TASK_WIFIMANAGER_PING );
 
     return true;
 }
@@ -738,13 +770,13 @@ bool WiFiManager::startPing( IPAddress host ) {
  *           occured or round trip time is ping was successful.
  *           
  */
-int32_t WiFiManager::getPingResult( IPAddress &dest ) {
+int32_t WiFi::getPingResult( IPAddress &dest ) {
     if( _init == false ) {
 		return 0;
 	}
 
     /* Request is still running */
-    if( this->getCurrentTask() == TASK_WIFIMANAGER_PING ) {
+    if( this->getCurrentTask() == TASK_WIFI_PING ) {
         return 0;
     }
 
@@ -769,7 +801,7 @@ int32_t WiFiManager::getPingResult( IPAddress &dest ) {
  * Returns : Nothing
  * 
  */
-void WiFiManager::runTask() {
+void WiFi::runTask() {
 
     if ( _init == false ) {
 		return;
@@ -787,59 +819,60 @@ void WiFiManager::runTask() {
     /* Process running tasks */
     switch( this->getCurrentTask() ) {
 
+
         /* Current task : connecting to WIFI network */
-        case TASK_WIFIMANAGER_CONNECT:
+        case TASK_WIFI_CONNECT:
         {
 
             switch( _status ) {
-                case WL_DISCONNECTED:
-                case WL_CONNECT_FAILED:
-                case WL_NO_SSID_AVAIL:
+                case WIFI_STATUS_DISCONNECTED:
+                case WIFI_STATUS_CONNECT_FAILED:
+                case WIFI_STATUS_NO_SSID_AVAIL:
                     this->endTask( _status );
                     break;
 
-                case WL_CONNECTED:
-                    this->endTask( WL_CONNECTED );
+                case WIFI_STATUS_CONNECTED:
+                    this->endTask( WIFI_STATUS_CONNECTED );
                     break;
             }
         }
         break;
 
         /* Current task : Reconnect to WiFi */
-        case TASK_WIFIMANAGER_RECONNECT:
+        case TASK_WIFI_RECONNECT:
         {
 
-            if( _status == WL_DISCONNECTED ) {
+            if( _status == WIFI_STATUS_DISCONNECTED ) {
                 this->endTask( TASK_SUCCESS );
 
-                /* Disconnected event, now start the connection again */
+                /* Got disconnected status, now try to reconnect */
                 this->connect();
             }
         }
         break;
 
         /* Current task : DNS resolve */
-        case TASK_WIFIMANAGER_RESOLVE:
+        case TASK_WIFI_RESOLVE:
         {
 
             if( this->getTaskRunningTime() > WIFI_RESOLVE_TIMEOUT ) {
 
-                this->endTask( TASK_TIMEOUT );
+                this->endTask( ERR_TASK_TIMEOUT );
                 _resolve = 0;
             }
         }
         break;
 
         /* Current task : Ping */
-        case TASK_WIFIMANAGER_PING_HOSTNAME:
-        case TASK_WIFIMANAGER_PING:
+        case TASK_WIFI_PING_HOSTNAME:
+        case TASK_WIFI_PING:
         {
 
             if( this->getTaskRunningTime() > WIFI_PING_TIMEOUT ) {
 
-                this->endTask( TASK_TIMEOUT );
+                this->endTask( ERR_TASK_TIMEOUT );
                 _resolve = 0;
-                _rtt = WL_PING_TIMEOUT;
+                _rtt = ERR_WIFI_PING_TIMEOUT;
             }
         }
         break;
@@ -850,7 +883,7 @@ void WiFiManager::runTask() {
         {
 
             /* Attempt to reconnect WIFI if connection was lost */
-            if( _autoReconnect == true && _status != WL_CONNECTED && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_DELAY )) {
+            if( _autoReconnect == true && _status != WIFI_STATUS_CONNECTED && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_DELAY )) {
 
                 /* Do not reconnect WIFI if clock is running on battery */
                 if( g_power.getPowerMode() == POWER_MODE_NORMAL ) {
@@ -861,6 +894,28 @@ void WiFiManager::runTask() {
         break;
   }
     
+}
+
+
+/*--------------------------------------------------------------------------
+ *
+ * Set the date/time on the wifi module
+ *
+ * Arguments
+ * ---------
+ *  - ntd : DateTime object containing the current UTC time 
+ *
+ * Returns : TRUE if successful, FALSE otherwise.
+ * 
+ */
+bool WiFi::setSystemTime( DateTime *ndt ) {
+
+    /* Disable SNTP and use system time instead */
+    m2m_wifi_enable_sntp( 0 );
+    
+    uint32_t ts = ndt->getEpoch() + EPOCH_NTP_OFFSET;
+
+    return ( m2m_wifi_set_sytem_time( ts ) == M2M_SUCCESS );
 }
 
 
@@ -878,7 +933,7 @@ void WiFiManager::runTask() {
  */
 static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
 
-    g_wifimanager.handleEvent( u8MsgType, pvMsg );
+    g_wifi.handleEvent( u8MsgType, pvMsg );
 }
 
 
@@ -896,7 +951,7 @@ static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
  */
 static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp ) 
 {
-	g_wifimanager.handleResolve( hostName, hostIp );
+	g_wifi.handleResolve( hostName, hostIp );
 }
 
 
@@ -915,7 +970,7 @@ static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp )
  */
 static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
 
-    WiFiSocket.eventCallback( sock, u8Msg, pvMsg );   
+    g_wifisocket.handleEvent( sock, u8Msg, pvMsg );   
 }
 
 
@@ -934,5 +989,5 @@ static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
  */
 static void wifimanager_ping_cb( uint32 ip, uint32 rtt, uint8 error ) {
 
-    g_wifimanager.handlePingResponse( ip, rtt, error );
+    g_wifi.handlePingResponse( ip, rtt, error );
 }

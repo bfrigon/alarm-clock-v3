@@ -106,7 +106,7 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
     this->resetSuspendDelay();
 
     /* Update modules power state */
-    g_wifimanager.onPowerStateChange( mode );
+    g_wifi.onPowerStateChange( mode );
     g_clock.onPowerStateChange( mode );
     g_lamp.onPowerStateChange( mode );
     g_alarm.onPowerStateChange( mode );
@@ -307,7 +307,7 @@ void Power::cpuReset() {
  */
 void Power::reboot() {
     g_alarm.end();
-    g_wifimanager.end();
+    g_wifi.end();
     g_clock.end();
     g_lamp.end();
     g_lcd.end();
