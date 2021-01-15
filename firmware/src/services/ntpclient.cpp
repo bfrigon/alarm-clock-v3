@@ -21,6 +21,7 @@
 #include "../drivers/rtc.h"
 #include "../drivers/neoclock.h"
 #include "../console/console.h"
+#include "../libs/timezone.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -30,7 +31,7 @@
  */
 NtpClient::NtpClient() {
 
-    _nextSyncDelay = -1;
+    _nextSyncDelay = 0;
 }
 
 
@@ -62,17 +63,9 @@ bool NtpClient::sync( bool verbose ) {
     if( _verbose == true ) {
 
         if( _lastSync != DateTime()) {
-            g_console.print_P( S_CONSOLE_NTP_LAST_SYNC );
-            g_console.printf_P( S_CONSOLE_DATE_FMT_UTC, 
-                                getDayName( _lastSync.dow(), true ),
-                                getMonthName( _lastSync.month(), true ),
-                                _lastSync.day(),
-                                _lastSync.hour(),
-                                _lastSync.minute(),
-                                _lastSync.second(),
-                                0, 
-                                _lastSync.year());;
 
+            g_console.print_P( S_CONSOLE_NTP_LAST_SYNC );
+            g_console.printDateTime( &_lastSync, TZ_UTC );
             g_console.println();
         }
     }
@@ -272,7 +265,8 @@ bool NtpClient::readNtpResponse() {
 
 
     /* Schedule the next synchronization */
-    if( _nextSyncDelay != -1 ) {
+    if( _nextSyncDelay != 0 ) {
+
         randomSeed( analogRead( PIN_A0 ));
         _nextSyncDelay = random( NTPCLIENT_SYNC_SCHD_MIN, NTPCLIENT_SYNC_SCHD_MAX );
     }
@@ -291,7 +285,7 @@ bool NtpClient::readNtpResponse() {
                             ( sec_offset < 0 || ms_offset < 0 ) ? '-' : '+',
                             ( 1 - ((( sec_offset >> 31 ) & 0x1 ) << 1 )) * sec_offset, 
                             ( 1 - ((( ms_offset >> 31 ) & 0x1 ) << 1 )) * ms_offset );
-        g_console.println();                                    
+        g_console.println();
     }
 
 
@@ -316,14 +310,15 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
 
     if( enabled == false ) {
 
-        _nextSyncDelay = -1;
+        _nextSyncDelay = 0;
      
     } else {
 
         if( verbose == true ) {
 
             g_console.println();
-            g_console.println_P( S_CONSOLE_NTP_AUTOSYNC_ON );
+            g_console.print_P( S_CONSOLE_NTP_AUTOSYNC );
+            g_console.println_P( S_ENABLED );
         }
 
         /* If WiFi is connected, immediately synchronize */
@@ -333,10 +328,11 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
 
         /* Or schedule the next retry */
         } else {
-
+            this->setTaskError( ERR_WIFI_NOT_CONNECTED );
             _lastSync = g_rtc.now();
-            _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
         }
+
+        _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
     }
 }
 
@@ -349,7 +345,7 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
 void NtpClient::runTask() {
 
     
-    if( _nextSyncDelay != -1 && this->isBusy() == false && g_config.clock.use_ntp == true ) {
+    if( this->isBusy() == false && _nextSyncDelay > 0 ) {
         
         DateTime now;
         now = g_rtc.now();
@@ -425,4 +421,52 @@ void NtpClient::runTask() {
         }
         break;
     }
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Prints NTP client status on the console.
+ * 
+ */
+void NtpClient::printNTPStatus() {
+
+    /* Print the NTP client configuration */
+    g_console.printf_P( S_CONSOLE_NTP_SERVER, g_config.network.ntpserver );
+    g_console.println();
+
+    g_console.print_P( S_CONSOLE_NTP_AUTOSYNC );
+    g_console.println_P( (g_config.clock.use_ntp == true ) ? S_ENABLED : S_DISABLED );
+
+    g_console.println();
+
+    /* Print the last synchronization date/time */
+    g_console.print_P( S_CONSOLE_NTP_LAST_SYNC );
+    g_console.printDateTime( &_lastSync, TZ_UTC );
+    g_console.println();
+
+    /* Print delay before next synchronization */
+    if( _nextSyncDelay > 0 ) {
+        unsigned long remaining;
+        remaining = ( _lastSync.getEpoch() + _nextSyncDelay ) - g_rtc.now()->getEpoch();
+
+        if( remaining > 0 ) {
+            g_console.print_P( S_CONSOLE_NTP_NEXT_SYNC );
+            g_console.printTimeInterval( remaining, S_DATETIME_SEPARATOR_COMMA );
+            g_console.println();
+        }
+    }
+
+    g_console.println();
+
+    /* Print the previous attempt error */
+    g_console.print_P( S_CONSOLE_NTP_LAST_ERROR );
+
+    if( this->getTaskError() == TASK_SUCCESS ) {
+        g_console.println_P( S_CONSOLE_NONE );
+    } else {
+        g_console.printErrorMessage( this->getTaskError() );
+    }
+
+
 }

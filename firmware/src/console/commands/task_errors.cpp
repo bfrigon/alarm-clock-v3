@@ -26,9 +26,13 @@
  * @brief   Print the error message of the last command.
  *
  */
-void Console::printCommandError() {
+void Console::printErrorMessage( int8_t error ) {
 
-    switch( this->getTaskError() ) {
+    switch( error ) {
+
+        case TASK_SUCCESS:
+            this->println_P( S_CONSOLE_SUCCESS );
+            break;
 
         case ERR_CONFIG_NO_SDCARD:
             this->println_P( S_STATUS_ERROR_NO_SDCARD );

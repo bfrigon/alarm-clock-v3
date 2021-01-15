@@ -624,49 +624,49 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 
     switch( format ) {
 
-        case DATE_FORMAT_MMDDYYYY:
+        case DATETIME_FORMAT_MMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%02d/%02d/%d" ),
                                 date->month(),
                                 date->day(),
                                 date->year() );
             break;
 
-        case DATE_FORMAT_YYYYMMDD:
+        case DATETIME_FORMAT_YYYYMMDD:
             length = sprintf_P( buffer, PSTR( "%d/%02d/%02d" ),
                                 date->year(),
                                 date->month(),
                                 date->day() );
             break;
 
-        case DATE_FORMAT_DDMMMYYYY:
+        case DATETIME_FORMAT_DDMMMYYYY:
             length = sprintf_P( buffer, PSTR( "%02d-%S-%d" ),
                                 date->day(),
                                 getMonthName( date->month(), true ),
                                 date->year() );
             break;
 
-        case DATE_FORMAT_MMMDDYYYY:
+        case DATETIME_FORMAT_MMMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%S-%02d-%d" ),
                                 getMonthName( date->month(), true ),
                                 date->day(),
                                 date->year() );
             break;
 
-        case DATE_FORMAT_YYYYMMMDD:
+        case DATETIME_FORMAT_YYYYMMMDD:
             length = sprintf_P( buffer, PSTR( "%d-%S-%02d" ),
                                 date->year(),
                                 getMonthName( date->month(), true ),
                                 date->day() );
             break;
 
-        case DATE_FORMAT_WDMMMDD:
+        case DATETIME_FORMAT_WDMMMDD:
             length = sprintf_P( buffer, PSTR( "%S, %S %d" ),
                                 getDayName( date->dow(), true ),
                                 getMonthName( date->month(), true ),
                                 date->day() );
             break;
 
-        case DATE_FORMAT_WDMMMDDYYYY:
+        case DATETIME_FORMAT_WDMMMDDYYYY:
             length = sprintf_P( buffer, PSTR( "%S, %S %d %d" ),
                                 getDayName( date->dow(), true ),
                                 getMonthName( date->month(), true ),

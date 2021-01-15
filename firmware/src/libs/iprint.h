@@ -20,10 +20,14 @@
 
 #include <Arduino.h>
 #include "../resources.h"
+#include "time.h"
 
 #define TEXT_ALIGN_LEFT     0
 #define TEXT_ALIGN_CENTER   1
 #define TEXT_ALIGN_RIGHT    2
+
+
+
 
 
 class IPrint {
@@ -44,7 +48,7 @@ class IPrint {
     uint8_t println_P( const char *str, uint8_t length, uint8_t align );
     uint8_t printf_P( const char *format, ... );
 
-    uint8_t printTimeInterval( long seconds, const char *separator = S_DATETIME_SEPARATOR_SPACE, bool compact = false );
+    uint8_t printTimeInterval( unsigned long seconds, const char *separator = S_DATETIME_SEPARATOR_SPACE, bool compact = false );
     
   private:
     FILE _stream = {0};

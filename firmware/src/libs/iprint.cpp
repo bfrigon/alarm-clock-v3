@@ -438,10 +438,7 @@ uint8_t IPrint::printf_P( const char *format, ... ) {
  * @return  Number of characters printed.
  * 
  */
-uint8_t IPrint::printTimeInterval( long time, const char *separator, bool compact ) {
-
-    /* Treat positive and negative interval the same */
-    time = abs( time );
+uint8_t IPrint::printTimeInterval( unsigned long time, const char *separator, bool compact ) {
 
     uint8_t seconds, minutes, hours;
     seconds = ( time % 60L );

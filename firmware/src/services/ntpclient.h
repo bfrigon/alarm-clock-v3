@@ -27,11 +27,10 @@
 
 
 #define NTPCLIENT_NTP_PORT      123
-#define NTPCLIENT_PACKET_SIZE   48
 #define NTPCLIENT_REQ_TIMEOUT   5000
 #define NTPCLIENT_BIND_TIMEOUT  2000
 
-#define NTPCLIENT_RETRY_DELAY   120     /* 2 */
+#define NTPCLIENT_RETRY_DELAY   120     /* 2 minutes */
 #define NTPCLIENT_SYNC_SCHD_MIN 36000   /* 10 hours */
 #define NTPCLIENT_SYNC_SCHD_MAX 50400   /* 14 hours */
 
@@ -108,6 +107,7 @@ class NtpClient : public ITask {
     void getPreviousSync( DateTime &dt );
     void getPreviousSyncOffset( int32_t seconds, int16_t milliseconds );
     void setAutoSync( bool enabled, bool verbose = false );
+    void printNTPStatus();
 
 
   private:
@@ -115,7 +115,7 @@ class NtpClient : public ITask {
     UDPClient _udp;
     ntp_packet_t _packet;
     DateTime _lastSync;
-    long _nextSyncDelay = 0;
+    unsigned long _nextSyncDelay = 0;
     bool _verbose = false;
 
     bool requestBind();

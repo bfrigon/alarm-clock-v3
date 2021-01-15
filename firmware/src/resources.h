@@ -98,6 +98,7 @@ PROG_STR( S_DATETIME_SEPARATOR_COMMA,   ", " );
 PROG_STR( S_DATETIME_SEPARATOR_AND,     " and " );
 PROG_STR( S_DATETIME_SEPARATOR_SPACE,   " " );
 
+
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
 PROG_STR( S_YES,                        "Yes" );
@@ -106,6 +107,8 @@ PROG_STR( S_SEPARATOR,                  ": " );
 
 PROG_STR( S_ON,                         "On" );
 PROG_STR( S_OFF,                        "Off" );
+PROG_STR( S_ENABLED,                    "Enabled" );
+PROG_STR( S_DISABLED,                   "Disabled" );
 PROG_STR( S_AM,                         "am" );
 PROG_STR( S_PM,                         "pm" );
 PROG_STR( S_DOW,                        "SMTWTFS" );
@@ -229,6 +232,8 @@ PROG_STR( S_CONSOLE_APPLY,              "Apply settings? " );
 PROG_STR( S_CONSOLE_DONE,               "Done!" );
 PROG_STR( S_CONSOLE_CONTINUE,           "Do you want to continue? " );
 PROG_STR( S_CONSOLE_UNKNOWN_ERROR,      "Unknown error! (%d)" );
+PROG_STR( S_CONSOLE_SUCCESS,            "Success" );
+PROG_STR( S_CONSOLE_NONE,               "None" );
 PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid input! Enter 'Y' or 'N'" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
@@ -284,9 +289,6 @@ PROG_STR( S_CONSOLE_INVALID_DATE_FMT,   "Invalid date! (expects YYYY-MM-DD)" );
 PROG_STR( S_CONSOLE_INVALID_TIME_FMT,   "Invalid time! (expects HH:MM)" );
 
 
-
-PROG_STR( S_CONSOLE_DATE_FMT_UTC,       "%S %S %d %02d:%02d:%02d.%03d UTC %d\r\n" );
-PROG_STR( S_CONSOLE_DATE_FMT_LOCAL,     "%S %S %d %02d:%02d:%02d.%03d %S %d\r\n" );
 PROG_STR( S_CONSOLE_TZ_IS_DST,          "Currently on daylight saving time: %S\r\n");
 PROG_STR( S_CONSOLE_TZ_NO_DST,          "Daylight saving time not observed\r\n");
 PROG_STR( S_CONSOLE_TZ_EQUAL_UTC,       "Local time is the same as UTC/GMT\r\n");
@@ -312,11 +314,15 @@ PROG_STR( S_CONSOLE_NTP_INVALID_RESP,   "Invalid response from NTP server!");
 PROG_STR( S_CONSOLE_NTP_NO_RESP,        "No response from NTP server!");
 PROG_STR( S_CONSOLE_NTP_BIND_FAIL,      "Socket bind fail!");
 PROG_STR( S_CONSOLE_NTP_UNKNOWN_HOST,   "The NTP server address '%s' could not be resolved!" );
-PROG_STR( S_CONSOLE_NTP_LAST_SYNC,      "Clock last synchronized on : " );
-PROG_STR( S_CONSOLE_NTP_SYNC_WITH,      "Synchronize with %s");
-PROG_STR( S_CONSOLE_NTP_SENDING,        "Sending request (%d.%d.%d.%d)...");
-PROG_STR( S_CONSOLE_NTP_ADJUST,         "Adjust clock %c%ld.%03ld seconds");
-PROG_STR( S_CONSOLE_NTP_AUTOSYNC_ON,    "Clock auto syncronize is ON");
+PROG_STR( S_CONSOLE_NTP_LAST_SYNC,      "Last synchronized on : " );
+PROG_STR( S_CONSOLE_NTP_NEXT_SYNC,      "Next synchronization in : " );
+PROG_STR( S_CONSOLE_NTP_SYNC_WITH,      "Synchronize with %s" );
+PROG_STR( S_CONSOLE_NTP_SENDING,        "Sending request (%d.%d.%d.%d)..." );
+PROG_STR( S_CONSOLE_NTP_ADJUST,         "Adjusted clock %c%ld.%03ld seconds" );
+PROG_STR( S_CONSOLE_NTP_SERVER,         "NTP server : %s" );
+PROG_STR( S_CONSOLE_NTP_AUTOSYNC,       "Automatic clock synchronization : " );
+PROG_STR( S_CONSOLE_NTP_LAST_ERROR,     "Previous sync error : " );
+
 
 //--------------------------------------------------------------------------
 //

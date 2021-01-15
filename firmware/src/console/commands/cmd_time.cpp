@@ -26,6 +26,7 @@
 
 static char* param_tz_name;
 static DateTime cmd_time_adj;
+bool cmd_time_use_ntp;
 
 /*! ------------------------------------------------------------------------
  *
@@ -82,17 +83,17 @@ void Console::runTaskSetDate() {
         case 1:
             if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
 
-                g_config.clock.use_ntp = true;
+                cmd_time_use_ntp = true;
                 _taskIndex = 6;
 
             } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
 
-                g_config.clock.use_ntp = false;
+                cmd_time_use_ntp = false;
 
             } else if( _inputlength == 0 ) {
 
                 /* If using ntp, skip manual time set */
-                if( g_config.clock.use_ntp == true ) {
+                if( cmd_time_use_ntp == true ) {
                     _taskIndex = 6;
                 }
 
@@ -155,6 +156,8 @@ void Console::runTaskSetDate() {
         case 7:
             if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
 
+                g_config.clock.use_ntp = cmd_time_use_ntp;
+
                 /* Save configuration */
                 g_config.save( EEPROM_SECTION_CLOCK );
                 g_screenUpdate = true;
@@ -190,10 +193,6 @@ void Console::runTaskSetDate() {
 
             } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
 
-                /* Restore configuration */
-                g_config.load( EEPROM_SECTION_CLOCK );
-                g_config.apply( EEPROM_SECTION_CLOCK );
-
                 this->endTask( TASK_SUCCESS );
                 return;
 
@@ -227,7 +226,7 @@ void Console::runTaskSetDate() {
  * @brief   Print the current date and time to the console
  *           
  */
-void Console::printDateTime() {
+void Console::runTaskPrintDateTime() {
 
     DateTime now;
     const char *month;
@@ -244,8 +243,8 @@ void Console::printDateTime() {
     month = getMonthName( now.month(), true );
     dow = getDayName( now.dow(), true );
 
-    this->printf_P( S_CONSOLE_DATE_FMT_UTC, dow, month, now.day(), now.hour(), now.minute(), now.second(), ms, now.year() );
-
+    this->printDateTime( &now, TZ_UTC, ms );
+    g_console.println();
     
     g_timezone.toLocal( &now );
 
@@ -253,7 +252,8 @@ void Console::printDateTime() {
     month = getMonthName( now.month(), true );
     dow = getDayName( now.dow(), true );
 
-    this->printf_P( S_CONSOLE_DATE_FMT_LOCAL, dow, month, now.day(), now.hour(), now.minute(), now.second(), ms, abbvr, now.year() );
+    this->printDateTime( &now, abbvr, ms );
+    g_console.println();
 }
 
 
@@ -342,7 +342,8 @@ void Console::runTaskSetTimeZone() {
  *           
  */
 void Console::showTimezoneInfo() {
-    this->printDateTime();
+    
+    this->runTaskPrintDateTime();
     this->println();
 
     DateTime now = g_rtc.now();
@@ -366,11 +367,11 @@ void Console::showTimezoneInfo() {
         this->print_P( S_CONSOLE_TZ_EQUAL_UTC );
     } else if( current_offset > 0 ) {
         this->print_P( S_CONSOLE_TZ_AHEAD_UTC_PRE );
-        this->printTimeInterval( abs( current_offset * 60L ), S_DATETIME_SEPARATOR_AND );
+        this->printTimeInterval( abs( current_offset ) * 60UL , S_DATETIME_SEPARATOR_AND );
         this->print_P( S_CONSOLE_TZ_AHEAD_UTC );
     } else {
         this->print_P( S_CONSOLE_TZ_BEHIND_UTC_PRE );
-        this->printTimeInterval( abs( current_offset * 60L ), S_DATETIME_SEPARATOR_AND );
+        this->printTimeInterval( abs( current_offset ) * 60UL, S_DATETIME_SEPARATOR_AND );
         this->print_P( S_CONSOLE_TZ_BEHIND_UTC );
     }
 

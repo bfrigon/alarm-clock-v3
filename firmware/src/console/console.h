@@ -57,7 +57,8 @@ PROG_STR( S_COMMAND_SET_TIME,         "set time" );   /* alias of "set date" */
 PROG_STR( S_COMMAND_DATE,             "date" );
 PROG_STR( S_COMMAND_TZ_INFO,          "tz info" );
 PROG_STR( S_COMMAND_TZ_SET,           "tz set" );     /* alias of "set timezone" */
-PROG_STR( S_COMMAND_NTPSYNC,          "ntp sync" );
+PROG_STR( S_COMMAND_NTP_SYNC,         "ntp sync" );
+PROG_STR( S_COMMAND_NTP_STATUS,       "ntp status" );
 PROG_STR( S_COMMAND_PRINT_LOGS,       "print logs" );
 PROG_STR( S_COMMAND_NET_STATUS,       "net status" );
 PROG_STR( S_COMMAND_NET_CONFIG,       "net config" );
@@ -109,7 +110,7 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_DATE,
     S_COMMAND_SET_DATE,
     S_COMMAND_SET_TIMEZONE,
-    S_COMMAND_NTPSYNC,
+    S_COMMAND_NTP_SYNC,
     S_COMMAND_PRINT_LOGS,
     S_COMMAND_NET_STATUS,
     S_COMMAND_NET_CONFIG,
@@ -153,6 +154,9 @@ class Console : public IPrint, ITask {
     void disableInput();
     void runTask();
 
+    void printDateTime( DateTime *dt, const char *timezone, int16_t ms = -1 );
+    void printErrorMessage( int8_t error );
+
   private:
 
     char _inputbuffer[ INPUT_BUFFER_LENGTH + 1 ];
@@ -163,15 +167,14 @@ class Console : public IPrint, ITask {
     bool _inputHidden = false;
 
     uint16_t _taskIndex = 0;
-
-    void printCommandError();
+    
     bool processInput();
     void trimInput();
     void parseCommand();
     void resetInput();
     bool matchCommandName( const char *command, bool hasParameter = false ); 
     char* getInputParameter();
-    
+        
     void displayPrompt();
     uint8_t _print( char c );
 
@@ -214,7 +217,7 @@ class Console : public IPrint, ITask {
     void runTaskSetDate();
 
     /* 'date' command */
-    void printDateTime();
+    void runTaskPrintDateTime();
 
     /* 'set timezone' and 'tz set' command */
     bool startTaskSetTimeZone();

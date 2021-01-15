@@ -330,7 +330,7 @@ void Console::parseCommand() {
 
     /* 'date' command */
     } else if( this->matchCommandName( S_COMMAND_DATE, false ) == true ) {
-        this->printDateTime();
+        this->runTaskPrintDateTime();
         this->println();
 
         started = false;
@@ -366,9 +366,17 @@ void Console::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_FACTORY_RESET, false ) == true ) {
         started = this->startTaskFactoryReset();
 
-    /* 'factory reset' command */
-    } else if( this->matchCommandName( S_COMMAND_NTPSYNC, false ) == true ) {
+    /* 'ntp sync' command */
+    } else if( this->matchCommandName( S_COMMAND_NTP_SYNC, false ) == true ) {
         started = this->startTaskNtpSync();
+
+    /* 'ntp status' command */
+    } else if( this->matchCommandName( S_COMMAND_NTP_STATUS, false ) == true ) {
+
+        g_ntp.printNTPStatus();
+        this->println();
+        
+        started = false;
 
     /* No command entered, display the prompt again */
     } else if( strlen( _inputbuffer ) == 0 ) {
@@ -473,7 +481,7 @@ void Console::runTask() {
 
 
             if( this->getTaskError() != TASK_SUCCESS ) {
-                this->printCommandError();
+                this->printErrorMessage( this->getTaskError() );
             }
             
             this->println();
@@ -482,4 +490,32 @@ void Console::runTask() {
             this->resetInput();
         }
     }
+}
+
+
+void Console::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
+
+    if( ms >= 0 ) {
+        this->printf_P( PSTR( "%S %S %d %02d:%02d:%02d.%03d %S %d" ), 
+                        getDayName( dt->dow(), true ),
+                        getMonthName( dt->month(), true ),
+                        dt->day(),
+                        dt->hour(),
+                        dt->minute(),
+                        dt->second(),
+                        ms,
+                        timezone,
+                        dt->year());
+    } else {
+        this->printf_P( PSTR( "%S %S %d %02d:%02d:%02d %S %d" ), 
+                        getDayName( dt->dow(), true ),
+                        getMonthName( dt->month(), true ),
+                        dt->day(),
+                        dt->hour(),
+                        dt->minute(),
+                        dt->second(),
+                        timezone,
+                        dt->year());
+    }
+    
 }
