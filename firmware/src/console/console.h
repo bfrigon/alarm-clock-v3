@@ -53,9 +53,10 @@ PROG_STR( S_COMMAND_HELP,             "help" );
 PROG_STR( S_COMMAND_REBOOT,           "reboot" );
 PROG_STR( S_COMMAND_SET_TIMEZONE,     "set timezone" );
 PROG_STR( S_COMMAND_SET_DATE,         "set date" );
+PROG_STR( S_COMMAND_SET_TIME,         "set time" );   /* alias of "set date" */
 PROG_STR( S_COMMAND_DATE,             "date" );
 PROG_STR( S_COMMAND_TZ_INFO,          "tz info" );
-PROG_STR( S_COMMAND_TZ_SET,           "tz set" );   /* alias of "set timezone" */
+PROG_STR( S_COMMAND_TZ_SET,           "tz set" );     /* alias of "set timezone" */
 PROG_STR( S_COMMAND_NTPSYNC,          "ntp sync" );
 PROG_STR( S_COMMAND_PRINT_LOGS,       "print logs" );
 PROG_STR( S_COMMAND_NET_STATUS,       "net status" );
@@ -63,8 +64,9 @@ PROG_STR( S_COMMAND_NET_CONFIG,       "net config" );
 PROG_STR( S_COMMAND_NET_STOP,         "net stop" );
 PROG_STR( S_COMMAND_NET_START,        "net start" );
 PROG_STR( S_COMMAND_NET_RESTART,      "net restart" );
+PROG_STR( S_COMMAND_NET_PING,         "net ping" );   /* alias of "ping" */
 PROG_STR( S_COMMAND_NET_NSLOOKUP,     "nslookup" );
-PROG_STR( S_COMMAND_NET_PING,         "ping" );
+PROG_STR( S_COMMAND_PING,             "ping" );
 PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
 PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
 PROG_STR( S_COMMAND_FACTORY_RESET,    "factory reset" );

@@ -60,8 +60,8 @@ void Console::begin( unsigned long baud ) {
     while (!Serial);
     
     this->println();
-    this->println_P( S_CONSOLE_WELCOME );
     this->println();
+    this->println_P( S_CONSOLE_WELCOME );
     this->println();
 
     this->resetInput();
@@ -319,7 +319,9 @@ void Console::parseCommand() {
         started = this->startTaskNslookup();
     
     /* 'ping' command */
-    } else if( this->matchCommandName( S_COMMAND_NET_PING, true ) == true ) {
+    } else if( this->matchCommandName( S_COMMAND_PING, true ) == true || 
+               this->matchCommandName( S_COMMAND_NET_PING, true ) == true ) {
+
         started = this->startTaskPing();
     
     /* 'net config' command */
@@ -334,7 +336,9 @@ void Console::parseCommand() {
         started = false;
 
     /* 'set date' command */
-    } else if( this->matchCommandName( S_COMMAND_SET_DATE, false ) == true ) {
+    } else if( this->matchCommandName( S_COMMAND_SET_DATE, false ) == true ||
+               this->matchCommandName( S_COMMAND_SET_TIME, false ) == true ) {
+
         started = this->startTaskSetDate();
 
     /* 'set timezone' and 'tz set' command */
