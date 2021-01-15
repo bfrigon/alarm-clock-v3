@@ -31,7 +31,7 @@ unsigned long g_enterScreenTime = 0;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor for ScreenItem class.
+ * @brief   Class constructor for ScreenItem class.
  *
  */
 ScreenItem::ScreenItem() {
@@ -41,7 +41,7 @@ ScreenItem::ScreenItem() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Load a screen item from program memory.
+ * @brief   Load a screen item from program memory.
  *
  * @param   item    Pointer to the screen item structure contained in 
  *                  program memory
@@ -68,7 +68,7 @@ void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Unload the screen item
+ * @brief   Unload the screen item
  * 
  */
 void ScreenItem::unload() {
@@ -89,7 +89,7 @@ void ScreenItem::unload() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor for Screen class.
+ * @brief   Class constructor for Screen class.
  *
  * @param   id    Screen ID
  */
@@ -100,7 +100,7 @@ Screen::Screen( uint8_t id ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor for Screen class with events pre-defined.
+ * @brief   Class constructor for Screen class with events pre-defined.
  *
  * @param   id                  Screen ID
  * @param   items               Screen items
@@ -122,7 +122,7 @@ Screen::Screen( uint8_t id, const struct ScreenItemBase* items, pfcbValueChange 
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Run task for this screen
+ * @brief   Run task for this screen
  *
  */
 void Screen::runTask() {
@@ -151,7 +151,7 @@ void Screen::runTask() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Update the screen contents on the LCD.
+ * @brief   Update the screen contents on the LCD.
  *
  * @param   force    Update the screen contents event if it's not the current
  *                   active screen.
@@ -265,7 +265,7 @@ void Screen::update( bool force ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Process key press events.
+ * @brief   Process key press events.
  *
  * @param   key    detected key press
  * 
@@ -373,7 +373,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Reset the timeout timer.
+ * @brief   Reset the timeout timer.
  * 
  */
 void Screen::resetTimeout( int16_t timeout ) {
@@ -388,7 +388,7 @@ void Screen::resetTimeout( int16_t timeout ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns whether or not the timeout delay has elapsed.
+ * @brief   Returns whether or not the timeout delay has elapsed.
  *
  * @return  TRUE if the screen has timed out, FALSE otherwise.
  * 
@@ -405,7 +405,7 @@ bool Screen::hasScreenTimedOut() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Exits the current screen and returns to the parent screen.
+ * @brief   Exits the current screen and returns to the parent screen.
  * 
  */
 void Screen::exitScreen() {
@@ -433,7 +433,7 @@ void Screen::exitScreen() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Leave the current screen and activate this one.
+ * @brief   Leave the current screen and activate this one.
  *
  * @param   selectFirstItem    TRUE to select the first item or False to leave 
  *                             the previously selected item the last time the 
@@ -485,7 +485,7 @@ void Screen::activate( bool selectFirstItem, Screen* parent ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Update a screen item display on the LCD
+ * @brief   Update a screen item display on the LCD
  *
  * @param   item          Pointer to a screen item.
  * @param   isSelected    TRUE if item is currently selectedor False otherwise.
@@ -770,7 +770,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns whether or not a given item can be viewed full screen.
+ * @brief   Returns whether or not a given item can be viewed full screen.
  *
  * @param   item    Pointer to a screen item.
  *
@@ -794,7 +794,7 @@ bool Screen::isItemFullScreenEditable( ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Prints a given item's caption on the LCD.
+ * @brief   Prints a given item's caption on the LCD.
  *
  * @param   item    Pointer to a screen item.
  *
@@ -826,7 +826,7 @@ uint8_t Screen::printItemCaption( ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Selects the first item on the screen.
+ * @brief   Selects the first item on the screen.
  * 
  */
 void Screen::selectFirstItem() {
@@ -840,7 +840,7 @@ void Screen::selectFirstItem() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Resets the screen selection.
+ * @brief   Resets the screen selection.
  * 
  */
 void Screen::clearSelection() {
@@ -866,7 +866,7 @@ void Screen::clearSelection() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Selects a given item from it's index position.
+ * @brief   Selects a given item from it's index position.
  *
  * @param   index    zero-based index of the item to select.
  * 
@@ -953,7 +953,7 @@ void Screen::selectItem( uint8_t index ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets which keys on the keypad are repeatable when held down 
+ * @brief   Sets which keys on the keypad are repeatable when held down 
  *          based on the current screen state and selected item.
  * 
  */
@@ -991,7 +991,7 @@ void Screen::updateKeypadRepeatMode() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns a given item's maximum value length.
+ * @brief   Returns a given item's maximum value length.
  *
  * @param   item    Pointer to a screen item.
  *
@@ -1047,7 +1047,7 @@ uint8_t Screen::calcFieldLength( ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Update the cursor position on the LCD.
+ * @brief   Update the cursor position on the LCD.
  * 
  */
 void Screen::updateCursorPosition() {
@@ -1161,7 +1161,7 @@ void Screen::updateCursorPosition() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Revert an item to it's default value.
+ * @brief   Revert an item to it's default value.
  *
  * @param   item    Pointer to a screen item.
  * 
@@ -1221,7 +1221,7 @@ void Screen::clearItemValue( ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Converts the item's value to the number of bars to be displayed 
+ * @brief   Converts the item's value to the number of bars to be displayed 
  *          for ITEM_TYPE_BAR items.
  *
  * @param   item    Pointer to a screen item.
@@ -1252,7 +1252,7 @@ uint8_t Screen::itemValueToBars( ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Increment a given item's value
+ * @brief   Increment a given item's value
  *
  * @param   item     Pointer to a screen item.
  * @param   shift    TRUE to use an alternate increment valueor False to 
@@ -1469,7 +1469,7 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the next valid character when incrementing a text box item
+ * @brief   Get the next valid character when incrementing a text box item
  *
  * @param   current    Current character to start from
  *
@@ -1518,7 +1518,7 @@ inline char Screen::nextValidCharacter( char current ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Increments an item's value while keeping it in the valid range.
+ * @brief   Increments an item's value while keeping it in the valid range.
  *
  * @param   value    Pointer to the item's value
  * @param   pos      Zero-based digit position
@@ -1559,7 +1559,7 @@ void Screen::incDigit( uint8_t* value, uint8_t pos, uint8_t max, uint8_t min ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns the number of digits in a given number.
+ * @brief   Returns the number of digits in a given number.
  *
  * @return  The number of digits.
  * 

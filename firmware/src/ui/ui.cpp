@@ -157,7 +157,7 @@ void initScreens() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.
@@ -173,7 +173,7 @@ bool onKeypress( Screen* screen, uint8_t key ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when drawing an item.
+ * @brief   Event raised when drawing an item.
  *
  * @param   screen        Pointer to the screen where the event occured.
  * @param   item          Item being drawn.
@@ -251,7 +251,7 @@ bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row,
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when the cursor on the currently selected 
+ * @brief   Event raised when the cursor on the currently selected 
  *          item has changed position or when another item is selected.
  *
  * @param   screen        Pointer to the screen where the event occured.
@@ -358,7 +358,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Raised when a screen item value changes.
+ * @brief   Raised when a screen item value changes.
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   item      Item currently selected.
@@ -504,7 +504,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when entering the screen
+ * @brief   Event raised when entering the screen
  *
  * @param   screen    Pointer to the new screen.
  *
@@ -556,7 +556,7 @@ bool onEnterScreen( Screen* screen ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when leaving the screen
+ * @brief   Event raised when leaving the screen
  *
  * @param   currentScreen    Current screen.
  * @param   newScreen        The new screen to be loaded.

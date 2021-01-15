@@ -28,7 +28,7 @@
 
 
 extern "C" {
-	#include "driver/include/m2m_wifi.h"
+  #include "driver/include/m2m_wifi.h"
   #include "bsp/include/nm_bsp.h"
   #include "bsp/include/nm_bsp_arduino.h"
   #include "driver/include/m2m_periph.h"
@@ -127,10 +127,10 @@ class WiFi : public ITask {
     bool _autoReconnect = true;
 
     uint32_t _localip;
-	  uint32_t _submask;
-	  uint32_t _gateway;
+    uint32_t _submask;
+    uint32_t _gateway;
     uint32_t _dns;
-	  uint32_t _resolve;
+    uint32_t _resolve;
     int32_t _rtt;
     wl_status_t _status;
     wl_status_t _prev_status;

@@ -23,7 +23,7 @@
 #include <winc1500api.h>
 
 extern "C" {
-	#include "socket/include/socket.h"
+  #include "socket/include/socket.h"
 }
 
 #define SOCKET_BUFFER_UDP_SIZE      (128u)
@@ -62,15 +62,12 @@ class UDPClient : public UDP {
 
   private:
 
-	SOCKET _socket;
-	int _parsedPacketSize;
-	uint8_t _sndBuffer[SOCKET_BUFFER_UDP_SIZE];
-	uint16_t _sndSize;
-	uint16_t _sndPort;
-	uint32_t _sndIP;
+    SOCKET _socket;
+    int _parsedPacketSize;
+    uint8_t _sndBuffer[SOCKET_BUFFER_UDP_SIZE];
+    uint16_t _sndSize;
+    uint16_t _sndPort;
+    uint32_t _sndIP;
 };
-
-
-
 
 #endif /* UDPCLIENT_H */

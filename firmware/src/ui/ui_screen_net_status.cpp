@@ -24,7 +24,7 @@ uint8_t g_netStatusPage = 0;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when updating the screen.
+ * @brief   Event raised when updating the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -90,7 +90,7 @@ bool netStatus_onDrawScreen( Screen* screen ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.

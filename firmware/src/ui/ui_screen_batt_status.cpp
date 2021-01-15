@@ -25,7 +25,7 @@ uint8_t g_battStatusPage = 0;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when updating the screen.
+ * @brief   Event raised when updating the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -178,7 +178,7 @@ bool battStatus_onKeypress( Screen* screen, uint8_t key ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when the exit screen timeout delay has elapsed.
+ * @brief   Event raised when the exit screen timeout delay has elapsed.
  *
  * @param   screen    Pointer to the screen where the event occured.
  */

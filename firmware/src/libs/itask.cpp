@@ -20,7 +20,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks if a task is currently running.
+ * @brief   Checks if a task is currently running.
  *
  * @return  TRUE if task running, FALSE otherwise.
  * 
@@ -32,7 +32,7 @@ bool ITask::isBusy() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the current running task ID
+ * @brief   Get the current running task ID
  *
  * @return  Task ID
  * 
@@ -44,7 +44,7 @@ uint8_t ITask::getCurrentTask() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the previous task exit error code.
+ * @brief   Get the previous task exit error code.
  *
  * @return  Error code
  * 
@@ -56,7 +56,7 @@ int ITask::getTaskError() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the time in milliseconds the task has been running.
+ * @brief   Get the time in milliseconds the task has been running.
  *
  * @return  Time elapsed
  * 
@@ -68,7 +68,7 @@ unsigned long ITask::getTaskRunningTime() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts a new task.
+ * @brief   Starts a new task.
  *
  * @param   task     Task ID
  * @param   force    Cancel the previous task if one is currently running.
@@ -92,7 +92,7 @@ uint8_t ITask::startTask( uint8_t task, bool force ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Ends the current task
+ * @brief   Ends the current task
  *
  * @param   error    Error code 
  * 
@@ -110,7 +110,7 @@ void ITask::endTask( int error ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the error code of the running task
+ * @brief   Sets the error code of the running task
  *
  * @param   error    Error code 
  * 

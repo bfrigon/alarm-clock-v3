@@ -21,7 +21,7 @@
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Starts the 'ntp sync' command task
+ * @brief   Starts the 'ntp sync' command task
  * 
  * @return  TRUE if successful, FALSE otherwise
  * 
@@ -42,7 +42,7 @@ bool Console::startTaskNtpSync() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Monitor the 'ntp sync' task
+ * @brief   Monitor the 'ntp sync' task
  * 
  */
 void Console::runTaskNtpSync() {

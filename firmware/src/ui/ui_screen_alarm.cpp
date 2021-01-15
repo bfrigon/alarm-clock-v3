@@ -23,7 +23,7 @@ bool showHelpMsg = false;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when entering the screen
+ * @brief   Event raised when entering the screen
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -40,7 +40,7 @@ bool alarmScreen_onEnterScreen( Screen *screen ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.
@@ -89,7 +89,7 @@ bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when updating the screen.
+ * @brief   Event raised when updating the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -163,7 +163,7 @@ bool alarmScreen_onDrawScreen( Screen *screen ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when the exit screen timeout delay has elapsed.
+ * @brief   Event raised when the exit screen timeout delay has elapsed.
  *
  * @param   screen    Pointer to the screen where the event occured.
  */

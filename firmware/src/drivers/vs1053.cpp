@@ -21,7 +21,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_cs       Chip select pin
  * @param   pin_xdcs     Chip data select pin
@@ -41,7 +41,7 @@ VS1053::VS1053( int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_rese
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the codec IC.
+ * @brief   Initialize the codec IC.
  *
  * @return  Returns the chip version if successful, -1 otherwise.
  * 
@@ -80,7 +80,7 @@ int8_t VS1053::begin() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Shut down the codec IC.
+ * @brief   Shut down the codec IC.
  * 
  */
 void VS1053::end() {
@@ -96,7 +96,7 @@ void VS1053::end() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check the state of the DREQ pin to see if the codec is ready 
+ * @brief   Check the state of the DREQ pin to see if the codec is ready 
  *          for more data.
  *
  * @return  TRUE if ready, FALSE otherwise.
@@ -114,7 +114,7 @@ bool VS1053::readyForData() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Send a data block to the codec buffer.
+ * @brief   Send a data block to the codec buffer.
  *
  * @param   buffer     Pointer to the data block
  * @param   bufsize    Size of the data block
@@ -143,7 +143,7 @@ void VS1053::playData( uint8_t *buffer, uint8_t buffsiz ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the volume attenuation in 0.5 DB increment for each channels. 
+ * @brief   Set the volume attenuation in 0.5 DB increment for each channels. 
  *          Value range from 0-255, 0 being full volume and 255 total silence.
  *
  * @param   left     Volume for the left channel.
@@ -170,7 +170,7 @@ void VS1053::setVolume( uint8_t left, uint8_t right ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Performs a software reset
+ * @brief   Performs a software reset
  * 
  */
 void VS1053::softReset() {
@@ -185,7 +185,7 @@ void VS1053::softReset() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Performs a hardware reset
+ * @brief   Performs a hardware reset
  * 
  */
 void VS1053::reset() {
@@ -211,7 +211,7 @@ void VS1053::reset() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Read data from specified register.
+ * @brief   Read data from specified register.
  *
  * @param   addr    Address of the register to write to.
  *
@@ -246,7 +246,7 @@ uint16_t VS1053::sciRead( uint8_t addr ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Write data the specified register.
+ * @brief   Write data the specified register.
  *
  * @param   addr    Address of the register to write to.
  * @param   data    Data to write to the register.
@@ -275,7 +275,7 @@ void VS1053::sciWrite( uint8_t addr, uint16_t data ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sends a single byte to the codec over SPO.
+ * @brief   Sends a single byte to the codec over SPO.
  *
  * @param   c    Byte to send
  * 
@@ -287,7 +287,7 @@ inline void VS1053::spiwrite( uint8_t c ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sends a data block to the codec over SPI.
+ * @brief   Sends a data block to the codec over SPI.
  *
  * @param   buffer    Pointer to the data block.
  * @param   size      Size of the data block.

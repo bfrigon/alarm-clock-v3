@@ -25,9 +25,9 @@
 extern "C" {
     #include "socket/include/socket.h"
     #include "socket/include/m2m_socket_host_if.h"
-  	#include "driver/include/m2m_wifi.h"
-	  #include "driver/source/m2m_hif.h"
-	  #include "driver/include/m2m_periph.h"
+    #include "driver/include/m2m_wifi.h"
+    #include "driver/source/m2m_hif.h"
+    #include "driver/include/m2m_periph.h"
 }
 
 #define SOCKET_BUFFER_SIZE    128
@@ -48,15 +48,15 @@ struct SocketInfo {
 
 /* Socket states */
 enum {
-	SOCKET_STATE_INVALID,
-	SOCKET_STATE_IDLE,
-	SOCKET_STATE_CONNECTING,
-	SOCKET_STATE_CONNECTED,
-	SOCKET_STATE_BINDING,
-	SOCKET_STATE_BOUND,
-	SOCKET_STATE_LISTEN,
-	SOCKET_STATE_LISTENING,
-	SOCKET_STATE_ACCEPTED
+  SOCKET_STATE_INVALID,
+  SOCKET_STATE_IDLE,
+  SOCKET_STATE_CONNECTING,
+  SOCKET_STATE_CONNECTED,
+  SOCKET_STATE_BINDING,
+  SOCKET_STATE_BOUND,
+  SOCKET_STATE_LISTEN,
+  SOCKET_STATE_LISTENING,
+  SOCKET_STATE_ACCEPTED
 };
 
 

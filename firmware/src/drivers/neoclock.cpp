@@ -27,7 +27,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_leds    Pin ID connected to the neopixel data line.
  * @param   pin_shdn    Pin ID connected to the neopixel power MOSFET.
@@ -41,7 +41,7 @@ NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the clock display back to it's default state.
+ * @brief   Set the clock display back to it's default state.
  *
  */
 void NeoClock::restoreClockDisplay() {
@@ -64,7 +64,7 @@ void NeoClock::restoreClockDisplay() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Refresh the lamp NeoPixel data.
+ * @brief   Refresh the lamp NeoPixel data.
  * 
  */
 void NeoClock::update() {
@@ -147,7 +147,7 @@ void NeoClock::update() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check if the pixels needs to be updated.
+ * @brief   Check if the pixels needs to be updated.
  * 
  */
 void NeoClock::runTask() {
@@ -187,7 +187,7 @@ void NeoClock::runTask() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets pixel for a given segment digit position. Each digits 
+ * @brief   Sets pixel for a given segment digit position. Each digits 
  *          contains 7 pixels.
  *
  * @param   pixmap    Pointer to the pixel buffer ( 1 bit per pixel )
@@ -207,7 +207,7 @@ void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Turn on all the leds on the display.
+ * @brief   Turn on all the leds on the display.
  *
  * @param   testMode    True to enable pixel test mdoe.
  */
@@ -218,7 +218,7 @@ void NeoClock::setTestMode( bool testMode ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Request a clock display update. It only accepts the request 
+ * @brief   Request a clock display update. It only accepts the request 
  *          when the current screen is neither the clock set screen or the 
  *          alarm display screen
  *

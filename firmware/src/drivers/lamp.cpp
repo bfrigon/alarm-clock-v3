@@ -21,7 +21,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_leds    Pin ID connected to the nepoxel data line.
  * 
@@ -33,7 +33,7 @@ Lamp::Lamp( int8_t pin_leds ) : NeoPixel( pin_leds, -1 ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the brightness of the lamp
+ * @brief   Sets the brightness of the lamp
  *
  * @param   brightness      Brighness value 0-100 %
  * @param   force           Force set even if night light is active
@@ -66,7 +66,7 @@ void Lamp::setBrightness( uint8_t brightness, bool force ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the lamp color using the RGB table color ID.
+ * @brief   Sets the lamp color using the RGB table color ID.
  *
  * @param   id      value 0-12 (color table in ressource.h)
  * @param   force   Force set even if night light is active
@@ -89,7 +89,7 @@ void Lamp::setColorFromTable( uint8_t id, bool force ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the lamp color using an RGB value.
+ * @brief   Sets the lamp color using an RGB value.
  *
  * @param   r       Red component
  * @param   g       Green component
@@ -114,7 +114,7 @@ void Lamp::setColorRGB( uint8_t r, uint8_t g, uint8_t b, bool force ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the visual effect animation speed.
+ * @brief   Sets the visual effect animation speed.
  *
  * @param   speed   1 (slowest), 10 (fastest)
  * 
@@ -136,7 +136,7 @@ void Lamp::setEffectSpeed( uint8_t speed ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the lamp off delay.
+ * @brief   Sets the lamp off delay.
  *
  * @param   delay       Delay in minutes before the lamp turn off 
  * 
@@ -158,11 +158,12 @@ void Lamp::setDelayOff( uint8_t delay ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Turn on the lamp
+ * @brief   Turn on the lamp
  *
  * @param   settings    Structure containing the lamp settings.
  * @param   test_mode   True to force the lamp to remain on.
- * @param   force       Force activate even if night light active 
+ * @param   force       Force activate even if night light active
+ * 
  */
 void Lamp::activate( struct NightLampSettings *settings, bool test_mode, bool force, uint8_t mode ) {
 
@@ -210,7 +211,7 @@ void Lamp::activate( struct NightLampSettings *settings, bool test_mode, bool fo
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns whether or not the lamp is on
+ * @brief   Returns whether or not the lamp is on
  *
  * @return  TRUE if lamp is ON, FLASE otherwise
  * 
@@ -222,7 +223,7 @@ bool Lamp::isActive() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Update the visual effect animation next step delay when speed 
+ * @brief   Update the visual effect animation next step delay when speed 
  *          settings changes.
  *
  */
@@ -251,9 +252,10 @@ void Lamp::updateVisualStepDelay() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Turn off the lamp
+ * @brief   Turn off the lamp
  *
  * @param   force   Force deactivate even if night light is active
+ * 
  */
 void Lamp::deactivate( bool force ) {
 
@@ -268,7 +270,7 @@ void Lamp::deactivate( bool force ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check if the turn-off delay timer has elapsed and execute the 
+ * @brief   Check if the turn-off delay timer has elapsed and execute the 
  *          visual effect animation next step.
  * 
  */
@@ -378,7 +380,7 @@ void Lamp::processEvents() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Refresh the lamp NeoPixel data.
+ * @brief   Refresh the lamp NeoPixel data.
  * 
  */
 void Lamp::update() {

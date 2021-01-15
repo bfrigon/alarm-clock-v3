@@ -25,7 +25,7 @@ BQ27441::BQ27441() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the IC.
+ * @brief   Initialize the IC.
  *
  * @param   capacity    Design capacity of the battery.
  *
@@ -83,7 +83,7 @@ bool BQ27441::begin( uint16_t capacity ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Enable config update mode.
+ * @brief   Enable config update mode.
  *
  * @return  TRUE if successful or FALSE otherwise.
  * 
@@ -105,7 +105,7 @@ bool BQ27441::enterConfig() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Exits config update mode.
+ * @brief   Exits config update mode.
  *
  * @return  TRUE if successful or FALSE otherwise.
  * 
@@ -127,7 +127,7 @@ bool BQ27441::exitConfig() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Un-seal memory access.
+ * @brief   Un-seal memory access.
  *
  * @return  TRUE if successful or FALSE otherwise.
  * 
@@ -146,7 +146,7 @@ bool BQ27441::unseal() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Re-seal memory access.
+ * @brief   Re-seal memory access.
  *
  * @return  TRUE if successful or FALSE otherwise.
  * 
@@ -164,7 +164,7 @@ bool BQ27441::seal() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks if the battery monitor has finished initializing.
+ * @brief   Checks if the battery monitor has finished initializing.
  *
  * @return  TRUE if ready or FALSE otherwise.
  * 
@@ -184,7 +184,7 @@ bool BQ27441::isReady() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks if a battery has been detected.
+ * @brief   Checks if a battery has been detected.
  *
  * @return  TRUE if present or FALSE otherwise.
  * 
@@ -200,7 +200,7 @@ bool BQ27441::isBatteryPresent() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks if the battery is currently discharging.
+ * @brief   Checks if the battery is currently discharging.
  *
  * @return  TRUE if discharging or FALSE otherwise.
  * 
@@ -212,7 +212,7 @@ bool BQ27441::isDischarging() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check if the battery is currently charging.
+ * @brief   Check if the battery is currently charging.
  *
  * @return  TRUE if charging or FALSE otherwise.
  * 
@@ -223,7 +223,7 @@ bool BQ27441::isCharging() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the average power being consumed or stored in the battery.
+ * @brief   Gets the average power being consumed or stored in the battery.
  *
  * @return  The average power in milliwatts (mW). power > 0 if battery 
  *           is being charged or power < 0 if discharged.
@@ -240,7 +240,7 @@ int16_t BQ27441::getAvgPower() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the average current being consumed or stored in the battery.
+ * @brief   Gets the average current being consumed or stored in the battery.
  *
  * @return  The average current in milliamps (mA). current > 0 if battery 
  *           is being charged or current < 0 if discharged.
@@ -257,7 +257,7 @@ int16_t BQ27441::getAvgCurrent() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the state of the battery.
+ * @brief   Gets the state of the battery.
  *
  * @return  Value representing the current battery state
  * 
@@ -303,7 +303,7 @@ uint8_t BQ27441::getBatteryState() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the estimated remaining battery capacity.
+ * @brief   Gets the estimated remaining battery capacity.
  *
  * @param   Filtered
  *
@@ -321,7 +321,7 @@ uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the fully charged battery capacity.
+ * @brief   Gets the fully charged battery capacity.
  *
  * @param   Filtered
  *
@@ -339,7 +339,7 @@ uint16_t BQ27441::getFullCapacity( bool filtered ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the battery voltage.
+ * @brief   Gets the battery voltage.
  *
  * @return  Battery voltage in millivolts (mV).
  * 
@@ -355,7 +355,7 @@ uint16_t BQ27441::getVoltage() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the battery health percentage.
+ * @brief   Gets the battery health percentage.
  *
  * @return  Calculated battery health in percent or -1 if monitor is not 
  *          ready or if battery was not detected.
@@ -388,7 +388,7 @@ int8_t BQ27441::getStateOfHealth() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gets the calculated state of charge
+ * @brief   Gets the calculated state of charge
  *
  * @param   Filtered
  *
@@ -406,7 +406,7 @@ uint8_t BQ27441::getStateOfCharge( bool filtered ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Transmit data to the monitor IC.
+ * @brief   Transmit data to the monitor IC.
  *
  * @param   reg     Register address to start writing to.
  * @param   data    Pointer to the data to be written.
@@ -437,7 +437,7 @@ uint8_t BQ27441::write( uint8_t reg, void* data, uint8_t size ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Transmit a single byte to the monitor IC.
+ * @brief   Transmit a single byte to the monitor IC.
  *
  * @param   reg     Register address to write to.
  * @param   data    byte to write.
@@ -458,7 +458,7 @@ uint8_t BQ27441::write( uint8_t reg, uint8_t data ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Read data from the monitor IC.
+ * @brief   Read data from the monitor IC.
  *
  * @param   reg     Register address to start reading from.
  * @param   data    Pointer to the buffer.
@@ -490,7 +490,7 @@ uint8_t BQ27441::read( uint8_t reg, void* data, uint8_t size ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Read a 2-bytes (word) value from the monitor IC
+ * @brief   Read a 2-bytes (word) value from the monitor IC
  *
  * @param   reg     Register address where to read the word from.
  *
@@ -508,7 +508,7 @@ uint16_t BQ27441::readWord( uint8_t reg ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Execute a control function and read the return value.
+ * @brief   Execute a control function and read the return value.
  *
  * @param   function    Function to execute.
  *
@@ -526,7 +526,7 @@ uint16_t BQ27441::readControlData( uint8_t function ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Execute a control function..
+ * @brief   Execute a control function..
  *
  * @param   function    Function to execute.
  *
@@ -542,7 +542,7 @@ bool BQ27441::executeControlCommand( uint8_t function ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Read a data block when in update config mode.
+ * @brief   Read a data block when in update config mode.
  *
  * @param   classID     Data class ID to access.
  * @param   offset      Offset in the datab class to start reading from.
@@ -583,7 +583,7 @@ bool BQ27441::readDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Write to a data block when in config update mode.
+ * @brief   Write to a data block when in config update mode.
  *
  * @param   classID     Data class ID to access.
  * @param   offset      Offset in the datab class to start reading from.
@@ -635,7 +635,7 @@ bool BQ27441::writeDataBlock( uint8_t classID, uint8_t offset, void* data, uint8
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Calculate the checksum of the 32 bytes block currently accessed.
+ * @brief   Calculate the checksum of the 32 bytes block currently accessed.
  *
  * @return  CRC value.
  * 

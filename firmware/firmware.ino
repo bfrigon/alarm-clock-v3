@@ -41,7 +41,7 @@ NtpClient       g_ntp;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks if the check button is held after reset or if EEPROM 
+ * @brief   Checks if the check button is held after reset or if EEPROM 
  *          contains an invalid magic code. In that case, all settings are 
  *          restored to default.
  *
@@ -93,7 +93,7 @@ bool checkFactoryReset() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize drivers
+ * @brief   Initialize drivers
  *
  */
 void setup() {
@@ -169,7 +169,7 @@ void setup() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Main loop
+ * @brief   Main loop
  *
  */
 void loop() {

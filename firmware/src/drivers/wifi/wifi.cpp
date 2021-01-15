@@ -7,7 +7,7 @@
 // Credit  : This file contains large portions of code from the WiFi101
 //           arduino library. It has been adapted to make the calls to the
 //           WiFi module non-blocking. Original code at: 
-//           https://github.com/arduino-libraries/WiFi101/blob/master/src/WiFi.cpp
+//           https://github.com/arduino-libraries/WiFi101
 //
 // -----------------------------------------------------------------------------
 //
@@ -39,10 +39,10 @@
  */
 WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
 
-	gi8Winc1501CsPin = pin_cs;
-	gi8Winc1501IntnPin = pin_irq;
-	gi8Winc1501ResetPin = pin_rst;
-	gi8Winc1501ChipEnPin = pin_en;
+    gi8Winc1501CsPin = pin_cs;
+    gi8Winc1501IntnPin = pin_irq;
+    gi8Winc1501ResetPin = pin_rst;
+    gi8Winc1501ChipEnPin = pin_en;
 }
 
 
@@ -53,8 +53,8 @@ WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
  */
 void WiFi::begin() {
     if( _init == false ) {
-		init();
-	}
+        init();
+    }
 
     this->connect();
 }
@@ -67,8 +67,8 @@ void WiFi::begin() {
  */
 void WiFi::end() {
     if( _init == false ) {
-		return;
-	}
+        return;
+    }
 
     _status = WIFI_STATUS_IDLE;
     _init = false;        
@@ -80,10 +80,10 @@ void WiFi::end() {
     socketDeinit();
 
     /* Uninitialize the WiFi module */
-	m2m_wifi_deinit( NULL );
+    m2m_wifi_deinit( NULL );
 
     /* Unitiialize the board support for the WiFi module */
-	nm_bsp_deinit();
+    nm_bsp_deinit();
 }
 
 
@@ -95,14 +95,14 @@ void WiFi::end() {
 int WiFi::init() {
     
     tstrWifiInitParam param;
-	int8_t ret;
+    int8_t ret;
 
-	/* Initialize the board support for the WiFi module */
-	nm_bsp_init();
+    /* Initialize the board support for the WiFi module */
+    nm_bsp_init();
 
     /* Initialize the WiFi module and register notification callback */
-	param.pfAppWifiCb = wifimanager_wifi_cb;
-	ret = m2m_wifi_init(&param);   
+    param.pfAppWifiCb = wifimanager_wifi_cb;
+    ret = m2m_wifi_init(&param);   
 
     if( M2M_SUCCESS != ret && M2M_ERR_FW_VER_MISMATCH != ret ) {
         return ret;
@@ -112,29 +112,29 @@ int WiFi::init() {
     socketInit();
 
     /* Register socket callback routines */
-	registerSocketCallback( wifimanager_socket_cb, wifimanager_resolve_cb );
+    registerSocketCallback( wifimanager_socket_cb, wifimanager_resolve_cb );
     
 
-	_init = true;
-	_status = WIFI_STATUS_IDLE;
-	_localip = 0;
-	_submask = 0;
-	_gateway = 0;
-	_dhcp = true;
-	_resolve = 0;
+    _init = true;
+    _status = WIFI_STATUS_IDLE;
+    _localip = 0;
+    _submask = 0;
+    _gateway = 0;
+    _dhcp = true;
+    _resolve = 0;
 
 
-	extern uint32 nmdrv_firm_ver;
+    extern uint32 nmdrv_firm_ver;
 
-	if( nmdrv_firm_ver >= M2M_MAKE_VERSION( 19, 5, 0 )) {
+    if( nmdrv_firm_ver >= M2M_MAKE_VERSION( 19, 5, 0 )) {
 
-		/* enable AES-128 and AES-256 Ciphers, if firmware is 19.5.0 or higher */
-		m2m_ssl_set_active_ciphersuites( SSL_CIPHER_RSA_WITH_AES_128_CBC_SHA | 
+        /* enable AES-128 and AES-256 Ciphers, if firmware is 19.5.0 or higher */
+        m2m_ssl_set_active_ciphersuites( SSL_CIPHER_RSA_WITH_AES_128_CBC_SHA | 
                                          SSL_CIPHER_RSA_WITH_AES_128_CBC_SHA256 | 
                                          SSL_CIPHER_RSA_WITH_AES_128_GCM_SHA256 | 
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA | 
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA256 );
-	}
+    }
 
 
     return ret;
@@ -150,9 +150,9 @@ int WiFi::init() {
  */
 wl_status_t WiFi::reconnect() {
 
-	if( _init == false ) {
-		init();
-	}
+    if( _init == false ) {
+        init();
+    }
 
     if( _status == WIFI_STATUS_CONNECTED ) {
         if( this->getCurrentTask() != TASK_NONE ) {
@@ -201,9 +201,9 @@ wl_status_t WiFi::connect() {
 
     tstrM2MIPConfig conf;
 
-	if( _init == false ) {
-		init();
-	}
+    if( _init == false ) {
+        init();
+    }
     
     /* Connection already established */
     if( _status == WIFI_STATUS_CONNECTED ) {
@@ -253,11 +253,11 @@ wl_status_t WiFi::connect() {
 
     /* Start connection to the WiFi network */
     if( m2m_wifi_connect( (char*)ssid, strlen(ssid), M2M_WIFI_SEC_WPA_PSK, (void*)pvAuthInfo, M2M_WIFI_CH_ALL) < 0 ) {
-		_status = WIFI_STATUS_CONNECT_FAILED;
+        _status = WIFI_STATUS_CONNECT_FAILED;
 
         this->endTask( _status );
-		return _status;
-	}
+        return _status;
+    }
 
     /* Set the hostname only if DHCP is used */
     if( _dhcp == true ) {
@@ -280,19 +280,19 @@ wl_status_t WiFi::connect() {
 void WiFi::disconnect() {
 
     if( _init == false ) {
-		return;
-	}
+        return;
+    }
 
     if( _status != WIFI_STATUS_CONNECTED ) {
         return;
     }
 
     /* Close sockets to clean state */
-	for( int i = 0; i < MAX_SOCKET; i++ ) {
-		g_wifisocket.close( i );
-	}
+    for( int i = 0; i < MAX_SOCKET; i++ ) {
+        g_wifisocket.close( i );
+    }
 
-	m2m_wifi_disconnect();
+    m2m_wifi_disconnect();
 }
 
 
@@ -363,10 +363,10 @@ uint32_t WiFi::getDNS()
 void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
 {
     switch( u8MsgType ) {
-		case M2M_WIFI_RESP_CON_STATE_CHANGED: {
+        case M2M_WIFI_RESP_CON_STATE_CHANGED: {
 
             tstrM2mWifiStateChanged *pstrWifiState = (tstrM2mWifiStateChanged *)pvMsg;
-			if( pstrWifiState->u8CurrState == M2M_WIFI_CONNECTED ) {
+            if( pstrWifiState->u8CurrState == M2M_WIFI_CONNECTED ) {
 
                 if( _dhcp == false ) {
                     _status = WIFI_STATUS_CONNECTED;
@@ -431,8 +431,8 @@ void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
         // }
         // break;
 
-    	default:
-		break;
+        default:
+        break;
     }
 }
 
@@ -480,27 +480,27 @@ void WiFi::handleResolve( uint8 *hostName, uint32_t hostIp )
 void WiFi::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
 
 
-	if( error == PING_ERR_SUCCESS ) {
+    if( error == PING_ERR_SUCCESS ) {
 
-		/* Ensure this ICMP reply comes from requested IP address */
-		if ( _resolve == ip ) {
+        /* Ensure this ICMP reply comes from requested IP address */
+        if ( _resolve == ip ) {
 
-			_rtt = (int32_t) rtt;
-		} else {
+            _rtt = (int32_t) rtt;
+        } else {
 
-			/* Another network device replied to the our ICMP request */
-			_rtt = (int32_t) ERR_WIFI_NETWORK_UNREACHABLE;
-		}
+            /* Another network device replied to the our ICMP request */
+            _rtt = (int32_t) ERR_WIFI_NETWORK_UNREACHABLE;
+        }
 
-	} else if( error == PING_ERR_DEST_UNREACH ) {
-		_rtt = (uint32_t) ERR_WIFI_NETWORK_UNREACHABLE;
+    } else if( error == PING_ERR_DEST_UNREACH ) {
+        _rtt = (uint32_t) ERR_WIFI_NETWORK_UNREACHABLE;
 
-	} else if( error == PING_ERR_TIMEOUT ) {
-		_rtt = (uint32_t) ERR_WIFI_PING_TIMEOUT;
+    } else if( error == PING_ERR_TIMEOUT ) {
+        _rtt = (uint32_t) ERR_WIFI_PING_TIMEOUT;
 
-	} else {
-		_rtt = (uint32_t) ERR_WIFI_PING_ERROR;
-	}
+    } else {
+        _rtt = (uint32_t) ERR_WIFI_PING_ERROR;
+    }
 
     if( this->getCurrentTask() == TASK_WIFI_PING ) {
         this->endTask(( _rtt > 0 ) ? TASK_SUCCESS : _rtt );
@@ -518,8 +518,8 @@ void WiFi::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
 void WiFi::onPowerStateChange( uint8_t state ) {
 
     if( _init == false ) {
-		init();
-	}
+        init();
+    }
 
     if( state == POWER_MODE_NORMAL ) {
         this->connect();
@@ -567,8 +567,8 @@ wl_status_t WiFi::status() {
  */
 bool WiFi::startHostnameResolve( const char *hostname ) {
     if( _init == false ) {
-		return false;
-	}
+        return false;
+    }
 
     if( this->startTask( TASK_WIFI_RESOLVE ) != TASK_WIFI_RESOLVE ) {
         
@@ -604,8 +604,8 @@ bool WiFi::startHostnameResolve( const char *hostname ) {
  */
 bool WiFi::getHostnameResolveResults( IPAddress &result ) {
     if( _init == false ) {
-		return false;
-	}
+        return false;
+    }
 
     if( this->getCurrentTask() == TASK_WIFI_RESOLVE ) {
         return false;
@@ -630,8 +630,8 @@ bool WiFi::getHostnameResolveResults( IPAddress &result ) {
  */
 bool WiFi::startPing( const char* hostname ) {
     if( _init == false ) {
-		return false;
-	}
+        return false;
+    }
 
     if( this->startTask( TASK_WIFI_PING_HOSTNAME ) != TASK_WIFI_PING_HOSTNAME ) {
         return false;
@@ -665,8 +665,8 @@ bool WiFi::startPing( const char* hostname ) {
  */
 bool WiFi::startPing( IPAddress host ) {
     if( _init == false ) {
-		return false;
-	}
+        return false;
+    }
 
     if( this->startTask( TASK_WIFI_PING ) != TASK_WIFI_PING ) {
         return false;
@@ -700,8 +700,8 @@ bool WiFi::startPing( IPAddress host ) {
  */
 int32_t WiFi::getPingResult( IPAddress &dest ) {
     if( _init == false ) {
-		return 0;
-	}
+        return 0;
+    }
 
     /* Request is still running */
     if( this->getCurrentTask() == TASK_WIFI_PING ) {
@@ -726,8 +726,8 @@ int32_t WiFi::getPingResult( IPAddress &dest ) {
 void WiFi::runTask() {
 
     if ( _init == false ) {
-		return;
-	}
+        return;
+    }
 
     /* Handle WIFI module events */
     m2m_wifi_handle_events(NULL);
@@ -864,7 +864,7 @@ static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
  */
 static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp ) 
 {
-	g_wifi.handleResolve( hostName, hostIp );
+    g_wifi.handleResolve( hostName, hostIp );
 }
 
 

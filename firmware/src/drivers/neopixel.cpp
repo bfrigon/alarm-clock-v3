@@ -22,7 +22,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_leds    Pin ID connected to the neopixel data line.
  * @param   pin_shdn    Pin ID connected to the neopixel power MOSFET.
@@ -36,7 +36,7 @@ NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize pins for the LED string.
+ * @brief   Initialize pins for the LED string.
  * 
  */
 void NeoPixel::begin() {
@@ -58,7 +58,7 @@ void NeoPixel::begin() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Disable power for the LED string.
+ * @brief   Disable power for the LED string.
  * 
  */
 void NeoPixel::end() {
@@ -76,7 +76,7 @@ void NeoPixel::end() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Disable/enable power for the leds based on the current system 
+ * @brief   Disable/enable power for the leds based on the current system 
  *          power state
  *
  * @param   state    Current power state
@@ -98,7 +98,7 @@ void NeoPixel::onPowerStateChange( uint8_t state ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Calculate the pixel brightness and apply gamma correction for an 
+ * @brief   Calculate the pixel brightness and apply gamma correction for an 
  *          individual color channel.
  *
  * @param   color    Color channel value.
@@ -127,7 +127,7 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Send the data to each pixels.
+ * @brief   Send the data to each pixels.
  *
  * @param   pixmap        Pointer to the pixel data buffer ( 1 bit per pixel )
  * @param   num_pixels    Number of pixels contained in the pixel map.
@@ -247,7 +247,7 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set/clear pixel within the pixel map.
+ * @brief   Set/clear pixel within the pixel map.
  *
  * @param   pixmap    Pointer to the pixel map data.
  * @param   pos       Pixel position to modify.
@@ -269,7 +269,7 @@ void NeoPixel::setPixel( uint8_t *pixmap, uint8_t pos, bool state ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the brightness of the pixel string.
+ * @brief   Sets the brightness of the pixel string.
  *
  * @param   brightness    Brighness value 0-100 %
  * 
@@ -285,7 +285,7 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the pixel string color using an RGB value.
+ * @brief   Sets the pixel string color using an RGB value.
  *
  * @param   r    Red component
  * @param   g    Green component
@@ -301,7 +301,7 @@ void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the pixel string color using the RGB table color ID.
+ * @brief   Sets the pixel string color using the RGB table color ID.
  *
  * @param   id    value 0-12 (use color table in ressource.h)
  * 

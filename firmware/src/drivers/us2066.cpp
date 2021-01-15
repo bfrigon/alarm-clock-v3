@@ -20,7 +20,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   address      I2C address of the OLED module
  * @param   pin_reset    Pin connected to the OLED reset line
@@ -37,7 +37,7 @@ US2066::US2066( uint8_t address, uint8_t pin_reset ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Perform proper power-up sequence and initialize the LCD module.
+ * @brief   Perform proper power-up sequence and initialize the LCD module.
  * 
  */
 void US2066::begin() {
@@ -111,7 +111,7 @@ void US2066::begin() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Shutdown the LCD module.
+ * @brief   Shutdown the LCD module.
  * 
  */
 void US2066::end() {
@@ -130,7 +130,7 @@ void US2066::end() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Selects the display instruction set.
+ * @brief   Selects the display instruction set.
  *
  * @param   iset    Instruction set (US2066_ISET_STANDARD, US2066_ISET_SPECIAL,
  *                  US2066_ISET_EXTENDED or US2066_ISET_OLED).
@@ -195,7 +195,7 @@ void US2066::selectInstructions( uint8_t iset ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sends a single byte command to the LCD module.
+ * @brief   Sends a single byte command to the LCD module.
  *
  * @param   cmd     Command to send
  *
@@ -222,7 +222,7 @@ uint8_t US2066::sendCommand( uint8_t cmd ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Send a two bytes command to the LCD module (cmd + data)
+ * @brief   Send a two bytes command to the LCD module (cmd + data)
  *
  * @param   cmd     Command to send
  * @param   data    Data (single byte)
@@ -252,7 +252,7 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Write custom characters to the LCD CGRAM.
+ * @brief   Write custom characters to the LCD CGRAM.
  *
  * @param   pchrmap    Pointer to the array containing the 
  *                     characters (8x8 bytes).
@@ -304,7 +304,7 @@ uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the DDRAM address corresponding to the specified 
+ * @brief   Set the DDRAM address corresponding to the specified 
  *          row and column.
  *
  * @param   row     Row number (0 based)
@@ -323,7 +323,7 @@ void US2066::setPosition( uint8_t row, uint8_t col ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Clear the display
+ * @brief   Clear the display
  * 
  */
 void US2066::clear() {
@@ -337,7 +337,7 @@ void US2066::clear() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the display contrast
+ * @brief   Set the display contrast
  * 
  * @param   contrast    Contrast value (0-255)
  */
@@ -361,7 +361,7 @@ void US2066::setContrast( uint8_t contrast ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the cursor state of the LCD module.
+ * @brief   Sets the cursor state of the LCD module.
  *
  * @param   underline    Underline cursor ON or OFF.
  * @param   blinking     Blinking cursor (block).
@@ -380,7 +380,7 @@ void US2066::setCursor( bool underline, bool blinking ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Turn the display ON or OFF.
+ * @brief   Turn the display ON or OFF.
  *
  * @param   on          Turn display On or OFF.
  * @param   reverse     Reverse all pixels on the display.
@@ -400,7 +400,7 @@ void US2066::setDisplay( bool on, bool reverse ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Update the display control register on the LCD. 
+ * @brief   Update the display control register on the LCD. 
  *          (display ON/OFF, cursor)
  * 
  */
@@ -425,7 +425,7 @@ void US2066::updateDisplayState() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Fills the LCD with the specified number of characters
+ * @brief   Fills the LCD with the specified number of characters
  *
  * @param   c       Character to print
  * @param   num     Number of times to print the character
@@ -456,7 +456,7 @@ void US2066::fill( char c, uint8_t num ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	IPrint interface callback for printing a single character. 
+ * @brief   IPrint interface callback for printing a single character. 
  *          Sends the output to the LCD module at the current coordinates.
  *
  * @param   c    Character to print

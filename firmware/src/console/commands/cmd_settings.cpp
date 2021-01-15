@@ -22,7 +22,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'config backup' command task
+ * @brief   Starts the 'config backup' command task
  *
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
@@ -38,7 +38,7 @@ bool Console::startTaskConfigBackup() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Monitor the 'config backup' command task. Display prompts and validate 
+ * @brief   Monitor the 'config backup' command task. Display prompts and validate 
  *          responses required before executing the task.
  *           
  */
@@ -171,7 +171,7 @@ void Console::runTaskConfigBackup() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'config restore' command task
+ * @brief   Starts the 'config restore' command task
  *
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
@@ -186,7 +186,7 @@ bool Console::startTaskConfigRestore() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Monitor the 'config restore' command task. Display prompts and validate 
+ * @brief   Monitor the 'config restore' command task. Display prompts and validate 
  *          responses required before executing the task.
  *           
  */
@@ -302,7 +302,7 @@ void Console::runTaskConfigRestore() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'factory reset' command task
+ * @brief   Starts the 'factory reset' command task
  *
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
@@ -320,7 +320,7 @@ bool Console::startTaskFactoryReset() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Monitor the 'factory reset' command task. Display prompts and validate 
+ * @brief   Monitor the 'factory reset' command task. Display prompts and validate 
  *          responses required before executing the task.
  *           
  */

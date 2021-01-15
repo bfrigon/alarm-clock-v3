@@ -22,7 +22,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_irq     QT1070 interrupt pin
  * 
@@ -67,7 +67,7 @@ QT1070::QT1070( uint8_t pin_irq ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the touch IC.
+ * @brief   Initialize the touch IC.
  * 
  */
 void QT1070::begin() {
@@ -88,7 +88,7 @@ void QT1070::begin() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Enable key change interrupt.
+ * @brief   Enable key change interrupt.
  * 
  */
 void QT1070::enableInterrupt() {
@@ -100,7 +100,7 @@ void QT1070::enableInterrupt() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Disable key change interrupt.
+ * @brief   Disable key change interrupt.
  * 
  */
 void QT1070::disableInterrupt() {
@@ -111,7 +111,7 @@ void QT1070::disableInterrupt() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Reads the two status bytes from the touch IC.
+ * @brief   Reads the two status bytes from the touch IC.
  *
  * @return  TRUE if the read was successful, FALSE otherwise.
  * 
@@ -128,7 +128,7 @@ bool QT1070::readStatus() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Write configuration block to the touch IC.
+ * @brief   Write configuration block to the touch IC.
  *
  * @return  TRUE if the write was successful, FALSE otherwise.
  * 
@@ -145,7 +145,7 @@ bool QT1070::writeConfig() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Process the touche events to detect which key was pressed.
+ * @brief   Process the touche events to detect which key was pressed.
  *
  * @return  The pressed key ID, false otherwize.
  * 
@@ -206,7 +206,7 @@ uint8_t QT1070::processEvents() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Process key event using the standard mode meaning that holding 
+ * @brief   Process key event using the standard mode meaning that holding 
  *          the key down will be considered a SHIFT+KEY press.
  *
  * @param   key               Detected key
@@ -261,7 +261,7 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Process key event using the repeat mode.
+ * @brief   Process key event using the repeat mode.
  *
  * @param   key               Detected key
  * @param   lastEventDelay    Delay in ms since the last event.
@@ -323,7 +323,7 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Transmit data to the touch IC.
+ * @brief   Transmit data to the touch IC.
  *
  * @param   reg     Register address to start writing to.
  * @param   data    Pointer to the data to be written.
@@ -354,7 +354,7 @@ uint8_t QT1070::write( uint8_t reg, void *data, uint8_t size ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Read data from the touch IC.
+ * @brief   Read data from the touch IC.
  *
  * @param   reg     Register address to start reading from.
  * @param   data    Pointer to the buffer.
@@ -384,7 +384,7 @@ uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Interrupt service routine for the key change event.
+ * @brief   Interrupt service routine for the key change event.
  *
  */
 void isr_qt1070() {

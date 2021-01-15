@@ -29,7 +29,7 @@ static DateTime cmd_time_adj;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'set date' task
+ * @brief   Starts the 'set date' task
  *
  * @return  TRUE if successful, FALSE otherwise
  *           
@@ -50,7 +50,7 @@ bool Console::startTaskSetDate() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Run the 'set date' task. Display prompts and validate 
+ * @brief   Run the 'set date' task. Display prompts and validate 
  *          responses required before executing the task.
  *           
  */
@@ -224,7 +224,7 @@ void Console::runTaskSetDate() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Print the current date and time to the console
+ * @brief   Print the current date and time to the console
  *           
  */
 void Console::printDateTime() {
@@ -259,7 +259,7 @@ void Console::printDateTime() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'set timezone' task
+ * @brief   Starts the 'set timezone' task
  *
  * @return  TRUE if successful, FALSE otherwise
  *           
@@ -285,7 +285,7 @@ bool Console::startTaskSetTimeZone() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Run the 'set timezone' task. Display prompts and validate 
+ * @brief   Run the 'set timezone' task. Display prompts and validate 
  *          responses required before executing the task.
  *           
  */
@@ -338,7 +338,7 @@ void Console::runTaskSetTimeZone() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Print current timezone information to the console.
+ * @brief   Print current timezone information to the console.
  *           
  */
 void Console::showTimezoneInfo() {

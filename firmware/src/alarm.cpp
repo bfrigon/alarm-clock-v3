@@ -25,7 +25,7 @@ uint8_t vs1053_buffer[VS1053_DATABUFFERLEN];
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_cs           Codec chip select pin
  * @param   pin_xdcs         Codec data select pin
@@ -54,7 +54,7 @@ Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq,
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the codec and amplifier.
+ * @brief   Initialize the codec and amplifier.
  * 
  */
 void Alarm::begin() {
@@ -71,7 +71,7 @@ void Alarm::begin() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Power down the amplifier and codec.
+ * @brief   Power down the amplifier and codec.
  * 
  */
 void Alarm::end() {
@@ -90,7 +90,7 @@ void Alarm::end() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the TPA2016 amplifier 
+ * @brief   Initialize the TPA2016 amplifier 
  * 
  */
 void Alarm::initAmplifier() {
@@ -108,7 +108,7 @@ void Alarm::initAmplifier() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Power up or down the codec and amplifier based on the 
+ * @brief   Power up or down the codec and amplifier based on the 
  *          current power mode
  *
  * @param   state    Current power state 
@@ -141,7 +141,7 @@ void Alarm::onPowerStateChange( uint8_t state ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Return whether the SD card was detected or not.
+ * @brief   Return whether the SD card was detected or not.
  *
  * @return  TRUE if detected, FALSE otherwise.
  * 
@@ -153,7 +153,7 @@ bool Alarm::isSDCardPresent() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check the current state of the SD card detect pin. If a card 
+ * @brief   Check the current state of the SD card detect pin. If a card 
  *          is found, initialize the SdFat library.
  *
  * @return  TRUE if detected, FALSE otherwise.
@@ -237,7 +237,7 @@ bool Alarm::detectSDCard() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Open the next music file in the SD card root directory. 
+ * @brief   Open the next music file in the SD card root directory. 
  * 
  * @details If the end of the directory was reached, it will select the 
  *          fallback file stored in program memory. The next time 
@@ -265,7 +265,7 @@ bool Alarm::openNextFile() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Open a specific music file on the SD card located in the root directory.
+ * @brief   Open a specific music file on the SD card located in the root directory.
  *
  * @details If the file is not found or card was removed, it will use the fallback
  *          file instead.
@@ -341,7 +341,7 @@ bool Alarm::openFile( char* name ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Read the alarm time for a given profile ID
+ * @brief   Read the alarm time for a given profile ID
  *
  * @param   profile_id    Profile to read the time from.
  * @param   time          Pointer to a Time structure where the alarm time will be
@@ -384,7 +384,7 @@ bool Alarm::readProfileAlarmTime( uint8_t profile_id, Time* time, uint8_t* dow )
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Load the given alarm profile from EEPROM
+ * @brief   Load the given alarm profile from EEPROM
  *
  * @param   id    Alarm profile ID to load.
  *
@@ -398,7 +398,7 @@ bool Alarm::loadProfile( uint8_t id ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Load the given alarm profile from EEPROM into an 
+ * @brief   Load the given alarm profile from EEPROM into an 
  *          AlarmProfile structure.
  *
  * @param   profile    Pointer to the AlarmProfile structure to write to.
@@ -423,7 +423,7 @@ bool Alarm::loadProfile( AlarmProfile* profile, uint8_t id ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Store the current profile settings in EEPROM.
+ * @brief   Store the current profile settings in EEPROM.
  *
  * @param   id    Alarm profile ID to save.
  * 
@@ -435,7 +435,7 @@ void Alarm::saveProfile( uint8_t id ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Store alarm profile settings contained in a given AlarmProfile 
+ * @brief   Store alarm profile settings contained in a given AlarmProfile 
  *          structure to EEPROM
  *
  * @param   profile    AlarmProfile structure containing the settings.
@@ -456,7 +456,7 @@ void Alarm::saveProfile( AlarmProfile* profile, uint8_t id ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Activate the alarm with a start delay.
+ * @brief   Activate the alarm with a start delay.
  *
  * @param   mode     Alarm play mode.
  * @param   delay    Delay in ms to wait before activating alarm.
@@ -476,7 +476,7 @@ void Alarm::play( uint8_t mode, uint16_t delay ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Activate the alarm immediately.
+ * @brief   Activate the alarm immediately.
  *
  * @param   mode    Alarm play mode.
  * 
@@ -514,7 +514,7 @@ void Alarm::play( uint8_t mode ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Stops the alarm.
+ * @brief   Stops the alarm.
  * 
  */
 void Alarm::stop() {
@@ -542,7 +542,7 @@ void Alarm::stop() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Stop the audio element of the alarm.
+ * @brief   Stop the audio element of the alarm.
  * 
  */
 void Alarm::audioStop() {
@@ -558,7 +558,7 @@ void Alarm::audioStop() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Start the audio element of the alarm.
+ * @brief   Start the audio element of the alarm.
  * 
  */
 void Alarm::audioStart() {
@@ -602,7 +602,7 @@ void Alarm::audioStart() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Pause the alarm playback and snooze for the given amount of 
+ * @brief   Pause the alarm playback and snooze for the given amount of 
  *          time in the profile settings. 
  * 
  * @details If the snooze delay is set to 0, the alarm will stop.
@@ -634,7 +634,7 @@ void Alarm::snooze() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Resume the alarm playback from a snooze state.
+ * @brief   Resume the alarm playback from a snooze state.
  * 
  */
 void Alarm::resume() {
@@ -658,7 +658,7 @@ void Alarm::resume() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the codec volume.
+ * @brief   Set the codec volume.
  *
  * @param   vol     0 represents a 50 dB attenuation, 100 is 0 dB
  * 
@@ -677,7 +677,7 @@ void Alarm::setVolume( uint8_t vol ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns whether or not the current alarm state is snoozing.
+ * @brief   Returns whether or not the current alarm state is snoozing.
  *
  * @return  TRUE if currently snoozing, FALSE otherwise.
  * 
@@ -689,7 +689,7 @@ bool Alarm::isSnoozing() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Return whether or the the alarm is currently playing.
+ * @brief   Return whether or the the alarm is currently playing.
  *
  * @return  TRUE if currently playing, FALSE otherwise.
  * 
@@ -701,7 +701,7 @@ bool Alarm::isPlaying() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the current alarm play mode
+ * @brief   Get the current alarm play mode
  *
  * @return  Alarm play mode.
  * 
@@ -713,7 +713,7 @@ uint8_t Alarm::getPlayMode() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the time remaining before the alarm playback is resumed.
+ * @brief   Get the time remaining before the alarm playback is resumed.
  *
  * @return  The time remaining in seconds.
  * 
@@ -733,7 +733,7 @@ uint16_t Alarm::getSnoozeTimeRemaining() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the visual element of the alarm playback.
+ * @brief   Starts the visual element of the alarm playback.
  * 
  */
 void Alarm::visualStart() {
@@ -770,7 +770,7 @@ void Alarm::visualStart() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Update the visual effect animation next step delay when speed 
+ * @brief   Update the visual effect animation next step delay when speed 
  *          settings changes.
  *
  */
@@ -796,7 +796,7 @@ inline void Alarm::updateVisualStepDelay() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Process the next step of the visual effect animation.
+ * @brief   Process the next step of the visual effect animation.
  *
  */
 inline void Alarm::visualStep() {
@@ -878,7 +878,7 @@ inline void Alarm::visualStep() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Stops the visual element of the alarm playback.
+ * @brief   Stops the visual element of the alarm playback.
  * 
  */
 inline void Alarm::visualStop() {
@@ -895,7 +895,7 @@ inline void Alarm::visualStop() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Feed alarm audio buffer and process visual effect animation
+ * @brief   Feed alarm audio buffer and process visual effect animation
  *
  */
 void Alarm::runTask() {
@@ -980,7 +980,7 @@ void Alarm::runTask() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Send data to the codec when it is ready to receive data.
+ * @brief   Send data to the codec when it is ready to receive data.
  *
  */
 inline void Alarm::feedBuffer() {
@@ -1033,7 +1033,7 @@ inline void Alarm::feedBuffer() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns whether or not the alarm switch was ON.
+ * @brief   Returns whether or not the alarm switch was ON.
  *
  * @return  TRUE if alarm switch is ON, FALSE otherwise.
  * 
@@ -1045,7 +1045,7 @@ bool Alarm::isAlarmSwitchOn() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks the current state of the alarm switch pin.
+ * @brief   Checks the current state of the alarm switch pin.
  *
  * @return  TRUE if alarm switch is ONor False otherwise.
  * 
@@ -1059,7 +1059,7 @@ bool Alarm::detectAlarmSwitchState() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns wether or not an alarm is set and that the alarm 
+ * @brief   Returns wether or not an alarm is set and that the alarm 
  *          switch is ON.
  *
  */
@@ -1074,7 +1074,7 @@ bool Alarm::isAlarmEnabled() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Checks if the given time match an alarm. If so, load it's profile 
+ * @brief   Checks if the given time match an alarm. If so, load it's profile 
  *          and start playback.
  *
  * @param   now    Current date/time
@@ -1106,7 +1106,7 @@ bool Alarm::checkForAlarms( DateTime* now ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the alarm profile ID which is set to occur next.
+ * @brief   Get the alarm profile ID which is set to occur next.
  *
  * @param   currentTime    DateTime structure containing the current time.
  * @param   matchNow       TRUE to include alarm which match the current time
@@ -1143,7 +1143,7 @@ int8_t Alarm::getNextAlarmID( DateTime* currentTime, bool matchNow ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the delay in minutes until the next alarm is set to occur.
+ * @brief   Get the delay in minutes until the next alarm is set to occur.
  *
  * @param   currentTime    DateTime structure containing the current time.
  * @param   matchNow       TRUE to include alarm which match the current time

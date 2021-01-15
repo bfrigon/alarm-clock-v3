@@ -22,7 +22,7 @@
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Starts the 'net restart' command task
+ * @brief   Starts the 'net restart' command task
  * 
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
@@ -48,7 +48,7 @@ bool Console::startTaskNetRestart() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Monitor the 'net restart' command task
+ * @brief   Monitor the 'net restart' command task
  * 
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
@@ -87,7 +87,7 @@ void Console::runTaskNetRestart() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Starts the 'net start' command task
+ * @brief   Starts the 'net start' command task
  * 
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
@@ -111,7 +111,7 @@ bool Console::startTaskNetStart() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Starts the 'net stop' command task
+ * @brief   Starts the 'net stop' command task
  * 
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
@@ -140,7 +140,7 @@ bool Console::startTaskNetStop() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Monitor the 'net stop' command task
+ * @brief   Monitor the 'net stop' command task
  * 
  */
 void Console::runTaskNetStop() {
@@ -155,7 +155,7 @@ void Console::runTaskNetStop() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Print the status of the WiFi connection to the console
+ * @brief   Print the status of the WiFi connection to the console
  * 
  */
 void Console::printNetStatus() {
@@ -198,7 +198,7 @@ void Console::printNetStatus() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Starts the 'nslookup' command task
+ * @brief   Starts the 'nslookup' command task
  * 
  * @return  TRUE if successful, FALSE if another task is already running or
  *          an invalid parameter is provided.
@@ -253,7 +253,7 @@ bool Console::startTaskNslookup() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Monitor the 'nslookup' command task. Display prompts and validate 
+ * @brief   Monitor the 'nslookup' command task. Display prompts and validate 
  *          input required before executing the task. 
  * 
  */
@@ -277,7 +277,7 @@ void Console::runTaskNsLookup() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'ping' command task
+ * @brief   Starts the 'ping' command task
  *
  */
 bool Console::startTaskPing() {
@@ -337,7 +337,7 @@ bool Console::startTaskPing() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Monitor the 'ping' command task. 
+ * @brief   Monitor the 'ping' command task. 
  *           
  */
 void Console::runTaskPing() {
@@ -387,7 +387,7 @@ void Console::runTaskPing() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Starts the 'net config' command task
+ * @brief   Starts the 'net config' command task
  *           
  */
 bool Console::startTaskNetworkConfig() {
@@ -409,7 +409,7 @@ bool Console::startTaskNetworkConfig() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Run the 'net config' command task. Display prompts and validate 
+ * @brief   Run the 'net config' command task. Display prompts and validate 
  *          responses required before executing the task.
  * 
  */

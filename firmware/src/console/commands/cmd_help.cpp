@@ -20,7 +20,7 @@
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Starts the 'help' command task
+ * @brief   Starts the 'help' command task
  * 
  */
 void Console::startTaskPrintHelp() {
@@ -33,7 +33,7 @@ void Console::startTaskPrintHelp() {
 
 /*! ------------------------------------------------------------------------
  * 
- * @brief	Run the 'help' command task
+ * @brief   Run the 'help' command task
  * 
  */
 void Console::runTaskPrintHelp() {

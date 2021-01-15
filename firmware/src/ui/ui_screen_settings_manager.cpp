@@ -26,7 +26,7 @@ bool confirm_action = false;
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when an item on the screen change it's value
+ * @brief   Event raised when an item on the screen change it's value
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   item      Pointer to the item that changed it's value
@@ -39,7 +39,7 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when entering the screen
+ * @brief   Event raised when entering the screen
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -64,7 +64,7 @@ bool settingsManager_onEnterScreen( Screen* screen ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when updating the screen.
+ * @brief   Event raised when updating the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -141,7 +141,7 @@ bool settingsManager_onDrawScreen( Screen* screen ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.

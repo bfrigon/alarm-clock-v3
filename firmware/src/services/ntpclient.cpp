@@ -25,7 +25,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize class
+ * @brief   Initialize class
  *
  */
 NtpClient::NtpClient() {
@@ -36,7 +36,7 @@ NtpClient::NtpClient() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Begin the synchronization request
+ * @brief   Begin the synchronization request
  *
  * @param   verbose    TRUE to display messages
  *
@@ -113,7 +113,7 @@ bool NtpClient::sync( bool verbose ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Request a socket bind to the NTP port 123
+ * @brief   Request a socket bind to the NTP port 123
  *
  * @return  TRUE if the request was successful or FALSE otherwise. 
  * 
@@ -136,7 +136,7 @@ bool NtpClient::requestBind() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Format the NTP request packet and sent it
+ * @brief   Format the NTP request packet and sent it
  *
  * @return  TRUE if the request was successful or FALSE otherwise. 
  * 
@@ -194,7 +194,7 @@ bool NtpClient::sendNtpPacket() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check if a response was received. If so, decode the NTP response 
+ * @brief   Check if a response was received. If so, decode the NTP response 
  *          packet and update the clock accordingly
  *
  * @return  TRUE if a response was received and processed or FALSE otherwise. 
@@ -306,7 +306,7 @@ bool NtpClient::readNtpResponse() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Enable/disable the automatic time synchronization
+ * @brief   Enable/disable the automatic time synchronization
  *
  * @param   enabled    Enable the auto-sync feature
  * @param   verbose    Display messages on the console 
@@ -343,7 +343,7 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Monitor the different stages of the request.
+ * @brief   Monitor the different stages of the request.
  * 
  */
 void NtpClient::runTask() {

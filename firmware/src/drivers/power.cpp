@@ -23,7 +23,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  * @param   pin_onbatt    Pin which detect when the system is running
  *                        on battery power.
@@ -42,7 +42,7 @@ Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the power management class
+ * @brief   Initialize the power management class
  * 
  */
 void Power::begin() {
@@ -61,7 +61,7 @@ void Power::begin() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the current power state.
+ * @brief   Get the current power state.
  *
  * @return  Current power state value.
  * 
@@ -73,7 +73,7 @@ uint8_t Power::getPowerMode() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the power state
+ * @brief   Set the power state
  *
  * @param   mode    The new power state
  *
@@ -116,7 +116,7 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Run power management tasks.
+ * @brief   Run power management tasks.
  *
  */
 void Power::runTask() {
@@ -137,7 +137,7 @@ void Power::runTask() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Detect the state of the 'on battery' pin and set power mode 
+ * @brief   Detect the state of the 'on battery' pin and set power mode 
  *          accordingly.
  *
  * @return  Detected power state
@@ -172,7 +172,7 @@ uint8_t Power::detectPowerState() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Detect the state of the 'on battery' pin.
+ * @brief   Detect the state of the 'on battery' pin.
  *
  * @return  TRUE if currently running on battery power, FALSE otherwise
  * 
@@ -184,7 +184,7 @@ bool Power::isOnBatteryPower() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Resets the suspend timer.
+ * @brief   Resets the suspend timer.
  * 
  */
 void Power::resetSuspendDelay() {
@@ -194,7 +194,7 @@ void Power::resetSuspendDelay() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Enter CPU sleep mode.
+ * @brief   Enter CPU sleep mode.
  * 
  */
 void Power::enterSleep() {
@@ -243,7 +243,7 @@ void Power::enterSleep() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Pull the reset pin low from the "factory config/reset" pin to reset 
+ * @brief   Pull the reset pin low from the "factory config/reset" pin to reset 
  *          the processor.
  * 
  */
@@ -263,7 +263,7 @@ void Power::cpuReset() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Gracefuly reboot
+ * @brief   Gracefuly reboot
  * 
  */
 void Power::reboot() {
@@ -279,7 +279,7 @@ void Power::reboot() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check the state of the "factory config/reset" button
+ * @brief   Check the state of the "factory config/reset" button
  *
  * @return  TRUE if the button is pressed or FALSE otherwise.
  * 
@@ -295,7 +295,7 @@ bool Power::detectConfigResetButton() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Enable the watchdog timer.
+ * @brief   Enable the watchdog timer.
  * 
  */
 void Power::enableWatchdog() {
@@ -307,7 +307,7 @@ void Power::enableWatchdog() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Disable the watchdog timer.
+ * @brief   Disable the watchdog timer.
  * 
  */
 void Power::disableWatchdog() {
@@ -319,7 +319,7 @@ void Power::disableWatchdog() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Reset the watchdog timer.
+ * @brief   Reset the watchdog timer.
  * 
  */
 void Power::resetWatchdog() {

@@ -19,9 +19,10 @@
 #include "../hardware.h"
 #include "../services/ntpclient.h"
 
+
 /*! ------------------------------------------------------------------------
  *
- * @brief	Class constructor
+ * @brief   Class constructor
  *
  */
 Console::Console() {
@@ -34,7 +35,7 @@ Console::Console() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	IPrint interface callback for printing a single character. Sends the 
+ * @brief   IPrint interface callback for printing a single character. Sends the 
  *          output to the serial port.
  * 
  * @param   c   character to print
@@ -48,7 +49,7 @@ uint8_t Console::_print( char c ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize the console
+ * @brief   Initialize the console
  *
  * @param   baud    Speed of the serial port
  * 
@@ -69,7 +70,7 @@ void Console::begin( unsigned long baud ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Discard the user input from the serial port
+ * @brief   Discard the user input from the serial port
  * 
  */
 void Console::resetInput() {
@@ -82,7 +83,7 @@ void Console::resetInput() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Enable user input
+ * @brief   Enable user input
  * 
  */
 void Console::enableInput() {
@@ -95,7 +96,7 @@ void Console::enableInput() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Inhibit user input
+ * @brief   Inhibit user input
  * 
  */
 void Console::disableInput() {
@@ -105,7 +106,7 @@ void Console::disableInput() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Check if the input buffer contains the specified command
+ * @brief   Check if the input buffer contains the specified command
  *
  * @param   command         Command name to find
  * @param   hasParameter    TRUE if the command expects a parameter, 
@@ -149,7 +150,7 @@ bool Console::matchCommandName( const char *command, bool hasParameter ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Returns the pointer to the start of the parameter in the input buffer
+ * @brief   Returns the pointer to the start of the parameter in the input buffer
  *
  * @return  Pointer to the parameter start, 0 if none is found.
  * 
@@ -171,7 +172,7 @@ char* Console::getInputParameter() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Remove leading and trailing white spaces from the input buffer
+ * @brief   Remove leading and trailing white spaces from the input buffer
  * 
  */
 void Console::trimInput() {
@@ -181,27 +182,27 @@ void Console::trimInput() {
         return;
     }
 
-	char *begin = _inputbuffer;
-	while( isspace( *begin )) begin++;
+    char *begin = _inputbuffer;
+    while( isspace( *begin )) begin++;
 
-	char *end = _inputbuffer + _inputlength - 1;
-	while( isspace( *end ) && end >= begin ) {
+    char *end = _inputbuffer + _inputlength - 1;
+    while( isspace( *end ) && end >= begin ) {
         end--;
     } 
 
-	_inputlength = end + 1 - begin;
+    _inputlength = end + 1 - begin;
 
-	if (begin > _inputbuffer) {
+    if (begin > _inputbuffer) {
         memcpy( _inputbuffer, begin, _inputlength );
     } 
 
-	_inputbuffer[ _inputlength ] = 0;
+    _inputbuffer[ _inputlength ] = 0;
 }
 
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Process incomming character from the serial port and echo the 
+ * @brief   Process incomming character from the serial port and echo the 
  *          input back on the serial port accordingly.
  *
  * @return  TRUE if end of line is detected, FALSE otherwise
@@ -258,7 +259,7 @@ bool Console::processInput() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Display an input prompt
+ * @brief   Display an input prompt
  * 
  */
 void Console::displayPrompt() {
@@ -268,7 +269,7 @@ void Console::displayPrompt() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Scan the input buffer for known commands and run them accordingly.
+ * @brief   Scan the input buffer for known commands and run them accordingly.
  * 
  */
 void Console::parseCommand() {
@@ -390,7 +391,7 @@ void Console::parseCommand() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Run current tasks
+ * @brief   Run current tasks
  * 
  */
 void Console::runTask() {

@@ -22,7 +22,7 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Initialize class with UTC as the default timezone
+ * @brief   Initialize class with UTC as the default timezone
  *
  */
 TimeZone::TimeZone() {
@@ -35,7 +35,7 @@ TimeZone::TimeZone() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the current timezone ID
+ * @brief   Sets the current timezone ID
  *
  * @param   zone_id    Timezone index in the timezone table
  * 
@@ -57,7 +57,7 @@ bool TimeZone::setTimezoneByID( uint16_t id ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Sets the current timezone by name
+ * @brief   Sets the current timezone by name
  *
  * @param   name    Name of the timezone.
  *
@@ -78,7 +78,7 @@ bool TimeZone::setTimezoneByName( char *name ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Find a timezone index in the table from it's name.
+ * @brief   Find a timezone index in the table from it's name.
  *
  * @param   name   Pointer to an array of character containg the name 
  *                 to search for
@@ -104,7 +104,7 @@ int16_t TimeZone::findTimezoneByName( char* name ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the current timezone name
+ * @brief   Get the current timezone name
  *
  * @return  Pointer to the array of character in program memory containing
  *          the name of the timezone.
@@ -117,7 +117,7 @@ const char* TimeZone::getName() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the current timezone abbreviation whether it is currently 
+ * @brief   Get the current timezone abbreviation whether it is currently 
  *          on standard time or daylight saving time.
  *
  * @param   local    Pointer to a DateTime object containing local time.
@@ -138,7 +138,7 @@ const char* TimeZone::getAbbreviation( DateTime *local ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Convert a DateTime object from UTC to local time for the 
+ * @brief   Convert a DateTime object from UTC to local time for the 
  *          current timezone
  *
  * @param   utc    Pointer to a DateTime object containing UTC time.
@@ -175,7 +175,7 @@ void TimeZone::toLocal( DateTime *utc ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Convert a DateTime object from local time to UTC for the 
+ * @brief   Convert a DateTime object from local time to UTC for the 
  *          current timezone
  *
  * @param   utc    Pointer to a DateTime object containing local time time.
@@ -204,7 +204,7 @@ void TimeZone::toUTC( DateTime *local ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Determine whether or not the local time is currently 
+ * @brief   Determine whether or not the local time is currently 
  *          in a daylight saving period
  *
  * @param   local    Pointer to a DateTime object containing local time.
@@ -237,7 +237,7 @@ bool TimeZone::isDST( DateTime *local ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the specified DateTime object to the DST->STD transition 
+ * @brief   Set the specified DateTime object to the DST->STD transition 
  *          for this timezone.
  *
  * @param   year    Current year
@@ -262,7 +262,7 @@ void TimeZone::getStdTransition( int16_t year, DateTime *std ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Set the specified DateTime object to the STD->DST transition 
+ * @brief   Set the specified DateTime object to the STD->DST transition 
  *          for this timezone.
  *
  * @param   year    Current year
@@ -287,7 +287,7 @@ void TimeZone::getDstTransition( int16_t year, DateTime *dst ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the standard time offset from UTC
+ * @brief   Get the standard time offset from UTC
  *
  * @return  Offset in minutes
  * 
@@ -299,7 +299,7 @@ int16_t TimeZone::getStdUtcOffset() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief	Get the daylight saving time offset from UTC
+ * @brief   Get the daylight saving time offset from UTC
  *
  * @return  Offset in minutes
  * 
