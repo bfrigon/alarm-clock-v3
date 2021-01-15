@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/drivers/wifi.cpp
+// File    : src/drivers/wifi/wifi.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // Credit  : This file contains large portions of code from the WiFi101
@@ -135,7 +135,6 @@ int WiFi::init() {
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA | 
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA256 );
     }
-
 
     return ret;
 }
@@ -512,7 +511,7 @@ void WiFi::handlePingResponse( uint32 ip, uint32 rtt, uint8 error ) {
  *
  * @brief   Called when power management driver changes the current power mode
  *
- * @param   state : New power state
+ * @param   state    New power state
  * 
  */
 void WiFi::onPowerStateChange( uint8_t state ) {
@@ -534,9 +533,9 @@ void WiFi::onPowerStateChange( uint8_t state ) {
  * @brief   Check if the connection is established
  *
  * @return  TRUE if connection is established, FALSE otherwise. 
- *           If using DHCP, returns TRUE only once a valid DHCP response 
- *           has been received.
- *           
+ *          If using DHCP, returns TRUE only once a valid DHCP response 
+ *          has been received.
+ * 
  */
 bool WiFi::isConnected() {
     return ( _status == WIFI_STATUS_CONNECTED );
@@ -562,7 +561,7 @@ wl_status_t WiFi::status() {
  * @param   hostname    Hostname to resolve
  *
  * @return  TRUE if successful, FALSE if a resolve request is already running 
- *           or an invalid hostname is provided
+ *          or an invalid hostname is provided
  *           
  */
 bool WiFi::startHostnameResolve( const char *hostname ) {
@@ -695,8 +694,8 @@ bool WiFi::startPing( IPAddress host ) {
  * @param   result    IPADDRESS structure to write the result to.
  *
  * @return  0 if request is still running, < 0 if an error
- *           occured or round trip time is ping was successful.
- *           
+ *          occured or round trip time is ping was successful.
+ * 
  */
 int32_t WiFi::getPingResult( IPAddress &dest ) {
     if( _init == false ) {

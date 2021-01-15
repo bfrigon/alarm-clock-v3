@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/drivers/wifisocket.cpp
+// File    : src/drivers/wifi/wifisocket.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // Credit  : This file contains large portions of code from the WiFi101
@@ -52,7 +52,7 @@ WiFiSocket::WiFiSocket() {
  *
  * @brief   Handle socket events
  *
- * @param   socket 	  Socket ID
+ * @param   socket    Socket ID
  * @param   u8Msg     Event ID
  * @param   pvMsg     Pointer to additional event data
  * 
@@ -175,17 +175,17 @@ void WiFiSocket::handleEvent( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
  *
  * @brief   Create a socket
  * 
- * @param   u16Domain 	 family. The only allowed value is AF_INET (IPv4.0) 
- * 						 for TCP/UDP sockets.
+ * @param   u16Domain    Family. The only allowed value is AF_INET (IPv4.0) 
+ *                       for TCP/UDP sockets.
  * @param   u8Type       Socket type :
- * 						  - SOCK_STREAM
- * 						  - SOCK_DGRAM
+ *                        - SOCK_STREAM
+ *                        - SOCK_DGRAM
  * @param   u8Flags      Used to specify the socket creation flags. It shall be 
- * 						 set to zero for normal TCP/UDP sockets. It could be  
- * 						 SOCKET_FLAGS_SSL if the socket is used for SSL session.
+ *                       set to zero for normal TCP/UDP sockets. It could be  
+ *                       SOCKET_FLAGS_SSL if the socket is used for SSL session.
  * 
- * @return	If successful, returns the socket ID or a negative number to 
- * 			indicate an error.
+ * @return  If successful, returns the socket ID or a negative number to 
+ *          indicate an error.
  */
 SOCKET WiFiSocket::create( uint16 u16Domain, uint8 u8Type, uint8 u8Flags ) {
 
@@ -205,15 +205,15 @@ SOCKET WiFiSocket::create( uint16 u16Domain, uint8 u8Type, uint8 u8Flags ) {
  * @brief   Associates the provided address and local port to the socket
  * 
  * @details This functions returns immediately. Upon socket bind completion, 
- * 		    the application will receive a SOCKET_MSG_BIND message in the 
- * 			socket callback. The function bound() can be used to determine
- * 			if the socket is ready.
+ *          the application will receive a SOCKET_MSG_BIND message in the 
+ *          socket callback. The function bound() can be used to determine
+ *          if the socket is ready.
  * 
- * @param   sock 	    Socket ID
- * @param   pstrAddr    Pointer to socket address structure "sockaddr_in" 
- * @param   u8AddrLen   Size of the given socket address structure in bytes.
+ * @param   sock         Socket ID
+ * @param   pstrAddr     Pointer to socket address structure "sockaddr_in" 
+ * @param   u8AddrLen    Size of the given socket address structure in bytes.
  * 
- * @return	TRUE if successful, FALSE otherwise.
+ * @return  TRUE if successful, FALSE otherwise.
  * 
  */
 bool WiFiSocket::requestBind( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8AddrLen ) {
@@ -233,9 +233,9 @@ bool WiFiSocket::requestBind( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8Ad
  *
  * @brief   Check if the given socket is bound. 
  * 
- * @param   sock	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	TRUE if bound, FALSE otherwise
+ * @return  TRUE if bound, FALSE otherwise
  * 
  */
 bool WiFiSocket::bound( SOCKET sock ) {
@@ -249,17 +249,17 @@ bool WiFiSocket::bound( SOCKET sock ) {
 /*! ------------------------------------------------------------------------
  *
  * @brief   After successful socket binding to an IP address and port on the 
- * 			system, start listening on a passive socket for incoming connections.
+ *          system, start listening on a passive socket for incoming connections.
  * 
  * @details This functions returns immediately. Upon the call to the asynchronous 
- * 			listen function, response is received through the event SOCKET_MSG_BIND
- *			in the socket callback. The function listening() can be used to determine
- * 			if the socket is ready to accept connections.
+ *          listen function, response is received through the event SOCKET_MSG_BIND
+ *          in the socket callback. The function listening() can be used to determine
+ *          if the socket is ready to accept connections.
  * 
- * @param   sock 	    Socket ID
+ * @param   sock        Socket ID
  * @param   backlog    	Not used by the current implementation
  * 
- * @return	TRUE if successful, FALSE otherwise.
+ * @return  TRUE if successful, FALSE otherwise.
  * 
  */
 bool WiFiSocket::requestListen( SOCKET sock, uint8 backlog ) {
@@ -278,9 +278,9 @@ bool WiFiSocket::requestListen( SOCKET sock, uint8 backlog ) {
  *
  * @brief   Check if the given socket is listening. 
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	TRUE if listening, FALSE otherwise
+ * @return  TRUE if listening, FALSE otherwise
  * 
  */
 bool WiFiSocket::listening( SOCKET sock ) {
@@ -296,15 +296,15 @@ bool WiFiSocket::listening( SOCKET sock ) {
  * @brief   Establishes a TCP connection with a remote server.
  * 
  * @details This functions returns immediately. The application socket callback 
- * 			function is notified of a successful new socket connection through 
- * 			the event SOCKET_MSG_CONNECT. The function connected() can be used 
- * 			to determine the connection is established.
+ *          function is notified of a successful new socket connection through 
+ *          the event SOCKET_MSG_CONNECT. The function connected() can be used 
+ *          to determine the connection is established.
  * 
- * @param   sock 	    Socket ID
+ * @param   sock        Socket ID
  * @param   pstrAddr    Pointer to socket address structure "sockaddr_in" 
- * @param   u8AddrLen	Size of the given socket address structure in bytes.
+ * @param   u8AddrLen   Size of the given socket address structure in bytes.
  * 
- * @return	TRUE if successful, FALSE otherwise.
+ * @return  TRUE if successful, FALSE otherwise.
  * 
  */
 bool WiFiSocket::requestConnect( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8AddrLen ) {
@@ -326,9 +326,9 @@ bool WiFiSocket::requestConnect( SOCKET sock, struct sockaddr *pstrAddr, uint8 u
  *
  * @brief   Check if the given socket is connected to a remote server.
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	TRUE if connected, FALSE otherwise
+ * @return  TRUE if connected, FALSE otherwise
  * 
  */
 bool WiFiSocket::connected( SOCKET sock ) {
@@ -343,14 +343,14 @@ bool WiFiSocket::connected( SOCKET sock ) {
  *
  * @brief   Set the socket option.
  * 
- * @param   socket 		    Socket ID
- * @param	u8Level			protocol level
- * @param	option_name		option to be set
- * @param	option_value	pointer to user provided value.
- * @param	u16OptionLen	length of the option value in bytes
+ * @param   socket          Socket ID
+ * @param   u8Level         protocol level
+ * @param   option_name     option to be set
+ * @param   option_value    pointer to user provided value.
+ * @param   u16OptionLen    length of the option value in bytes
  * 
- * @return	SOCK_ERR_NO_ERROR if successful or a negative number indicating
- * 			an error
+ * @return  SOCK_ERR_NO_ERROR if successful or a negative number indicating
+ * 	        an error
  * 
  */
 sint8 WiFiSocket::setopt( SOCKET socket, uint8 u8Level, uint8 option_name, const void *option_value, uint16 u16OptionLen ) {
@@ -363,9 +363,9 @@ sint8 WiFiSocket::setopt( SOCKET socket, uint8 u8Level, uint8 option_name, const
  *
  * @brief   Get the number of received bytes in the buffer
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	Number of bytes available
+ * @return  Number of bytes available
  * 
  */
 int WiFiSocket::available( SOCKET sock ) {
@@ -384,7 +384,7 @@ int WiFiSocket::available( SOCKET sock ) {
  *
  * @brief   Reads the next character in the buffer without discarding it.
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
  * @return  Character read or -1 if no character is available
  * 
@@ -414,13 +414,13 @@ int WiFiSocket::peek( SOCKET sock ) {
 /*! ------------------------------------------------------------------------
  *
  * @brief   Reads from the packet buffer and copy the data to
- * 			the specified buffer
+ *          the specified buffer
  * 
- * @param   sock 	Socket ID
- * @param 	buf		Pointer to a buffer to hold incoming packets
- * @param	size	Maximum size of the buffer
+ * @param   sock    Socket ID
+ * @param   buf     Pointer to a buffer to hold incoming packets
+ * @param   size    Maximum size of the buffer
  * 
- * @return	The number of bytes read.
+ * @return  The number of bytes read.
  * 
  */
 int WiFiSocket::read( SOCKET sock, uint8_t* buf, size_t size ) {
@@ -485,9 +485,9 @@ int WiFiSocket::read( SOCKET sock, uint8_t* buf, size_t size ) {
  *
  * @brief   Get the server IP address the given socket is connected to.
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	IPAddress structure containing the ip address.
+ * @return  IPAddress structure containing the ip address.
  * 
  */
 IPAddress WiFiSocket::remoteIP( SOCKET sock )
@@ -500,9 +500,9 @@ IPAddress WiFiSocket::remoteIP( SOCKET sock )
  *
  * @brief   Get the server port number the given socket is connected to.
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	The port number
+ * @return  The port number
  * 
  */
 uint16_t WiFiSocket::remotePort( SOCKET sock )
@@ -514,14 +514,14 @@ uint16_t WiFiSocket::remotePort( SOCKET sock )
 /*! ------------------------------------------------------------------------
  *
  * @brief   Transmit the data contained in the given buffer to the connected
- * 			remote host.
+ *          remote host.
  * 
- * @param   sock 	Socket ID
- * @param	buf		Pointer to a buffer holding data to be transmitted
- * @param	size	Length of the buffer to send
+ * @param   sock    Socket ID
+ * @param   buf     Pointer to a buffer holding data to be transmitted
+ * @param   size    Length of the buffer to send
  * 
- * @return	number of bytes sent if successful or negative number inticating 
- * 			an error.
+ * @return  Number of bytes sent if successful or negative number inticating 
+ *          an error.
  * 
  */
 size_t WiFiSocket::write( SOCKET sock, const uint8_t *buf, size_t size ) {
@@ -555,17 +555,17 @@ size_t WiFiSocket::write( SOCKET sock, const uint8_t *buf, size_t size ) {
 /*! ------------------------------------------------------------------------
  *
  * @brief   Transmit the data contained in the given buffer to the connected
- * 			remote host.
+ *          remote host.
  * 
- * @param   sock 			 Socket ID
- * @param	pvSendBuffer	 Pointer to a buffer holding data to be transmitted
- * @param	u16SendLength	 The buffer size in bytes
- * @param	flags			 Not used in the current implementation
- * @param	pstrDestAddr	 The destination address.
- * @param	u8AddrLen		 Destination address length in bytes.
+ * @param   sock             Socket ID
+ * @param   pvSendBuffer     Pointer to a buffer holding data to be transmitted
+ * @param   u16SendLength    The buffer size in bytes
+ * @param   flags            Not used in the current implementation
+ * @param   pstrDestAddr     The destination address.
+ * @param   u8AddrLen        Destination address length in bytes.
  * 
- * @return	SOCK_ERR_NO_ERROR if successful or negative number inticating an
- * 			error
+ * @return  SOCK_ERR_NO_ERROR if successful or negative number inticating an
+ * 	        error
  * 
  */
 sint16 WiFiSocket::sendto( SOCKET sock, void *pvSendBuffer, uint16 u16SendLength, uint16 flags, struct sockaddr *pstrDestAddr, uint8 u8AddrLen ) {
@@ -590,10 +590,10 @@ sint16 WiFiSocket::sendto( SOCKET sock, void *pvSendBuffer, uint16 u16SendLength
  *
  * @brief   Close the socket
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
- * @return	SOCK_ERR_NO_ERROR if successful or negative number inticating an
- * 			error
+ * @return  SOCK_ERR_NO_ERROR if successful or negative number inticating an
+ *          error
  * 
  */
 sint8 WiFiSocket::close( SOCKET sock ) {
@@ -631,8 +631,8 @@ sint8 WiFiSocket::close( SOCKET sock ) {
  *
  * @brief   Checks if a given socket belongs to the parent socket.
  * 
- * @param   sock 	Parent socket ID
- * @param   child 	Child socket ID
+ * @param   sock     Parent socket ID
+ * @param   child    Child socket ID
  * 
  * @return  1 if successful, 0 if an error occured
  * 
@@ -652,7 +652,7 @@ int WiFiSocket::hasParent( SOCKET sock, SOCKET child ) {
  * @brief   Find the next child socket that belong to the given parent 
  *          socket who have accepted a connection from a client.
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
  * @return  Available socket or -1 if no socket has accepted a connection.
  * 
@@ -680,7 +680,7 @@ SOCKET WiFiSocket::accepted( SOCKET sock ) {
  *
  * @brief   Fill the packet buffer with the received data.
  * 
- * @param   sock 	Socket ID
+ * @param   sock    Socket ID
  * 
  * @return  1 if successful, 0 if an error occured.
  * 

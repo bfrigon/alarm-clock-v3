@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/drivers/wifi/udpclient.h
+// File    : src/drivers/wifi/tcpclient.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -20,4 +20,4 @@
 
 
 
-#endif /* UDPCLIENT_H */
+#endif /* TCPCLIENT_H */

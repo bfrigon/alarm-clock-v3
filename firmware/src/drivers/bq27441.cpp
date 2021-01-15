@@ -305,7 +305,7 @@ uint8_t BQ27441::getBatteryState() {
  *
  * @brief   Gets the estimated remaining battery capacity.
  *
- * @param   Filtered
+ * @param   filtered
  *
  * @return  Remaining capacity in milliamps-hour (mAh)
  * 
@@ -323,7 +323,7 @@ uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
  *
  * @brief   Gets the fully charged battery capacity.
  *
- * @param   Filtered
+ * @param   filtered
  *
  * @return  Fully charged capacity in milliamps-hour (mAh)
  * 
@@ -492,7 +492,7 @@ uint8_t BQ27441::read( uint8_t reg, void* data, uint8_t size ) {
  *
  * @brief   Read a 2-bytes (word) value from the monitor IC
  *
- * @param   reg     Register address where to read the word from.
+ * @param   reg    Register address where to read the word from.
  *
  * @return  Word value (2 bytes)
  * 
