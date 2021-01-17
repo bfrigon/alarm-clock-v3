@@ -48,7 +48,7 @@
 #define MAX_LENGTH_ALARM_FILENAME       12
 #define MAX_LENGTH_ALARM_MESSAGE        16
 #define MAX_SSID_LENGTH                 32
-#define MAX_HOSTNAME_LENGTH             64
+#define MAX_HOSTNAME_LENGTH             32
 #define MAX_NTPSERVER_LENGTH            64
 #define MAX_WKEY_LENGTH                 63
 #define MIN_CLOCK_BRIGHTNESS            10
@@ -230,17 +230,6 @@ enum {
 enum {
     TASK_CONFIG_BACKUP = 1,
     TASK_CONFIG_RESTORE
-};
-
-
-/* Task errors */
-enum {
-    ERR_CONFIG_NO_SDCARD = (-40),
-    ERR_CONFIG_FILE_WRITE,
-    ERR_CONFIG_FILE_NOT_FOUND,
-    ERR_CONFIG_FILE_READ,
-    ERR_CONFIG_FILE_CANT_OPEN,
-    ERR_CONFIG_FILE_EXISTS,
 };
 
 

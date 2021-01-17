@@ -17,6 +17,7 @@
 //******************************************************************************
 #include "../console.h"
 #include "../../config.h"
+#include "../../task_errors.h"
 #include "../../drivers/power.h"
 
 
@@ -60,7 +61,7 @@ void Console::runTaskConfigBackup() {
         filename = this->getInputParameter();
 
         if( filename != 0 ) {
-            memmove( _inputbuffer, filename, strlen( filename ) + 1);
+            memmove( _inputBuffer, filename, strlen( filename ) + 1);
 
             /* Skip filename prompt if a filename is provided in the command parameter */
             _taskIndex = 1;
@@ -80,17 +81,17 @@ void Console::runTaskConfigBackup() {
         case 1:
 
             /* If filename is empty, use the default one */
-            if( strlen( _inputbuffer ) == 0 ) {
-                strcpy( _inputbuffer, CONFIG_BACKUP_FILENAME );
+            if( strlen( _inputBuffer ) == 0 ) {
+                strcpy( _inputBuffer, CONFIG_BACKUP_FILENAME );
             }
 
             /* Start the backup task */
-            if( g_config.startBackup( _inputbuffer, false ) == false ) {
+            if( g_config.startBackup( _inputBuffer, false ) == false ) {
 
                 if( g_config.getTaskError() == ERR_CONFIG_FILE_EXISTS ) {
 
                     /* Move filename to an unused area of the input buffer */
-                    memmove( _inputbuffer + 4, _inputbuffer, strlen( _inputbuffer ) + 1 );
+                    memmove( _inputBuffer + 4, _inputBuffer, strlen( _inputBuffer ) + 1 );
 
                     /* Continue on step 2, display overwrite prompt */
                     _taskIndex = 2;
@@ -117,22 +118,22 @@ void Console::runTaskConfigBackup() {
         case 2:
             _inputBufferLimit = 1;
 
-            this->printf_P( S_CONSOLE_CFG_FILE_EXISTS, _inputbuffer + 4 );
+            this->printf_P( S_CONSOLE_CFG_FILE_EXISTS, _inputBuffer + 4 );
             break;
 
         /* Validate overwrite file prompt */
         case 3:
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
                 
                 /* Start backup */
-                g_config.startBackup( _inputbuffer + 4, true );
+                g_config.startBackup( _inputBuffer + 4, true );
 
                 this->println();
                 this->println_P( S_CONSOLE_CFG_SAVING );
 
                 _taskIndex = 4;
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
                 this->endTask( TASK_SUCCESS );
                 return;
 
@@ -208,7 +209,7 @@ void Console::runTaskConfigRestore() {
         filename = this->getInputParameter();
 
         if( filename != 0 ) {
-            memmove( _inputbuffer, filename, strlen( filename ) + 1);
+            memmove( _inputBuffer, filename, strlen( filename ) + 1);
 
             /* Skip filename prompt if a filename is provided in the command parameter */
             _taskIndex = 1;
@@ -228,12 +229,12 @@ void Console::runTaskConfigRestore() {
         case 1:
 
             /* If filename is empty, use the default one */
-            if( strlen( _inputbuffer ) == 0 ) {
-                strcpy( _inputbuffer, CONFIG_BACKUP_FILENAME );
+            if( strlen( _inputBuffer ) == 0 ) {
+                strcpy( _inputBuffer, CONFIG_BACKUP_FILENAME );
             }
 
             /* Move filename to an unused area of the input buffer */
-            memmove( _inputbuffer + 4, _inputbuffer, strlen( _inputbuffer ) + 1 );
+            memmove( _inputBuffer + 4, _inputBuffer, strlen( _inputBuffer ) + 1 );
 
             this->println();
             this->println_P( S_CONSOLE_CFG_RESTORE_MSG );
@@ -248,10 +249,10 @@ void Console::runTaskConfigRestore() {
 
         /* Validate overwrite file prompt */
         case 3:
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
                 
                 /* Start the restore task */
-                if( g_config.startRestore( _inputbuffer + 4 ) == false ) {
+                if( g_config.startRestore( _inputBuffer + 4 ) == false ) {
 
                     this->endTask( g_config.getTaskError() );
                     return;
@@ -262,7 +263,7 @@ void Console::runTaskConfigRestore() {
 
                 _taskIndex = 4;
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
                 this->endTask( TASK_SUCCESS );
                 return;
 
@@ -347,7 +348,7 @@ void Console::runTaskFactoryReset() {
 
         /* Validate overwrite file prompt */
         case 1:
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 this->println();
                 this->println_P( S_CONSOLE_CFG_RESETTING );
@@ -358,7 +359,7 @@ void Console::runTaskFactoryReset() {
                 g_power.reboot();
                 return;
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
                 this->endTask( TASK_SUCCESS );
                 return;
 

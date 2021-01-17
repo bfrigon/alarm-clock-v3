@@ -22,6 +22,7 @@
 //******************************************************************************
 
 #include "wifi.h"
+#include "../../task_errors.h"
 #include "../../hardware.h"
 #include "../../config.h"
 #include "../../ui/ui.h"

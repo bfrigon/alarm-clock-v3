@@ -17,6 +17,7 @@
 //******************************************************************************
 #include "console.h"
 #include "../hardware.h"
+#include "../task_errors.h"
 #include "../services/ntpclient.h"
 
 
@@ -26,7 +27,19 @@
  *
  */
 Console::Console() {
-    memset( _inputbuffer, 0, INPUT_BUFFER_LENGTH + 1);
+
+    memset( _inputBuffer, 0, INPUT_BUFFER_LENGTH + 1);
+    memset( _historyBuffer, 0, CMD_HISTORY_BUFFER_LENGTH + 1);
+
+    
+    _inputParameter= NULL;
+    _inputBufferLimit = INPUT_BUFFER_LENGTH;
+    _inputEnabled = false;
+    _inputHidden = false;
+    _taskIndex = 0;
+    _escapeSequence = 0;
+
+    this->resetInput();
 
     /* Initialize IPrint interface */
     this->_initPrint();
@@ -59,12 +72,112 @@ void Console::begin( unsigned long baud ) {
     Serial.begin( baud );
     while (!Serial);
     
-    this->println();
-    this->println();
+    this->resetConsole();
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Send control sequences to clear the remote terminal screen
+ * 
+ */
+void Console::clearScreen() {
+
+    this->sendControlSequence( CTRL_SEQ_CLEAR_SCREEN );
+    this->sendControlSequence( CTRL_SEQ_CURSOR_POSITION, 0, 0 );
+    this->sendControlSequence( CTRL_SEQ_CLEAR_SCROLLBACK );
+
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Clear the screen and display the login message
+ * 
+ */
+void Console::resetConsole() {
+
+    this->clearScreen();
+
     this->println_P( S_CONSOLE_WELCOME );
     this->println();
 
     this->resetInput();
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Sends a control sequence to the remote terminal.
+ * 
+ * @param   sequence    Sequence code to send
+ * @param   row         Optional row parameter
+ * @param   col         Optional column parameter
+ * 
+ */
+void Console::sendControlSequence( uint8_t sequence, uint8_t row, uint8_t col ) {
+
+    switch( sequence ) {
+
+        case CTRL_SEQ_CLEAR_SCREEN:
+            this->print_P( PSTR( "\033[2J" ));
+            break;
+
+        case CTRL_SEQ_CLEAR_SCROLLBACK:
+            this->print_P( PSTR( "\033[3J" ));
+            break;
+
+        case CTRL_SEQ_CURSOR_POSITION:
+            this->printf_P( PSTR( "\033[%d;%dH" ), row, col );
+            break;
+
+        case CTRL_SEQ_ERASE_LINE:
+            this->print_P( PSTR( "\033[2K" ));
+            break;
+
+        case CTRL_SEQ_CURSOR_COLUMN:
+            this->printf_P( PSTR( "\033[%dG" ), col );
+            break;
+    }
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Decode incomming control sequence characters
+ * 
+ * @param   ch    Next character in the sequence to process
+ * 
+ */
+void Console::processControlSequence( char ch ) {
+
+    if( _escapeSequence == 0) {
+        return;
+    }
+
+    /* Check if control sequence is valid */
+    if( _escapeSequence == 1) {
+
+        _escapeSequence = ( ch == '[' ) ? 2 : 0;
+        return;
+    }
+
+
+    switch( ch ) {
+
+        /* Cursor up */
+        case 'A':
+            this->readHistoryBuffer( true );
+            break;
+
+        /* Cursor down */
+        case 'B':
+            this->readHistoryBuffer( false );
+            break;
+        
+    }
+
+    _escapeSequence = 0;
 }
 
 
@@ -76,8 +189,9 @@ void Console::begin( unsigned long baud ) {
 void Console::resetInput() {
 
     /* Reset input buffer */
-    _inputlength = 0;
-    _inputbuffer[ 0 ] = 0;
+    _inputBuffer[ 0 ] = '\0';
+
+    _cmdHistoryPtr = NULL;
 }
 
 
@@ -90,7 +204,7 @@ void Console::enableInput() {
     this->resetInput();
     this->displayPrompt();
 
-    _inputenabled = true;
+    _inputEnabled = true;
 }
 
 
@@ -100,7 +214,7 @@ void Console::enableInput() {
  * 
  */
 void Console::disableInput() {
-    _inputenabled = false;
+    _inputEnabled = false;
 }
 
 
@@ -120,16 +234,16 @@ bool Console::matchCommandName( const char *command, bool hasParameter ) {
 
     /* If no parameter, match the entire input buffer */
     if( hasParameter == false ) {
-        return strcasecmp_P( _inputbuffer, command ) == 0;
+        return strcasecmp_P( _inputBuffer, command ) == 0;
     }
 
     /* Otherwise, match only the length of the command */
-    if( strncasecmp_P( _inputbuffer, command, strlen_P( command )) != 0 ) {
+    if( strncasecmp_P( _inputBuffer, command, strlen_P( command )) != 0 ) {
         return false;
     }
 
 
-    _inputParameter = _inputbuffer + strlen_P( command );
+    _inputParameter = _inputBuffer + strlen_P( command );
 
     /* If next character after command is a null character, command
        still match but no parameters was given */
@@ -177,26 +291,27 @@ char* Console::getInputParameter() {
  */
 void Console::trimInput() {
     uint8_t i;
+    uint8_t length = strlen( _inputBuffer );
 
-    if( _inputlength == 0 ) {
+    if( length == 0 ) {
         return;
     }
 
-    char *begin = _inputbuffer;
+    char *begin = _inputBuffer;
     while( isspace( *begin )) begin++;
 
-    char *end = _inputbuffer + _inputlength - 1;
+    char *end = _inputBuffer + length - 1;
     while( isspace( *end ) && end >= begin ) {
         end--;
     } 
 
-    _inputlength = end + 1 - begin;
+    length = end + 1 - begin;
 
-    if (begin > _inputbuffer) {
-        memcpy( _inputbuffer, begin, _inputlength );
+    if (begin > _inputBuffer) {
+        memcpy( _inputBuffer, begin, length );
     } 
 
-    _inputbuffer[ _inputlength ] = 0;
+    _inputBuffer[ length ] = '\0';
 }
 
 
@@ -209,49 +324,62 @@ void Console::trimInput() {
  * 
  */
 bool Console::processInput() {
-    
-    while( Serial.available() > 0 ) {
 
-        char ch = Serial.read();
+    uint8_t length = strlen( _inputBuffer );
+    char ch = Serial.read();
 
-        if( _inputenabled == false ) {
-            continue;
+
+    if( _inputEnabled == false ) {
+        return false;
+    }
+
+    if( _escapeSequence > 0 ) {
+
+        this->processControlSequence( ch );
+        return false;
+    }
+
+    /* Printable character */
+    if( isprint( ch )) {
+
+        /* If limit has been reach, discard the character */
+        if( length >= _inputBufferLimit ) {
+            return false;
         }
 
-        /* Printable character */
-        if( isprint( ch )) {
+        _inputBuffer[ length ] = ch;
+        _inputBuffer[ length + 1 ] = '\0';
 
-            /* If limit has been reach, discard the character */
-            if( _inputlength >= _inputBufferLimit ) {
-                continue;
-            }
+        this->print( _inputHidden == true ? '*' : ch );
 
-            _inputbuffer[ _inputlength++ ] = ch;
-            Serial.write( _inputHidden == true ? '*' : ch );
+    /* Backspace */
+    } else if( ch == '\b' || ch == 0x7f ) {
 
-        /* Backspace */
-        } else if( ch == '\b' || ch == 0x7f ) {
+        if( length > 0 ) {
+            this->print( '\b' );
+            this->print( 0x20 );
+            this->print( '\b' );
+            
+            _inputBuffer[ length - 1 ] = '\0';
+        }
 
-            if( _inputlength > 0 ) {
-                Serial.write( '\b' );
-                Serial.write( 0x20 );
-                Serial.write( '\b' );
-                _inputlength--;
-            }
+    /* Enter */
+    } else if( ch == '\r' || ch == '\n' ) {
+        if( Serial.peek() == '\n' ) {
+            Serial.read();
+        }
 
-        /* Enter */
-        } else if( ch == '\r' || ch == '\n' ) {
-            if( Serial.peek() == '\n' ) {
-                Serial.read();
-            }
+        _inputBuffer[ length ] = '\0';
 
-            _inputbuffer[ _inputlength ] = 0;
+        Serial.println();
 
-            Serial.println();
+        return true;
 
-            return true;
-        } 
+    /* Control sequence start */
+    } else if( ch == '\033' ) {
+        _escapeSequence = 1;
     }
+
 
     return false;
 }
@@ -263,7 +391,120 @@ bool Console::processInput() {
  * 
  */
 void Console::displayPrompt() {
-    this->print_P( S_CONSOLE_PROMPT );
+
+    this->printf_P( S_CONSOLE_PROMPT, g_config.network.hostname );
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Move the history buffer cursor forward or back and copy the
+ *          stored command to the input buffer
+ * 
+ * @param   forward    TRUE to move forward in the history buffer, FALSE
+ *                     otherwise.
+ * 
+ */
+void Console::readHistoryBuffer( bool forward ) {
+
+    char *pos = _cmdHistoryPtr;
+
+    if( forward ) {
+
+        if( pos == NULL ) {
+            pos = _historyBuffer;
+
+        } else {
+
+            while( pos++ < _historyBuffer + CMD_HISTORY_BUFFER_LENGTH ) {
+
+                if( *pos == '\0' ) {
+                    pos++;
+                    break;
+                }
+            }
+        }
+
+        if( *pos == '\0' ) {
+            return;
+        }
+        
+    } else {
+
+        if( pos == NULL ) {
+            return;
+        }
+        
+        if( pos == _historyBuffer ) {
+
+            sendControlSequence( CTRL_SEQ_ERASE_LINE );
+            sendControlSequence( CTRL_SEQ_CURSOR_COLUMN, 1 );
+            this->displayPrompt();
+            this->resetInput();
+
+            return;
+        }
+
+        /* Find the start of the previous command in the history buffer */
+        for( pos -= 2; pos > _historyBuffer; pos-- ) {
+
+            if( *pos == '\0' ) {
+                pos++;
+                break;
+            }
+        }
+    }
+    
+
+    sendControlSequence( CTRL_SEQ_ERASE_LINE );
+    sendControlSequence( CTRL_SEQ_CURSOR_COLUMN, 1 );
+    this->displayPrompt();
+    this->resetInput();
+
+    strcpy( _inputBuffer, pos );
+    _cmdHistoryPtr = pos;
+
+    this->print( _inputBuffer );
+}
+
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Store the current command in the input buffer to the start of 
+ *          the history buffer
+ * 
+ */
+void Console::writeHistoryBuffer() {
+
+    /* Don't add empty lines in the history buffer */
+    if( strlen( _inputBuffer ) == 0 ) {
+        return;
+    }
+
+    /* Don't add if the new item is a duplicate of the 
+       first one in the history buffer */
+    if( strcmp( _inputBuffer, _historyBuffer ) == 0 ) {
+        return;
+    }
+
+    /* Make space for the new item by shifting the content of the history 
+       buffer to the right */
+    memmove( _historyBuffer + strlen( _inputBuffer ) + 1, _historyBuffer, 
+             CMD_HISTORY_BUFFER_LENGTH - strlen( _inputBuffer ));
+
+    /* Remove the last command in the history buffer if it does not 
+       fit entierly*/
+    char *ptr = _historyBuffer + CMD_HISTORY_BUFFER_LENGTH ;
+    while( *ptr != '\0' && ptr >= _historyBuffer ) {
+        *ptr-- = '\0';
+    }
+
+    /* Insert the new command in the buffer */
+    strcpy( _historyBuffer, _inputBuffer );
+
+    /* Reset the history buffer pointer to the first item */
+    _cmdHistoryPtr = NULL;
 }
 
 
@@ -273,19 +514,8 @@ void Console::displayPrompt() {
  * 
  */
 void Console::parseCommand() {
-    bool started;
-
-    if( this->isBusy() ) {
-        this->println_P( S_CONSOLE_BUSY );
-        this->println();
-
-        this->resetInput();
-
-        return;
-    }
-
-    this->trimInput();
-
+    bool started = false;
+  
     /* 'help' command */
     if( this->matchCommandName( S_COMMAND_HELP ) == true ) {
         this->startTaskPrintHelp();
@@ -293,6 +523,8 @@ void Console::parseCommand() {
 
     /* 'reboot' command */
     } else if( this->matchCommandName( S_COMMAND_REBOOT ) == true ) {
+
+        this->clearScreen();
         g_power.reboot();
 
     /* 'net restart' command */
@@ -311,8 +543,6 @@ void Console::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_NET_STATUS ) == true ) {
         this->printNetStatus();
         this->println();
-
-        started = false;
 
     /* 'nslookup' command */
     } else if( this->matchCommandName( S_COMMAND_NET_NSLOOKUP, true ) == true ) {
@@ -333,8 +563,6 @@ void Console::parseCommand() {
         this->runTaskPrintDateTime();
         this->println();
 
-        started = false;
-
     /* 'set date' command */
     } else if( this->matchCommandName( S_COMMAND_SET_DATE, false ) == true ||
                this->matchCommandName( S_COMMAND_SET_TIME, false ) == true ) {
@@ -351,8 +579,6 @@ void Console::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_TZ_INFO, false ) == true ) {
         this->showTimezoneInfo();
         this->println();
-
-        started = false;
 
     /* 'config backup' command */
     } else if( this->matchCommandName( S_COMMAND_SETTING_BACKUP, true ) == true ) {
@@ -372,27 +598,37 @@ void Console::parseCommand() {
 
     /* 'ntp status' command */
     } else if( this->matchCommandName( S_COMMAND_NTP_STATUS, false ) == true ) {
-
         g_ntp.printNTPStatus();
         this->println();
-        
-        started = false;
+
+    /* 'exit' command */
+    } else if( this->matchCommandName( S_COMMAND_EXIT, false ) == true ) {
+        this->resetConsole();
+
+    /* 'clear' command */
+    } else if( this->matchCommandName( S_COMMAND_CLEAR, false ) == true ) {
+        this->clearScreen();
 
     /* No command entered, display the prompt again */
-    } else if( strlen( _inputbuffer ) == 0 ) {
-        started = false;
+    } else if( strlen( _inputBuffer ) == 0 ) {
 
     /* Unknown command */
     } else {
         this->println_P( S_CONSOLE_INVALID_COMMAND );
         this->println();
-
-        started = false;
     }
 
     /* If command was not executed, display the prompt on a new line
        and wait for another command  */
     if( started == false ) {
+
+        if( this->getTaskError() != TASK_SUCCESS ) {
+            this->printErrorMessage( this->getTaskError() );
+            this->println();
+
+            this->clearError();
+        }
+
         this->displayPrompt();
     }
 
@@ -416,6 +652,12 @@ void Console::runTask() {
 
         /* If no task is running, process the input buffer */
         if( this->processInput() == true ) {
+
+            /* Remove unnecessary spaces */
+            this->trimInput();
+
+            /* Store the command in the history buffer */
+            this->writeHistoryBuffer();
             
             /* If new line is found, parse the line */
             this->parseCommand();
@@ -479,9 +721,10 @@ void Console::runTask() {
         /* If task is done, displays the prompt and reset input buffer */
         if( this->getCurrentTask() == TASK_NONE ) {
 
-
             if( this->getTaskError() != TASK_SUCCESS ) {
+
                 this->printErrorMessage( this->getTaskError() );
+                this->clearError();
             }
             
             this->println();
@@ -493,6 +736,16 @@ void Console::runTask() {
 }
 
 
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   prints the date and time on the console.
+ * 
+ * @param   dt          dateTime object holding the date/time to print
+ * @param   timezone    Timezone abbreviation
+ * @param   ms          Milliseconds to display. Set to -1 to not display 
+ *                      the milliseconds
+ * 
+ */
 void Console::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
 
     if( ms >= 0 ) {
@@ -518,4 +771,98 @@ void Console::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
                         dt->year());
     }
     
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Print the error message of the last command.
+ *
+ */
+void Console::printErrorMessage( int8_t error ) {
+
+    switch( error ) {
+
+        case TASK_SUCCESS:
+            this->println_P( S_CONSOLE_SUCCESS );
+            break;
+
+        case ERR_CONSOLE_INVALID_TIMEZONE:
+            this->println_P( S_CONSOLE_TIME_INVALID_TZ );
+            break;
+
+        case ERR_CONFIG_NO_SDCARD:
+            this->println_P( S_STATUS_ERROR_NO_SDCARD );
+            break;
+
+        case ERR_CONFIG_FILE_CANT_OPEN:
+        case ERR_CONFIG_FILE_WRITE:
+            this->println_P( S_STATUS_ERROR_WRITE );
+            break;
+
+        case ERR_CONFIG_FILE_READ:
+            this->println_P( S_STATUS_ERROR_READ );
+            break;
+
+        case ERR_CONFIG_FILE_NOT_FOUND:
+            this->println_P( S_STATUS_ERROR_NOTFOUND );
+            break;        
+
+        case ERR_WIFI_BUSY:
+            this->println_P( S_CONSOLE_WIFI_BUSY );
+            break;
+
+        case ERR_WIFI_NOT_CONNECTED:
+            this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
+            break;
+
+        case ERR_WIFI_ALREADY_CONNECTED:
+            this->println_P( S_CONSOLE_NET_ALREADY_CONN );
+            break;
+
+        case ERR_WIFI_PING_ERROR:
+            this->println_P( S_CONSOLE_NET_PING_ERROR );
+            break;
+
+        case ERR_WIFI_PING_TIMEOUT:
+            this->println_P( S_CONSOLE_NET_PING_TIMEOUT );
+            break;
+
+        case ERR_WIFI_INVALID_HOSTNAME:
+            this->println_P( S_CONSOLE_NET_INVALID_HOST );
+            break;
+
+        case ERR_WIFI_UNKNOWN_HOSTNAME:
+            this->println_P( S_CONSOLE_NET_PING_UNKNOWN );
+            break;
+
+        case ERR_WIFI_NETWORK_UNREACHABLE:
+            this->println_P( S_CONSOLE_NET_PING_UNREACH );
+            break;
+
+        case ERR_NTPCLIENT_UNKNOWN_HOSTNAME:
+            this->println_P( S_CONSOLE_NTP_UNKNOWN_HOST );
+            break;
+
+        case ERR_NTPCLIENT_SOCKET_BIND_FAIL:
+            this->println_P( S_CONSOLE_NTP_BIND_FAIL );
+            break;
+
+        case ERR_NTPCLIENT_SEND_FAIL:
+            this->println_P( S_CONSOLE_NTP_SEND_FAIL );
+            break;
+
+        case ERR_NTPCLIENT_INVALID_RESPONSE:
+            this->println_P( S_CONSOLE_NTP_INVALID_RESP );
+            break;
+
+        case ERR_NTPCLIENT_NO_RESPONSE:
+            this->println_P( S_CONSOLE_NTP_NO_RESP );
+            break;
+
+        default:
+            this->printf_P( S_CONSOLE_UNKNOWN_ERROR, this->getTaskError() );
+            this->println();
+            break;
+    }
 }

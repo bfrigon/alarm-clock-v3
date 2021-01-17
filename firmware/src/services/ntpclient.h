@@ -44,16 +44,6 @@ enum {
 };
 
 
-/* Task errors */
-enum {
-    ERR_NTPCLIENT_UNKNOWN_HOSTNAME = (-20),
-    ERR_NTPCLIENT_SOCKET_BIND_FAIL,
-    ERR_NTPCLIENT_SEND_FAIL,
-    ERR_NTPCLIENT_NO_RESPONSE,
-    ERR_NTPCLIENT_INVALID_RESPONSE,
-};
-
-
 typedef struct
 {
     uint8_t flags;            // Flags

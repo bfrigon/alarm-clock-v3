@@ -226,7 +226,7 @@ PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw date: " __DA
 PROG_STR( S_CONSOLE_INIT,               "Initializing..." );
 PROG_STR( S_CONSOLE_BUSY,               "Console is busy running another task!" );
 PROG_STR( S_CONSOLE_WIFI_BUSY,          "WiFi manager is busy running another request." );
-PROG_STR( S_CONSOLE_PROMPT,             "> " );
+PROG_STR( S_CONSOLE_PROMPT,             "(%s) > " );
 PROG_STR( S_CONSOLE_USAGE,              "Usage : " );
 PROG_STR( S_CONSOLE_APPLY,              "Apply settings? " );
 PROG_STR( S_CONSOLE_DONE,               "Done!" );
@@ -313,7 +313,7 @@ PROG_STR( S_CONSOLE_NTP_SEND_FAIL,      "NTP packet send fail!");
 PROG_STR( S_CONSOLE_NTP_INVALID_RESP,   "Invalid response from NTP server!");
 PROG_STR( S_CONSOLE_NTP_NO_RESP,        "No response from NTP server!");
 PROG_STR( S_CONSOLE_NTP_BIND_FAIL,      "Socket bind fail!");
-PROG_STR( S_CONSOLE_NTP_UNKNOWN_HOST,   "The NTP server address '%s' could not be resolved!" );
+PROG_STR( S_CONSOLE_NTP_UNKNOWN_HOST,   "The NTP server address could not be resolved!" );
 PROG_STR( S_CONSOLE_NTP_LAST_SYNC,      "Last synchronized on : " );
 PROG_STR( S_CONSOLE_NTP_NEXT_SYNC,      "Next synchronization in : " );
 PROG_STR( S_CONSOLE_NTP_SYNC_WITH,      "Synchronize with %s" );

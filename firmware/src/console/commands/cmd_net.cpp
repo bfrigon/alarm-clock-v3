@@ -16,6 +16,7 @@
 //
 //******************************************************************************
 #include "../console.h"
+#include "../../task_errors.h"
 #include "../../drivers/wifi/wifi.h"
 #include "../../config.h"
 
@@ -66,6 +67,7 @@ void Console::runTaskNetRestart() {
 
         /* Connection successful */
         case WIFI_STATUS_CONNECTED:
+
             this->println_P( S_CONSOLE_NET_CONNECTED );
             this->endTask( TASK_SUCCESS );
             break;
@@ -74,6 +76,7 @@ void Console::runTaskNetRestart() {
         case WIFI_STATUS_DISCONNECTED:
         case WIFI_STATUS_CONNECT_FAILED:
         case WIFI_STATUS_NO_SSID_AVAIL:
+
             this->printf_P( S_CONSOLE_NET_CONNECT_FAIL, status );
             this->endTask( status );
             break;
@@ -94,8 +97,7 @@ void Console::runTaskNetRestart() {
  */
 bool Console::startTaskNetStart() {
     if( g_wifi.isConnected() == true ) {
-        this->println_P( S_CONSOLE_NET_ALREADY_CONN );
-        this->println();
+        this->endTask( ERR_WIFI_ALREADY_CONNECTED );
         return false;
     }
 
@@ -118,16 +120,15 @@ bool Console::startTaskNetStart() {
  */
 bool Console::startTaskNetStop() {
     if( g_wifi.isConnected() == false ) {
-        this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
-        this->println();
+        this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
 
     if( g_wifi.isBusy() && g_wifi.isConnected() ) {
-        this->println_P( S_CONSOLE_WIFI_BUSY );
-        this->println();
+        this->endTask( ERR_WIFI_BUSY );
         return false;
     }
+    
     
     this->startTask( TASK_CONSOLE_NET_STOP, true );
 
@@ -220,25 +221,12 @@ bool Console::startTaskNslookup() {
     }
 
     if( g_wifi.isBusy() ) {
-        this->println_P( S_CONSOLE_WIFI_BUSY );
-        this->println();
-
+        this->endTask( ERR_WIFI_BUSY );
         return false;
     }
 
     if( g_wifi.startHostnameResolve( hostname ) == false ) {
-        switch( g_wifi.getTaskError() ) {
-            case ERR_WIFI_NOT_CONNECTED:
-                this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
-                this->println();
-                break;
-
-            case ERR_WIFI_INVALID_HOSTNAME:
-                this->println_P( S_CONSOLE_NET_INVALID_HOST );
-                this->println();
-                break;
-        }
-
+        this->endTask( g_wifi.getTaskError() );
         return false;
     }
 
@@ -265,12 +253,12 @@ void Console::runTaskNsLookup() {
         if( result != 0 ) {
             result.printTo( Serial );
             this->println();
+
+            this->endTask( TASK_SUCCESS );
         } else {
 
-            this->println_P( S_CONSOLE_NET_PING_UNKNOWN );
+            this->endTask( ERR_WIFI_UNKNOWN_HOSTNAME );
         }
-
-        this->endTask( TASK_SUCCESS );
     }
 }
 
@@ -296,14 +284,12 @@ bool Console::startTaskPing() {
     }
 
     if( g_wifi.isConnected() == false ) {
-        this->println_P( S_CONSOLE_NET_NOT_CONNECTED );
-        this->println();
+        this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
 
     if( g_wifi.isBusy() ) {
-        this->println_P( S_CONSOLE_WIFI_BUSY );
-        this->println();
+        this->endTask( ERR_WIFI_BUSY );
         return false;
     }
 
@@ -324,13 +310,11 @@ bool Console::startTaskPing() {
     }
 
     if( ret == false ) {
-        this->println_P( S_CONSOLE_NET_PING_ERROR );
-        this->println();
+        this->endTask( ERR_WIFI_PING_ERROR );
         return false;
     }
 
     this->startTask( TASK_CONSOLE_NET_PING );
-
     return true;
 }
 
@@ -360,24 +344,6 @@ void Console::runTaskPing() {
 
     /* Ping error */
     } else {
-
-        switch( rtt ) {
-            case ERR_WIFI_NETWORK_UNREACHABLE:
-                this->println_P( S_CONSOLE_NET_PING_UNREACH );
-                break;
-
-            case ERR_WIFI_PING_ERROR:
-                this->println_P( S_CONSOLE_NET_PING_ERROR );
-                break;
-
-            case ERR_WIFI_PING_TIMEOUT:
-                this->println_P( S_CONSOLE_NET_PING_TIMEOUT );
-                break;
-
-            case ERR_WIFI_UNKNOWN_HOSTNAME:
-                this->println_P( S_CONSOLE_NET_PING_UNKNOWN );
-                break;
-        }
 
         this->endTask( rtt );          
     }    
@@ -438,8 +404,8 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate network SSID input */
         case 1:
-            if( _inputlength > 0 ) {
-                strncpy( g_config.network.ssid, _inputbuffer, MAX_SSID_LENGTH );
+            if( strlen( _inputBuffer ) > 0 ) {
+                strncpy( g_config.network.ssid, _inputBuffer, MAX_SSID_LENGTH );
                 g_config.network.ssid[ MAX_SSID_LENGTH ] = '\0';
             }
             break;
@@ -454,8 +420,8 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate WiFi password prompt */
         case 3:
-            if( _inputlength > 0 ) {
-                strncpy( g_config.network.wkey, _inputbuffer, MAX_WKEY_LENGTH );
+            if( strlen( _inputBuffer ) > 0 ) {
+                strncpy( g_config.network.wkey, _inputBuffer, MAX_WKEY_LENGTH );
                 g_config.network.wkey[ MAX_WKEY_LENGTH ] = '\0';
             }
             break;
@@ -470,16 +436,16 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate use DHCP answer */
         case 5:
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
                 g_config.network.dhcp = true;
 
                 /* Skips static ip settings */
                 _taskIndex = 14;
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
                 g_config.network.dhcp = false;
 
-            } else if ( _inputlength > 0 ) {
+            } else if ( strlen( _inputBuffer ) > 0 ) {
                 this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
                 this->println();
 
@@ -505,10 +471,10 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate local ip address prompt */
         case 7:
-            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+            if( strlen( _inputBuffer ) > 0 && addr.fromString( _inputBuffer ) == true ) {
                 IPADDRESS_TO_ARRAY( addr, g_config.network.ip );
                 
-            } else if( _inputlength > 0 ) {
+            } else if( strlen( _inputBuffer ) > 0 ) {
                 this->println_P( S_CONSOLE_INVALID_INPUT_IP );
                 this->println();
 
@@ -526,10 +492,10 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate local ip address prompt */
         case 9:
-            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+            if( strlen( _inputBuffer ) > 0 && addr.fromString( _inputBuffer ) == true ) {
                 IPADDRESS_TO_ARRAY( addr, g_config.network.mask );
                 
-            } else if( _inputlength > 0 ) {
+            } else if( strlen( _inputBuffer ) > 0 ) {
                 this->println_P( S_CONSOLE_INVALID_INPUT_SUB );
                 this->println();
 
@@ -547,10 +513,10 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate gateway address prompt */
         case 11:
-            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+            if( strlen( _inputBuffer ) > 0 && addr.fromString( _inputBuffer ) == true ) {
                 IPADDRESS_TO_ARRAY( addr, g_config.network.gateway );
                 
-            } else if( _inputlength > 0 ) {
+            } else if( strlen( _inputBuffer ) > 0 ) {
                 this->println_P( S_CONSOLE_INVALID_INPUT_IP );
                 this->println();
 
@@ -568,18 +534,18 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate DNS address prompt */
         case 13:
-            if( _inputlength > 0 && addr.fromString( _inputbuffer ) == true ) {
+            if( strlen( _inputBuffer ) > 0 && addr.fromString( _inputBuffer ) == true ) {
                 IPADDRESS_TO_ARRAY( addr, g_config.network.dns );
 
                 /* Skip hostname since dhcp is not used */
                 _taskIndex = 16;
 
-            } else if( _inputlength == 0 ) {
+            } else if( strlen( _inputBuffer ) == 0 ) {
 
                 /* Skip hostname since dhcp is not used */
                 _taskIndex = 16;
                 
-            } else if( _inputlength > 0 ) {
+            } else if( strlen( _inputBuffer ) > 0 ) {
                 this->println_P( S_CONSOLE_INVALID_INPUT_IP );
                 this->println();
 
@@ -599,8 +565,8 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate hostname prompt */
         case 15:
-            if( _inputlength > 0 ) {
-                strncpy( g_config.network.hostname, _inputbuffer, MAX_HOSTNAME_LENGTH );
+            if( strlen( _inputBuffer ) > 0 ) {
+                strncpy( g_config.network.hostname, _inputBuffer, MAX_HOSTNAME_LENGTH );
                 g_config.network.hostname[ MAX_HOSTNAME_LENGTH ] = '\0';
             }
             break;     
@@ -615,8 +581,8 @@ void Console::runTaskNetworkConfig() {
 
         /* Validate hostname prompt */
         case 17:
-            if( _inputlength > 0 ) {
-                strncpy( g_config.network.ntpserver, _inputbuffer, MAX_NTPSERVER_LENGTH );
+            if( strlen( _inputBuffer ) > 0 ) {
+                strncpy( g_config.network.ntpserver, _inputBuffer, MAX_NTPSERVER_LENGTH );
                 g_config.network.ntpserver[ MAX_NTPSERVER_LENGTH ] = '\0';
             }
             break;  
@@ -633,13 +599,13 @@ void Console::runTaskNetworkConfig() {
         /* Validate apply settings answer */
         case 19:
 
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 /* Save and apply the new network configuration */
                 g_config.save( EEPROM_SECTION_NETWORK );
                 g_config.apply( EEPROM_SECTION_NETWORK );
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
                 g_config.load( EEPROM_SECTION_NETWORK );
 
             } else {

@@ -36,7 +36,9 @@ class ITask {
     virtual void runTask();
     uint8_t getCurrentTask();
     int getTaskError();
+    void clearError();
     unsigned long getTaskRunningTime();
+
 
   private:
     uint8_t _currentTask = TASK_NONE;

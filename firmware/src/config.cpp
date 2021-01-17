@@ -19,6 +19,7 @@
 #include "config.h"
 #include "alarm.h"
 #include "screen.h"
+#include "task_errors.h"
 #include "drivers/lamp.h"
 #include "drivers/neoclock.h"
 #include "services/ntpclient.h"

@@ -44,17 +44,6 @@ enum {
     TASK_WIFI_PING_HOSTNAME,
 };
 
-/* Task errors */
-enum {
-    ERR_WIFI_BUSY = (-15),
-    ERR_WIFI_NOT_CONNECTED,
-    ERR_WIFI_INVALID_HOSTNAME,
-    ERR_WIFI_UNKNOWN_HOSTNAME,
-    ERR_WIFI_NETWORK_UNREACHABLE,
-    ERR_WIFI_PING_TIMEOUT,
-    ERR_WIFI_PING_ERROR,
-};
-
 /* WiFi module status */
 typedef enum {
     WIFI_STATUS_IDLE = 0,

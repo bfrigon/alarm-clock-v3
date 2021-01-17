@@ -16,6 +16,7 @@
 //
 //******************************************************************************
 #include "ui.h"
+#include "../task_errors.h"
 #include "../drivers/power.h"
 #include "../alarm.h"
 

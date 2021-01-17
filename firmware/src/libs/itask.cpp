@@ -118,3 +118,13 @@ void ITask::endTask( int error ) {
 void ITask::setTaskError( int error ) {
     this->_taskError = error;
 }
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Clear the error code of the running task
+ * 
+ */
+void ITask::clearError() {
+    this->_taskError = TASK_SUCCESS;
+}

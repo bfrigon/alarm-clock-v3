@@ -16,6 +16,7 @@
 //
 //******************************************************************************
 #include "../console.h"
+#include "../../task_errors.h"
 #include "../../libs/time.h"
 #include "../../libs/timezone.h"
 #include "../../drivers/neoclock.h"
@@ -81,16 +82,16 @@ void Console::runTaskSetDate() {
 
         /* Validate 'synchronize with ntp' response */
         case 1:
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 cmd_time_use_ntp = true;
                 _taskIndex = 6;
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
 
                 cmd_time_use_ntp = false;
 
-            } else if( _inputlength == 0 ) {
+            } else if( strlen( _inputBuffer ) == 0 ) {
 
                 /* If using ntp, skip manual time set */
                 if( cmd_time_use_ntp == true ) {
@@ -115,7 +116,7 @@ void Console::runTaskSetDate() {
         /* Validate 'enter date' response */
         case 3:
             
-            if( _inputlength > 0 && ( strptime( _inputbuffer, "%Y-%m-%d", &cmd_time_adj ) == NULL )) {
+            if( strlen( _inputBuffer ) > 0 && ( strptime( _inputBuffer, "%Y-%m-%d", &cmd_time_adj ) == NULL )) {
                 this->println_P( S_CONSOLE_INVALID_DATE_FMT );
                 this->println();
 
@@ -133,7 +134,7 @@ void Console::runTaskSetDate() {
 
         /* Validate 'enter time' response */
         case 5:
-            if( _inputlength > 0 && ( strptime( _inputbuffer, "%H:%M", &cmd_time_adj ) == NULL )) {
+            if( strlen( _inputBuffer ) > 0 && ( strptime( _inputBuffer, "%H:%M", &cmd_time_adj ) == NULL )) {
                 this->println_P( S_CONSOLE_INVALID_TIME_FMT );
                 this->println();
 
@@ -154,7 +155,7 @@ void Console::runTaskSetDate() {
 
         /* Validate 'apply settings' response */
         case 7:
-            if( tolower( _inputbuffer[ 0 ] ) == 'y' ) {
+            if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 g_config.clock.use_ntp = cmd_time_use_ntp;
 
@@ -191,7 +192,7 @@ void Console::runTaskSetDate() {
                 this->endTask( TASK_SUCCESS );
                 return;
 
-            } else if ( tolower( _inputbuffer[ 0 ] ) == 'n' ) {
+            } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
 
                 this->endTask( TASK_SUCCESS );
                 return;
@@ -301,13 +302,13 @@ void Console::runTaskSetTimeZone() {
         this->trimInput();
 
         /* If empty, keep existing time zone */
-        if( _inputlength == 0 ) {
+        if( strlen( _inputBuffer ) == 0 ) {
             this->endTask( TASK_SUCCESS );
             return;
         }
 
         
-        id = g_timezone.findTimezoneByName( _inputbuffer );
+        id = g_timezone.findTimezoneByName( _inputBuffer );
 
     /* Timezone provided as a parameter */
     } else {
@@ -315,9 +316,8 @@ void Console::runTaskSetTimeZone() {
     }
 
     if( id < 0 )  {
-        this->println_P( S_CONSOLE_TIME_INVALID_TZ );
 
-        this->endTask( ERR_TASK_FAIL );
+        this->endTask( ERR_CONSOLE_INVALID_TIMEZONE );
         return;
     }
 

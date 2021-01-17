@@ -24,7 +24,10 @@
 #include "../libs/iprint.h"
 
 
-#define INPUT_BUFFER_LENGTH         128
+#define INPUT_BUFFER_LENGTH         80
+#define CMD_HISTORY_BUFFER_LENGTH   256
+
+
 
 // ----------------------------------------
 // Console tasks ID's
@@ -50,6 +53,8 @@
 // Command names
 // ----------------------------------------
 PROG_STR( S_COMMAND_HELP,             "help" );
+PROG_STR( S_COMMAND_EXIT,             "exit" );
+PROG_STR( S_COMMAND_CLEAR,            "clear" );
 PROG_STR( S_COMMAND_REBOOT,           "reboot" );
 PROG_STR( S_COMMAND_SET_TIMEZONE,     "set timezone" );
 PROG_STR( S_COMMAND_SET_DATE,         "set date" );
@@ -59,7 +64,7 @@ PROG_STR( S_COMMAND_TZ_INFO,          "tz info" );
 PROG_STR( S_COMMAND_TZ_SET,           "tz set" );     /* alias of "set timezone" */
 PROG_STR( S_COMMAND_NTP_SYNC,         "ntp sync" );
 PROG_STR( S_COMMAND_NTP_STATUS,       "ntp status" );
-PROG_STR( S_COMMAND_PRINT_LOGS,       "print logs" );
+PROG_STR( S_COMMAND_LOGS,             "logs" );
 PROG_STR( S_COMMAND_NET_STATUS,       "net status" );
 PROG_STR( S_COMMAND_NET_CONFIG,       "net config" );
 PROG_STR( S_COMMAND_NET_STOP,         "net stop" );
@@ -82,7 +87,7 @@ PROG_STR( S_HELP_SET_TIMEZONE,        "Set the time zone." );
 PROG_STR( S_HELP_SET_DATE,            "Set the clock." );
 PROG_STR( S_HELP_DATE,                "Display the current time and time zone" );
 PROG_STR( S_HELP_NTPSYNC,             "Synchronize the clock using the configured NTP server" );
-PROG_STR( S_HELP_PRINT_LOGS,          "Print the event log stored on SD card." );
+PROG_STR( S_HELP_LOGS,                "Print the event log stored on the SD card." );
 PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection." );
 PROG_STR( S_HELP_NET_CONFIG,          "Configure the network settings.");
 PROG_STR( S_HELP_NET_RESTART,         "Restart the WiFi manager." );
@@ -111,7 +116,7 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_SET_DATE,
     S_COMMAND_SET_TIMEZONE,
     S_COMMAND_NTP_SYNC,
-    S_COMMAND_PRINT_LOGS,
+    S_COMMAND_LOGS,
     S_COMMAND_NET_STATUS,
     S_COMMAND_NET_CONFIG,
     S_COMMAND_NET_RESTART,
@@ -129,7 +134,7 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_SET_DATE,
     S_HELP_SET_TIMEZONE,
     S_HELP_NTPSYNC,
-    S_HELP_PRINT_LOGS,
+    S_HELP_LOGS,
     S_HELP_NET_STATUS,
     S_HELP_NET_CONFIG,
     S_HELP_NET_RESTART,
@@ -141,6 +146,17 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_FACTORY_RESET,
     S_HELP_REBOOT,
 };
+
+enum { 
+    CTRL_SEQ_CLEAR_SCREEN,
+    CTRL_SEQ_CLEAR_SCROLLBACK,
+    CTRL_SEQ_CURSOR_POSITION,
+    CTRL_SEQ_ERASE_LINE,
+    CTRL_SEQ_CURSOR_COLUMN,
+
+};
+
+
 
 
 
@@ -156,26 +172,33 @@ class Console : public IPrint, ITask {
 
     void printDateTime( DateTime *dt, const char *timezone, int16_t ms = -1 );
     void printErrorMessage( int8_t error );
-
+    
   private:
 
-    char _inputbuffer[ INPUT_BUFFER_LENGTH + 1 ];
-    char* _inputParameter= NULL;
-    uint8_t _inputlength = 0;
-    uint8_t _inputBufferLimit = INPUT_BUFFER_LENGTH;
-    bool _inputenabled = false;
-    bool _inputHidden = false;
-
-    uint16_t _taskIndex = 0;
+    char _inputBuffer[ INPUT_BUFFER_LENGTH + 1 ];
+    char _historyBuffer[ CMD_HISTORY_BUFFER_LENGTH + 1];
+    char* _inputParameter;
+    char* _cmdHistoryPtr;
+    uint8_t _inputBufferLimit;
+    bool _inputEnabled;
+    bool _inputHidden;
+    uint8_t _escapeSequence;
+    uint16_t _taskIndex;
     
     bool processInput();
     void trimInput();
-    void parseCommand();
     void resetInput();
+    void parseCommand();
     bool matchCommandName( const char *command, bool hasParameter = false ); 
     char* getInputParameter();
-        
     void displayPrompt();
+    void readHistoryBuffer( bool forward );
+    void writeHistoryBuffer();
+    void resetConsole();
+    void clearScreen();
+    void sendControlSequence( uint8_t sequence, uint8_t row = 1, uint8_t col = 1 );
+    void processControlSequence( char ch );
+
     uint8_t _print( char c );
 
     // ----------------------------------------

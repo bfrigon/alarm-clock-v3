@@ -17,6 +17,7 @@
 //******************************************************************************
 
 #include "ntpclient.h"
+#include "../task_errors.h"
 #include "../drivers/wifi/wifi.h"
 #include "../drivers/rtc.h"
 #include "../drivers/neoclock.h"
