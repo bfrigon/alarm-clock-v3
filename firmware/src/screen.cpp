@@ -125,7 +125,7 @@ Screen::Screen( uint8_t id, const struct ScreenItemBase* items, pfcbValueChange 
  * @brief   Run task for this screen
  *
  */
-void Screen::runTask() {
+void Screen::processEvents() {
 
     /* Process Keypad event if available */
     uint8_t key;

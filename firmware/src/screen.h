@@ -59,6 +59,7 @@
 #define CHAR_BATTERY_CHARGING   0x06
 #define CHAR_NO_BATTERY         0x07
 #define CHAR_ALARM              0x92
+#define CHAR_TELNET_SESSION     0x94
 
 
 
@@ -271,7 +272,7 @@ class ScreenItem : protected ScreenItemBase {
 // Screen class
 //
 //**************************************************************************
-class Screen : public ITask {
+class Screen {
 
   public:
 
@@ -296,7 +297,7 @@ class Screen : public ITask {
     bool hasScreenTimedOut();
     void exitScreen();
     void activate( bool selectFirstItem, Screen* parent = NULL );
-    void runTask();
+    void processEvents();
 
 
     //----------------------------------------------------------------------

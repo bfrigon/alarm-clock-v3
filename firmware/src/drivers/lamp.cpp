@@ -284,7 +284,7 @@ void Lamp::processEvents() {
     if( this->_delay_off > 0 ) {
 
         uint32_t timerEnd;
-        timerEnd = this->_timerStart + ( this->_delay_off * 60000);
+        timerEnd = this->_timerStart + ( this->_delay_off * 60000UL);
 
         if( millis() >= timerEnd ) {
 
@@ -295,7 +295,7 @@ void Lamp::processEvents() {
             } else {
 
                 uint8_t brightness;
-                brightness = this->_settings->brightness - ((millis() - timerEnd) * this->_settings->brightness / 5000);
+                brightness = this->_settings->brightness - ((millis() - timerEnd) * this->_settings->brightness / 5000 );
 
                 if ( brightness != this->_brightness ) {
 

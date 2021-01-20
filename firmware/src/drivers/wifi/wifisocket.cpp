@@ -235,10 +235,14 @@ bool WiFiSocket::requestBind( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8Ad
  * 
  * @param   sock    Socket ID
  * 
- * @return  TRUE if bound, FALSE otherwise
+ * @return  1 if connected, 0 otherwise
  * 
  */
-bool WiFiSocket::bound( SOCKET sock ) {
+uint8_t WiFiSocket::bound( SOCKET sock ) {
+
+    if( sock < 0 ) {
+        return 0;
+    }
 
     m2m_wifi_handle_events( NULL );
 
@@ -280,10 +284,14 @@ bool WiFiSocket::requestListen( SOCKET sock, uint8 backlog ) {
  * 
  * @param   sock    Socket ID
  * 
- * @return  TRUE if listening, FALSE otherwise
+ * @return  1 if connected, 0 otherwise
  * 
  */
-bool WiFiSocket::listening( SOCKET sock ) {
+uint8_t WiFiSocket::listening( SOCKET sock ) {
+
+    if( sock < 0 ) {
+        return 0;
+    }
 
     m2m_wifi_handle_events( NULL );
 
@@ -328,10 +336,14 @@ bool WiFiSocket::requestConnect( SOCKET sock, struct sockaddr *pstrAddr, uint8 u
  * 
  * @param   sock    Socket ID
  * 
- * @return  TRUE if connected, FALSE otherwise
+ * @return  1 if connected, 0 otherwise
  * 
  */
-bool WiFiSocket::connected( SOCKET sock ) {
+uint8_t WiFiSocket::connected( SOCKET sock ) {
+
+    if( sock < 0 ) {
+        return 0;
+    }
 
     m2m_wifi_handle_events( NULL );
 

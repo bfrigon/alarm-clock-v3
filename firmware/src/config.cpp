@@ -127,7 +127,9 @@ void ConfigManager::apply( uint8_t section ) {
     }
 
     if( section & EEPROM_SECTION_NETWORK ) {
-        g_wifi.reconnect();
+
+        g_wifi.setAutoReconnect( true, true );
+        g_wifi.disconnect();
     }
 }
 
@@ -220,7 +222,7 @@ void ConfigManager::formatEeprom() {
  * @brief   Run tasks for the configuration manager
  * 
  */
-void ConfigManager::runTask() {
+void ConfigManager::runTasks() {
 
     switch( this->getCurrentTask() ) {
 

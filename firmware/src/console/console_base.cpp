@@ -15,7 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "console.h"
+#include "console_base.h"
 #include "../hardware.h"
 #include "../task_errors.h"
 #include "../services/ntpclient.h"
@@ -26,7 +26,7 @@
  * @brief   Class constructor
  *
  */
-Console::Console() {
+ConsoleBase::ConsoleBase() {
 
     memset( _inputBuffer, 0, INPUT_BUFFER_LENGTH + 1);
     memset( _historyBuffer, 0, CMD_HISTORY_BUFFER_LENGTH + 1);
@@ -34,7 +34,6 @@ Console::Console() {
     
     _inputParameter= NULL;
     _inputBufferLimit = INPUT_BUFFER_LENGTH;
-    _inputEnabled = false;
     _inputHidden = false;
     _taskIndex = 0;
     _escapeSequence = 0;
@@ -48,40 +47,10 @@ Console::Console() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   IPrint interface callback for printing a single character. Sends the 
- *          output to the serial port.
- * 
- * @param   c   character to print
- *
- * @return  Number of bytes written
- */
-uint8_t Console::_print( char c ) {
-    return Serial.write( c );
-}
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Initialize the console
- *
- * @param   baud    Speed of the serial port
- * 
- */
-void Console::begin( unsigned long baud ) {
-
-    Serial.begin( baud );
-    while (!Serial);
-    
-    this->resetConsole();
-}
-
-
-/*! ------------------------------------------------------------------------
- *
  * @brief   Send control sequences to clear the remote terminal screen
  * 
  */
-void Console::clearScreen() {
+void ConsoleBase::clearScreen() {
 
     this->sendControlSequence( CTRL_SEQ_CLEAR_SCREEN );
     this->sendControlSequence( CTRL_SEQ_CURSOR_POSITION, 0, 0 );
@@ -92,30 +61,14 @@ void Console::clearScreen() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Clear the screen and display the login message
- * 
- */
-void Console::resetConsole() {
-
-    this->clearScreen();
-
-    this->println_P( S_CONSOLE_WELCOME );
-    this->println();
-
-    this->resetInput();
-}
-
-
-/*! ------------------------------------------------------------------------
- *
  * @brief   Sends a control sequence to the remote terminal.
  * 
  * @param   sequence    Sequence code to send
- * @param   row         Optional row parameter
- * @param   col         Optional column parameter
+ * @param   param1      Optional parameter
+ * @param   param2      Optional parameter
  * 
  */
-void Console::sendControlSequence( uint8_t sequence, uint8_t row, uint8_t col ) {
+void ConsoleBase::sendControlSequence( uint8_t sequence, uint8_t param1, uint8_t param2 ) {
 
     switch( sequence ) {
 
@@ -128,15 +81,19 @@ void Console::sendControlSequence( uint8_t sequence, uint8_t row, uint8_t col ) 
             break;
 
         case CTRL_SEQ_CURSOR_POSITION:
-            this->printf_P( PSTR( "\033[%d;%dH" ), row, col );
+            this->printf_P( PSTR( "\033[%d;%dH" ), param1, param2 );
             break;
 
         case CTRL_SEQ_ERASE_LINE:
-            this->print_P( PSTR( "\033[2K" ));
+            this->printf_P( PSTR( "\033[%dK" ), param1 );
             break;
 
         case CTRL_SEQ_CURSOR_COLUMN:
-            this->printf_P( PSTR( "\033[%dG" ), col );
+            this->printf_P( PSTR( "\033[%dG" ), param1 );
+            break;
+
+        case CTRL_SEQ_CURSOR_LEFT:
+            this->printf_P( PSTR( "\033[%dD" ), param1 );
             break;
     }
 }
@@ -149,7 +106,7 @@ void Console::sendControlSequence( uint8_t sequence, uint8_t row, uint8_t col ) 
  * @param   ch    Next character in the sequence to process
  * 
  */
-void Console::processControlSequence( char ch ) {
+void ConsoleBase::processControlSequence( char ch ) {
 
     if( _escapeSequence == 0) {
         return;
@@ -183,38 +140,15 @@ void Console::processControlSequence( char ch ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Discard the user input from the serial port
+ * @brief   Discard the user input
  * 
  */
-void Console::resetInput() {
+void ConsoleBase::resetInput() {
 
     /* Reset input buffer */
     _inputBuffer[ 0 ] = '\0';
 
     _cmdHistoryPtr = NULL;
-}
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Enable user input
- * 
- */
-void Console::enableInput() {
-    this->resetInput();
-    this->displayPrompt();
-
-    _inputEnabled = true;
-}
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Inhibit user input
- * 
- */
-void Console::disableInput() {
-    _inputEnabled = false;
 }
 
 
@@ -229,7 +163,7 @@ void Console::disableInput() {
  * @return  TRUE if command name is matching, FALSE otherwise
  * 
  */
-bool Console::matchCommandName( const char *command, bool hasParameter ) {
+bool ConsoleBase::matchCommandName( const char *command, bool hasParameter ) {
     _inputParameter = NULL;
 
     /* If no parameter, match the entire input buffer */
@@ -269,7 +203,7 @@ bool Console::matchCommandName( const char *command, bool hasParameter ) {
  * @return  Pointer to the parameter start, 0 if none is found.
  * 
  */
-char* Console::getInputParameter() {
+char* ConsoleBase::getInputParameter() {
     if( _inputParameter == NULL ) {
         return 0;
     }
@@ -289,7 +223,7 @@ char* Console::getInputParameter() {
  * @brief   Remove leading and trailing white spaces from the input buffer
  * 
  */
-void Console::trimInput() {
+void ConsoleBase::trimInput() {
     uint8_t i;
     uint8_t length = strlen( _inputBuffer );
 
@@ -317,21 +251,20 @@ void Console::trimInput() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Process incomming character from the serial port and echo the 
- *          input back on the serial port accordingly.
+ * @brief   Process incomming character and echo the input back accordingly.
  *
  * @return  TRUE if end of line is detected, FALSE otherwise
  * 
  */
-bool Console::processInput() {
+bool ConsoleBase::processInput() {
 
-    uint8_t length = strlen( _inputBuffer );
-    char ch = Serial.read();
-
-
-    if( _inputEnabled == false ) {
+    if( this->_available() == 0 ) {
         return false;
     }
+
+    uint8_t length = strlen( _inputBuffer );
+    char ch = this->_read();
+    
 
     if( _escapeSequence > 0 ) {
 
@@ -365,13 +298,13 @@ bool Console::processInput() {
 
     /* Enter */
     } else if( ch == '\r' || ch == '\n' ) {
-        if( Serial.peek() == '\n' ) {
-            Serial.read();
+        if( this->_peek() == '\n' ) {
+            this->_read();
         }
 
         _inputBuffer[ length ] = '\0';
 
-        Serial.println();
+        this->println();
 
         return true;
 
@@ -390,7 +323,7 @@ bool Console::processInput() {
  * @brief   Display an input prompt
  * 
  */
-void Console::displayPrompt() {
+void ConsoleBase::displayPrompt() {
 
     this->printf_P( S_CONSOLE_PROMPT, g_config.network.hostname );
 }
@@ -405,7 +338,7 @@ void Console::displayPrompt() {
  *                     otherwise.
  * 
  */
-void Console::readHistoryBuffer( bool forward ) {
+void ConsoleBase::readHistoryBuffer( bool forward ) {
 
     char *pos = _cmdHistoryPtr;
 
@@ -437,11 +370,10 @@ void Console::readHistoryBuffer( bool forward ) {
         
         if( pos == _historyBuffer ) {
 
-            sendControlSequence( CTRL_SEQ_ERASE_LINE );
-            sendControlSequence( CTRL_SEQ_CURSOR_COLUMN, 1 );
-            this->displayPrompt();
+            sendControlSequence( CTRL_SEQ_CURSOR_LEFT, strlen( _inputBuffer ));
+            sendControlSequence( CTRL_SEQ_ERASE_LINE, 0 );
+            
             this->resetInput();
-
             return;
         }
 
@@ -455,10 +387,12 @@ void Console::readHistoryBuffer( bool forward ) {
         }
     }
     
-
-    sendControlSequence( CTRL_SEQ_ERASE_LINE );
-    sendControlSequence( CTRL_SEQ_CURSOR_COLUMN, 1 );
-    this->displayPrompt();
+    if( strlen( _inputBuffer ) > 0 ) {
+        
+        sendControlSequence( CTRL_SEQ_CURSOR_LEFT, strlen( _inputBuffer ));
+        sendControlSequence( CTRL_SEQ_ERASE_LINE, 0 );
+    }
+    
     this->resetInput();
 
     strcpy( _inputBuffer, pos );
@@ -475,7 +409,7 @@ void Console::readHistoryBuffer( bool forward ) {
  *          the history buffer
  * 
  */
-void Console::writeHistoryBuffer() {
+void ConsoleBase::writeHistoryBuffer() {
 
     /* Don't add empty lines in the history buffer */
     if( strlen( _inputBuffer ) == 0 ) {
@@ -513,7 +447,7 @@ void Console::writeHistoryBuffer() {
  * @brief   Scan the input buffer for known commands and run them accordingly.
  * 
  */
-void Console::parseCommand() {
+void ConsoleBase::parseCommand() {
     bool started = false;
   
     /* 'help' command */
@@ -545,7 +479,7 @@ void Console::parseCommand() {
         this->println();
 
     /* 'nslookup' command */
-    } else if( this->matchCommandName( S_COMMAND_NET_NSLOOKUP, true ) == true ) {
+    } else if( this->matchCommandName( S_COMMAND_NSLOOKUP, true ) == true ) {
         started = this->startTaskNslookup();
     
     /* 'ping' command */
@@ -598,12 +532,14 @@ void Console::parseCommand() {
 
     /* 'ntp status' command */
     } else if( this->matchCommandName( S_COMMAND_NTP_STATUS, false ) == true ) {
-        g_ntp.printNTPStatus();
+        g_ntp.printNTPStatus( this );
         this->println();
 
     /* 'exit' command */
     } else if( this->matchCommandName( S_COMMAND_EXIT, false ) == true ) {
-        this->resetConsole();
+        
+        this->exitConsole();
+        return;
 
     /* 'clear' command */
     } else if( this->matchCommandName( S_COMMAND_CLEAR, false ) == true ) {
@@ -626,7 +562,7 @@ void Console::parseCommand() {
             this->printErrorMessage( this->getTaskError() );
             this->println();
 
-            this->clearError();
+            this->clearTaskError();
         }
 
         this->displayPrompt();
@@ -642,7 +578,7 @@ void Console::parseCommand() {
  * @brief   Run current tasks
  * 
  */
-void Console::runTask() {
+void ConsoleBase::runTasks() {
 
     if( this->getCurrentTask() == TASK_NONE ) {
 
@@ -724,7 +660,7 @@ void Console::runTask() {
             if( this->getTaskError() != TASK_SUCCESS ) {
 
                 this->printErrorMessage( this->getTaskError() );
-                this->clearError();
+                this->clearTaskError();
             }
             
             this->println();
@@ -746,7 +682,7 @@ void Console::runTask() {
  *                      the milliseconds
  * 
  */
-void Console::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
+void ConsoleBase::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
 
     if( ms >= 0 ) {
         this->printf_P( PSTR( "%S %S %d %02d:%02d:%02d.%03d %S %d" ), 
@@ -776,10 +712,12 @@ void Console::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Print the error message of the last command.
+ * @brief   Print the error message of a given error ID.
+ * 
+ * @param   error    Error ID
  *
  */
-void Console::printErrorMessage( int8_t error ) {
+void ConsoleBase::printErrorMessage( int8_t error ) {
 
     switch( error ) {
 

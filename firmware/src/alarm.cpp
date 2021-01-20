@@ -898,7 +898,7 @@ inline void Alarm::visualStop() {
  * @brief   Feed alarm audio buffer and process visual effect animation
  *
  */
-void Alarm::runTask() {
+void Alarm::processEvents() {
 
     /* Detect if the SD card is present, if so, initialize it */
     if( this->_sd_present != this->detectSDCard() ) {

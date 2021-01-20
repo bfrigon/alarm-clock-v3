@@ -22,6 +22,7 @@
 
 #include "../libs/itask.h"
 #include "../drivers/wifi/wifi.h"
+#include "../console/console_base.h"
 #include "../config.h"
 #include "../drivers/wifi/udpclient.h"
 
@@ -92,12 +93,12 @@ class NtpClient : public ITask {
 
     NtpClient();
 
-    bool sync( bool verbose = false);
-    void runTask();
+    bool sync( ConsoleBase *console = NULL );
+    void runTasks();
     void getPreviousSync( DateTime &dt );
     void getPreviousSyncOffset( int32_t seconds, int16_t milliseconds );
-    void setAutoSync( bool enabled, bool verbose = false );
-    void printNTPStatus();
+    void setAutoSync( bool enabled, ConsoleBase *console = NULL );
+    void printNTPStatus( ConsoleBase *console );
 
 
   private:
@@ -105,8 +106,8 @@ class NtpClient : public ITask {
     UDPClient _udp;
     ntp_packet_t _packet;
     DateTime _lastSync;
-    unsigned long _nextSyncDelay = 0;
-    bool _verbose = false;
+    unsigned long _nextSyncDelay;
+    ConsoleBase *_console;
 
     bool requestBind();
     bool sendNtpPacket();

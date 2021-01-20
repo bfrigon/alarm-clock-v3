@@ -72,7 +72,7 @@
 #define TSL2591_ENABLE_OFF          0x00
 
 
-class TSL2591 : public ITask {
+class TSL2591 {
 
   public:
     TSL2591();
@@ -82,7 +82,7 @@ class TSL2591 : public ITask {
     void onPowerStateChange( uint8_t state );
     void suspend();
     void resume();
-    void runTask();
+    void processEvents();
 
     void begin();
 

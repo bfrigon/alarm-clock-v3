@@ -125,6 +125,6 @@ void ITask::setTaskError( int error ) {
  * @brief   Clear the error code of the running task
  * 
  */
-void ITask::clearError() {
+void ITask::clearTaskError() {
     this->_taskError = TASK_SUCCESS;
 }

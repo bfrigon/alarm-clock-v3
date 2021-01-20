@@ -18,6 +18,7 @@
 #ifndef WIFISOCKET_H
 #define WIFISOCKET_H
 
+
 #include <Arduino.h>
 #include <IPAddress.h>
 #include <winc1500api.h>
@@ -71,11 +72,11 @@ class WiFiSocket {
 
     SOCKET create( uint16 u16Domain, uint8 u8Type, uint8 u8Flags );
     bool requestBind( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8AddrLen );
-    bool bound( SOCKET sock );
+    uint8_t bound( SOCKET sock );
     bool requestListen( SOCKET sock, uint8 backlog );
-    bool listening( SOCKET sock );
+    uint8_t listening( SOCKET sock );
     bool requestConnect( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8AddrLen );
-    bool connected( SOCKET sock );
+    uint8_t connected( SOCKET sock );
         
     sint8 setopt( SOCKET socket, uint8 u8Level, uint8 option_name, const void *option_value, uint16 u16OptionLen );
         

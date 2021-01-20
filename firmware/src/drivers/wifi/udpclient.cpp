@@ -59,20 +59,21 @@ uint8_t UDPClient::begin( uint16_t port ) {
     addr.sin_port = _htons(port);
     addr.sin_addr.s_addr = 0;
 
-    if (_socket != -1 && g_wifisocket.bound( _socket )) {
+    if( _socket != -1 && g_wifisocket.bound( _socket )) {
         g_wifisocket.close( _socket );
         _socket = -1;
     }
 
     // Open UDP server socket.
-    if ((_socket = g_wifisocket.create( AF_INET, SOCK_DGRAM, 0 )) < 0) {
+    if(( _socket = g_wifisocket.create( AF_INET, SOCK_DGRAM, 0 )) < 0) {
         return 0;
     }
 
     g_wifisocket.setopt( _socket, SOL_SOCKET, SO_SET_UDP_SEND_CALLBACK, &u32EnableCallbacks, 0 );
 
     /* Bind socket: */
-    if ( g_wifisocket.requestBind( _socket, (struct sockaddr *)&addr, sizeof( struct sockaddr_in )) == false ) {
+    if( g_wifisocket.requestBind( _socket, (struct sockaddr *)&addr, sizeof( struct sockaddr_in )) == false ) {
+
         g_wifisocket.close( _socket );
         _socket = -1;
         return 0;
@@ -107,11 +108,11 @@ uint8_t UDPClient::beginMulticast( IPAddress ip, uint16_t port ) {
  *
  * @brief   Check if the socket is bound. 
  * 
- * @return  TRUE if bound, FALSE otherwise
+ * @return  1 if bound, 0 otherwise
  * 
  */
-bool UDPClient::bound() {
-    if( _socket == -1 ) {
+uint8_t UDPClient::bound() {
+    if( _socket < 0 ) {
         return false;
     }
 
@@ -369,12 +370,10 @@ int UDPClient::peek() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Unimplemented
+ * @brief   Unimplemented method of the Print class
  * 
  */
-void UDPClient::flush()
-{
-}
+void UDPClient::flush() {}
 
 
 /*! ------------------------------------------------------------------------

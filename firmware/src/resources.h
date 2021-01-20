@@ -218,12 +218,17 @@ PROG_STR( S_BATT_NO_POWER,              "Pwr: n/a" );
 PROG_STR( S_NETINFO_IP,                 "%d.%d.%d.%d" );
 PROG_STR( S_SSID,                       "SSID" );
 
+PROG_STR( S_CONSOLE_CONNECT_REFUSE,     "Another telnet session is active.\r\n" );
+
 PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw date: " __DATE__ ")\r\n" \
                                         "https://github.com/bfrigon/alarm-clock-v3\r\n"
                                         "\r\n"
-                                        "Type 'help' for a list of commands\r\n" );
+                                        "Type 'help' for a list of commands" );
 
+PROG_STR( S_CONSOLE_GOODBYE,            "Bye!" );
+PROG_STR( S_CONSOLE_TIMEOUT,            "Session timeout" );
 PROG_STR( S_CONSOLE_INIT,               "Initializing..." );
+
 PROG_STR( S_CONSOLE_BUSY,               "Console is busy running another task!" );
 PROG_STR( S_CONSOLE_WIFI_BUSY,          "WiFi manager is busy running another request." );
 PROG_STR( S_CONSOLE_PROMPT,             "(%s) > " );
@@ -264,6 +269,7 @@ PROG_STR( S_CONSOLE_NET_MASK,           "Subnet mask      : %d.%d.%d.%d\r\n" );
 PROG_STR( S_CONSOLE_NET_GATEWAY,        "Gateway          : %d.%d.%d.%d\r\n" );
 PROG_STR( S_CONSOLE_NET_DNS,            "DNS              : %d.%d.%d.%d\r\n" );
 
+PROG_STR( S_CONSOLE_NSLOOKUP_RESULT,    "Address: %d.%d.%d.%d" );
 PROG_STR( S_CONSOLE_NET_CFG_INSTR,      "Network settings\r\nLeave the field empty to keep existing settings." );
 PROG_STR( S_CONSOLE_NET_CFG_SSID,       "SSID (%s): " );
 PROG_STR( S_CONSOLE_NET_CFG_KEY,        "Password: " );

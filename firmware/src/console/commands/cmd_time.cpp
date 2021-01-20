@@ -15,7 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console.h"
+#include "../console_base.h"
 #include "../../task_errors.h"
 #include "../../libs/time.h"
 #include "../../libs/timezone.h"
@@ -36,7 +36,7 @@ bool cmd_time_use_ntp;
  * @return  TRUE if successful, FALSE otherwise
  *           
  */
-bool Console::startTaskSetDate() {
+bool ConsoleBase::startTaskSetDate() {
     _taskIndex = 0;
 
     cmd_time_adj = g_rtc.now();
@@ -56,7 +56,7 @@ bool Console::startTaskSetDate() {
  *          responses required before executing the task.
  *           
  */
-void Console::runTaskSetDate() {
+void ConsoleBase::runTaskSetDate() {
     
 
     /* Even index display the prompt, odd index process user input */
@@ -166,7 +166,7 @@ void Console::runTaskSetDate() {
                 if( g_config.clock.use_ntp == true ) {
 
                     /* Enable auto sync and synchronize now */
-                    g_ntp.setAutoSync( true, true );
+                    g_ntp.setAutoSync( true, this );
 
                     _taskIndex = 8;
                     break;
@@ -227,7 +227,7 @@ void Console::runTaskSetDate() {
  * @brief   Print the current date and time to the console
  *           
  */
-void Console::runTaskPrintDateTime() {
+void ConsoleBase::runTaskPrintDateTime() {
 
     DateTime now;
     const char *month;
@@ -245,7 +245,7 @@ void Console::runTaskPrintDateTime() {
     dow = getDayName( now.dow(), true );
 
     this->printDateTime( &now, TZ_UTC, ms );
-    g_console.println();
+    this->println();
     
     g_timezone.toLocal( &now );
 
@@ -254,7 +254,7 @@ void Console::runTaskPrintDateTime() {
     dow = getDayName( now.dow(), true );
 
     this->printDateTime( &now, abbvr, ms );
-    g_console.println();
+    this->println();
 }
 
 
@@ -265,7 +265,7 @@ void Console::runTaskPrintDateTime() {
  * @return  TRUE if successful, FALSE otherwise
  *           
  */
-bool Console::startTaskSetTimeZone() {
+bool ConsoleBase::startTaskSetTimeZone() {
 
     
     param_tz_name = this->getInputParameter();
@@ -290,7 +290,7 @@ bool Console::startTaskSetTimeZone() {
  *          responses required before executing the task.
  *           
  */
-void Console::runTaskSetTimeZone() {
+void ConsoleBase::runTaskSetTimeZone() {
     int16_t id;
 
     
@@ -341,7 +341,7 @@ void Console::runTaskSetTimeZone() {
  * @brief   Print current timezone information to the console.
  *           
  */
-void Console::showTimezoneInfo() {
+void ConsoleBase::showTimezoneInfo() {
     
     this->runTaskPrintDateTime();
     this->println();

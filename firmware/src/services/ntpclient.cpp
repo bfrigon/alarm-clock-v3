@@ -21,7 +21,7 @@
 #include "../drivers/wifi/wifi.h"
 #include "../drivers/rtc.h"
 #include "../drivers/neoclock.h"
-#include "../console/console.h"
+#include "../console/console_base.h"
 #include "../libs/timezone.h"
 
 
@@ -47,11 +47,11 @@ NtpClient::NtpClient() {
  *          the isBusy() function. Use getTaskError() to get the error ID.
  * 
  */
-bool NtpClient::sync( bool verbose ) {
+bool NtpClient::sync( ConsoleBase *console ) {
 
-    _verbose = verbose;
+    _console = console;
 
-    if( g_wifi.isConnected() == false ) {
+    if( g_wifi.connected() == false ) {
         this->setTaskError( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
@@ -61,13 +61,13 @@ bool NtpClient::sync( bool verbose ) {
     }
    
 
-    if( _verbose == true ) {
+    if( console != NULL ) {
 
         if( _lastSync != DateTime()) {
 
-            g_console.print_P( S_CONSOLE_NTP_LAST_SYNC );
-            g_console.printDateTime( &_lastSync, TZ_UTC );
-            g_console.println();
+            console->print_P( S_CONSOLE_NTP_LAST_SYNC );
+            console->printDateTime( &_lastSync, TZ_UTC );
+            console->println();
         }
     }
 
@@ -81,9 +81,9 @@ bool NtpClient::sync( bool verbose ) {
     /* Resolve the ntp server hostname */
     } else {
 
-        if( _verbose == true ) {
-            g_console.printf_P( S_CONSOLE_NTP_SYNC_WITH, g_config.network.ntpserver );
-            g_console.println();
+        if( console != NULL ) {
+            console->printf_P( S_CONSOLE_NTP_SYNC_WITH, g_config.network.ntpserver );
+            console->println();
         }
 
         this->startTask( TASK_NTPCLIENT_RESOLVE_HOST, true );
@@ -166,10 +166,10 @@ bool NtpClient::sendNtpPacket() {
 
     _udp.write( (char*)&_packet, sizeof( ntp_packet_t ));
 
-    if( _verbose == true ) {
+    if( _console != NULL ) {
 
-        g_console.printf_P( S_CONSOLE_NTP_SENDING, _server_ip[ 0 ], _server_ip[ 1 ], _server_ip[ 2 ], _server_ip[ 3 ] );
-        g_console.println();
+        _console->printf_P( S_CONSOLE_NTP_SENDING, _server_ip[ 0 ], _server_ip[ 1 ], _server_ip[ 2 ], _server_ip[ 3 ] );
+        _console->println();
     }
     
 
@@ -273,7 +273,7 @@ bool NtpClient::readNtpResponse() {
     }
 
 
-    if( _verbose == true ) {
+    if( _console != NULL ) {
 
 
         if( sec_offset > 0 && ms_offset < 0 ) {
@@ -281,12 +281,12 @@ bool NtpClient::readNtpResponse() {
             sec_offset--;
         }
         
-        g_console.println();
-        g_console.printf_P( S_CONSOLE_NTP_ADJUST, 
+        _console->println();
+        _console->printf_P( S_CONSOLE_NTP_ADJUST, 
                             ( sec_offset < 0 || ms_offset < 0 ) ? '-' : '+',
                             ( 1 - ((( sec_offset >> 31 ) & 0x1 ) << 1 )) * sec_offset, 
                             ( 1 - ((( ms_offset >> 31 ) & 0x1 ) << 1 )) * ms_offset );
-        g_console.println();
+        _console->println();
     }
 
 
@@ -307,7 +307,7 @@ bool NtpClient::readNtpResponse() {
  * @param   verbose    Display messages on the console 
  * 
  */
-void NtpClient::setAutoSync( bool enabled, bool verbose ) {
+void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
 
     if( enabled == false ) {
 
@@ -315,17 +315,17 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
      
     } else {
 
-        if( verbose == true ) {
+        if( console != NULL ) {
 
-            g_console.println();
-            g_console.print_P( S_CONSOLE_NTP_AUTOSYNC );
-            g_console.println_P( S_ENABLED );
+            console->println();
+            console->print_P( S_CONSOLE_NTP_AUTOSYNC );
+            console->println_P( S_ENABLED );
         }
 
         /* If WiFi is connected, immediately synchronize */
-        if( g_wifi.isConnected() == true ) {
+        if( g_wifi.connected() == true ) {
             
-            this->sync( verbose );
+            this->sync( console );
 
         /* Or schedule the next retry */
         } else {
@@ -343,7 +343,7 @@ void NtpClient::setAutoSync( bool enabled, bool verbose ) {
  * @brief   Monitor the different stages of the request.
  * 
  */
-void NtpClient::runTask() {
+void NtpClient::runTasks() {
 
     
     if( this->isBusy() == false && _nextSyncDelay > 0 ) {
@@ -352,7 +352,7 @@ void NtpClient::runTask() {
         now = g_rtc.now();
 
         if( now.getEpoch() > _lastSync.getEpoch() + _nextSyncDelay ) {
-            this->sync( false );
+            this->sync( NULL );
 
             _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
         }
@@ -386,12 +386,13 @@ void NtpClient::runTask() {
 
         /* Monitor bind socket status */
         case TASK_NTPCLIENT_SOCKET_BIND: {
+            
             if( this->getTaskRunningTime() > NTPCLIENT_BIND_TIMEOUT ) {
                 this->endTask( ERR_NTPCLIENT_SOCKET_BIND_FAIL );
                 return;
             }
 
-            if( _udp.bound() == true ) {
+            if( _udp.bound() ) {
 
                 /* Now that socket is bound, send the NTP request packet */
                 this->sendNtpPacket();
@@ -430,21 +431,21 @@ void NtpClient::runTask() {
  * @brief   Prints NTP client status on the console.
  * 
  */
-void NtpClient::printNTPStatus() {
+void NtpClient::printNTPStatus( ConsoleBase *console ) {
 
     /* Print the NTP client configuration */
-    g_console.printf_P( S_CONSOLE_NTP_SERVER, g_config.network.ntpserver );
-    g_console.println();
+    console->printf_P( S_CONSOLE_NTP_SERVER, g_config.network.ntpserver );
+    console->println();
 
-    g_console.print_P( S_CONSOLE_NTP_AUTOSYNC );
-    g_console.println_P( (g_config.clock.use_ntp == true ) ? S_ENABLED : S_DISABLED );
+    console->print_P( S_CONSOLE_NTP_AUTOSYNC );
+    console->println_P( (g_config.clock.use_ntp == true ) ? S_ENABLED : S_DISABLED );
 
-    g_console.println();
+    console->println();
 
     /* Print the last synchronization date/time */
-    g_console.print_P( S_CONSOLE_NTP_LAST_SYNC );
-    g_console.printDateTime( &_lastSync, TZ_UTC );
-    g_console.println();
+    console->print_P( S_CONSOLE_NTP_LAST_SYNC );
+    console->printDateTime( &_lastSync, TZ_UTC );
+    console->println();
 
     /* Print delay before next synchronization */
     if( _nextSyncDelay > 0 ) {
@@ -452,22 +453,20 @@ void NtpClient::printNTPStatus() {
         remaining = ( _lastSync.getEpoch() + _nextSyncDelay ) - g_rtc.now()->getEpoch();
 
         if( remaining > 0 ) {
-            g_console.print_P( S_CONSOLE_NTP_NEXT_SYNC );
-            g_console.printTimeInterval( remaining, S_DATETIME_SEPARATOR_COMMA );
-            g_console.println();
+            console->print_P( S_CONSOLE_NTP_NEXT_SYNC );
+            console->printTimeInterval( remaining, S_DATETIME_SEPARATOR_COMMA );
+            console->println();
         }
     }
 
-    g_console.println();
+    console->println();
 
     /* Print the previous attempt error */
-    g_console.print_P( S_CONSOLE_NTP_LAST_ERROR );
+    console->print_P( S_CONSOLE_NTP_LAST_ERROR );
 
     if( this->getTaskError() == TASK_SUCCESS ) {
-        g_console.println_P( S_CONSOLE_NONE );
+        console->println_P( S_CONSOLE_NONE );
     } else {
-        g_console.printErrorMessage( this->getTaskError() );
+        console->printErrorMessage( this->getTaskError() );
     }
-
-
 }

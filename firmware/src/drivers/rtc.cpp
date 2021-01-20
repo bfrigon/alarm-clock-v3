@@ -21,7 +21,7 @@
 #include "wifi/wifi.h"
 
 #include "../libs/time.h"
-#include "../console/console.h"
+
 
 volatile bool rtc_event = false;
 

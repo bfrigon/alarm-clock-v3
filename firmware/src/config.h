@@ -308,7 +308,7 @@ class ConfigManager : public ITask {
     bool startBackup( const char *filename, bool overwrite = true );
     void endBackup( int error = TASK_SUCCESS );
     void endRestore( int error = TASK_SUCCESS );
-    void runTask();
+    void runTasks();
 
     ClockSettings clock;
     NetworkSettings network;

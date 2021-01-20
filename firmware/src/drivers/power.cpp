@@ -19,6 +19,7 @@
 #include "../screen.h"
 #include "../hardware.h"
 #include "../alarm.h"
+#include "../services/telnet_console.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -119,7 +120,7 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
  * @brief   Run power management tasks.
  *
  */
-void Power::runTask() {
+void Power::processEvents() {
 
     uint8_t prevState = this->_mode;
     uint8_t newState = g_power.detectPowerState();
@@ -267,6 +268,8 @@ void Power::cpuReset() {
  * 
  */
 void Power::reboot() {
+
+    g_telnetConsole.stopServer();
     g_alarm.end();
     g_wifi.end();
     g_clock.end();

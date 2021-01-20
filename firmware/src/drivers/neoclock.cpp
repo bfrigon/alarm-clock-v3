@@ -150,7 +150,7 @@ void NeoClock::update() {
  * @brief   Check if the pixels needs to be updated.
  * 
  */
-void NeoClock::runTask() {
+void NeoClock::processEvents() {
 
     DateTime now = g_rtc.now();
     

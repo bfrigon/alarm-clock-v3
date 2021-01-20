@@ -15,7 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console.h"
+#include "../console_base.h"
 #include "../../task_errors.h"
 #include "../../drivers/wifi/wifi.h"
 #include "../../config.h"
@@ -28,20 +28,26 @@
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-bool Console::startTaskNetRestart() {
+bool ConsoleBase::startTaskNetRestart() {
 
-     if( g_wifi.isBusy() && g_wifi.isConnected() ) {
+     if( g_wifi.isBusy() && g_wifi.connected() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
         this->println();
         return false;
     }
 
+    if( g_wifi.connected() == false ) {
+
+        /* If already disconnected, issue a net start command instead */
+        return this->startTaskNetStart();
+    }
+
     _taskIndex = 0;
-    this->startTask( TASK_CONSOLE_NET_RESTART, true );
+    this->startTask( TASK_CONSOLE_NET_RESTART );
 
     this->printf_P( S_CONSOLE_NET_RECONNECTING, g_config.network.ssid );
-    g_wifi.reconnect();
-    g_wifi.setAutoReconnect( true );
+    g_wifi.disconnect();
+    g_wifi.setAutoReconnect( true, true );
 
     return true;
 }
@@ -54,7 +60,7 @@ bool Console::startTaskNetRestart() {
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-void Console::runTaskNetRestart() {
+void ConsoleBase::runTaskNetRestart() {
 
     if( g_wifi.isBusy() == true ) {
         return;
@@ -75,10 +81,11 @@ void Console::runTaskNetRestart() {
         /* Connection failure */
         case WIFI_STATUS_DISCONNECTED:
         case WIFI_STATUS_CONNECT_FAILED:
-        case WIFI_STATUS_NO_SSID_AVAIL:
+            this->endTask( ERR_WIFI_CANNOT_CONNECT );
+            break;
 
-            this->printf_P( S_CONSOLE_NET_CONNECT_FAIL, status );
-            this->endTask( status );
+        case WIFI_STATUS_NO_SSID_AVAIL:
+            this->endTask( ERR_WIFI_NO_SSID_AVAILABLE );
             break;
 
         /* Request is still running */
@@ -95,13 +102,13 @@ void Console::runTaskNetRestart() {
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-bool Console::startTaskNetStart() {
-    if( g_wifi.isConnected() == true ) {
+bool ConsoleBase::startTaskNetStart() {
+    if( g_wifi.connected() == true ) {
         this->endTask( ERR_WIFI_ALREADY_CONNECTED );
         return false;
     }
 
-    this->startTask( TASK_CONSOLE_NET_START, true );
+    this->startTask( TASK_CONSOLE_NET_START );
 
     this->printf_P( S_CONSOLE_NET_CONNECTING, g_config.network.ssid );
     g_wifi.connect();
@@ -118,19 +125,19 @@ bool Console::startTaskNetStart() {
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-bool Console::startTaskNetStop() {
-    if( g_wifi.isConnected() == false ) {
+bool ConsoleBase::startTaskNetStop() {
+    if( g_wifi.connected() == false ) {
         this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
 
-    if( g_wifi.isBusy() && g_wifi.isConnected() ) {
+    if( g_wifi.isBusy() && g_wifi.connected() ) {
         this->endTask( ERR_WIFI_BUSY );
         return false;
     }
     
     
-    this->startTask( TASK_CONSOLE_NET_STOP, true );
+    this->startTask( TASK_CONSOLE_NET_STOP );
 
     g_wifi.setAutoReconnect( false );
     g_wifi.disconnect();
@@ -144,9 +151,9 @@ bool Console::startTaskNetStop() {
  * @brief   Monitor the 'net stop' command task
  * 
  */
-void Console::runTaskNetStop() {
+void ConsoleBase::runTaskNetStop() {
     
-    if( g_wifi.isConnected() == false ) {
+    if( g_wifi.connected() == false ) {
         this->println_P( S_CONSOLE_NET_DISCONNECTED );
 
         this->endTask( TASK_SUCCESS );
@@ -159,14 +166,14 @@ void Console::runTaskNetStop() {
  * @brief   Print the status of the WiFi connection to the console
  * 
  */
-void Console::printNetStatus() {
+void ConsoleBase::printNetStatus() {
 
     IPAddress addr;
 
     /* Print connection status */
     this->print_P( S_CONSOLE_NET_STATUS );
 
-    if( g_wifi.isConnected() == true ) {
+    if( g_wifi.connected() == true ) {
         this->println_P( S_CONSOLE_NET_CONNECTED );
     } else {
         this->println_P( S_CONSOLE_NET_DISCONNECTED );
@@ -205,7 +212,7 @@ void Console::printNetStatus() {
  *          an invalid parameter is provided.
  * 
  */
-bool Console::startTaskNslookup() {
+bool ConsoleBase::startTaskNslookup() {
 
     char* hostname;
     hostname = this->getInputParameter();
@@ -245,13 +252,13 @@ bool Console::startTaskNslookup() {
  *          input required before executing the task. 
  * 
  */
-void Console::runTaskNsLookup() {
+void ConsoleBase::runTaskNsLookup() {
     
     IPAddress result;
     if( g_wifi.getHostnameResolveResults( result )) {
 
         if( result != 0 ) {
-            result.printTo( Serial );
+            this->printf_P( S_CONSOLE_NSLOOKUP_RESULT, result[ 0 ], result[ 1 ], result[ 2 ], result[ 3 ] );
             this->println();
 
             this->endTask( TASK_SUCCESS );
@@ -268,7 +275,7 @@ void Console::runTaskNsLookup() {
  * @brief   Starts the 'ping' command task
  *
  */
-bool Console::startTaskPing() {
+bool ConsoleBase::startTaskPing() {
 
     char* host;
     host = this->getInputParameter();
@@ -283,7 +290,7 @@ bool Console::startTaskPing() {
         return false;
     }
 
-    if( g_wifi.isConnected() == false ) {
+    if( g_wifi.connected() == false ) {
         this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
@@ -324,7 +331,7 @@ bool Console::startTaskPing() {
  * @brief   Monitor the 'ping' command task. 
  *           
  */
-void Console::runTaskPing() {
+void ConsoleBase::runTaskPing() {
 
     IPAddress ip;
     int32_t rtt;
@@ -356,7 +363,7 @@ void Console::runTaskPing() {
  * @brief   Starts the 'net config' command task
  *           
  */
-bool Console::startTaskNetworkConfig() {
+bool ConsoleBase::startTaskNetworkConfig() {
 
     _taskIndex = 0;
 
@@ -379,7 +386,7 @@ bool Console::startTaskNetworkConfig() {
  *          responses required before executing the task.
  * 
  */
-void Console::runTaskNetworkConfig() {
+void ConsoleBase::runTaskNetworkConfig() {
     
     IPAddress addr;
 
@@ -624,7 +631,7 @@ void Console::runTaskNetworkConfig() {
     if (_taskIndex > 19 ) {
         this->endTask( TASK_SUCCESS );
 
-        if( g_wifi.isConnected() == true ) {
+        if( g_wifi.connected() == true ) {
             g_wifi.setAutoReconnect( true );
         }
     }

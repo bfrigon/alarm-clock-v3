@@ -16,10 +16,12 @@
 //
 //******************************************************************************
 #include "src/hardware.h"
-#include "src/console/console.h"
+#include "src/services/console.h"
+#include "src/services/telnet_console.h"
 #include "src/ui/ui.h"
 #include "src/config.h"
 #include "src/services/ntpclient.h"
+
 
 
 Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
@@ -35,8 +37,13 @@ TSL2591         g_als;
 BQ27441         g_battery;
 ConfigManager   g_config;
 Console         g_console;
+TelnetConsole   g_telnetConsole;
 TimeZone        g_timezone;
 NtpClient       g_ntp;
+
+
+bool g_prev_state_wifi = false;
+bool g_prev_state_telnetConsole = false;
 
 
 /*! ------------------------------------------------------------------------
@@ -100,8 +107,8 @@ void setup() {
 
     /* Setup console */
     g_console.begin( 115200 );
+    g_console.clearScreen();
     g_console.println_P( S_CONSOLE_INIT );
-    g_console.println();
 
     /* Setup I2C */
     Wire.begin();
@@ -160,10 +167,11 @@ void setup() {
     g_wifi.begin();
     g_wifi.setSystemTime( g_rtc.now() );
 
+    /* Display console prompt */
+    g_console.resetConsole();
+
     
     g_ntp.setAutoSync( g_config.clock.use_ntp );
-
-    g_console.enableInput();
 }
 
 
@@ -178,19 +186,19 @@ void loop() {
     g_power.resetWatchdog();
 
     /* Run power management tasks */
-    g_power.runTask();
+    g_power.processEvents();
 
     /* If an RTC interrupt occured, read the current time */
     g_rtc.processEvents();
     
     /* Update the Clock display if needed */
-    g_clock.runTask();
+    g_clock.processEvents();
    
     /* Check for alarms, feed alarm audio buffer */
-    g_alarm.runTask();
+    g_alarm.processEvents();
 
     /* Process keypad events and check if screen has timed out */
-    g_currentScreen->runTask();
+    g_currentScreen->processEvents();
 
     /* Update the current screen if requested */
     if( g_screenUpdate == true ) {
@@ -209,17 +217,34 @@ void loop() {
     g_lamp.processEvents();
 
     /* Run config manager tasks */
-    g_config.runTask();
+    g_config.runTasks();
 
     /* Run ambiand light sensor tasks */
-    g_als.runTask();
+    g_als.processEvents();
 
     /* Process WIFI driver events */
-    g_wifi.runTask();
+    g_wifi.runTasks();
 
     /* Process serial console inputs */
-    g_console.runTask();
+    g_console.runTasks();
 
     /* Run NTP client tasks */
-    g_ntp.runTask();
+    g_ntp.runTasks();
+
+    /* Process telnet server events */
+    g_telnetConsole.runTasks();
+
+
+    /* Update status icons on main display */
+    if( g_telnetConsole.clientConnected() != g_prev_state_telnetConsole ) {
+        g_prev_state_telnetConsole = g_telnetConsole.clientConnected();
+
+        g_screenUpdate = (g_currentScreen == SCREEN_ID_ROOT) ? true : false;
+    }
+
+    if( g_wifi.connected() != g_prev_state_wifi ) {
+        g_prev_state_wifi = g_wifi.connected();
+
+        g_screenUpdate = (g_currentScreen == SCREEN_ID_ROOT) ? true : false;
+    }
 }

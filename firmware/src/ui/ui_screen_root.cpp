@@ -16,7 +16,8 @@
 //
 //******************************************************************************
 #include "ui.h"
-
+#include "../drivers/wifi/wifi.h"
+#include "../services/telnet_console.h"
 
 
 uint8_t g_prevBattState = 0;
@@ -81,7 +82,8 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
     char buffer[16];
 
     g_lcd.setPosition( 0, 0 );
-    g_lcd.print( ( g_wifi.isConnected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
+    g_lcd.print( ( g_wifi.connected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
+    g_lcd.print( ( g_telnetConsole.clientConnected() == true ) ? CHAR_TELNET_SESSION : CHAR_SPACE );
 
     /* Print status icons */
     g_lcd.setPosition( 0, 13 );

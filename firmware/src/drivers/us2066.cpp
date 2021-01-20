@@ -464,7 +464,7 @@ void US2066::fill( char c, uint8_t num ) {
  * @return  Number of bytes written
  * 
  */
-uint8_t US2066::_print( char c ) {
+size_t US2066::_print( char c ) {
     if( this->_init == false ) {
         this->begin();
     }

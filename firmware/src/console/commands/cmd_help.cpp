@@ -15,7 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console.h"
+#include "../console_base.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -23,7 +23,7 @@
  * @brief   Starts the 'help' command task
  * 
  */
-void Console::startTaskPrintHelp() {
+void ConsoleBase::startTaskPrintHelp() {
     _taskIndex = 0;
     
     this->startTask( TASK_CONSOLE_PRINT_HELP );
@@ -36,7 +36,7 @@ void Console::startTaskPrintHelp() {
  * @brief   Run the 'help' command task
  * 
  */
-void Console::runTaskPrintHelp() {
+void ConsoleBase::runTaskPrintHelp() {
     this->print_P( (const char *)pgm_read_word( &( S_COMMANDS[ _taskIndex ])), 16, TEXT_ALIGN_LEFT );
     this->print_P( (const char *)pgm_read_word( &( S_HELP_COMMANDS[ _taskIndex ])));
     this->println();

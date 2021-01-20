@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/console.h
+// File    : src/console/console_base.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,8 +15,8 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#ifndef CONSOLE_BASE_H
+#define CONSOLE_BASE_H
 
 #include <Arduino.h>
 #include "../resources.h"
@@ -71,7 +71,7 @@ PROG_STR( S_COMMAND_NET_STOP,         "net stop" );
 PROG_STR( S_COMMAND_NET_START,        "net start" );
 PROG_STR( S_COMMAND_NET_RESTART,      "net restart" );
 PROG_STR( S_COMMAND_NET_PING,         "net ping" );   /* alias of "ping" */
-PROG_STR( S_COMMAND_NET_NSLOOKUP,     "nslookup" );
+PROG_STR( S_COMMAND_NSLOOKUP,         "nslookup" );
 PROG_STR( S_COMMAND_PING,             "ping" );
 PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
 PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
@@ -92,8 +92,8 @@ PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection." 
 PROG_STR( S_HELP_NET_CONFIG,          "Configure the network settings.");
 PROG_STR( S_HELP_NET_RESTART,         "Restart the WiFi manager." );
 PROG_STR( S_HELP_NET_STOP,            "Stop the WiFi manager." );
-PROG_STR( S_HELP_NET_NSLOOKUP,        "Query the nameserver for the IP address of the given host." );
-PROG_STR( S_HELP_NET_PING,            "Test the reachability of a given host." );
+PROG_STR( S_HELP_NSLOOKUP,            "Query the nameserver for the IP address of the given host." );
+PROG_STR( S_HELP_PING,                "Test the reachability of a given host." );
 PROG_STR( S_HELP_SETTING_BACKUP,      "Save settings to a file on the SD card." );
 PROG_STR( S_HELP_SETTING_RESTORE,     "Restore settings from a file on the SD card." );
 PROG_STR( S_HELP_FACTORY_RESET,       "Restore settings to their default values." );
@@ -121,8 +121,8 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_NET_CONFIG,
     S_COMMAND_NET_RESTART,
     S_COMMAND_NET_STOP,
-    S_COMMAND_NET_NSLOOKUP,
-    S_COMMAND_NET_PING,
+    S_COMMAND_NSLOOKUP,
+    S_COMMAND_PING,
     S_COMMAND_SETTING_BACKUP,
     S_COMMAND_SETTING_RESTORE,
     S_COMMAND_FACTORY_RESET,
@@ -139,8 +139,8 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_NET_CONFIG,
     S_HELP_NET_RESTART,
     S_HELP_NET_STOP,
-    S_HELP_NET_NSLOOKUP,
-    S_HELP_NET_PING,
+    S_HELP_NSLOOKUP,
+    S_HELP_PING,
     S_HELP_SETTING_BACKUP,
     S_HELP_SETTING_RESTORE,
     S_HELP_FACTORY_RESET,
@@ -153,6 +153,7 @@ enum {
     CTRL_SEQ_CURSOR_POSITION,
     CTRL_SEQ_ERASE_LINE,
     CTRL_SEQ_CURSOR_COLUMN,
+    CTRL_SEQ_CURSOR_LEFT,
 
 };
 
@@ -160,19 +161,30 @@ enum {
 
 
 
-class Console : public IPrint, ITask {
+class ConsoleBase : public IPrint, protected ITask {
 
   public:
-    Console();
-    void begin( unsigned long baud );
+    ConsoleBase();
 
-    void enableInput();
-    void disableInput();
-    void runTask();
+    virtual void runTasks() = 0;
 
     void printDateTime( DateTime *dt, const char *timezone, int16_t ms = -1 );
     void printErrorMessage( int8_t error );
+    void clearScreen();
+
+  protected:
     
+    
+    void resetInput();
+    void displayPrompt();
+
+    virtual int _read() = 0;
+    virtual int _peek() = 0;
+    virtual int _available() = 0;
+
+    virtual void exitConsole( bool timeout = false ) = 0;
+    virtual void resetConsole() = 0;
+
   private:
 
     char _inputBuffer[ INPUT_BUFFER_LENGTH + 1 ];
@@ -180,26 +192,23 @@ class Console : public IPrint, ITask {
     char* _inputParameter;
     char* _cmdHistoryPtr;
     uint8_t _inputBufferLimit;
-    bool _inputEnabled;
     bool _inputHidden;
     uint8_t _escapeSequence;
     uint16_t _taskIndex;
     
     bool processInput();
     void trimInput();
-    void resetInput();
+    
     void parseCommand();
     bool matchCommandName( const char *command, bool hasParameter = false ); 
     char* getInputParameter();
-    void displayPrompt();
     void readHistoryBuffer( bool forward );
     void writeHistoryBuffer();
-    void resetConsole();
-    void clearScreen();
+    
     void sendControlSequence( uint8_t sequence, uint8_t row = 1, uint8_t col = 1 );
     void processControlSequence( char ch );
 
-    uint8_t _print( char c );
+    
 
     // ----------------------------------------
     // Commands
@@ -267,6 +276,6 @@ class Console : public IPrint, ITask {
 
 };
 
-extern Console g_console;
+
 
 #endif  /* CONSOLE_H */

@@ -51,7 +51,7 @@ void TSL2591::onPowerStateChange( uint8_t state ) {
 }
 
 
-void TSL2591::runTask() {
+void TSL2591::processEvents() {
 
 
 

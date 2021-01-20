@@ -33,7 +33,7 @@
 #define POWER_MODE_SUSPEND          2
 
 
-class Power : public ITask {
+class Power {
 
   public:
     Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst = -1 );
@@ -49,7 +49,7 @@ class Power : public ITask {
     void cpuReset();
     void reboot();
     bool detectConfigResetButton();
-    void runTask();
+    void processEvents();
 
 
   private:

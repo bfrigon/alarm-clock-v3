@@ -15,7 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console.h"
+#include "../console_base.h"
 #include "../../config.h"
 #include "../../task_errors.h"
 #include "../../drivers/power.h"
@@ -28,7 +28,7 @@
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool Console::startTaskConfigBackup() {
+bool ConsoleBase::startTaskConfigBackup() {
     _taskIndex = 0;
     
 
@@ -43,7 +43,7 @@ bool Console::startTaskConfigBackup() {
  *          responses required before executing the task.
  *           
  */
-void Console::runTaskConfigBackup() {
+void ConsoleBase::runTaskConfigBackup() {
 
     /* Even index display the prompt, odd index process user input */
     if( _taskIndex % 2 ) {
@@ -177,7 +177,7 @@ void Console::runTaskConfigBackup() {
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool Console::startTaskConfigRestore() {
+bool ConsoleBase::startTaskConfigRestore() {
     _taskIndex = 0;
 
     this->startTask( TASK_CONSOLE_CONFIG_RESTORE );
@@ -191,7 +191,7 @@ bool Console::startTaskConfigRestore() {
  *          responses required before executing the task.
  *           
  */
-void Console::runTaskConfigRestore() {
+void ConsoleBase::runTaskConfigRestore() {
 
     /* Even index display the prompt, odd index process user input */
     if( _taskIndex % 2 ) {
@@ -308,7 +308,7 @@ void Console::runTaskConfigRestore() {
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool Console::startTaskFactoryReset() {
+bool ConsoleBase::startTaskFactoryReset() {
     _taskIndex = 0;
 
     this->println();
@@ -325,7 +325,7 @@ bool Console::startTaskFactoryReset() {
  *          responses required before executing the task.
  *           
  */
-void Console::runTaskFactoryReset() {
+void ConsoleBase::runTaskFactoryReset() {
     
     /* Even index display the prompt, odd index process user input */
     if( _taskIndex % 2 ) {

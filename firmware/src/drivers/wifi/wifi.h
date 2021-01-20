@@ -18,6 +18,7 @@
 #ifndef WIFI_H
 #define WIFI_H
 
+
 #include <Arduino.h>
 #include <IPAddress.h>
 #include <winc1500api.h>
@@ -38,7 +39,8 @@ extern "C" {
 
 enum {
     TASK_WIFI_CONNECT = 1,
-    TASK_WIFI_RECONNECT,
+    TASK_WIFI_DISCONNECT_CLOSE_SOCKET,
+    TASK_WIFI_DISCONNECT,
     TASK_WIFI_RESOLVE,
     TASK_WIFI_PING,
     TASK_WIFI_PING_HOSTNAME,
@@ -56,8 +58,10 @@ typedef enum {
 } wl_status_t;
 
 
-#define WIFI_RECONNECT_DELAY            15000   
+#define WIFI_RECONNECT_ATTEMPT_DELAY    15000   
+#define WIFI_CONNECT_TIMEOUT            10000
 #define WIFI_RESOLVE_TIMEOUT            5000
+#define WIFI_SOCKET_CLOSE_TIMEOUT       250
 #define WIFI_PING_TIMEOUT               5000
 
 
@@ -81,7 +85,6 @@ class WiFi : public ITask {
 
     void begin();
     void end();
-    wl_status_t reconnect();
     wl_status_t connect();
     void disconnect();
     bool startHostnameResolve( const char *hostname );
@@ -91,15 +94,15 @@ class WiFi : public ITask {
     uint32_t getGateway();
     uint32_t getSubmask();
     uint32_t getDNS();
-    bool isConnected();
+    bool connected();
     wl_status_t status();
 
-    void runTask();
+    void runTasks();
     void handleEvent( uint8_t u8MsgType, void *pvMsg );
     void handleResolve( uint8 *hostName, uint32_t hostIp );
     void handlePingResponse( uint32 ip, uint32 rtt, uint8 error );
     void onPowerStateChange( uint8_t state );
-    void setAutoReconnect( bool autoReconnect );
+    void setAutoReconnect( bool autoReconnect, bool immediate = false );
 
     bool startPing( const char* hostname );
     bool startPing( IPAddress host );
@@ -122,7 +125,6 @@ class WiFi : public ITask {
     uint32_t _resolve;
     int32_t _rtt;
     wl_status_t _status;
-    wl_status_t _prev_status;
 
 
     unsigned long _lastConnectAttempt;

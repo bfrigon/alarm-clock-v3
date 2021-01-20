@@ -183,7 +183,7 @@ class US2066 : public IPrint {
     void updateDisplayState();
     uint8_t sendCommand( uint8_t cmd );
     uint8_t sendCommand( uint8_t cmd, uint8_t data );
-    uint8_t _print( char c );
+    size_t _print( char c );
 
     bool _init = false;
     uint8_t _address = US2066_DEF_I2C_ADDR;

@@ -33,10 +33,10 @@ class ITask {
   public:
 
     bool isBusy();
-    virtual void runTask();
+    virtual void runTasks();
     uint8_t getCurrentTask();
     int getTaskError();
-    void clearError();
+    void clearTaskError();
     unsigned long getTaskRunningTime();
 
 
@@ -46,7 +46,7 @@ class ITask {
     int _taskError = 0;
 
   protected:
-    uint8_t startTask( uint8_t task, bool force = false );
+    uint8_t startTask( uint8_t task, bool force = true );
     void endTask( int error = TASK_SUCCESS );
     void setTaskError( int error );
 };

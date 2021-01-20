@@ -15,7 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console.h"
+#include "../console_base.h"
 #include "../../services/ntpclient.h"
 
 
@@ -26,11 +26,11 @@
  * @return  TRUE if successful, FALSE otherwise
  * 
  */
-bool Console::startTaskNtpSync() {
+bool ConsoleBase::startTaskNtpSync() {
 
     this->startTask( TASK_CONSOLE_NTP_SYNC );
 
-    if( g_ntp.sync( true ) == false ) {
+    if( g_ntp.sync( this ) == false ) {
 
         this->endTask( g_ntp.getTaskError() );
         return false;
@@ -45,7 +45,7 @@ bool Console::startTaskNtpSync() {
  * @brief   Monitor the 'ntp sync' task
  * 
  */
-void Console::runTaskNtpSync() {
+void ConsoleBase::runTaskNtpSync() {
 
     if( g_ntp.isBusy() == true ) {
         return;

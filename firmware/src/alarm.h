@@ -60,7 +60,7 @@
 
 
 
-class Alarm : private VS1053, public ITask {
+class Alarm : private VS1053 {
 
   public:
 
@@ -94,7 +94,7 @@ class Alarm : private VS1053, public ITask {
     bool isAlarmSwitchOn();
     bool detectAlarmSwitchState();
 
-    void runTask();
+    void processEvents();
     bool checkForAlarms( DateTime *now );
     int8_t getNextAlarmID( DateTime *currentTime, bool matchNow );
     int16_t getNextAlarmOffset( int8_t profile_id, DateTime *currentTime, bool matchNow );

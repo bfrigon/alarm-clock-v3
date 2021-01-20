@@ -54,7 +54,7 @@ class IPrint {
     FILE _stream = {0};
     static int _cb_putchar( char ch, FILE *stream );
 
-    virtual uint8_t _print( char c ) = 0;
+    virtual size_t _print( char c ) = 0;
     uint8_t _print( const char *str, bool ptr_pgm_space = false );
     uint8_t _print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
 

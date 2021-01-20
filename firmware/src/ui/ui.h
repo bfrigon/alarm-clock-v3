@@ -22,7 +22,6 @@
 
 #include "../libs/time.h"
 
-#include "../hardware.h"
 #include "../config.h"
 #include "../screen.h"
 #include "../alarm.h"

@@ -15,8 +15,8 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef TASKERROR_H
-#define TASKERROR_H
+#ifndef TASK_ERRORS_H
+#define TASK_ERRORS_H
 
 #include <Arduino.h>
 
@@ -33,6 +33,8 @@ enum {
     ERR_WIFI_ALREADY_CONNECTED,
     ERR_WIFI_PING_TIMEOUT,
     ERR_WIFI_PING_ERROR,
+    ERR_WIFI_NO_SSID_AVAILABLE,
+    ERR_WIFI_CANNOT_CONNECT,
 
     ERR_CONFIG_NO_SDCARD,
     ERR_CONFIG_FILE_WRITE,
@@ -47,10 +49,15 @@ enum {
     ERR_NTPCLIENT_NO_RESPONSE,
     ERR_NTPCLIENT_INVALID_RESPONSE,
 
+    ERR_TELNET_CANT_CREATE_SOCKET,
+    ERR_TELNET_CANNOT_BIND,
+    ERR_TELNET_SOCKET_CLOSED,
+    ERR_TELNET_CANNOT_LISTEN,
+
 };
 
 
 
 
-#endif /* TASKERROR_H */
+#endif /* TASK_ERRORS_H */
 

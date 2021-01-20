@@ -25,7 +25,7 @@
 #include "../../task_errors.h"
 #include "../../hardware.h"
 #include "../../config.h"
-#include "../../ui/ui.h"
+#include "../../services/telnet_console.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -76,6 +76,7 @@ void WiFi::end() {
 
     
     this->disconnect();
+    delay( WIFI_SOCKET_CLOSE_TIMEOUT );
 
     /* Uninitialize socket class */
     socketDeinit();
@@ -143,50 +144,20 @@ int WiFi::init() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Re-establish the connection to the WiFi network. 
- *
- * @return  WL_IDLE_STATUS if successful or error otherwise.
- * 
- */
-wl_status_t WiFi::reconnect() {
-
-    if( _init == false ) {
-        init();
-    }
-
-    if( _status == WIFI_STATUS_CONNECTED ) {
-        if( this->getCurrentTask() != TASK_NONE ) {
-            this->endTask( WIFI_STATUS_DISCONNECTED );
-        }
-        
-        this->startTask( TASK_WIFI_RECONNECT );
-
-        /* Sends disconnect request */
-        this->disconnect();
-
-        /* Status remains IDLE until a disconnect event is 
-           received. Then, runTask will send a connect request. */
-        return WIFI_STATUS_IDLE;
-
-    } else {
-
-        /* Not connected, send a connect request */
-        return this->connect();
-    } 
-
-}
-
-
-/*! ------------------------------------------------------------------------
- *
  * @brief   Sets whether or not the WiFi manager should attempt to reconnect 
  *          when it loses connection.
  *
  * @param   autoReconnect    TRUE to enable auto-reconnect, FALSE otherwise
+ * @param   immediate        Don't wait the minimum delay before trying to
+ *                           reconnect for the next attemps. 
  * 
  */
-void WiFi::setAutoReconnect( bool autoReconnect ) {
+void WiFi::setAutoReconnect( bool autoReconnect, bool immediate ) {
     _autoReconnect = autoReconnect;
+
+    if( immediate ) {
+        _lastConnectAttempt = millis() - WIFI_RECONNECT_ATTEMPT_DELAY;
+    }
 }
 
 
@@ -208,10 +179,6 @@ wl_status_t WiFi::connect() {
     /* Connection already established */
     if( _status == WIFI_STATUS_CONNECTED ) {
         return WIFI_STATUS_CONNECTED;
-    }
-
-    if( this->getCurrentTask() != TASK_NONE ) {
-        this->endTask( WIFI_STATUS_DISCONNECTED );
     }
 
     /* Starts a task to monitor connection progress */
@@ -292,7 +259,33 @@ void WiFi::disconnect() {
         g_wifisocket.close( i );
     }
 
-    m2m_wifi_disconnect();
+    this->startTask( TASK_WIFI_DISCONNECT_CLOSE_SOCKET );  
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Check if the connection is established
+ *
+ * @return  TRUE if connection is established, FALSE otherwise. 
+ *          If using DHCP, returns TRUE only once a valid DHCP response 
+ *          has been received.
+ * 
+ */
+bool WiFi::connected() {
+    return ( _status == WIFI_STATUS_CONNECTED );
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Returns the connection status or error.
+ *
+ * @return  Connection status or error
+ *           
+ */
+wl_status_t WiFi::status() {
+    return _status;
 }
 
 
@@ -531,32 +524,6 @@ void WiFi::onPowerStateChange( uint8_t state ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Check if the connection is established
- *
- * @return  TRUE if connection is established, FALSE otherwise. 
- *          If using DHCP, returns TRUE only once a valid DHCP response 
- *          has been received.
- * 
- */
-bool WiFi::isConnected() {
-    return ( _status == WIFI_STATUS_CONNECTED );
-}
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Returns the connection status or error.
- *
- * @return  Connection status or error
- *           
- */
-wl_status_t WiFi::status() {
-    return _status;
-}
-
-
-/*! ------------------------------------------------------------------------
- *
  * @brief   Starts a hostname resolve request on the WiFi module.
  *
  * @param   hostname    Hostname to resolve
@@ -570,7 +537,7 @@ bool WiFi::startHostnameResolve( const char *hostname ) {
         return false;
     }
 
-    if( this->startTask( TASK_WIFI_RESOLVE ) != TASK_WIFI_RESOLVE ) {
+    if( this->startTask( TASK_WIFI_RESOLVE, false ) != TASK_WIFI_RESOLVE ) {
         
         return false;
     }
@@ -633,7 +600,7 @@ bool WiFi::startPing( const char* hostname ) {
         return false;
     }
 
-    if( this->startTask( TASK_WIFI_PING_HOSTNAME ) != TASK_WIFI_PING_HOSTNAME ) {
+    if( this->startTask( TASK_WIFI_PING_HOSTNAME, false ) != TASK_WIFI_PING_HOSTNAME ) {
         return false;
     }
 
@@ -668,7 +635,7 @@ bool WiFi::startPing( IPAddress host ) {
         return false;
     }
 
-    if( this->startTask( TASK_WIFI_PING ) != TASK_WIFI_PING ) {
+    if( this->startTask( TASK_WIFI_PING, false ) != TASK_WIFI_PING ) {
         return false;
     }
 
@@ -723,7 +690,7 @@ int32_t WiFi::getPingResult( IPAddress &dest ) {
  * @brief   Handle WiFi module events and process running tasks.
  * 
  */
-void WiFi::runTask() {
+void WiFi::runTasks() {
 
     if ( _init == false ) {
         return;
@@ -732,44 +699,57 @@ void WiFi::runTask() {
     /* Handle WIFI module events */
     m2m_wifi_handle_events(NULL);
 
-    /* Update root screen if connection status has changed */
-    if( _status != _prev_status ) {
-        g_screenUpdate = true;
-    }
-    _prev_status = _status;
-
     /* Process running tasks */
     switch( this->getCurrentTask() ) {
 
-
         /* Current task : connecting to WIFI network */
-        case TASK_WIFI_CONNECT:
-        {
+        case TASK_WIFI_CONNECT: {
+
+            if( this->getTaskRunningTime() > WIFI_CONNECT_TIMEOUT ) {
+
+                this->endTask( ERR_WIFI_CANNOT_CONNECT );
+                return;
+            }
 
             switch( _status ) {
                 case WIFI_STATUS_DISCONNECTED:
                 case WIFI_STATUS_CONNECT_FAILED:
                 case WIFI_STATUS_NO_SSID_AVAIL:
                     this->endTask( _status );
-                    break;
+                    return;
 
                 case WIFI_STATUS_CONNECTED:
                     this->endTask( WIFI_STATUS_CONNECTED );
-                    break;
+                    return;
             }
         }
         break;
 
-        /* Current task : Reconnect to WiFi */
-        case TASK_WIFI_RECONNECT:
-        {
-
-            if( _status == WIFI_STATUS_DISCONNECTED ) {
-                this->endTask( TASK_SUCCESS );
-
-                /* Got disconnected status, now try to reconnect */
-                this->connect();
+        /* Current task : Closing sockets before disconnecting from WIFI */
+        case TASK_WIFI_DISCONNECT_CLOSE_SOCKET: {
+            if( this->getTaskRunningTime() > WIFI_SOCKET_CLOSE_TIMEOUT ) {
+                
+                this->startTask( TASK_WIFI_DISCONNECT );
+                m2m_wifi_disconnect();
             }
+
+        }
+        break;
+
+        /* Current task : Disconnecting from WIFI */
+        case TASK_WIFI_DISCONNECT: {
+
+            if( this->_status != WIFI_STATUS_DISCONNECTED ) {
+                return;
+            }
+
+            if( _autoReconnect == true && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_ATTEMPT_DELAY )) {
+                this->connect();
+                
+            } else {
+                this->endTask( WIFI_STATUS_DISCONNECTED );
+            }
+
         }
         break;
 
@@ -805,7 +785,10 @@ void WiFi::runTask() {
         {
 
             /* Attempt to reconnect WIFI if connection was lost */
-            if( _autoReconnect == true && _status != WIFI_STATUS_CONNECTED && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_DELAY )) {
+            if( _autoReconnect == true && 
+                _status != WIFI_STATUS_CONNECTED && 
+                ( millis() - _lastConnectAttempt > WIFI_RECONNECT_ATTEMPT_DELAY )) {
+                    
 
                 /* Do not reconnect WIFI if clock is running on battery */
                 if( g_power.getPowerMode() == POWER_MODE_NORMAL ) {
