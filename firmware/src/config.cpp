@@ -23,6 +23,7 @@
 #include "drivers/lamp.h"
 #include "drivers/neoclock.h"
 #include "services/ntpclient.h"
+#include "services/telnet_console.h"
 
 
 
@@ -130,6 +131,8 @@ void ConfigManager::apply( uint8_t section ) {
 
         g_wifi.setAutoReconnect( true, true );
         g_wifi.disconnect();
+
+        g_telnetConsole.enableServer( g_config.network.telnetEnabled );
     }
 }
 
@@ -142,6 +145,8 @@ void ConfigManager::apply( uint8_t section ) {
 void ConfigManager::reset() {
     this->network.ssid[0] = 0;
     this->network.wkey[0] = 0;
+    this->network.telnetEnabled = false;
+
     this->clock.lamp.brightness = 60;
     this->clock.lamp.mode = LAMP_MODE_OFF;
     this->clock.lamp.color = COLOR_WHITE;
@@ -517,6 +522,9 @@ bool ConfigManager::readNextLine() {
 
     } else if( this->matchSettingName( name, SETTING_NAME_NTPSERVER, SECTION_ID_NETWORK ) == true ) {
         this->parseSettingValue( value, &this->network.ntpserver, SETTING_TYPE_STRING, 0, MAX_NTPSERVER_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_TELNET_ENABLED, SECTION_ID_NETWORK ) == true ) {
+        this->parseSettingValue( value, &this->network.telnetEnabled, SETTING_TYPE_BOOL );
 
     } else if( this->matchSettingName( name, SETTING_NAME_SSID, SECTION_ID_NETWORK ) == true ) {
         this->parseSettingValue( value, &this->network.ssid, SETTING_TYPE_STRING, 0, MAX_SSID_LENGTH );
@@ -906,6 +914,10 @@ bool ConfigManager::writeNextLine()  {
 
         case SETTING_ID_NETWORK_NTPSERVER:
             this->writeConfigLine( SETTING_NAME_NTPSERVER, SETTING_TYPE_STRING, &this->network.ntpserver );
+            break;
+
+        case SETTING_ID_NETWORK_TELNET_ENABLED:
+            this->writeConfigLine( SETTING_NAME_TELNET_ENABLED, SETTING_TYPE_BOOL, &this->network.telnetEnabled );
             break;
 
         case SETTING_ID_NETWORK_SSID:

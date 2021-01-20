@@ -170,6 +170,9 @@ void setup() {
     /* Display console prompt */
     g_console.resetConsole();
 
+
+    g_telnetConsole.enableServer( g_config.network.telnetEnabled );
+
     
     g_ntp.setAutoSync( g_config.clock.use_ntp );
 }
@@ -239,12 +242,12 @@ void loop() {
     if( g_telnetConsole.clientConnected() != g_prev_state_telnetConsole ) {
         g_prev_state_telnetConsole = g_telnetConsole.clientConnected();
 
-        g_screenUpdate = (g_currentScreen == SCREEN_ID_ROOT) ? true : false;
+        g_screenUpdate = ( g_currentScreen->getId() == SCREEN_ID_ROOT );
     }
 
     if( g_wifi.connected() != g_prev_state_wifi ) {
         g_prev_state_wifi = g_wifi.connected();
 
-        g_screenUpdate = (g_currentScreen == SCREEN_ID_ROOT) ? true : false;
+        g_screenUpdate = ( g_currentScreen->getId() == SCREEN_ID_ROOT );
     }
 }

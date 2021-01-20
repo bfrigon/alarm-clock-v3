@@ -31,104 +31,105 @@
 // ----------------------------------------
 // Screen item id's
 // ----------------------------------------
+enum {
+    /* --- Main menu --- */
+    ID_MAIN_SET_ALARMS = 1,
+    ID_MAIN_SET_TIME,
+    ID_MAIN_LIST_PROFILES,
+    ID_MAIN_EDIT_DISPLAY,
+    ID_MAIN_EDIT_LAMP,
+    ID_MAIN_EDIT_NETWORK,
+    ID_MAIN_TIME_AUTOSYNC,
+    ID_MAIN_SETTINGS,
 
-/* --- Main menu --- */
-#define ID_MAIN_SET_ALARMS          1
-#define ID_MAIN_SET_TIME            2
-#define ID_MAIN_LIST_PROFILES       3
-#define ID_MAIN_EDIT_DISPLAY        4
-#define ID_MAIN_EDIT_LAMP           5
-#define ID_MAIN_EDIT_NETWORK        6
-#define ID_MAIN_TIME_AUTOSYNC       7
-#define ID_MAIN_SETTINGS            8
+    /* --- Set alarms screen --- */
+    ID_ALARM_ON_1,
+    ID_ALARM_ON_2,
+    ID_ALARM_EDIT_1,
+    ID_ALARM_EDIT_2,
 
-/* --- Set alarms screen --- */
-#define ID_ALARM_ON_1               10
-#define ID_ALARM_ON_2               11
-#define ID_ALARM_EDIT_1             12
-#define ID_ALARM_EDIT_2             13
+    /* --- Set time screen --- */
+    ID_SET_TIME,
+    ID_SET_DATE_DAY,
+    ID_SET_DATE_MONTH,
+    ID_SET_DATE_YEAR,
 
-/* --- Set time screen --- */
-#define ID_SET_TIME                 15
-#define ID_SET_DATE_DAY             16
-#define ID_SET_DATE_MONTH           17
-#define ID_SET_DATE_YEAR            18
+    /* --- Display settings screen --- */
+    ID_CLOCK_24H,
+    ID_CLOCK_COLOR,
+    ID_CLOCK_BRIGHTNESS,
+    ID_LCD_CONTRAST,
+    ID_DATE_FORMAT,
+    ID_ALS_PRESET,
 
-/* --- Display settings screen --- */
-#define ID_CLOCK_24H                20
-#define ID_CLOCK_COLOR              21
-#define ID_CLOCK_BRIGHTNESS         22
-#define ID_LCD_CONTRAST             23
-#define ID_DATE_FORMAT              24
-#define ID_ALS_PRESET               25
+    /* --- Network settings screen --- */
+    ID_NETWORK_STATUS,
+    ID_NETWORK_DHCP,
+    ID_NETWORK_IP,
+    ID_NETWORK_MASK,
+    ID_NETWORK_GATEWAY,
+    ID_NETWORK_DNS,
+    ID_NETWORK_HOSTNAME,
+    ID_NETWORK_TELNET_ENABLED,
 
-/* --- Network settings screen --- */
-#define ID_NETWORK_DHCP             30
-#define ID_NETWORK_IP               31
-#define ID_NETWORK_MASK             32
-#define ID_NETWORK_GATEWAY          33
-#define ID_NETWORK_DNS              34
-#define ID_NETWORK_HOSTNAME         35
-#define ID_NETWORK_STATUS           36
+    /* --- Edit profile screen / edit alarm screen --- */
+    ID_PROFILE_FILENAME,
+    ID_PROFILE_TIME,
+    ID_PROFILE_SNOOZE,
+    ID_PROFILE_DOW,
+    ID_PROFILE_VOLUME,
+    ID_PROFILE_GRADUAL,
+    ID_PROFILE_VISUAL,
+    ID_PROFILE_LAMP,
+    ID_PROFILE_MSG,
+    ID_PROFILE_TEST,
 
-/* --- Edit profile screen / edit alarm screen --- */
-#define ID_PROFILE_FILENAME         40
-#define ID_PROFILE_TIME             41
-#define ID_PROFILE_SNOOZE           42
-#define ID_PROFILE_DOW              43
-#define ID_PROFILE_VOLUME           44
-#define ID_PROFILE_GRADUAL          45
-#define ID_PROFILE_VISUAL           46
-#define ID_PROFILE_LAMP             47
-#define ID_PROFILE_MSG              48
-#define ID_PROFILE_TEST             49
+    /* --- Night lamp settings screen --- */
+    ID_LAMP_COLOR,
+    ID_LAMP_BRIGHTNESS,
+    ID_LAMP_DELAY,
+    ID_LAMP_EFFECT_SPEED,
+    ID_LAMP_MODE,
 
-/* --- Night lamp settings screen --- */
-#define ID_LAMP_COLOR               60
-#define ID_LAMP_BRIGHTNESS          61
-#define ID_LAMP_DELAY               62
-#define ID_LAMP_EFFECT_SPEED        63
-#define ID_LAMP_MODE                64
+    /* --- Alarm profile visual edit screen --- */
+    ID_PROFILE_VISUAL_MODE,
+    ID_PROFILE_VISUAL_SPEED,
 
-/* --- Alarm profile visual edit screen --- */
-#define ID_PROFILE_VISUAL_MODE      70
-#define ID_PROFILE_VISUAL_SPEED     71
+    /* --- Settings menu screen --- */
+    ID_SETTINGS_BACKUP,
+    ID_SETTINGS_RESTORE,
+    ID_SETTINGS_FACTORY_RESET,
+    ID_SETTINGS_BATT_STATUS,
 
-/* --- Settings menu screen --- */
-#define ID_SETTINGS_BACKUP          80
-#define ID_SETTINGS_RESTORE         81
-#define ID_SETTINGS_FACTORY_RESET   82
-#define ID_SETTINGS_BATT_STATUS     83
-
-
-/* --- YES/NO dialog screen --- */
-#define ID_DIALOG_YES               250
-#define ID_DIALOG_NO                251
-
+    /* --- YES/NO dialog screen --- */
+    ID_DIALOG_YES,
+    ID_DIALOG_NO,
+};
 
 
 // ----------------------------------------
 // Screen id's
 // ----------------------------------------
-#define SCREEN_ID_ROOT              0
-#define SCREEN_ID_MAIN_MENU         1
-#define SCREEN_ID_SET_TIME          2
-#define SCREEN_ID_SET_ALARMS        3
-#define SCREEN_ID_EDIT_ALARM        4
-#define SCREEN_ID_SHOW_ALARMS       5
-#define SCREEN_ID_NETWORK           6
-#define SCREEN_ID_DISPLAY_SETTINGS  7
-#define SCREEN_ID_LIST_PROFILES     8
-#define SCREEN_ID_EDIT_PROFILE      9
-#define SCREEN_ID_EDIT_NIGHT_LAMP   10
-#define SCREEN_ID_EDIT_ALARM_LAMP   11
-#define SCREEN_ID_EDIT_ALARM_VISUAL 12
-#define SCREEN_ID_ALARM             13
-#define SCREEN_ID_MENU_SETTINGS     14
-#define SCREEN_ID_SETTINGS_MANAGER  15
-#define SCREEN_ID_BATT_STATUS       16
-#define SCREEN_ID_NET_STATUS        17
-
+enum {
+    SCREEN_ID_ROOT = 0 ,
+    SCREEN_ID_MAIN_MENU,
+    SCREEN_ID_SET_TIME,
+    SCREEN_ID_SET_ALARMS,
+    SCREEN_ID_EDIT_ALARM,
+    SCREEN_ID_SHOW_ALARMS,
+    SCREEN_ID_NETWORK,
+    SCREEN_ID_DISPLAY_SETTINGS,
+    SCREEN_ID_LIST_PROFILES,
+    SCREEN_ID_EDIT_PROFILE,
+    SCREEN_ID_EDIT_NIGHT_LAMP,
+    SCREEN_ID_EDIT_ALARM_LAMP,
+    SCREEN_ID_EDIT_ALARM_VISUAL,
+    SCREEN_ID_ALARM,
+    SCREEN_ID_MENU_SETTINGS,
+    SCREEN_ID_SETTINGS_MANAGER,
+    SCREEN_ID_BATT_STATUS,
+    SCREEN_ID_NET_STATUS,
+};
 
 
 void initScreens();
@@ -282,6 +283,7 @@ PROGMEM const struct ScreenItemBase ITEMS_NETWORK[] = {
     ITEM_IP( ID_NETWORK_DNS, 5, 0, S_MENU_NETWORK_DNS, &g_config.network.dns, ITEM_EDIT_FULLSCREEN ),
     ITEM_TEXT( ID_NETWORK_HOSTNAME, 6, 0, S_MENU_NETWORK_HOSTNAME, &g_config.network.hostname,
                MAX_HOSTNAME_LENGTH, ITEM_EDIT_FULLSCREEN ),
+    ITEM_TOGGLE( ID_NETWORK_TELNET_ENABLED, 7, 0, S_MENU_NETWORK_TELNET, &g_config.network.telnetEnabled, ITEM_NORMAL ),
     ITEM_END()
 };
 

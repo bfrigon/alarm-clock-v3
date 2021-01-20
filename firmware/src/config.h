@@ -142,6 +142,7 @@ PROG_STR( SETTING_NAME_DNS,                 "dns" );
 PROG_STR( SETTING_NAME_SSID,                "ssid" );
 PROG_STR( SETTING_NAME_HOSTNAME,            "hostname" );
 PROG_STR( SETTING_NAME_NTPSERVER,           "ntpserver" );
+PROG_STR( SETTING_NAME_TELNET_ENABLED,      "telnet" );
 PROG_STR( SETTING_NAME_WKEY,                "passphrase" );
 PROG_STR( SETTING_NAME_ENABLED,             "enabled" );
 PROG_STR( SETTING_NAME_SNOOZE,              "snooze" );
@@ -181,6 +182,7 @@ enum {
     SETTING_ID_NETWORK_HOSTNAME,
     SETTING_ID_NETWORK_WKEY,
     SETTING_ID_NETWORK_NTPSERVER,
+    SETTING_ID_NETWORK_TELNET_ENABLED,
 
     /* Alarm section */
     SETTING_ID_ALARM_ENABLED,
@@ -287,6 +289,7 @@ struct NetworkSettings {
     char wkey[ MAX_WKEY_LENGTH + 1 ];
     char hostname[ MAX_HOSTNAME_LENGTH + 1 ];
     char ntpserver[ MAX_NTPSERVER_LENGTH + 1];
+    bool telnetEnabled = false;
 };
 
 

@@ -1356,8 +1356,13 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
             }
 
         case ITEM_TYPE_TOGGLE:
+        
+            if( item->getValueBoolean() == true ) {
+                item->setValueBoolean( false );
+            } else {
+                item->setValueBoolean( true );
+            }
 
-            item->setValueBoolean( ! item->getValueBoolean() );
             break;
 
         case ITEM_TYPE_NUMBER:

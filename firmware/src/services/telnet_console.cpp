@@ -32,6 +32,7 @@ TelnetConsole::TelnetConsole() {
     memset( _sendBuffer, 0, sizeof( _sendBuffer ) );
     
     _state = TELNET_STATE_WAIT_WIFI_CONNECTION;
+    _serverEnabled = false;
 }
 
 
@@ -207,6 +208,9 @@ bool TelnetConsole::startServer() {
  */
 void TelnetConsole::stopServer() {
 
+    /* Stop currently running console commands */
+    this->endTask();
+    
     /* Close the client socket */
     _client.stop();
 
@@ -218,6 +222,29 @@ void TelnetConsole::stopServer() {
     }
 
     _state = TELNET_STATE_WAIT_WIFI_CONNECTION;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Sets whether or not the server is enabled.
+ * 
+ * @param   enabled    TRUE to accept connections, FALSE otherwise
+ * 
+ */
+void TelnetConsole::enableServer( bool enabled ) {
+    if( _serverEnabled == enabled ) {
+        return;
+    }
+
+    _serverEnabled = enabled;
+
+    if( enabled ) {
+        _state = TELNET_STATE_WAIT_WIFI_CONNECTION;
+
+    } else {
+        stopServer();
+    }
 }
 
 
@@ -372,6 +399,10 @@ void TelnetConsole::resetConsole() {
  * 
  */
 void TelnetConsole::runTasks() {
+
+    if( _serverEnabled == false ) {
+        return;
+    }
 
     /* Stop server if WiFi connection is lost */
     if( g_wifi.connected() == false && _state != TELNET_STATE_WAIT_WIFI_CONNECTION ) {

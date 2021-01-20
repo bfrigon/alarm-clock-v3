@@ -70,6 +70,7 @@ class TelnetConsole : public ConsoleBase {
     void stopServer();
     bool clientConnected();
 
+    void enableServer( bool enabled );
 
 
 
@@ -78,6 +79,7 @@ class TelnetConsole : public ConsoleBase {
     TCPClient _client;
     uint8_t _state;
     unsigned long _lastActivity;
+    bool _serverEnabled;
 
     char _sendBuffer[ TELNET_SEND_BUFFER_SIZE + 1 ];
     size_t _sendBufSize;
