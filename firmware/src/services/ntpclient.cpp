@@ -430,6 +430,8 @@ void NtpClient::runTasks() {
  *
  * @brief   Prints NTP client status on the console.
  * 
+ * @param   console    ConsoleBase object to print results to
+ * 
  */
 void NtpClient::printNTPStatus( ConsoleBase *console ) {
 

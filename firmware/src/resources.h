@@ -244,7 +244,7 @@ PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid input! Enter 'Y' or 'N'" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_SUB,  "Invalid subnet mask" );
-PROG_STR( S_CONSOLE_MISSING_PARAMATER,  "Missing parameter!" );
+PROG_STR( S_CONSOLE_MISSING_PARAMETER,  "Missing parameter!" );
 PROG_STR( S_CONSOLE_NET_CONNECTED,      "Connected" );
 PROG_STR( S_CONSOLE_NET_DISCONNECTED,   "Disconnected" );
 PROG_STR( S_CONSOLE_NET_NOT_CONNECTED,  "Not connected to the WiFi network" );
@@ -330,6 +330,16 @@ PROG_STR( S_CONSOLE_NTP_SERVER,         "NTP server : %s" );
 PROG_STR( S_CONSOLE_NTP_AUTOSYNC,       "Automatic clock synchronization : " );
 PROG_STR( S_CONSOLE_NTP_LAST_ERROR,     "Previous sync error : " );
 
+PROG_STR( S_CONSOLE_SERV_UNKNOWN,       "Unknown service name" );
+PROG_STR( S_CONSOLE_SERV_INVALID_OPT,   "Invalid option" );
+
+PROG_STR( S_CONSOLE_TELNET_ENABLED,     "Telnet console is enabled" );
+PROG_STR( S_CONSOLE_TELNET_DISABLED,    "Telnet console is disabled" );
+PROG_STR( S_CONSOLE_TELNET_SESS_ACTIVE, "Session active from %d.%d.%d.%d on port %hu" );
+PROG_STR( S_CONSOLE_TELNET_NO_SESS,     "No active session" );
+
+
+PROG_STR( S_CONSOLE_PARAMS_DELIMITER,   "\x20," );
 
 //--------------------------------------------------------------------------
 //

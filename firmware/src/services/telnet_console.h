@@ -71,7 +71,7 @@ class TelnetConsole : public ConsoleBase {
     bool clientConnected();
 
     void enableServer( bool enabled );
-
+    void printConsoleStatus( ConsoleBase *console );
 
 
   private:

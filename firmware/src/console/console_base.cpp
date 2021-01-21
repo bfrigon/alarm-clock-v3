@@ -452,7 +452,7 @@ void ConsoleBase::parseCommand() {
   
     /* 'help' command */
     if( this->matchCommandName( S_COMMAND_HELP ) == true ) {
-        this->startTaskPrintHelp();
+        this->openCommandPrintHelp();
         started = true;
 
     /* 'reboot' command */
@@ -463,15 +463,15 @@ void ConsoleBase::parseCommand() {
 
     /* 'net restart' command */
     } else if( this->matchCommandName( S_COMMAND_NET_RESTART ) == true ) {
-        started = this->startTaskNetRestart();
+        started = this->openCommandNetRestart();
 
     /* 'net start' command */
     } else if( this->matchCommandName( S_COMMAND_NET_START ) == true ) {
-        started = this->startTaskNetStart();
+        started = this->openCommandNetStart();
 
     /* 'net stop' command */
     } else if( this->matchCommandName( S_COMMAND_NET_STOP ) == true ) {
-        started = this->startTaskNetStop();
+        started = this->openCommandNetStop();
 
     /* 'net status' command */
     } else if( this->matchCommandName( S_COMMAND_NET_STATUS ) == true ) {
@@ -480,34 +480,34 @@ void ConsoleBase::parseCommand() {
 
     /* 'nslookup' command */
     } else if( this->matchCommandName( S_COMMAND_NSLOOKUP, true ) == true ) {
-        started = this->startTaskNslookup();
+        started = this->openCommandNslookup();
     
     /* 'ping' command */
     } else if( this->matchCommandName( S_COMMAND_PING, true ) == true || 
                this->matchCommandName( S_COMMAND_NET_PING, true ) == true ) {
 
-        started = this->startTaskPing();
+        started = this->openCommandPing();
     
     /* 'net config' command */
     } else if( this->matchCommandName( S_COMMAND_NET_CONFIG, false ) == true ) {
-        started = this->startTaskNetworkConfig();
+        started = this->openCommandNetworkConfig();
 
     /* 'date' command */
     } else if( this->matchCommandName( S_COMMAND_DATE, false ) == true ) {
-        this->runTaskPrintDateTime();
+        this->runCommandPrintDateTime();
         this->println();
 
     /* 'set date' command */
     } else if( this->matchCommandName( S_COMMAND_SET_DATE, false ) == true ||
                this->matchCommandName( S_COMMAND_SET_TIME, false ) == true ) {
 
-        started = this->startTaskSetDate();
+        started = this->openCommandSetDate();
 
     /* 'set timezone' and 'tz set' command */
     } else if( this->matchCommandName( S_COMMAND_SET_TIMEZONE, true ) == true ||
                this->matchCommandName( S_COMMAND_TZ_SET, true ) == true ) {
 
-        started = this->startTaskSetTimeZone();
+        started = this->openCommandSetTimeZone();
 
     /* 'tz info' command */
     } else if( this->matchCommandName( S_COMMAND_TZ_INFO, false ) == true ) {
@@ -516,24 +516,28 @@ void ConsoleBase::parseCommand() {
 
     /* 'config backup' command */
     } else if( this->matchCommandName( S_COMMAND_SETTING_BACKUP, true ) == true ) {
-        started = this->startTaskConfigBackup();
+        started = this->openCommandConfigBackup();
 
     /* 'config restore' command */
     } else if( this->matchCommandName( S_COMMAND_SETTING_RESTORE, true ) == true ) {
-        started = this->startTaskConfigRestore();
+        started = this->openCommandConfigRestore();
 
     /* 'factory reset' command */
     } else if( this->matchCommandName( S_COMMAND_FACTORY_RESET, false ) == true ) {
-        started = this->startTaskFactoryReset();
+        started = this->openCommandFactoryReset();
 
     /* 'ntp sync' command */
     } else if( this->matchCommandName( S_COMMAND_NTP_SYNC, false ) == true ) {
-        started = this->startTaskNtpSync();
+        started = this->openCommandNtpSync();
 
     /* 'ntp status' command */
     } else if( this->matchCommandName( S_COMMAND_NTP_STATUS, false ) == true ) {
         g_ntp.printNTPStatus( this );
         this->println();
+
+    /* 'ntp status' command */
+    } else if( this->matchCommandName( S_COMMAND_SERVICE, true ) == true ) {
+        this->openCommandService();
 
     /* 'exit' command */
     } else if( this->matchCommandName( S_COMMAND_EXIT, false ) == true ) {
@@ -605,53 +609,54 @@ void ConsoleBase::runTasks() {
         switch( this->getCurrentTask() ) {
 
             case TASK_CONSOLE_PRINT_HELP:
-                this->runTaskPrintHelp();
+                this->runCommandPrintHelp();
                 break;
 
             case TASK_CONSOLE_NET_START:
             case TASK_CONSOLE_NET_RESTART:
-                this->runTaskNetRestart();
+                this->runCommandNetRestart();
                 break;
 
             case TASK_CONSOLE_NET_STOP:
-                this->runTaskNetStop();
+                this->runCommandNetStop();
                 break;
             
             case TASK_CONSOLE_NET_NSLOOKUP:
-                this->runTaskNsLookup();
+                this->runCommandNsLookup();
                 break;
 
             case TASK_CONSOLE_NET_PING:
-                this->runTaskPing();
+                this->runCommandPing();
                 break;
 
             case TASK_CONSOLE_NET_CONFIG:
-                this->runTaskNetworkConfig();
+                this->runCommandNetworkConfig();
                 break;
 
             case TASK_CONSOLE_SET_TZ:
-                this->runTaskSetTimeZone();
+                this->runCommandSetTimeZone();
                 break;
 
             case TASK_CONSOLE_SET_DATE:
-                this->runTaskSetDate();
+                this->runCommandSetDate();
                 break;
 
             case TASK_CONSOLE_CONFIG_BACKUP:
-                this->runTaskConfigBackup();
+                this->runCommandConfigBackup();
                 break;
 
             case TASK_CONSOLE_CONFIG_RESTORE:
-                this->runTaskConfigRestore();
+                this->runCommandConfigRestore();
                 break;
 
             case TASK_CONSOLE_FACTORY_RESET:
-                this->runTaskFactoryReset();
+                this->runCommandFactoryReset();
                 break;
 
             case TASK_CONSOLE_NTP_SYNC:
-                this->runTaskNtpSync();
+                this->runCommandNtpSync();
                 break;
+
         }
 
         /* If task is done, displays the prompt and reset input buffer */

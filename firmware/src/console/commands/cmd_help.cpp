@@ -23,7 +23,7 @@
  * @brief   Starts the 'help' command task
  * 
  */
-void ConsoleBase::startTaskPrintHelp() {
+void ConsoleBase::openCommandPrintHelp() {
     _taskIndex = 0;
     
     this->startTask( TASK_CONSOLE_PRINT_HELP );
@@ -36,7 +36,7 @@ void ConsoleBase::startTaskPrintHelp() {
  * @brief   Run the 'help' command task
  * 
  */
-void ConsoleBase::runTaskPrintHelp() {
+void ConsoleBase::runCommandPrintHelp() {
     this->print_P( (const char *)pgm_read_word( &( S_COMMANDS[ _taskIndex ])), 16, TEXT_ALIGN_LEFT );
     this->print_P( (const char *)pgm_read_word( &( S_HELP_COMMANDS[ _taskIndex ])));
     this->println();

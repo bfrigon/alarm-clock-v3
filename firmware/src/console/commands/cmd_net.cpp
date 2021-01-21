@@ -28,7 +28,7 @@
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-bool ConsoleBase::startTaskNetRestart() {
+bool ConsoleBase::openCommandNetRestart() {
 
      if( g_wifi.isBusy() && g_wifi.connected() ) {
         this->println_P( S_CONSOLE_WIFI_BUSY );
@@ -39,7 +39,7 @@ bool ConsoleBase::startTaskNetRestart() {
     if( g_wifi.connected() == false ) {
 
         /* If already disconnected, issue a net start command instead */
-        return this->startTaskNetStart();
+        return this->openCommandNetStart();
     }
 
     _taskIndex = 0;
@@ -60,7 +60,7 @@ bool ConsoleBase::startTaskNetRestart() {
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-void ConsoleBase::runTaskNetRestart() {
+void ConsoleBase::runCommandNetRestart() {
 
     if( g_wifi.isBusy() == true ) {
         return;
@@ -102,7 +102,7 @@ void ConsoleBase::runTaskNetRestart() {
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-bool ConsoleBase::startTaskNetStart() {
+bool ConsoleBase::openCommandNetStart() {
     if( g_wifi.connected() == true ) {
         this->endTask( ERR_WIFI_ALREADY_CONNECTED );
         return false;
@@ -125,7 +125,7 @@ bool ConsoleBase::startTaskNetStart() {
  * @return  TRUE if successful, FALSE if another task is already running.
  * 
  */
-bool ConsoleBase::startTaskNetStop() {
+bool ConsoleBase::openCommandNetStop() {
     if( g_wifi.connected() == false ) {
         this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
@@ -151,7 +151,7 @@ bool ConsoleBase::startTaskNetStop() {
  * @brief   Monitor the 'net stop' command task
  * 
  */
-void ConsoleBase::runTaskNetStop() {
+void ConsoleBase::runCommandNetStop() {
     
     if( g_wifi.connected() == false ) {
         this->println_P( S_CONSOLE_NET_DISCONNECTED );
@@ -212,14 +212,14 @@ void ConsoleBase::printNetStatus() {
  *          an invalid parameter is provided.
  * 
  */
-bool ConsoleBase::startTaskNslookup() {
+bool ConsoleBase::openCommandNslookup() {
 
     char* hostname;
     hostname = this->getInputParameter();
 
     if( hostname == 0 ) {
 
-        this->println_P( S_CONSOLE_MISSING_PARAMATER );
+        this->println_P( S_CONSOLE_MISSING_PARAMETER );
         this->print_P( S_CONSOLE_USAGE );
         this->println_P( S_USAGE_NSLOOKUP );
         this->println();
@@ -252,7 +252,7 @@ bool ConsoleBase::startTaskNslookup() {
  *          input required before executing the task. 
  * 
  */
-void ConsoleBase::runTaskNsLookup() {
+void ConsoleBase::runCommandNsLookup() {
     
     IPAddress result;
     if( g_wifi.getHostnameResolveResults( result )) {
@@ -275,14 +275,14 @@ void ConsoleBase::runTaskNsLookup() {
  * @brief   Starts the 'ping' command task
  *
  */
-bool ConsoleBase::startTaskPing() {
+bool ConsoleBase::openCommandPing() {
 
     char* host;
     host = this->getInputParameter();
 
     if( host == 0 ) {
 
-        this->println_P( S_CONSOLE_MISSING_PARAMATER );
+        this->println_P( S_CONSOLE_MISSING_PARAMETER );
         this->print_P( S_CONSOLE_USAGE );
         this->println_P( S_USAGE_PING );
         this->println();
@@ -331,7 +331,7 @@ bool ConsoleBase::startTaskPing() {
  * @brief   Monitor the 'ping' command task. 
  *           
  */
-void ConsoleBase::runTaskPing() {
+void ConsoleBase::runCommandPing() {
 
     IPAddress ip;
     int32_t rtt;
@@ -363,7 +363,7 @@ void ConsoleBase::runTaskPing() {
  * @brief   Starts the 'net config' command task
  *           
  */
-bool ConsoleBase::startTaskNetworkConfig() {
+bool ConsoleBase::openCommandNetworkConfig() {
 
     _taskIndex = 0;
 
@@ -386,7 +386,7 @@ bool ConsoleBase::startTaskNetworkConfig() {
  *          responses required before executing the task.
  * 
  */
-void ConsoleBase::runTaskNetworkConfig() {
+void ConsoleBase::runCommandNetworkConfig() {
     
     IPAddress addr;
 

@@ -250,6 +250,40 @@ void TelnetConsole::enableServer( bool enabled ) {
 
 /*! ------------------------------------------------------------------------
  *
+ * @brief   Prints console status on the console.
+ * 
+ * @param   console    ConsoleBase object to print results to
+ * 
+ */
+void TelnetConsole::printConsoleStatus( ConsoleBase *console ) {
+
+    console->println_P( _serverEnabled == true ? S_CONSOLE_TELNET_ENABLED : S_CONSOLE_TELNET_DISABLED );
+
+    if( g_wifi.connected() == false ) {
+        console->println_P( S_CONSOLE_NET_NOT_CONNECTED );
+
+    } else {
+
+        if( _serverEnabled == true ) {
+            if( _client.connected() ) {
+
+                IPAddress ip;
+                ip = _client.remoteIP();
+
+                console->printf_P( S_CONSOLE_TELNET_SESS_ACTIVE, ip[ 0 ], ip[ 1 ], ip[ 2 ], ip[ 3 ], _client.remotePort() );
+                console->println();
+                
+            } else {
+
+                console->println_P( S_CONSOLE_TELNET_NO_SESS );
+            }
+        }
+    }
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
  * @brief   Check for accepted socket connection. Refuses the connection if
  *          a session is already active.
  * 

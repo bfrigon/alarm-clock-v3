@@ -36,7 +36,7 @@ bool cmd_time_use_ntp;
  * @return  TRUE if successful, FALSE otherwise
  *           
  */
-bool ConsoleBase::startTaskSetDate() {
+bool ConsoleBase::openCommandSetDate() {
     _taskIndex = 0;
 
     cmd_time_adj = g_rtc.now();
@@ -56,7 +56,7 @@ bool ConsoleBase::startTaskSetDate() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runTaskSetDate() {
+void ConsoleBase::runCommandSetDate() {
     
 
     /* Even index display the prompt, odd index process user input */
@@ -227,7 +227,7 @@ void ConsoleBase::runTaskSetDate() {
  * @brief   Print the current date and time to the console
  *           
  */
-void ConsoleBase::runTaskPrintDateTime() {
+void ConsoleBase::runCommandPrintDateTime() {
 
     DateTime now;
     const char *month;
@@ -265,7 +265,7 @@ void ConsoleBase::runTaskPrintDateTime() {
  * @return  TRUE if successful, FALSE otherwise
  *           
  */
-bool ConsoleBase::startTaskSetTimeZone() {
+bool ConsoleBase::openCommandSetTimeZone() {
 
     
     param_tz_name = this->getInputParameter();
@@ -290,7 +290,7 @@ bool ConsoleBase::startTaskSetTimeZone() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runTaskSetTimeZone() {
+void ConsoleBase::runCommandSetTimeZone() {
     int16_t id;
 
     
@@ -343,7 +343,7 @@ void ConsoleBase::runTaskSetTimeZone() {
  */
 void ConsoleBase::showTimezoneInfo() {
     
-    this->runTaskPrintDateTime();
+    this->runCommandPrintDateTime();
     this->println();
 
     DateTime now = g_rtc.now();

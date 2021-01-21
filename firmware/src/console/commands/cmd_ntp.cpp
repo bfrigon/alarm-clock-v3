@@ -26,7 +26,7 @@
  * @return  TRUE if successful, FALSE otherwise
  * 
  */
-bool ConsoleBase::startTaskNtpSync() {
+bool ConsoleBase::openCommandNtpSync() {
 
     this->startTask( TASK_CONSOLE_NTP_SYNC );
 
@@ -45,7 +45,7 @@ bool ConsoleBase::startTaskNtpSync() {
  * @brief   Monitor the 'ntp sync' task
  * 
  */
-void ConsoleBase::runTaskNtpSync() {
+void ConsoleBase::runCommandNtpSync() {
 
     if( g_ntp.isBusy() == true ) {
         return;
