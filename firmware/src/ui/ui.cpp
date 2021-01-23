@@ -15,144 +15,17 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "ui.h"
 #include "../services/ntpclient.h"
 
 
-bool g_clockUpdate = true;
 uint8_t selectedProfile = 0;
 uint8_t selectedAlarm = 0;
 
 
 struct Time adjTime;
 struct Date adjDate;
-
-
-Screen screen_root( SCREEN_ID_ROOT, NULL, NULL, &onEnterScreen, &onExitScreen );
-Screen screen_main_menu( SCREEN_ID_MAIN_MENU, ITEMS_MAIN_MENU,
-                         &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_display( SCREEN_ID_DISPLAY_SETTINGS, ITEMS_DISPLAY_SETTINGS,
-                       &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_network( SCREEN_ID_NETWORK, ITEMS_NETWORK,
-                       NULL, &onEnterScreen, &onExitScreen );
-
-Screen screen_set_time( SCREEN_ID_SET_TIME, ITEMS_SET_TIME,
-                        &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_alarm( SCREEN_ID_ALARM, NULL,
-                     NULL, &alarmScreen_onEnterScreen, NULL );
-
-Screen screen_set_alarms( SCREEN_ID_SET_ALARMS, ITEMS_SET_ALARM,
-                          &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_edit_alarm( SCREEN_ID_EDIT_ALARM, ITEMS_EDIT_ALARM,
-                          &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_show_alarms( SCREEN_ID_SHOW_ALARMS, NULL,
-                           NULL, &onEnterScreen, &onExitScreen );
-
-Screen screen_edit_profile( SCREEN_ID_EDIT_PROFILE, ITEMS_EDIT_PROFILE,
-                            &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_list_profiles( SCREEN_ID_LIST_PROFILES, ITEMS_LIST_PROFILES,
-                             &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_edit_night_lamp( SCREEN_ID_EDIT_NIGHT_LAMP, ITEMS_EDIT_NIGHT_LAMP,
-                               &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_edit_alarm_lamp( SCREEN_ID_EDIT_ALARM_LAMP, ITEMS_EDIT_ALARM_LAMP,
-                               &onValueChange, &onEnterScreen, &onExitScreen );
-
-Screen screen_edit_alarm_visual( SCREEN_ID_EDIT_ALARM_VISUAL, ITEMS_EDIT_PROFILE_VISUAL,
-                                 &onValueChange, &onEnterScreen, onExitScreen );
-
-Screen screen_menu_settings( SCREEN_ID_MENU_SETTINGS, ITEMS_MENU_SETTINGS,
-                             NULL, NULL, NULL );
-
-Screen screen_settings_manager( SCREEN_ID_SETTINGS_MANAGER, ITEMS_DIALOG_YESNO,
-                                NULL, &settingsManager_onEnterScreen, NULL );
-
-Screen screen_batt_status( SCREEN_ID_BATT_STATUS, NULL,
-                           NULL, &battStatus_onEnterScreen, NULL );
-
-Screen screen_net_status( SCREEN_ID_NET_STATUS, NULL,
-                           NULL, &netStatus_onEnterScreen, NULL );
-
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Initialize screens settings.
- *
- */
-void initScreens() {
-
-    screen_main_menu.setConfirmChanges( true );
-
-    screen_alarm.setCbDrawScreen( &alarmScreen_onDrawScreen );
-    screen_alarm.setCbKeypress( &alarmScreen_onKeypress );
-    screen_alarm.setCbTimeout( &alarmScreen_onTimeout );
-    screen_alarm.setTimeout( 3000 );
-
-    /* Root screen */
-    screen_root.setCbDrawScreen( &rootScreen_onDrawScreen );
-    screen_root.setCbKeypress( &rootScreen_onKeypress );
-    screen_root.setCbTimeout( &rootScreen_onTimeout );
-    screen_root.setTimeout( 1500 );
-    screen_root.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
-
-    /* Set time screen */
-    screen_set_time.setConfirmChanges( true );
-    screen_set_time.setCbSelectionChange( &onSelectionChange );
-
-    /* Set alarm screen */
-    screen_set_alarms.setCbDrawItem( &onDrawItem );
-
-    /* Show alarms screen */
-    screen_show_alarms.setTimeout( 3000 );
-    screen_show_alarms.setCbKeypress( &showAlarmScreen_onKeypress );
-    screen_show_alarms.setCbDrawScreen( &showAlarmScreen_onDrawScreen );
-
-    /* Network settings screen */
-    screen_network.setConfirmChanges( true );
-
-    /* List profile screen */
-    screen_edit_profile.setCbSelectionChange( &onSelectionChange );
-    screen_edit_profile.setCbDrawItem( &onDrawItem );
-
-    /* Edit alarm lamp settings */
-    screen_edit_alarm_lamp.setCbSelectionChange( &onSelectionChange );
-    screen_edit_alarm_lamp.setCbKeypress( &onKeypress );
-
-    /* Edit night lamp settings */
-    screen_edit_night_lamp.setCbSelectionChange( &onSelectionChange );
-    screen_edit_night_lamp.setCbKeypress( &onKeypress );
-    screen_edit_night_lamp.setCbDrawItem( &onDrawItem );
-
-    /* Edit alarm visual settings */
-    screen_edit_alarm_visual.setCbSelectionChange( &onSelectionChange );
-
-
-    screen_menu_settings.setCbValueChange( &settingsMenu_onValueChange );
-
-    screen_settings_manager.setCbDrawScreen( &settingsManager_onDrawScreen );
-    screen_settings_manager.setCbKeypress( &settingsManager_onKeypress );
-
-    screen_batt_status.setCbDrawScreen( &battStatus_onDrawScreen );
-    screen_batt_status.setCbTimeout( &battStatus_onTimeout );
-    screen_batt_status.setCbKeypress( &battStatus_onKeypress );
-    screen_batt_status.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
-
-    screen_net_status.setCbDrawScreen( &netStatus_onDrawScreen );
-    screen_net_status.setCbKeypress( &netStatus_onKeypress );
-    screen_net_status.setCustomCharacterSet( CUSTOM_CHARACTERS_ROOT );
-
-    g_currentScreen = &screen_root;
-    g_screenUpdate = true;
-    g_screenClear = true;
-}
 
 
 /*! ------------------------------------------------------------------------
@@ -336,7 +209,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
             g_clock.hourFlashing = ( fieldPos == 0 );
             g_clock.minutesFlashing = ( fieldPos == 1 );
 
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate( true );
 
             break;
 
@@ -347,7 +220,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
                 g_clock.hourFlashing = false;
                 g_clock.minutesFlashing = false;
 
-                g_clockUpdate = true;
+                g_clock.requestClockUpdate( true );
             }
 
             break;
@@ -372,19 +245,19 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
 
         case ID_CLOCK_24H:
 
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate();
             break;
 
         case ID_CLOCK_COLOR:
             g_clock.setColorFromTable( g_config.clock.clock_color );
 
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate();
             break;
 
         case ID_CLOCK_BRIGHTNESS:
             g_clock.setBrightness( g_config.clock.clock_brightness );
 
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate();
             break;
 
         case ID_LCD_CONTRAST:
@@ -439,7 +312,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
 
         case ID_ALARM_ON_1:
         case ID_ALARM_ON_2:
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate();
             break;
 
         case ID_ALARM_EDIT_1:
@@ -453,7 +326,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
             g_clock.hour = adjTime.hour;
             g_clock.minute = adjTime.minute;
 
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate( true );
             break;
 
         case ID_LAMP_DELAY:
@@ -507,17 +380,16 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
  * @brief   Event raised when entering the screen
  *
  * @param   screen    Pointer to the new screen.
- *
- * @return  TRUE to allow loading the screen, FALSE to override.
  * 
  */
-bool onEnterScreen( Screen* screen ) {
+void onEnterScreen( Screen* screen ) {
 
     DateTime now;
 
     switch( screen->getId() ) {
 
         case SCREEN_ID_SET_TIME:
+            screen->setConfirmChanges( true );
 
             now = g_rtc.now();
             g_timezone.toLocal( &now );
@@ -529,28 +401,15 @@ bool onEnterScreen( Screen* screen ) {
             adjDate.year = ( uint8_t )( now.year() - 2000 );
 
             g_clock.status_set = true;
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate();
 
             break;
 
-        case SCREEN_ID_SHOW_ALARMS:
-
-            int8_t alarm_id;
-            alarm_id = g_alarm.getNextAlarmID( g_rtc.now(), false );
-
-            Time time;
-            g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );
-
-            if( alarm_id != -1 ) {
-
-                g_clock.hour = time.hour;
-                g_clock.minute = time.minute;
-
-                g_clockUpdate = true;
-            }
+        case SCREEN_ID_NETWORK:
+        case SCREEN_ID_SERVICES:
+            screen->setConfirmChanges( true );
+            break;
     }
-
-    return true;
 }
 
 
@@ -558,26 +417,25 @@ bool onEnterScreen( Screen* screen ) {
  *
  * @brief   Event raised when leaving the screen
  *
- * @param   currentScreen    Current screen.
- * @param   newScreen        The new screen to be loaded.
+ * @param   screen    Current screen.
  *
  * @return  TRUE to allow leaving the screen, FALSE to override.
  * 
  */
-bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
+bool onExitScreen( Screen* screen  ) {
 
     bool save;
 
-    if( currentScreen->getConfirmChanges() == true ) {
-        save = ( currentScreen->getReturnValue() == RETURN_YES );
+    if( screen->getConfirmChanges() == true ) {
+        save = ( screen->getReturnValue() == RETURN_YES );
 
     } else {
 
-        save = currentScreen->hasItemsChanged();
+        save = screen->hasItemsChanged();
     }
 
 
-    switch( currentScreen->getId() ) {
+    switch( screen->getId() ) {
 
         case SCREEN_ID_MAIN_MENU:
 
@@ -619,12 +477,13 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
             break;
 
         case SCREEN_ID_NETWORK:
+        case SCREEN_ID_SERVICES:
             if( save == true ) {
-                g_config.save( EEPROM_SECTION_NETWORK );
-                g_config.apply( EEPROM_SECTION_NETWORK );
+                g_config.save( EEPROM_SECTION_ALL );
+                g_config.apply( EEPROM_SECTION_ALL );
 
             } else {
-                g_config.load( EEPROM_SECTION_NETWORK );
+                g_config.load( EEPROM_SECTION_ALL );
             }
 
             break;
@@ -656,12 +515,8 @@ bool onExitScreen( Screen* currentScreen, Screen* newScreen ) {
                 g_config.load( EEPROM_SECTION_CLOCK );
             }
 
-            g_clockUpdate = true;
+            g_clock.requestClockUpdate();
 
-            break;
-
-        case SCREEN_ID_SHOW_ALARMS:
-            g_clock.restoreClockDisplay();
             break;
 
         case SCREEN_ID_DISPLAY_SETTINGS:

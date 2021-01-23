@@ -18,12 +18,13 @@
 #include "neoclock.h"
 #include "rtc.h"
 #include "power.h"
-#include "../screen.h"
 #include "../config.h"
 #include "../alarm.h"
 #include "../libs/time.h"
 #include "../resources.h"
+#include "../ui/screen.h"
 #include "../ui/ui.h"
+
 
 /*! ------------------------------------------------------------------------
  *
@@ -57,8 +58,8 @@ void NeoClock::restoreClockDisplay() {
     g_clock.status_set = false;
 
 
-    g_clockUpdate = true;
-    g_screenUpdate = true;
+    _updateRequested = true;
+    g_screen.requestScreenUpdate( false );
 }
 
 
@@ -160,10 +161,10 @@ void NeoClock::processEvents() {
         this->_prevDate = now;
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-            g_screenUpdate = true;
+            g_screen.requestScreenUpdate( false );
         }
 
-        this->requestDisplayUpdate();
+        this->requestClockUpdate();
     }
 
     /* Update the clock display when blinking state changes */
@@ -172,15 +173,15 @@ void NeoClock::processEvents() {
         this->_flashState = !( this->_flashState );
 
         if( this->hourFlashing == true || this->minutesFlashing == true ) {
-            g_clockUpdate = true;
+            _updateRequested = true;
         }
     }
 
     /* Update the clock display if requested */
-    if( g_clockUpdate == true ) {
+    if( _updateRequested == true ) {
 
         g_clock.update();
-        g_clockUpdate = false;
+        _updateRequested = false;
     }
 }
 
@@ -225,19 +226,24 @@ void NeoClock::setTestMode( bool testMode ) {
  * @return  TRUE if the request is accepted, FALSE otherwise
  * 
  */
-bool NeoClock::requestDisplayUpdate() {
+bool NeoClock::requestClockUpdate( bool force ) {
 
     DateTime now = g_rtc.now();
 
-    switch( g_currentScreen->getId() ) {
+    switch( g_screen.getId() ) {
         case SCREEN_ID_SET_TIME:
         case SCREEN_ID_SHOW_ALARMS:
+
+            if( force == true ) {
+                _updateRequested = true;
+                return true;
+            }
         
             /* Don't update clock display on these screens */
             break;
 
         case SCREEN_ID_ROOT:
-            g_screenUpdate = true;
+            g_screen.requestScreenUpdate( false );
 
         /* Fall-through */
 
@@ -247,7 +253,7 @@ bool NeoClock::requestDisplayUpdate() {
             this->hour = now.hour();
             this->minute = now.minute();
 
-            g_clockUpdate = true;
+            _updateRequested = true;
             return true;
     }
 

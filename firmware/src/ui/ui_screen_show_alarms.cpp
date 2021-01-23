@@ -20,6 +20,55 @@
 
 /*! ------------------------------------------------------------------------
  *
+ * @brief   Event raised when entering the screen
+ *
+ * @param   screen    Pointer to the screen where the event occured.
+ *
+ */
+void showAlarmScreen_onEnterScreen( Screen* screen ) {
+
+    screen->setTimeout( 3000 );
+
+    int8_t alarm_id;
+    alarm_id = g_alarm.getNextAlarmID( g_rtc.now(), false );
+
+    Time time;
+    g_alarm.readProfileAlarmTime( alarm_id, &time, NULL );
+
+    if( alarm_id != -1 ) {
+
+        g_clock.hour = time.hour;
+        g_clock.minute = time.minute;
+        
+    } else {
+        g_clock.hour = 0xFF;
+        g_clock.minute = 0xFF;
+    }
+
+
+    g_clock.requestClockUpdate( true );
+
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Event raised when leaving the screen
+ *
+ * @param   screen    Current screen.
+ *
+ * @return  TRUE to allow leaving the screen, FALSE to override.
+ * 
+ */
+bool showAlarmScreen_onExitScreen( Screen* screen  ) {
+
+    /* Restore clock */
+    g_clock.restoreClockDisplay();
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
  * @brief   Event raised when a key press occurs
  *
  * @param   screen    Pointer to the screen where the event occured.
@@ -56,7 +105,7 @@ bool showAlarmScreen_onDrawScreen( Screen *screen ) {
 
     if( alarm_id == -1 ) {
 
-        g_lcd.print_P( S_ALARMS_OFF );
+        g_lcd.print_P( S_ALARMS_OFF, DISPLAY_WIDTH, TEXT_ALIGN_CENTER );
         return false;
     }
 

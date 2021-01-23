@@ -44,9 +44,8 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
- * @return  TRUE to continue loading the screen, FALSE otherwise
  */
-bool settingsManager_onEnterScreen( Screen* screen ) {
+void settingsManager_onEnterScreen( Screen* screen ) {
 
     screen->setTimeout( 0 );
     confirm_action = false;
@@ -58,8 +57,6 @@ bool settingsManager_onEnterScreen( Screen* screen ) {
             confirm_action = true;
         }
     }
-
-    return true;
 }
 
 
@@ -176,12 +173,10 @@ bool settingsManager_onKeypress( Screen* screen, uint8_t key ) {
 
         case ID_SETTINGS_BACKUP:
             g_config.startBackup( CONFIG_BACKUP_FILENAME, true );
-            g_screenUpdate = true;
             break;
 
         case ID_SETTINGS_RESTORE:
             g_config.startRestore( CONFIG_BACKUP_FILENAME );
-            g_screenUpdate = true;
             break;
 
         case ID_SETTINGS_FACTORY_RESET:
@@ -192,8 +187,7 @@ bool settingsManager_onKeypress( Screen* screen, uint8_t key ) {
     }
 
     confirm_action = true;
-    g_screenUpdate = true;
-    g_screenClear = true;
+    g_screen.requestScreenUpdate( true );
 
     return false;
 }

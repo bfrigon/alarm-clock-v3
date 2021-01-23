@@ -16,7 +16,8 @@
 //
 //******************************************************************************
 #include "power.h"
-#include "../screen.h"
+#include "../ui/screen.h"
+#include "../ui/ui.h"
 #include "../hardware.h"
 #include "../alarm.h"
 #include "../services/telnet_console.h"
@@ -97,6 +98,14 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
 
     this->resetSuspendDelay();
 
+    if( mode == POWER_MODE_SUSPEND ) {
+        g_screen.activate( &screen_suspend );
+    }
+
+    if( prevMode == POWER_MODE_SUSPEND && mode != POWER_MODE_SUSPEND ) {
+        g_screen.exitScreen();
+    }
+
     /* Update modules power state */
     g_wifi.onPowerStateChange( mode );
     g_clock.onPowerStateChange( mode );
@@ -105,11 +114,6 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
     g_als.onPowerStateChange( mode );
     
 
-    g_screenUpdate = true;
-
-    if( prevMode == POWER_MODE_SUSPEND || mode == POWER_MODE_SUSPEND ) {
-        g_screenClear = true;
-    }
 
     return mode;
 }
@@ -122,17 +126,7 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
  */
 void Power::processEvents() {
 
-    uint8_t prevState = this->_mode;
-    uint8_t newState = g_power.detectPowerState();
-
-
-    if( newState != prevState ) {
-        g_screenUpdate = true;
-
-        if( prevState == POWER_MODE_SUSPEND || newState == POWER_MODE_SUSPEND ) {
-            g_screenClear = true;
-        }
-    }
+    g_power.detectPowerState();
 }
 
 

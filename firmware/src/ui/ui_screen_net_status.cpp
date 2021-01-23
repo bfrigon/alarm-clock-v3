@@ -107,8 +107,7 @@ bool netStatus_onKeypress( Screen* screen, uint8_t key ) {
             g_netStatusPage = 0;
         }
 
-        g_screenUpdate = true;
-        g_screenClear = true;
+        g_screen.requestScreenUpdate( true );
 
         return false;
     }
@@ -123,12 +122,10 @@ bool netStatus_onKeypress( Screen* screen, uint8_t key ) {
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
- * @return  TRUE to continue loading the screen, FALSE otherwise
  * 
  */
-bool netStatus_onEnterScreen( Screen* screen ) {
+void netStatus_onEnterScreen( Screen* screen ) {
     g_netStatusPage = 0;
 
-    return true;
 }
 

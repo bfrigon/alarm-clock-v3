@@ -161,7 +161,6 @@ void ConsoleBase::runCommandSetDate() {
 
                 /* Save configuration */
                 g_config.save( EEPROM_SECTION_CLOCK );
-                g_screenUpdate = true;
 
                 if( g_config.clock.use_ntp == true ) {
 
@@ -186,7 +185,8 @@ void ConsoleBase::runCommandSetDate() {
                     g_wifi.setSystemTime( &cmd_time_adj );
 
                     /* Request clock display update */
-                    g_clock.requestDisplayUpdate();
+                    g_clock.requestClockUpdate();
+                    g_screen.requestScreenUpdate( false );
                 }
 
                 this->endTask( TASK_SUCCESS );
@@ -330,7 +330,7 @@ void ConsoleBase::runCommandSetTimeZone() {
     this->println_P( g_timezone.getName() );
 
     /* Request clock display update */
-    g_clock.requestDisplayUpdate();
+    g_clock.requestClockUpdate();
 
     this->endTask( TASK_SUCCESS );
 }

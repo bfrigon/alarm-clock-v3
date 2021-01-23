@@ -23,7 +23,6 @@
 #include "src/services/ntpclient.h"
 
 
-
 Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
                          PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
 WiFi            g_wifi( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
@@ -40,10 +39,12 @@ Console         g_console;
 TelnetConsole   g_telnetConsole;
 TimeZone        g_timezone;
 NtpClient       g_ntp;
+Screen          g_screen;
 
 
 bool g_prev_state_wifi = false;
 bool g_prev_state_telnetConsole = false;
+
 
 
 /*! ------------------------------------------------------------------------
@@ -114,9 +115,6 @@ void setup() {
     Wire.begin();
     Wire.setClock( 100000 );
 
-    /* Initialize UI */
-    initScreens();
-
     /* Initialize power management driver */
     g_power.begin();
     g_battery.begin( BATTERY_DESIGN_CAPACITY );
@@ -167,6 +165,9 @@ void setup() {
     g_wifi.begin();
     g_wifi.setSystemTime( g_rtc.now() );
 
+    /* Initialize UI */
+    g_screen.activate( &screen_root );
+
     /* Display console prompt */
     g_console.resetConsole();
 
@@ -201,20 +202,10 @@ void loop() {
     g_alarm.processEvents();
 
     /* Process keypad events and check if screen has timed out */
-    g_currentScreen->processEvents();
+    g_screen.processEvents();
 
     /* Update the current screen if requested */
-    if( g_screenUpdate == true ) {
-
-        if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-            screen_root.update( true );
-
-        } else {
-            g_currentScreen->update();
-        }
-
-        g_screenUpdate = false;
-    }
+    g_screen.update();
 
     /* Process lamp effect if lamp is active */
     g_lamp.processEvents();
@@ -242,12 +233,16 @@ void loop() {
     if( g_telnetConsole.clientConnected() != g_prev_state_telnetConsole ) {
         g_prev_state_telnetConsole = g_telnetConsole.clientConnected();
 
-        g_screenUpdate = ( g_currentScreen->getId() == SCREEN_ID_ROOT );
+        if( g_screen.getId() == SCREEN_ID_ROOT ) {
+            g_screen.requestScreenUpdate( false );
+        }
     }
 
     if( g_wifi.connected() != g_prev_state_wifi ) {
         g_prev_state_wifi = g_wifi.connected();
 
-        g_screenUpdate = ( g_currentScreen->getId() == SCREEN_ID_ROOT );
+        if( g_screen.getId() == SCREEN_ID_ROOT ) {
+            g_screen.requestScreenUpdate( false );
+        }
     }
 }

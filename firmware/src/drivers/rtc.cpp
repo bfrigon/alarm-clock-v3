@@ -165,7 +165,7 @@ bool DS3231::processEvents() {
         _adjustDelay = -1;
 
         /* Request clock display update */
-        g_clock.requestDisplayUpdate();
+        g_clock.requestClockUpdate();
 
         /* Update the time on the wifi module */
         g_wifi.setSystemTime( &_now );

@@ -20,10 +20,10 @@
 
 #include <Arduino.h>
 
-#include "../libs/time.h"
 
+#include "screen.h"
+#include "../libs/time.h"
 #include "../config.h"
-#include "../screen.h"
 #include "../alarm.h"
 #include "../resources.h"
 
@@ -39,7 +39,7 @@ enum {
     ID_MAIN_EDIT_DISPLAY,
     ID_MAIN_EDIT_LAMP,
     ID_MAIN_EDIT_NETWORK,
-    ID_MAIN_TIME_AUTOSYNC,
+    ID_MAIN_SERVICES,
     ID_MAIN_SETTINGS,
 
     /* --- Set alarms screen --- */
@@ -101,6 +101,10 @@ enum {
     ID_SETTINGS_FACTORY_RESET,
     ID_SETTINGS_BATT_STATUS,
 
+    /* --- Services menu --- */
+    ID_SERVICE_TELNET,
+    ID_SERVICE_NTP_AUTOSYNC,
+
     /* --- YES/NO dialog screen --- */
     ID_DIALOG_YES,
     ID_DIALOG_NO,
@@ -112,6 +116,7 @@ enum {
 // ----------------------------------------
 enum {
     SCREEN_ID_ROOT = 0 ,
+    SCREEN_ID_SUSPEND,
     SCREEN_ID_MAIN_MENU,
     SCREEN_ID_SET_TIME,
     SCREEN_ID_SET_ALARMS,
@@ -129,32 +134,39 @@ enum {
     SCREEN_ID_SETTINGS_MANAGER,
     SCREEN_ID_BATT_STATUS,
     SCREEN_ID_NET_STATUS,
+    SCREEN_ID_SERVICES,
 };
 
 
-void initScreens();
 void enableNightLamp();
 void disableNightLamp();
 
 /* default screen events */
-bool onEnterScreen( Screen* screen );
-bool onExitScreen( Screen* currentScreen, Screen* newScreen );
+void onEnterScreen( Screen* screen );
+bool onExitScreen( Screen* currentScreen );
 void onValueChange( Screen* screen, ScreenItem* item );
 void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen );
 bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
 bool onKeypress( Screen* screen, uint8_t key );
 
 /* Root screen events */
+void rootScreen_onEnterScreen( Screen* screen );
 bool rootScreen_onDrawScreen( Screen* screen );
 bool rootScreen_onKeypress( Screen* screen, uint8_t key );
-void rootScreen_onTimeout( Screen* screen );
+
+/* Suspend screen events */
+void suspendScreen_onEnterScreen( Screen* screen );
+bool suspendScreen_onKeypress( Screen* screen, uint8_t key );
+bool suspendScreen_onDrawScreen( Screen* screen );
 
 /* Show alarm screen events */
+void showAlarmScreen_onEnterScreen( Screen* screen );
+bool showAlarmScreen_onExitScreen( Screen* screen  );
 bool showAlarmScreen_onKeypress( Screen* screen, uint8_t key );
 bool showAlarmScreen_onDrawScreen( Screen* screen );
 
 /* Active alarm screen events */
-bool alarmScreen_onEnterScreen( Screen* currentScreen );
+void alarmScreen_onEnterScreen( Screen* currentScreen );
 bool alarmScreen_onKeypress( Screen* screen, uint8_t key );
 bool alarmScreen_onDrawScreen( Screen* screen );
 void alarmScreen_onTimeout( Screen* screen );
@@ -165,15 +177,15 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item );
 /* Settings manager screen events */
 bool settingsManager_onDrawScreen( Screen* screen );
 bool settingsManager_onKeypress( Screen* screen, uint8_t key );
-bool settingsManager_onEnterScreen( Screen* screen );
+void settingsManager_onEnterScreen( Screen* screen );
 
 bool battStatus_onDrawScreen( Screen* screen );
 void battStatus_onTimeout( Screen* screen );
-bool battStatus_onEnterScreen( Screen* screen );
+void battStatus_onEnterScreen( Screen* screen );
 bool battStatus_onKeypress( Screen* screen, uint8_t key );
 
 bool netStatus_onDrawScreen( Screen* screen );
-bool netStatus_onEnterScreen( Screen* screen );
+void netStatus_onEnterScreen( Screen* screen );
 bool netStatus_onKeypress( Screen* screen, uint8_t key );
 
 
@@ -182,67 +194,85 @@ extern struct Date adjDate;
 extern uint8_t selectedProfile;
 extern uint8_t selectedAlarm;
 
-extern Screen screen_root;
-extern Screen screen_main_menu;
-extern Screen screen_display;
-extern Screen screen_network;
-extern Screen screen_set_time;
-extern Screen screen_set_alarms;
-extern Screen screen_edit_alarm;
-extern Screen screen_show_alarms;
-extern Screen screen_edit_profile;
-extern Screen screen_list_profiles;
-extern Screen screen_edit_night_lamp;
-extern Screen screen_edit_alarm_lamp;
-extern Screen screen_edit_alarm_visual;
-extern Screen screen_alarm;
-extern Screen screen_menu_settings;
-extern Screen screen_settings_manager;
-extern Screen screen_batt_status;
-extern Screen screen_net_status;
 
 
 //--------------------------------------------------------------------------
 //
-// Screen items
+// Screen data
 //
 //--------------------------------------------------------------------------
 
-/* Display settings menu items */
-PROGMEM const struct ScreenItemBase ITEMS_DISPLAY_SETTINGS[] = {
-    ITEM_TOGGLE( ID_CLOCK_24H, 0, 0, S_MENU_SETTINGS_24H, &g_config.clock.display_24h, ITEM_COMPACT ),
+/* Yes/No dialog screen items */
+PROGMEM const struct ScreenItemBase ITEMS_DIALOG_YESNO[] = {
+    ITEM_LINK( ID_DIALOG_NO, 1, 0, S_NO, NULL, ITEM_NORMAL ),
+    ITEM_LINK( ID_DIALOG_YES, 1, 8, S_YES, NULL, ITEM_NORMAL ),
+    ITEM_END()
+};
 
-    ITEM_LIST( ID_CLOCK_COLOR, 1, 0, S_MENU_SETTINGS_COLOR, &g_config.clock.clock_color,
-               _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_BAR( ID_CLOCK_BRIGHTNESS, 2, 0, S_MENU_SETTINGS_BRIGHT, &g_config.clock.clock_brightness,
-              MIN_CLOCK_BRIGHTNESS, MAX_CLOCK_BRIGHTNESS, 12, ITEM_EDIT_FULLSCREEN ),
+// ----------------------------------------
+// Root screen
+// ----------------------------------------
+PROGMEM const ScreenData screen_root {
+    id                    : SCREEN_ID_ROOT, 
+    items                 : NULL,
+    customCharacterSet    : CUSTOM_CHARACTERS_ROOT,
+    eventEnterScreen      : NULL,
+    eventExitScreen       : NULL,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &rootScreen_onDrawScreen,
+    eventKeypress         : &rootScreen_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL
+};
 
-    ITEM_BAR( ID_LCD_CONTRAST, 3, 0, S_MENU_SETTINGS_LCD_CTR, &g_config.clock.lcd_contrast,
-              MIN_LCD_CONTRAST, MAX_LCD_CONTRAST, 12, ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.clock.date_format,
-               _DATE_FORMATS, 0, MAX_DATE_FORMATS - 1, DATE_FORMAT_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+// ----------------------------------------
+// Suspend screen
+// ----------------------------------------
+PROGMEM const ScreenData screen_suspend {
+    id                    : SCREEN_ID_SUSPEND, 
+    items                 : NULL,
+    customCharacterSet    : CUSTOM_CHARACTERS_ROOT,
+    eventEnterScreen      : NULL,
+    eventExitScreen       : NULL,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &suspendScreen_onDrawScreen,
+    eventKeypress         : &suspendScreen_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
 
-    ITEM_LIST( ID_ALS_PRESET, 5, 0, S_MENU_SETTINGS_ALS_PRESET, &g_config.clock.als_preset,
-               _ALS_PRESET_NAMES, 0, MAX_ALS_PRESETS_NAMES - 1, ALS_PRESET_NAME_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+// ----------------------------------------
+// Edit alarm screen
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_EDIT_ALARM[] = {
+    ITEM_TIME( ID_PROFILE_TIME, 0, 0, NULL, &g_alarm.profile.time, ITEM_COMPACT ),
+    ITEM_DOW( ID_PROFILE_DOW, 1, 0, NULL, &g_alarm.profile.dow, ITEM_NORMAL ),
 
     ITEM_END()
 };
 
-/* Set time screen items */
-PROGMEM const struct ScreenItemBase ITEMS_SET_TIME[] = {
-    ITEM_TIME( ID_SET_TIME, 0, 0, NULL, &adjTime, ITEM_COMPACT ),
-    ITEM_NUMBER( ID_SET_DATE_DAY, 1, 0, NULL, &adjDate.day, 1, 31, ITEM_COMPACT | ITEM_NUMBER_INC_WHOLE ),
-    ITEM_MONTH( ID_SET_DATE_MONTH, 1, 3, NULL, &adjDate.month, ITEM_COMPACT ),
-    ITEM_YEAR( ID_SET_DATE_YEAR, 1, 7, NULL, &adjDate.year, ITEM_COMPACT ),
-    ITEM_END()
+PROGMEM const ScreenData screen_edit_alarm {
+    id                    : SCREEN_ID_EDIT_ALARM, 
+    items                 : ITEMS_EDIT_ALARM,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
 };
 
-/* Set alarm screen items */
+
+// ----------------------------------------
+// Set alarm screen
+// ----------------------------------------
 PROGMEM const struct ScreenItemBase ITEMS_SET_ALARM[] = {
 
     /* Alarm 1 */
@@ -258,36 +288,149 @@ PROGMEM const struct ScreenItemBase ITEMS_SET_ALARM[] = {
     ITEM_END()
 };
 
-/* Edit alarm screen items */
-PROGMEM const struct ScreenItemBase ITEMS_EDIT_ALARM[] = {
-    ITEM_TIME( ID_PROFILE_TIME, 0, 0, NULL, &g_alarm.profile.time, ITEM_COMPACT ),
-    ITEM_DOW( ID_PROFILE_DOW, 1, 0, NULL, &g_alarm.profile.dow, ITEM_NORMAL ),
+PROGMEM const ScreenData screen_set_alarms {
+    id                    : SCREEN_ID_SET_ALARMS, 
+    items                 : ITEMS_SET_ALARM,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : &onDrawItem,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
 
+
+// ----------------------------------------
+// Set date/time screen
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_SET_TIME[] = {
+    ITEM_TIME( ID_SET_TIME, 0, 0, NULL, &adjTime, ITEM_COMPACT ),
+    ITEM_NUMBER( ID_SET_DATE_DAY, 1, 0, NULL, &adjDate.day, 1, 31, ITEM_COMPACT | ITEM_NUMBER_INC_WHOLE ),
+    ITEM_MONTH( ID_SET_DATE_MONTH, 1, 3, NULL, &adjDate.month, ITEM_COMPACT ),
+    ITEM_YEAR( ID_SET_DATE_YEAR, 1, 7, NULL, &adjDate.year, ITEM_COMPACT ),
     ITEM_END()
 };
 
-/* List alarm profiles screen */
-PROGMEM const struct ScreenItemBase ITEMS_LIST_PROFILES[] = {
-    ITEM_LINK( ID_ALARM_EDIT_1, 0, 0, S_EDIT_ALARM_1, &screen_edit_profile, ITEM_NORMAL ),
-    ITEM_LINK( ID_ALARM_EDIT_2, 1, 0, S_EDIT_ALARM_2, &screen_edit_profile, ITEM_NORMAL ),
+PROGMEM const ScreenData screen_set_time {
+    id                    : SCREEN_ID_SET_TIME, 
+    items                 : ITEMS_SET_TIME,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : &onSelectionChange,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Show next alarm screen
+// ----------------------------------------
+PROGMEM const ScreenData screen_show_alarms {
+    id                    : SCREEN_ID_SHOW_ALARMS, 
+    items                 : NULL,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &showAlarmScreen_onEnterScreen,
+    eventExitScreen       : &showAlarmScreen_onExitScreen,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &showAlarmScreen_onDrawScreen,
+    eventKeypress         : &showAlarmScreen_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Alarm screen
+// ----------------------------------------
+PROGMEM const ScreenData screen_alarm {
+    id                    : SCREEN_ID_ALARM, 
+    items                 : NULL,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &alarmScreen_onEnterScreen,
+    eventExitScreen       : NULL,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &alarmScreen_onDrawScreen,
+    eventKeypress         : &alarmScreen_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : &alarmScreen_onTimeout,
+};
+
+
+// ----------------------------------------
+// Edit alarm profile visual settings
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE_VISUAL[] = {
+    ITEM_LIST( ID_PROFILE_VISUAL_MODE, 0, 0, S_EDIT_PROFILE_VISUAL_MODE, &g_alarm.profile.visualMode,
+               _ALARM_VISUAL, 0, MAX_ALARM_VISUALS - 1, ALARM_VISUAL_NAME_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_BAR( ID_PROFILE_VISUAL_SPEED, 1, 0, S_EDIT_PROFILE_VISUAL_SPEED, &g_alarm.profile.effectSpeed,
+              MIN_ALARM_VISUAL_EFFECT_SPEED, MAX_ALARM_VISUAL_EFFECT_SPEED, 9, ITEM_EDIT_FULLSCREEN ),
     ITEM_END()
 };
 
-/* Network menu items */
-PROGMEM const struct ScreenItemBase ITEMS_NETWORK[] = {
-    ITEM_LINK( ID_NETWORK_STATUS, 0, 0, S_MENU_NETWORK_STATUS, &screen_net_status, ITEM_NORMAL ),
-    ITEM_TOGGLE( ID_NETWORK_DHCP, 1, 0, S_MENU_NETWORK_DHCP, &g_config.network.dhcp, ITEM_NORMAL ),
-    ITEM_IP( ID_NETWORK_IP, 2, 0, S_MENU_NETWORK_IP, &g_config.network.ip, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_MASK, 3, 0, S_MENU_NETWORK_MASK, &g_config.network.mask, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_GATEWAY, 4, 0, S_MENU_NETWORK_GATEWAY, &g_config.network.gateway, ITEM_EDIT_FULLSCREEN ),
-    ITEM_IP( ID_NETWORK_DNS, 5, 0, S_MENU_NETWORK_DNS, &g_config.network.dns, ITEM_EDIT_FULLSCREEN ),
-    ITEM_TEXT( ID_NETWORK_HOSTNAME, 6, 0, S_MENU_NETWORK_HOSTNAME, &g_config.network.hostname,
-               MAX_HOSTNAME_LENGTH, ITEM_EDIT_FULLSCREEN ),
-    ITEM_TOGGLE( ID_NETWORK_TELNET_ENABLED, 7, 0, S_MENU_NETWORK_TELNET, &g_config.network.telnetEnabled, ITEM_NORMAL ),
+PROGMEM const ScreenData screen_edit_alarm_visual {
+    id                    : SCREEN_ID_EDIT_ALARM_VISUAL, 
+    items                 : ITEMS_EDIT_PROFILE_VISUAL,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : &onSelectionChange,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Edit alarm lamp settings
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_EDIT_ALARM_LAMP[] = {
+    ITEM_LIST( ID_LAMP_MODE, 0, 0, S_NIGHT_LAMP_EFFECT, &g_alarm.profile.lamp.mode,
+               _ALARM_LAMP_MODES, 0, MAX_ALARM_LAMP_MODES - 1, ALARM_LAMP_MODES_NAME_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_LIST( ID_LAMP_COLOR, 1, 0, S_NIGHT_LAMP_COLOR, &g_alarm.profile.lamp.color,
+               _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_BAR( ID_LAMP_BRIGHTNESS, 2, 0, S_NIGHT_LAMP_BRIGHTNESS, &g_alarm.profile.lamp.brightness,
+              MIN_ALARM_LAMP_BRIGHTNESS, MAX_ALARM_LAMP_BRIGHTNESS, 12, ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_BAR( ID_LAMP_EFFECT_SPEED, 3, 0, S_EDIT_PROFILE_VISUAL_SPEED, &g_alarm.profile.lamp.speed,
+              MIN_ALARM_LAMP_EFFECT_SPEED, MAX_ALARM_LAMP_EFFECT_SPEED, 9, ITEM_EDIT_FULLSCREEN ),
     ITEM_END()
 };
 
-/* Edit profile screen items */
+PROGMEM const ScreenData screen_edit_alarm_lamp {
+    id                    : SCREEN_ID_EDIT_ALARM_LAMP, 
+    items                 : ITEMS_EDIT_ALARM_LAMP,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : &onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : &onSelectionChange,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Edit alarm profile screen
+// ----------------------------------------
 PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE[] = {
     ITEM_LIST( ID_PROFILE_FILENAME, 0, 0, S_EDIT_PROFILE_FILENAME, NULL,
                &g_alarm.profile.filename, 0, 0, MAX_LENGTH_ALARM_FILENAME,
@@ -313,18 +456,90 @@ PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE[] = {
     ITEM_END()
 };
 
-/* Alarm profile visual settings */
-PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE_VISUAL[] = {
-    ITEM_LIST( ID_PROFILE_VISUAL_MODE, 0, 0, S_EDIT_PROFILE_VISUAL_MODE, &g_alarm.profile.visualMode,
-               _ALARM_VISUAL, 0, MAX_ALARM_VISUALS - 1, ALARM_VISUAL_NAME_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+PROGMEM const ScreenData screen_edit_profile {
+    id                    : SCREEN_ID_EDIT_PROFILE, 
+    items                 : ITEMS_EDIT_PROFILE,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : &onDrawItem,
+    eventSelectionChanged : &onSelectionChange,
+    eventTimeout          : NULL,
+};
 
-    ITEM_BAR( ID_PROFILE_VISUAL_SPEED, 1, 0, S_EDIT_PROFILE_VISUAL_SPEED, &g_alarm.profile.effectSpeed,
-              MIN_ALARM_VISUAL_EFFECT_SPEED, MAX_ALARM_VISUAL_EFFECT_SPEED, 9, ITEM_EDIT_FULLSCREEN ),
+
+// ----------------------------------------
+// List alaram profiles screen
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_LIST_PROFILES[] = {
+    ITEM_LINK( ID_ALARM_EDIT_1, 0, 0, S_EDIT_ALARM_1, &screen_edit_profile, ITEM_NORMAL ),
+    ITEM_LINK( ID_ALARM_EDIT_2, 1, 0, S_EDIT_ALARM_2, &screen_edit_profile, ITEM_NORMAL ),
     ITEM_END()
 };
 
-/* Edit night lamp settings */
+PROGMEM const ScreenData screen_list_profiles {
+    id                    : SCREEN_ID_LIST_PROFILES, 
+    items                 : ITEMS_LIST_PROFILES,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Display settings menu
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_DISPLAY_SETTINGS[] = {
+    ITEM_TOGGLE( ID_CLOCK_24H, 0, 0, S_MENU_SETTINGS_24H, &g_config.clock.display_24h, ITEM_COMPACT ),
+
+    ITEM_LIST( ID_CLOCK_COLOR, 1, 0, S_MENU_SETTINGS_COLOR, &g_config.clock.clock_color,
+               _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_BAR( ID_CLOCK_BRIGHTNESS, 2, 0, S_MENU_SETTINGS_BRIGHT, &g_config.clock.clock_brightness,
+              MIN_CLOCK_BRIGHTNESS, MAX_CLOCK_BRIGHTNESS, 12, ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_BAR( ID_LCD_CONTRAST, 3, 0, S_MENU_SETTINGS_LCD_CTR, &g_config.clock.lcd_contrast,
+              MIN_LCD_CONTRAST, MAX_LCD_CONTRAST, 12, ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.clock.date_format,
+               _DATE_FORMATS, 0, MAX_DATE_FORMATS - 1, DATE_FORMAT_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_LIST( ID_ALS_PRESET, 5, 0, S_MENU_SETTINGS_ALS_PRESET, &g_config.clock.als_preset,
+               _ALS_PRESET_NAMES, 0, MAX_ALS_PRESETS_NAMES - 1, ALS_PRESET_NAME_LENGTH,
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+
+    ITEM_END()
+};
+
+PROGMEM const ScreenData screen_display {
+    id                    : SCREEN_ID_DISPLAY_SETTINGS, 
+    items                 : ITEMS_DISPLAY_SETTINGS,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Edit night lamp settings
+// ----------------------------------------
 PROGMEM const struct ScreenItemBase ITEMS_EDIT_NIGHT_LAMP[] = {
     ITEM_LIST( ID_LAMP_COLOR, 0, 0, S_NIGHT_LAMP_COLOR, &g_config.clock.lamp.color,
                _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
@@ -339,25 +554,108 @@ PROGMEM const struct ScreenItemBase ITEMS_EDIT_NIGHT_LAMP[] = {
     ITEM_END()
 };
 
-/* Edit alarm lamp settings */
-PROGMEM const struct ScreenItemBase ITEMS_EDIT_ALARM_LAMP[] = {
-    ITEM_LIST( ID_LAMP_MODE, 0, 0, S_NIGHT_LAMP_EFFECT, &g_alarm.profile.lamp.mode,
-               _ALARM_LAMP_MODES, 0, MAX_ALARM_LAMP_MODES - 1, ALARM_LAMP_MODES_NAME_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+PROGMEM const ScreenData screen_edit_night_lamp {
+    id                    : SCREEN_ID_EDIT_NIGHT_LAMP, 
+    items                 : ITEMS_EDIT_NIGHT_LAMP,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : &onKeypress,
+    eventDrawItem         : &onDrawItem,
+    eventSelectionChanged : &onSelectionChange ,
+    eventTimeout          : NULL,
+};
 
-    ITEM_LIST( ID_LAMP_COLOR, 1, 0, S_NIGHT_LAMP_COLOR, &g_alarm.profile.lamp.color,
-               _COLOR_NAMES, 0, COLOR_TABLE_MAX_COLORS - 1, COLOR_NAME_MAX_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
 
-    ITEM_BAR( ID_LAMP_BRIGHTNESS, 2, 0, S_NIGHT_LAMP_BRIGHTNESS, &g_alarm.profile.lamp.brightness,
-              MIN_ALARM_LAMP_BRIGHTNESS, MAX_ALARM_LAMP_BRIGHTNESS, 12, ITEM_EDIT_FULLSCREEN ),
+// ----------------------------------------
+// Network status screen
+// ----------------------------------------
+PROGMEM const ScreenData screen_net_status {
+    id                    : SCREEN_ID_NET_STATUS, 
+    items                 : NULL,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &netStatus_onEnterScreen,
+    eventExitScreen       : NULL,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &netStatus_onDrawScreen,
+    eventKeypress         : &netStatus_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
 
-    ITEM_BAR( ID_LAMP_EFFECT_SPEED, 3, 0, S_EDIT_PROFILE_VISUAL_SPEED, &g_alarm.profile.lamp.speed,
-              MIN_ALARM_LAMP_EFFECT_SPEED, MAX_ALARM_LAMP_EFFECT_SPEED, 9, ITEM_EDIT_FULLSCREEN ),
+
+// ----------------------------------------
+// Network settings menu
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_NETWORK[] = {
+    ITEM_LINK( ID_NETWORK_STATUS, 0, 0, S_MENU_NETWORK_STATUS, &screen_net_status, ITEM_NORMAL ),
+    ITEM_TOGGLE( ID_NETWORK_DHCP, 1, 0, S_MENU_NETWORK_DHCP, &g_config.network.dhcp, ITEM_NORMAL ),
+    ITEM_IP( ID_NETWORK_IP, 2, 0, S_MENU_NETWORK_IP, &g_config.network.ip, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_MASK, 3, 0, S_MENU_NETWORK_MASK, &g_config.network.mask, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_GATEWAY, 4, 0, S_MENU_NETWORK_GATEWAY, &g_config.network.gateway, ITEM_EDIT_FULLSCREEN ),
+    ITEM_IP( ID_NETWORK_DNS, 5, 0, S_MENU_NETWORK_DNS, &g_config.network.dns, ITEM_EDIT_FULLSCREEN ),
+    ITEM_TEXT( ID_NETWORK_HOSTNAME, 6, 0, S_MENU_NETWORK_HOSTNAME, &g_config.network.hostname,
+               MAX_HOSTNAME_LENGTH, ITEM_EDIT_FULLSCREEN ),
     ITEM_END()
 };
 
-/* Settings menu items */
+PROGMEM const ScreenData screen_network {
+    id                    : SCREEN_ID_NETWORK, 
+    items                 : ITEMS_NETWORK,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : NULL,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Settings manager screen
+// ----------------------------------------
+PROGMEM const ScreenData screen_settings_manager {
+    id                    : SCREEN_ID_SETTINGS_MANAGER, 
+    items                 : ITEMS_DIALOG_YESNO,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &settingsManager_onEnterScreen,
+    eventExitScreen       : NULL,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &settingsManager_onDrawScreen,
+    eventKeypress         : &settingsManager_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Battery status menu
+// ----------------------------------------
+PROGMEM const ScreenData screen_batt_status {
+    id                    : SCREEN_ID_BATT_STATUS, 
+    items                 : NULL,
+    customCharacterSet    : CUSTOM_CHARACTERS_ROOT,
+    eventEnterScreen      : &battStatus_onEnterScreen,
+    eventExitScreen       : NULL,
+    eventValueChange      : NULL,
+    eventDrawScreen       : &battStatus_onDrawScreen,
+    eventKeypress         : &battStatus_onKeypress,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : &battStatus_onTimeout,
+};
+
+
+// ----------------------------------------
+// Settings menu
+// ----------------------------------------
 PROGMEM const struct ScreenItemBase ITEMS_MENU_SETTINGS[] = {
     ITEM_LINK( ID_SETTINGS_BACKUP, 0, 0, S_MENU_SETTINGS_BACKUP, &screen_settings_manager, ITEM_NORMAL ),
     ITEM_LINK( ID_SETTINGS_RESTORE, 1, 0, S_MENU_SETTINGS_RESTORE, &screen_settings_manager, ITEM_NORMAL ),
@@ -366,14 +664,48 @@ PROGMEM const struct ScreenItemBase ITEMS_MENU_SETTINGS[] = {
     ITEM_END()
 };
 
-/* Settings manager items */
-PROGMEM const struct ScreenItemBase ITEMS_DIALOG_YESNO[] = {
-    ITEM_LINK( ID_DIALOG_NO, 1, 0, S_NO, NULL, ITEM_NORMAL ),
-    ITEM_LINK( ID_DIALOG_YES, 1, 8, S_YES, NULL, ITEM_NORMAL ),
+PROGMEM const ScreenData screen_menu_settings {
+    id                    : SCREEN_ID_MENU_SETTINGS, 
+    items                 : ITEMS_MENU_SETTINGS,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : NULL,
+    eventExitScreen       : NULL,
+    eventValueChange      : &settingsMenu_onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Service manager menu
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_MENU_SERVICES[] = {
+    ITEM_TOGGLE( ID_SERVICE_TELNET, 0, 0, S_MENU_SERVICE_TELNET, &g_config.network.telnetEnabled, ITEM_COMPACT ),
+    ITEM_TOGGLE( ID_SERVICE_NTP_AUTOSYNC, 1, 0, S_MENU_SERVICE_TIME_AUTOSYNC, &g_config.clock.use_ntp, ITEM_COMPACT ),
     ITEM_END()
 };
 
-/* Main menu items */
+PROGMEM const ScreenData screen_menu_services {
+    id                    : SCREEN_ID_SERVICES, 
+    items                 : ITEMS_MENU_SERVICES,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
+};
+
+
+// ----------------------------------------
+// Main menu
+// ----------------------------------------
 PROGMEM const struct ScreenItemBase ITEMS_MAIN_MENU[] = {
     ITEM_LINK( ID_MAIN_SET_ALARMS, 0, 0, S_MAIN_MENU_SET_ALARMS, &screen_set_alarms, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_SET_TIME, 1, 0, S_MAIN_MENU_SET_TIME, &screen_set_time, ITEM_NORMAL ),
@@ -381,9 +713,23 @@ PROGMEM const struct ScreenItemBase ITEMS_MAIN_MENU[] = {
     ITEM_LINK( ID_MAIN_EDIT_DISPLAY, 3, 0, S_MAIN_MENU_DISPLAY, &screen_display, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_EDIT_LAMP, 4, 0, S_MAIN_MENU_LAMP, &screen_edit_night_lamp, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_EDIT_NETWORK, 5, 0, S_MAIN_MENU_NETWORK, &screen_network, ITEM_NORMAL ),
-    ITEM_TOGGLE( ID_MAIN_TIME_AUTOSYNC, 6, 0, S_MAIN_MENU_TIME_AUTOSYNC, &g_config.clock.use_ntp, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_SERVICES, 6, 0, S_MAIN_MENU_SERVICES, &screen_menu_services, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_SETTINGS, 7, 0, S_MAIN_MENU_SETTINGS, &screen_menu_settings, ITEM_NORMAL ),
     ITEM_END()
+};
+
+PROGMEM const ScreenData screen_main_menu {
+    id                    : SCREEN_ID_MAIN_MENU, 
+    items                 : ITEMS_MAIN_MENU,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &onEnterScreen,
+    eventExitScreen       : &onExitScreen,
+    eventValueChange      : &onValueChange,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : NULL,
+    eventSelectionChanged : NULL,
+    eventTimeout          : NULL,
 };
 
 #endif /* UI_H */

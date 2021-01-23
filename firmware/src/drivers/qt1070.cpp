@@ -173,18 +173,9 @@ uint8_t QT1070::processEvents() {
             return KEY_NONE;
         }
         
+        
+        if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
 
-        if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-
-            g_power.setPowerMode( POWER_MODE_LOW_POWER );
-
-            this->firstKeyState = 0;
-            this->lastKeyState = 0;
-            this->repeatCount = 0;
-
-            return KEY_NONE;
-
-        } else if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
             g_power.resetSuspendDelay();
         }
 

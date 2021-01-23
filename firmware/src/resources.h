@@ -124,8 +124,12 @@ PROG_STR( S_MAIN_MENU_DISPLAY,          "Display" );
 PROG_STR( S_MAIN_MENU_NETWORK,          "Network" );
 PROG_STR( S_MAIN_MENU_LAMP,             "Night lamp" );
 PROG_STR( S_MAIN_MENU_PROFILES,         "Profiles" );
+PROG_STR( S_MAIN_MENU_SERVICES,         "Services" );
 PROG_STR( S_MAIN_MENU_SETTINGS,         "Settings" );
-PROG_STR( S_MAIN_MENU_TIME_AUTOSYNC,    "NTP Sync" );
+
+/* Service menu */
+PROG_STR( S_MENU_SERVICE_TIME_AUTOSYNC, "NTP Sync" );
+PROG_STR( S_MENU_SERVICE_TELNET,        "Telnet  " );
 
 /* Network menu srings */
 PROG_STR( S_MENU_NETWORK_STATUS,        "Network status" );
@@ -135,7 +139,6 @@ PROG_STR( S_MENU_NETWORK_MASK,          "Mask" );
 PROG_STR( S_MENU_NETWORK_GATEWAY,       "Gateway" );
 PROG_STR( S_MENU_NETWORK_DNS,           "DNS" );
 PROG_STR( S_MENU_NETWORK_HOSTNAME,      "Hostname" );
-PROG_STR( S_MENU_NETWORK_TELNET,        "T.Console" );
 
 /* Settings menu strings */
 PROG_STR( S_MENU_SETTINGS_BACKUP,       "Backup" );

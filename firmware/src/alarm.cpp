@@ -16,7 +16,7 @@
 //
 //******************************************************************************
 #include "alarm.h"
-#include "screen.h"
+#include "ui/screen.h"
 #include "ui/ui.h"
 
 
@@ -499,7 +499,7 @@ void Alarm::play( uint8_t mode ) {
     this->_alarmStart = millis();
 
     if( mode & ALARM_MODE_SCREEN ) {
-        screen_alarm.activate( true, g_currentScreen );
+        g_screen.activate( &screen_alarm );
     }
 
     if( mode & ALARM_MODE_AUDIO ) {
@@ -531,7 +531,7 @@ void Alarm::stop() {
     }
 
     if( this->_playMode & ALARM_MODE_SCREEN ) {
-        screen_alarm.exitScreen();
+        g_screen.exitScreen();
     }
 
     this->_playMode = ALARM_MODE_OFF;
@@ -624,11 +624,10 @@ void Alarm::snooze() {
     this->audioStop();
     this->visualStop();
 
-    g_screenClear = true;
-    g_screenUpdate = true;
+    g_screen.requestScreenUpdate( true );
 
-    screen_alarm.resetTimeout();
-    screen_alarm.setTimeout( 1000 );
+    g_screen.resetTimeout();
+    g_screen.setTimeout( 1000 );
 }
 
 
@@ -650,8 +649,7 @@ void Alarm::resume() {
     this->visualStart();
 
     if( this->_playMode & ALARM_MODE_SCREEN ) {
-        g_screenUpdate = true;
-        g_screenClear = true;
+        g_screen.requestScreenUpdate( true );
     }
 }
 
@@ -902,17 +900,17 @@ void Alarm::processEvents() {
 
     /* Detect if the SD card is present, if so, initialize it */
     if( this->_sd_present != this->detectSDCard() ) {
-        g_screenUpdate = true;
+        g_screen.requestScreenUpdate( false );
     }
 
     /* Detect alarm switch state */
     if( this->_alarm_sw_on != this->detectAlarmSwitchState() ) {
         g_power.resetSuspendDelay();
 
-        g_clockUpdate = true;
+        g_clock.requestClockUpdate( true );
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-            g_screenUpdate = true;
+            g_screen.requestScreenUpdate( false );
         }
     }
 

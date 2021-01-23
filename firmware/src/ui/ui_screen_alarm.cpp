@@ -26,15 +26,13 @@ bool showHelpMsg = false;
  * @brief   Event raised when entering the screen
  *
  * @param   screen    Pointer to the screen where the event occured.
- *
- * @return  TRUE to continue loading the screen, FALSE otherwise
  * 
  */
-bool alarmScreen_onEnterScreen( Screen *screen ) {
+void alarmScreen_onEnterScreen( Screen *screen ) {
+
+    screen->setTimeout( 3000 );
 
     showHelpMsg = false;
-
-    return true;
 }
 
 
@@ -65,11 +63,10 @@ bool alarmScreen_onKeypress( Screen *screen, uint8_t key ) {
         } else {
             showHelpMsg = true;
 
-            screen_alarm.resetTimeout();
-            screen_alarm.setTimeout( 3000 );
+            screen->resetTimeout();
+            screen->setTimeout( 3000 );
 
-            g_screenUpdate = true;
-            g_screenClear = true;
+            g_screen.requestScreenUpdate( true );
         }
 
     } else {
@@ -171,11 +168,11 @@ void alarmScreen_onTimeout( Screen *screen ) {
     if( showHelpMsg == true ) {
         showHelpMsg = false;
 
-        screen_alarm.resetTimeout();
-        screen_alarm.setTimeout( 1000 );
+        screen->resetTimeout();
+        screen->setTimeout( 1000 );
 
-        g_screenClear = true;
+        g_screen.requestScreenUpdate( true );
+    } else {
+        g_screen.requestScreenUpdate( false );
     }
-
-    g_screenUpdate = true;
 }

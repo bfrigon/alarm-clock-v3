@@ -31,8 +31,6 @@
 #define SEG_MINUS  0x0A
 #define SEG_SPACE  0x0B
 
-extern bool g_clockUpdate;
-
 
 static const uint8_t PROGMEM _charmap[ 12 ] = {
     0b00111111,  /* Digit 0 */
@@ -72,7 +70,7 @@ class NeoClock : public NeoPixel {
     void update();
     void setTestMode( bool testMode );
     void restoreClockDisplay();
-    bool requestDisplayUpdate();
+    bool requestClockUpdate( bool force = false );
     void processEvents();
     
 
@@ -82,6 +80,7 @@ class NeoClock : public NeoPixel {
     bool _flashState = false;
     bool _testMode = false;
     DateTime _prevDate;
+    bool _updateRequested = false;
 
     void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
 

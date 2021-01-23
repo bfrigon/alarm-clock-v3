@@ -18,8 +18,8 @@
 #include <SdFat.h>
 #include "config.h"
 #include "alarm.h"
-#include "screen.h"
 #include "task_errors.h"
+#include "ui/screen.h"
 #include "drivers/lamp.h"
 #include "drivers/neoclock.h"
 #include "services/ntpclient.h"
@@ -120,11 +120,11 @@ void ConfigManager::apply( uint8_t section ) {
 
         g_timezone.setTimezoneByName( g_config.clock.timezone );
 
-        g_clock.requestDisplayUpdate();
+        g_clock.requestClockUpdate();
 
         g_ntp.setAutoSync( g_config.clock.use_ntp );
 
-        g_screenUpdate = true;
+        g_screen.requestScreenUpdate( false );
     }
 
     if( section & EEPROM_SECTION_NETWORK ) {
@@ -325,7 +325,7 @@ void ConfigManager::endBackup( int error ) {
     }
 
     this->endTask( error );
-    g_screenUpdate = true;
+    g_screen.requestScreenUpdate( false );
 }
 
 
@@ -372,7 +372,7 @@ void ConfigManager::endRestore( int error ) {
     }
 
     this->endTask( error );
-    g_screenUpdate = true;
+    g_screen.requestScreenUpdate( false );
 
     if( error == TASK_SUCCESS ) {
 

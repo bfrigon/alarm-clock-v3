@@ -166,8 +166,7 @@ bool battStatus_onKeypress( Screen* screen, uint8_t key ) {
             g_battStatusPage = 0;
         }
 
-        g_screenUpdate = true;
-        g_screenClear = true;
+        g_screen.requestScreenUpdate( true );
 
         return false;
     }
@@ -184,7 +183,7 @@ bool battStatus_onKeypress( Screen* screen, uint8_t key ) {
  */
 void battStatus_onTimeout( Screen* screen ) {
 
-    g_screenUpdate = true;
+    g_screen.requestScreenUpdate( false );
     screen->resetTimeout();
 }
 
@@ -194,14 +193,11 @@ void battStatus_onTimeout( Screen* screen ) {
  * Event raised when entering the screen
  *
  * @param   screen    Pointer to the screen where the event occured.
- *
- * @return  TRUE to continue loading the screenor False otherwise
  * 
  */
-bool battStatus_onEnterScreen( Screen* screen ) {
+void battStatus_onEnterScreen( Screen* screen ) {
     g_battStatusPage = 0;
 
     screen->setTimeout( 1000 );
-    return true;
 }
 
