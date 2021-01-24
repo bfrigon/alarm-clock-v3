@@ -29,8 +29,8 @@
  * 
  */
 NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
-    this->_pin_leds = pin_leds;
-    this->_pin_shdn = pin_shdn;
+    _pin_leds = pin_leds;
+    _pin_shdn = pin_shdn;
 }
 
 
@@ -40,16 +40,16 @@ NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
  * 
  */
 void NeoPixel::begin() {
-    if( this->_init == true ) {
+    if( _init == true ) {
         return;
     }
 
-    this->_init = true;
+    _init = true;
 
-    pinMode( this->_pin_leds, OUTPUT );
+    pinMode( _pin_leds, OUTPUT );
 
-    if( this->_pin_shdn >= 0 ) {
-        pinMode( this->_pin_shdn, OUTPUT );
+    if( _pin_shdn >= 0 ) {
+        pinMode( _pin_shdn, OUTPUT );
     }
 
     this->onPowerStateChange( g_power.getPowerMode() );
@@ -62,14 +62,14 @@ void NeoPixel::begin() {
  * 
  */
 void NeoPixel::end() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
-    this->_init = false;
+    _init = false;
 
-    if( this->_pin_shdn >= 0 ) {
-        digitalWrite( this->_pin_shdn, HIGH );
+    if( _pin_shdn >= 0 ) {
+        digitalWrite( _pin_shdn, HIGH );
     }
 }
 
@@ -84,12 +84,12 @@ void NeoPixel::end() {
  */
 void NeoPixel::onPowerStateChange( uint8_t state ) {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
-    if( this->_pin_shdn >= 0 ) {
-        digitalWrite( this->_pin_shdn, ( state == POWER_MODE_SUSPEND ? HIGH : LOW ) );
+    if( _pin_shdn >= 0 ) {
+        digitalWrite( _pin_shdn, ( state == POWER_MODE_SUSPEND ? HIGH : LOW ) );
     }
 
     this->update();
@@ -108,16 +108,16 @@ void NeoPixel::onPowerStateChange( uint8_t state ) {
  */
 inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 
-    uint8_t brightness = this->_brightness;
+    uint8_t brightness = _brightness;
 
     if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
         /* limit brightness in low power mode */
-        brightness = ( this->_brightness > 25 ) ? 25 : this->_brightness;
+        brightness = ( _brightness > 25 ) ? 25 : _brightness;
     }
 
     color = ( ( uint16_t )color * ( uint16_t )brightness ) / 100;
 
-    if( this->_gammaCorrection == true ) {
+    if( _gammaCorrection == true ) {
         color = pgm_read_byte( &_GAMMA_TABLE[ color ] );
     }
 
@@ -151,15 +151,15 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 
     /* Build gamma corrected color table in GRB order */
     volatile uint8_t colorTable[3] = {
-        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 0 : this->_g ),
-        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 255 : this->_r ),
-        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 0 : this->_b ),
+        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 0 : _g ),
+        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 255 : _r ),
+        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 0 : _b ),
     };
 
 
     /* Get the port address and port bit from pin number */
-    volatile uint8_t *port = portOutputRegister( digitalPinToPort( this->_pin_leds ) );
-    uint8_t pinMask = digitalPinToBitMask( this->_pin_leds );
+    volatile uint8_t *port = portOutputRegister( digitalPinToPort( _pin_leds ) );
+    uint8_t pinMask = digitalPinToBitMask( _pin_leds );
 
     volatile uint8_t high = ( *port ) | pinMask;     /* Port data with neopixel data pin set high */
     volatile uint8_t low = ( *port ) & ~pinMask;     /* Port data with neopixel data pin set low */
@@ -168,7 +168,7 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
     /* Disable interrupts to prevent timing errors */
     noInterrupts();
 
-    digitalWrite( this->_pin_leds, LOW );
+    digitalWrite( _pin_leds, LOW );
     delayMicroseconds( 60 );
 
 
@@ -279,7 +279,7 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
         brightness = 100;
     }
 
-    this->_brightness = brightness;
+    _brightness = brightness;
 }
 
 
@@ -293,9 +293,9 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
  * 
  */
 void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
-    this->_r = r;
-    this->_g = g;
-    this->_b = b;
+    _r = r;
+    _g = g;
+    _b = b;
 }
 
 
@@ -312,7 +312,7 @@ void NeoPixel::setColorFromTable( uint8_t id ) {
         id = COLOR_TABLE_MAX_COLORS - 1;
     }
 
-    this->_r = pgm_read_byte( &_COLOR_TABLE[ id ][ 0 ] );
-    this->_g = pgm_read_byte( &_COLOR_TABLE[ id ][ 1 ] );
-    this->_b = pgm_read_byte( &_COLOR_TABLE[ id ][ 2 ] );
+    _r = pgm_read_byte( &_COLOR_TABLE[ id ][ 0 ] );
+    _g = pgm_read_byte( &_COLOR_TABLE[ id ][ 1 ] );
+    _b = pgm_read_byte( &_COLOR_TABLE[ id ][ 2 ] );
 }

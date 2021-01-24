@@ -31,10 +31,10 @@
  */
 VS1053::VS1053( int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_reset ) {
 
-    this->_pin_cs = pin_cs;
-    this->_pin_xdcs = pin_xdcs;
-    this->_pin_dreq = pin_dreq;
-    this->_pin_reset = pin_reset;
+    _pin_cs = pin_cs;
+    _pin_xdcs = pin_xdcs;
+    _pin_dreq = pin_dreq;
+    _pin_reset = pin_reset;
 
 }
 
@@ -47,22 +47,22 @@ VS1053::VS1053( int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_rese
  * 
  */
 int8_t VS1053::begin() {
-    if( this->_init == true ) {
+    if( _init == true ) {
         return -1;
     }
 
-    this->_init = true;
+    _init = true;
 
-    pinMode( this->_pin_reset, OUTPUT );
-    digitalWrite( this->_pin_reset, LOW );
+    pinMode( _pin_reset, OUTPUT );
+    digitalWrite( _pin_reset, LOW );
 
-    pinMode( this->_pin_cs, OUTPUT );
-    digitalWrite( this->_pin_cs, HIGH );
+    pinMode( _pin_cs, OUTPUT );
+    digitalWrite( _pin_cs, HIGH );
 
-    pinMode( this->_pin_xdcs, OUTPUT );
-    digitalWrite( this->_pin_xdcs, HIGH );
+    pinMode( _pin_xdcs, OUTPUT );
+    digitalWrite( _pin_xdcs, HIGH );
 
-    pinMode( this->_pin_dreq, INPUT );
+    pinMode( _pin_dreq, INPUT );
 
     SPI.begin();
 
@@ -84,13 +84,13 @@ int8_t VS1053::begin() {
  * 
  */
 void VS1053::end() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
-    digitalWrite( this->_pin_reset, LOW );
+    digitalWrite( _pin_reset, LOW );
 
-    this->_init = false;
+    _init = false;
 }
 
 
@@ -104,11 +104,11 @@ void VS1053::end() {
  */
 bool VS1053::readyForData() {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
-    return digitalRead( this->_pin_dreq );
+    return digitalRead( _pin_dreq );
 }
 
 
@@ -121,7 +121,7 @@ bool VS1053::readyForData() {
  * 
  */
 void VS1053::playData( uint8_t *buffer, uint8_t buffsiz ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -129,11 +129,11 @@ void VS1053::playData( uint8_t *buffer, uint8_t buffsiz ) {
     SPI.beginTransaction( VS1053_DATA_SPI_SETTING );
     #endif
 
-    digitalWrite( this->_pin_xdcs, LOW );
+    digitalWrite( _pin_xdcs, LOW );
 
     this->spiwrite( buffer, buffsiz );
 
-    digitalWrite( this->_pin_xdcs, HIGH );
+    digitalWrite( _pin_xdcs, HIGH );
 
     #ifdef SPI_HAS_TRANSACTION
     SPI.endTransaction();
@@ -151,7 +151,7 @@ void VS1053::playData( uint8_t *buffer, uint8_t buffsiz ) {
  * 
  */
 void VS1053::setVolume( uint8_t left, uint8_t right ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -174,7 +174,7 @@ void VS1053::setVolume( uint8_t left, uint8_t right ) {
  * 
  */
 void VS1053::softReset() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -189,17 +189,17 @@ void VS1053::softReset() {
  * 
  */
 void VS1053::reset() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
     /* hardware reset */
-    digitalWrite( this->_pin_reset, LOW );
+    digitalWrite( _pin_reset, LOW );
     delay( 3 );
-    digitalWrite( this->_pin_reset, HIGH );
+    digitalWrite( _pin_reset, HIGH );
 
-    digitalWrite( this->_pin_cs, HIGH );
-    digitalWrite( this->_pin_xdcs, HIGH );
+    digitalWrite( _pin_cs, HIGH );
+    digitalWrite( _pin_xdcs, HIGH );
     delay( 3 );
 
     this->softReset();
@@ -225,7 +225,7 @@ uint16_t VS1053::sciRead( uint8_t addr ) {
     SPI.beginTransaction( VS1053_CONTROL_SPI_SETTING );
     #endif
 
-    digitalWrite( this->_pin_cs, LOW );
+    digitalWrite( _pin_cs, LOW );
     spiwrite( VS1053_SCI_READ );
     spiwrite( addr );
     delayMicroseconds( 10 );
@@ -234,7 +234,7 @@ uint16_t VS1053::sciRead( uint8_t addr ) {
     data <<= 8;
     data |= SPI.transfer( 0x00 );
 
-    digitalWrite( this->_pin_cs, HIGH );
+    digitalWrite( _pin_cs, HIGH );
 
     #ifdef SPI_HAS_TRANSACTION
     SPI.endTransaction();
@@ -258,14 +258,14 @@ void VS1053::sciWrite( uint8_t addr, uint16_t data ) {
     SPI.beginTransaction( VS1053_CONTROL_SPI_SETTING );
     #endif
 
-    digitalWrite( this->_pin_cs, LOW );
+    digitalWrite( _pin_cs, LOW );
 
     this->spiwrite( VS1053_SCI_WRITE );
     this->spiwrite( addr );
     this->spiwrite( data >> 8 );
     this->spiwrite( data & 0xFF );
 
-    digitalWrite( this->_pin_cs, HIGH );
+    digitalWrite( _pin_cs, HIGH );
 
     #ifdef SPI_HAS_TRANSACTION
     SPI.endTransaction();

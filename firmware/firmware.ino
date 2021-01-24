@@ -21,6 +21,7 @@
 #include "src/ui/ui.h"
 #include "src/config.h"
 #include "src/services/ntpclient.h"
+#include "src/libs/freemem.h"
 
 
 Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
@@ -185,6 +186,7 @@ void setup() {
  *
  */
 void loop() {
+    g_freeMemory = freeMemory();
 
     /* Reset watchdog timer */
     g_power.resetWatchdog();

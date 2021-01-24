@@ -19,6 +19,7 @@
 #include "../hardware.h"
 #include "../task_errors.h"
 #include "../services/ntpclient.h"
+#include "../libs/freemem.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -548,6 +549,12 @@ void ConsoleBase::parseCommand() {
     /* 'clear' command */
     } else if( this->matchCommandName( S_COMMAND_CLEAR, false ) == true ) {
         this->clearScreen();
+
+    /* 'free' command */
+    } else if( this->matchCommandName( S_COMMAND_FREE, false ) == true ) {
+        this->printfln_P( S_CONSOLE_FREEMEM, g_freeMemory );
+        this->println();
+        
 
     /* No command entered, display the prompt again */
     } else if( strlen( _inputBuffer ) == 0 ) {

@@ -26,7 +26,7 @@
  * 
  */
 bool ITask::isBusy() {
-    return this->_currentTask != TASK_NONE;
+    return _currentTask != TASK_NONE;
 }
 
 
@@ -38,7 +38,7 @@ bool ITask::isBusy() {
  * 
  */
 uint8_t ITask::getCurrentTask() {
-    return this->_currentTask;
+    return _currentTask;
 }
 
 
@@ -50,7 +50,7 @@ uint8_t ITask::getCurrentTask() {
  * 
  */
 int ITask::getTaskError() {
-    return this->_taskError;
+    return _taskError;
 }
 
 
@@ -62,7 +62,7 @@ int ITask::getTaskError() {
  * 
  */
 unsigned long ITask::getTaskRunningTime() {
-    return millis() - this->_timerTaskStart;
+    return millis() - _timerTaskStart;
 }
 
 
@@ -79,13 +79,13 @@ unsigned long ITask::getTaskRunningTime() {
  */
 uint8_t ITask::startTask( uint8_t task, bool force ) {
 
-    if( this->_currentTask != TASK_NONE && force == false ) {
-        return this->_currentTask;
+    if( _currentTask != TASK_NONE && force == false ) {
+        return _currentTask;
     }
 
-    this->_timerTaskStart = millis();
-    this->_currentTask = task;
-    this->_taskError = TASK_SUCCESS;
+    _timerTaskStart = millis();
+    _currentTask = task;
+    _taskError = TASK_SUCCESS;
     return task;
 }
 
@@ -99,11 +99,11 @@ uint8_t ITask::startTask( uint8_t task, bool force ) {
  */
 void ITask::endTask( int error ) {
     
-    this->_currentTask = TASK_NONE;
-    this->_timerTaskStart = 0;
+    _currentTask = TASK_NONE;
+    _timerTaskStart = 0;
 
-    if( this->_taskError == TASK_SUCCESS ) {
-        this->_taskError = error;
+    if( _taskError == TASK_SUCCESS ) {
+        _taskError = error;
     }
 }
 
@@ -116,7 +116,7 @@ void ITask::endTask( int error ) {
  * 
  */
 void ITask::setTaskError( int error ) {
-    this->_taskError = error;
+    _taskError = error;
 }
 
 
@@ -126,5 +126,5 @@ void ITask::setTaskError( int error ) {
  * 
  */
 void ITask::clearTaskError() {
-    this->_taskError = TASK_SUCCESS;
+    _taskError = TASK_SUCCESS;
 }

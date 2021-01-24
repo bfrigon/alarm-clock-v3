@@ -30,7 +30,7 @@
 QT1070::QT1070( uint8_t pin_irq ) {
 
 
-    this->_pin_irq = pin_irq;
+    _pin_irq = pin_irq;
 
 
     for( uint8_t i = 0; i < 7; i++ ) {
@@ -72,7 +72,7 @@ QT1070::QT1070( uint8_t pin_irq ) {
  */
 void QT1070::begin() {
 
-    this->_init = true;
+    _init = true;
 
 
     /* Write default config */
@@ -93,8 +93,8 @@ void QT1070::begin() {
  */
 void QT1070::enableInterrupt() {
 
-    pinMode( this->_pin_irq, INPUT );
-    attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_qt1070, LOW );
+    pinMode( _pin_irq, INPUT );
+    attachInterrupt( digitalPinToInterrupt( _pin_irq ), isr_qt1070, LOW );
 }
 
 
@@ -105,7 +105,7 @@ void QT1070::enableInterrupt() {
  */
 void QT1070::disableInterrupt() {
 
-    detachInterrupt( digitalPinToInterrupt( this->_pin_irq ) );
+    detachInterrupt( digitalPinToInterrupt( _pin_irq ) );
 }
 
 
@@ -118,7 +118,7 @@ void QT1070::disableInterrupt() {
  */
 bool QT1070::readStatus() {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -135,7 +135,7 @@ bool QT1070::readStatus() {
  */
 bool QT1070::writeConfig() {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -159,7 +159,7 @@ uint8_t QT1070::processEvents() {
     /* Calculate the elapsed time since the last event */
     lastEventDelay = this->lastEventStart > 0 ? millis() - this->lastEventStart : 0;
 
-    if( digitalRead( this->_pin_irq) == LOW ) {
+    if( digitalRead( _pin_irq) == LOW ) {
 
         /* Read the status bytes (2-3) to reset the interrupt */
         if( this->readStatus() == false ) {

@@ -276,12 +276,12 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
         return false;
     }
 
-    this->_currentSectionID = SECTION_ID_UNKNOWN;
-    this->_currentSettingID = 0;
-    this->_currentAlarmID = 0;
+    _currentSectionID = SECTION_ID_UNKNOWN;
+    _currentSettingID = 0;
+    _currentAlarmID = 0;
 
-    if( this->_sd_file.isOpen() == true ) {
-        this->_sd_file.close();
+    if( _sd_file.isOpen() == true ) {
+        _sd_file.close();
     }
 
     if( _sd_file.openCwd() == false ) {
@@ -289,24 +289,24 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
         return false;
     }
 
-    if( overwrite == false && this->_sd_file.exists( filename ) == true ) {
+    if( overwrite == false && _sd_file.exists( filename ) == true ) {
         this->endBackup( ERR_CONFIG_FILE_EXISTS );
         return false;
     }
 
-    this->_sd_file.close();
+    _sd_file.close();
 
     uint8_t flags;
     flags = O_CREAT | O_WRITE | ( overwrite == true ? O_TRUNC : O_EXCL );
 
-    if( this->_sd_file.open( filename, flags ) == false ) {
+    if( _sd_file.open( filename, flags ) == false ) {
         this->endBackup( ERR_CONFIG_FILE_CANT_OPEN );
         return false;
     }
 
     /* Write file header */
     this->writeConfigLine( NULL, SETTING_TYPE_COMMENT, ( void* )COMMENT_FILE_HEADER );
-    this->_sd_file.sync();
+    _sd_file.sync();
 
     return true;
 }
@@ -320,8 +320,8 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
  * 
  */
 void ConfigManager::endBackup( int error ) {
-    if( this->_sd_file.isOpen() == true ) {
-        this->_sd_file.close();
+    if( _sd_file.isOpen() == true ) {
+        _sd_file.close();
     }
 
     this->endTask( error );
@@ -346,11 +346,11 @@ bool ConfigManager::startRestore( const char *filename) {
         return false;
     }
 
-    this->_currentSectionID = SECTION_ID_UNKNOWN;
-    this->_currentSettingID = 0;
-    this->_currentAlarmID = -1;
+    _currentSectionID = SECTION_ID_UNKNOWN;
+    _currentSettingID = 0;
+    _currentAlarmID = -1;
 
-    if( this->_sd_file.open( filename, O_READ ) == false ) {
+    if( _sd_file.open( filename, O_READ ) == false ) {
         this->endBackup( ERR_CONFIG_FILE_NOT_FOUND );
         return false;
     }
@@ -367,8 +367,8 @@ bool ConfigManager::startRestore( const char *filename) {
  * 
  */
 void ConfigManager::endRestore( int error ) {
-    if( this->_sd_file.isOpen() == true ) {
-        this->_sd_file.close();
+    if( _sd_file.isOpen() == true ) {
+        _sd_file.close();
     }
 
     this->endTask( error );
@@ -376,7 +376,7 @@ void ConfigManager::endRestore( int error ) {
 
     if( error == TASK_SUCCESS ) {
 
-        g_alarm.saveProfile( this->_currentAlarmID );
+        g_alarm.saveProfile( _currentAlarmID );
         this->save( EEPROM_SECTION_ALL );
 
         this->apply( EEPROM_SECTION_ALL );
@@ -394,7 +394,7 @@ void ConfigManager::endRestore( int error ) {
  */
 bool ConfigManager::readNextLine() {
 
-    if( this->_sd_file.peek() == -1 ) {
+    if( _sd_file.peek() == -1 ) {
         /* Reached EOF or error */
         return false;
     }
@@ -405,7 +405,7 @@ bool ConfigManager::readNextLine() {
     /* Read the next line */
     uint8_t type = this->parseConfigLine( name, value );
 
-    if( this->_sd_file.getError() != 0 ) {
+    if( _sd_file.getError() != 0 ) {
 
         this->setTaskError( ERR_CONFIG_FILE_READ );
         return false;
@@ -420,25 +420,25 @@ bool ConfigManager::readNextLine() {
     if( type == SETTING_TYPE_SECTION ) {
 
         if( strcmp_P( name, SETTING_NAME_SECTION_CLOCK ) == 0 ) {
-            this->_currentSectionID = SECTION_ID_CLOCK;
+            _currentSectionID = SECTION_ID_CLOCK;
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_ALS ) == 0 ) {
-            this->_currentSectionID = SECTION_ID_ALS;
+            _currentSectionID = SECTION_ID_ALS;
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_LAMP ) == 0 ) {
-            this->_currentSectionID = SECTION_ID_LAMP;
+            _currentSectionID = SECTION_ID_LAMP;
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_LCD ) == 0 ) {
-            this->_currentSectionID = SECTION_ID_LCD;
+            _currentSectionID = SECTION_ID_LCD;
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_NETWORK ) == 0 ) {
-            this->_currentSectionID = SECTION_ID_NETWORK;
+            _currentSectionID = SECTION_ID_NETWORK;
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_ALARM ) == 0 ) {
 
 
-            if( this->_currentAlarmID >= 0 ) {
-                g_alarm.saveProfile( this->_currentAlarmID );
+            if( _currentAlarmID >= 0 ) {
+                g_alarm.saveProfile( _currentAlarmID );
             }
 
             uint8_t alarmID = atoi( value );
@@ -447,18 +447,18 @@ bool ConfigManager::readNextLine() {
 
                 g_alarm.loadProfile( alarmID );
 
-                this->_currentAlarmID = alarmID;
-                this->_currentSectionID = SECTION_ID_ALARM;
+                _currentAlarmID = alarmID;
+                _currentSectionID = SECTION_ID_ALARM;
 
             } else {
 
-                this->_currentAlarmID = -1;
-                this->_currentSectionID = SECTION_ID_UNKNOWN;
+                _currentAlarmID = -1;
+                _currentSectionID = SECTION_ID_UNKNOWN;
 
             }
 
         } else {
-            this->_currentSectionID = SECTION_ID_UNKNOWN;
+            _currentSectionID = SECTION_ID_UNKNOWN;
         }
 
         return true;
@@ -533,7 +533,7 @@ bool ConfigManager::readNextLine() {
         this->parseSettingValue( value, &this->network.wkey, SETTING_TYPE_STRING, 0, MAX_WKEY_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_ENABLED, SECTION_ID_ALARM ) == true ) {
-        this->parseSettingValue( value, &this->clock.alarm_on[ this->_currentAlarmID ], SETTING_TYPE_BOOL );
+        this->parseSettingValue( value, &this->clock.alarm_on[ _currentAlarmID ], SETTING_TYPE_BOOL );
 
     } else if( this->matchSettingName( name, SETTING_NAME_FILENAME, SECTION_ID_ALARM ) == true ) {
         this->parseSettingValue( value, &g_alarm.profile.filename, SETTING_TYPE_STRING, 0, MAX_LENGTH_ALARM_FILENAME );
@@ -601,7 +601,7 @@ bool ConfigManager::readNextLine() {
  * 
  */
 inline bool ConfigManager::matchSettingName( char* currentName, const char* name, uint8_t section ) {
-    return ( strcmp_P( currentName, name ) == 0 && ( this->_currentSectionID == section || section == SECTION_ID_ANY ) );
+    return ( strcmp_P( currentName, name ) == 0 && ( _currentSectionID == section || section == SECTION_ID_ANY ) );
 }
 
 
@@ -743,15 +743,15 @@ uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
     name[0] = 0;
     value[0] = 0;
 
-    while( this->_sd_file.read( &chr, 1 ) == 1 ) {
+    while( _sd_file.read( &chr, 1 ) == 1 ) {
 
         if( chr == '\r' || chr == '\n' ) {
 
-            int nextChar = this->_sd_file.peek();
+            int nextChar = _sd_file.peek();
 
             /* Consumes the next character if it is a CR or LF. */
             if( nextChar == '\r' || nextChar == '\n' ) {
-                this->_sd_file.read();
+                _sd_file.read();
             }
 
             /* End of line */
@@ -831,13 +831,13 @@ uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
  */
 bool ConfigManager::writeNextLine()  {
 
-    this->_currentSettingID++;
+    _currentSettingID++;
 
-    if( this->_currentSettingID == SETTING_ID_ALARM_BEGIN ) {
+    if( _currentSettingID == SETTING_ID_ALARM_BEGIN ) {
         g_alarm.loadProfile( this ->_currentAlarmID );
     }
 
-    switch( this->_currentSettingID ) {
+    switch( _currentSettingID ) {
 
         case SETTING_ID_CLOCK_24H:
             this->writeConfigLine( SETTING_NAME_SECTION_CLOCK, SETTING_TYPE_SECTION, NULL );
@@ -929,8 +929,8 @@ bool ConfigManager::writeNextLine()  {
             break;
 
         case SETTING_ID_ALARM_ENABLED:
-            this->writeConfigLine( SETTING_NAME_SECTION_ALARM, SETTING_TYPE_SECTION, &this->_currentAlarmID );
-            this->writeConfigLine( SETTING_NAME_ENABLED, SETTING_TYPE_BOOL, &this->clock.alarm_on[ this->_currentAlarmID ] );
+            this->writeConfigLine( SETTING_NAME_SECTION_ALARM, SETTING_TYPE_SECTION, &_currentAlarmID );
+            this->writeConfigLine( SETTING_NAME_ENABLED, SETTING_TYPE_BOOL, &this->clock.alarm_on[ _currentAlarmID ] );
             break;
 
         case SETTING_ID_ALARM_FILENAME:
@@ -986,21 +986,21 @@ bool ConfigManager::writeNextLine()  {
             break;
     }
 
-    this->_sd_file.sync();
+    _sd_file.sync();
 
-    if( this->_sd_file.getError() != 0 ) {
+    if( _sd_file.getError() != 0 ) {
         this->setTaskError( ERR_CONFIG_FILE_WRITE );
         return false;
     }
 
 
 
-    if( this->_currentSettingID >= SETTING_ID_END ) {
+    if( _currentSettingID >= SETTING_ID_END ) {
 
-        this->_currentAlarmID++;
+        _currentAlarmID++;
 
-        if( this->_currentAlarmID < MAX_NUM_PROFILES ) {
-            this->_currentSettingID = SETTING_ID_ALARM_BEGIN - 1;
+        if( _currentAlarmID < MAX_NUM_PROFILES ) {
+            _currentSettingID = SETTING_ID_ALARM_BEGIN - 1;
             return true;
         }
 
@@ -1024,31 +1024,31 @@ void ConfigManager::writeConfigLine( const char* name, uint8_t type, void* value
 
     char buffer[ MAX_LENGTH_SETTING_VALUE ];
 
-    if( this->_sd_file.isOpen() == false ) {
+    if( _sd_file.isOpen() == false ) {
         return;
     }
 
     if( type != SETTING_TYPE_COMMENT ) {
 
         if( type == SETTING_TYPE_SECTION ) {
-            this->_sd_file.write( "\r\n[" );
+            _sd_file.write( "\r\n[" );
         }
 
         strcpy_P( buffer, name );
 
-        this->_sd_file.write( buffer );
+        _sd_file.write( buffer );
 
 
         if( type == SETTING_TYPE_SECTION ) {
-            this->_sd_file.write( "]" );
+            _sd_file.write( "]" );
 
             if( value != NULL ) {
-                this->_sd_file.write( ":" );
+                _sd_file.write( ":" );
                 type = SETTING_TYPE_INTEGER;
             }
 
         } else {
-            this->_sd_file.write( ": " );
+            _sd_file.write( ": " );
         }
     }
 
@@ -1056,30 +1056,30 @@ void ConfigManager::writeConfigLine( const char* name, uint8_t type, void* value
         case SETTING_TYPE_BOOL:
 
             if( *( ( bool* )value ) == true ) {
-                this->_sd_file.write( SETTING_VALUE_TRUE );
+                _sd_file.write( SETTING_VALUE_TRUE );
 
             } else {
-                this->_sd_file.write( SETTING_VALUE_FALSE );
+                _sd_file.write( SETTING_VALUE_FALSE );
             }
 
             break;
 
         case SETTING_TYPE_STRING:
-            this->_sd_file.write( '"' );
-            this->_sd_file.write( ( char* )value );
-            this->_sd_file.write( '"' );
+            _sd_file.write( '"' );
+            _sd_file.write( ( char* )value );
+            _sd_file.write( '"' );
             break;
 
         case SETTING_TYPE_INTEGER:
             itoa( *( ( uint8_t* )value ), buffer, 10 );
 
-            this->_sd_file.write( buffer );
+            _sd_file.write( buffer );
             break;
 
         case SETTING_TYPE_SHORT:
             itoa( *( ( uint16_t* )value ), buffer, 10 );
 
-            this->_sd_file.write( buffer );
+            _sd_file.write( buffer );
             break;
 
         case SETTING_TYPE_IP:
@@ -1088,13 +1088,13 @@ void ConfigManager::writeConfigLine( const char* name, uint8_t type, void* value
 
             sprintf( buffer, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3] );
 
-            this->_sd_file.write( buffer );
+            _sd_file.write( buffer );
             break;
 
         case SETTING_TYPE_COMMENT:
 
             strncpy_P( buffer, ( const char* )value, MAX_LENGTH_SETTING_VALUE );
-            this->_sd_file.write( buffer );
+            _sd_file.write( buffer );
             break;
 
         case SETTING_TYPE_TIME:
@@ -1103,32 +1103,32 @@ void ConfigManager::writeConfigLine( const char* name, uint8_t type, void* value
 
             sprintf( buffer, "%02d:%02d", time.hour, time.minute );
 
-            this->_sd_file.write( buffer );
+            _sd_file.write( buffer );
             break;
 
         case SETTING_TYPE_DOW:
             uint8_t dow = *( ( uint8_t* )value );
             uint8_t n = 0;
 
-            this->_sd_file.write( "[" );
+            _sd_file.write( "[" );
 
             for( uint8_t i = 0; i < 7; i++ ) {
 
                 if( dow & ( 1 << i ) ) {
 
                     if( n > 0 ) {
-                        this->_sd_file.write( ", " );
+                        _sd_file.write( ", " );
                     }
 
                     strcpy_P( buffer, getDayName( i + 1, true ) );
-                    this->_sd_file.write( buffer );
+                    _sd_file.write( buffer );
                     n++;
                 }
             }
 
-            this->_sd_file.write( "]" );
+            _sd_file.write( "]" );
     }
 
 
-    this->_sd_file.write( "\r\n" );
+    _sd_file.write( "\r\n" );
 }

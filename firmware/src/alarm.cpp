@@ -40,15 +40,15 @@ uint8_t vs1053_buffer[VS1053_DATABUFFERLEN];
 Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect,
               int8_t pin_alarm_sw, int8_t pin_amp_shdn ) : VS1053( pin_cs, pin_xdcs, pin_dreq, pin_reset ) {
 
-    this->_pin_sd_cs = pin_sd_cs;
+    _pin_sd_cs = pin_sd_cs;
 
-    this->_pin_sd_detect = pin_sd_detect;
+    _pin_sd_detect = pin_sd_detect;
     pinMode( pin_sd_detect, INPUT );
 
-    this->_pin_alarm_sw = pin_alarm_sw;
+    _pin_alarm_sw = pin_alarm_sw;
     pinMode( pin_alarm_sw, INPUT );
 
-    this->_amplifier.setPins( pin_amp_shdn );
+    _amplifier.setPins( pin_amp_shdn );
 }
 
 
@@ -58,12 +58,12 @@ Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq,
  * 
  */
 void Alarm::begin() {
-    if( this->_init == true ) {
+    if( _init == true ) {
         return;
     }
 
-    this->_init = true;
-    this->_volume = 0;
+    _init = true;
+    _volume = 0;
 
     this->onPowerStateChange( g_power.getPowerMode() );
 }
@@ -75,13 +75,13 @@ void Alarm::begin() {
  * 
  */
 void Alarm::end() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
-    this->_init = false;
+    _init = false;
 
-    this->_amplifier.end();
+    _amplifier.end();
     delay( 50 );
 
     VS1053::end();
@@ -94,15 +94,15 @@ void Alarm::end() {
  * 
  */
 void Alarm::initAmplifier() {
-    this->_amplifier.begin();
+    _amplifier.begin();
 
-    this->_amplifier.setCompression( TPA2016_COMPRESSION_2_1 );
-    this->_amplifier.setFixedGain( -3 );
-    this->_amplifier.setMaxGain( 30 );
-    this->_amplifier.setLimiter( false, 17 );   /* +2dBV */
-    this->_amplifier.setAttackTime( 0 );
-    this->_amplifier.setReleaseTime( 0 );
-    this->_amplifier.setHoldTime( 0 );
+    _amplifier.setCompression( TPA2016_COMPRESSION_2_1 );
+    _amplifier.setFixedGain( -3 );
+    _amplifier.setMaxGain( 30 );
+    _amplifier.setLimiter( false, 17 );   /* +2dBV */
+    _amplifier.setAttackTime( 0 );
+    _amplifier.setReleaseTime( 0 );
+    _amplifier.setHoldTime( 0 );
 }
 
 
@@ -116,7 +116,7 @@ void Alarm::initAmplifier() {
  */
 void Alarm::onPowerStateChange( uint8_t state ) {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
@@ -128,10 +128,10 @@ void Alarm::onPowerStateChange( uint8_t state ) {
         
         delay( 50 );
 
-        this->_amplifier.dumpRegs();
+        _amplifier.dumpRegs();
 
     } else {
-        this->_amplifier.end();
+        _amplifier.end();
         delay( 50 );
 
         VS1053::end();
@@ -147,7 +147,7 @@ void Alarm::onPowerStateChange( uint8_t state ) {
  * 
  */
 bool Alarm::isSDCardPresent() {
-    return this->_sd_present;
+    return _sd_present;
 }
 
 
@@ -160,44 +160,44 @@ bool Alarm::isSDCardPresent() {
  * 
  */
 bool Alarm::detectSDCard() {
-    if( digitalRead( this->_pin_sd_detect ) == LOW ) {
+    if( digitalRead( _pin_sd_detect ) == LOW ) {
 
         /* Already detected, no need to re-initialize */
-        if( this->_sd_present == true ) {
+        if( _sd_present == true ) {
             return true;
         }
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-            if( this->_timerStart == 0 ) {
+            if( _timerStart == 0 ) {
                 /* millis() not usable in suspend mode, debounce using wake-up counter */
-                this->_timerStart = 1;
+                _timerStart = 1;
                 return false;
             }
 
         } else {
             /* Start the debouce timer using millis() */
-            if( this->_timerStart == 0 ) {
-                this->_timerStart = millis();
+            if( _timerStart == 0 ) {
+                _timerStart = millis();
                 return false;
             }
 
             /* Still wait fot the detect card signal to make up it's mind. */
-            if( ( millis() - this->_timerStart ) < 1000 ) {
+            if( ( millis() - _timerStart ) < 1000 ) {
                 return false;
             }
         }
 
         /* The card was detected, now we can initialize or re-initalize it */
-        this->_sd_present = true;
+        _sd_present = true;
 
     } else {
         /* Already not present, do nothing */
-        if( this->_sd_present == false ) {
+        if( _sd_present == false ) {
             return false;
         }
 
-        if( this->_playMode != ALARM_MODE_OFF ) {
-            if( this->_playMode & ALARM_MODE_TEST ) {
+        if( _playMode != ALARM_MODE_OFF ) {
+            if( _playMode & ALARM_MODE_TEST ) {
                 this->stop();
 
             } else {
@@ -208,29 +208,29 @@ bool Alarm::detectSDCard() {
         }
 
         this->currentFile.close();
-        this->_timerStart = 0;
-        this->_sd_present = false;
+        _timerStart = 0;
+        _sd_present = false;
         return false;
     }
 
-    this->_sd_present = false;
-    this->_timerStart = 0;
+    _sd_present = false;
+    _timerStart = 0;
     //Serial.println( F( "Init SD card... " ) );
 
-    if( this->_sd.begin( this->_pin_sd_cs ) == false ) {
+    if( _sd.begin( _pin_sd_cs ) == false ) {
         //Serial.println( F( "SD init failed " ) );
         return false;
     }
 
     /* Open root directory */
-    this->_sd.vwd()->rewind();
+    _sd.vwd()->rewind();
 
-    if( this->_sd.vwd()->isOpen() == false ) {
+    if( _sd.vwd()->isOpen() == false ) {
         //Serial.println( F( "Cannot open root directory on SD card" ) );
         return false;
     }
 
-    this->_sd_present = true;
+    _sd_present = true;
     return true;
 }
 
@@ -250,7 +250,7 @@ bool Alarm::detectSDCard() {
  * 
  */
 bool Alarm::openNextFile() {
-    if( this->_playMode != ALARM_MODE_OFF ) {
+    if( _playMode != ALARM_MODE_OFF ) {
         this->stop();
     }
 
@@ -274,7 +274,7 @@ bool Alarm::openNextFile() {
  * 
  */
 bool Alarm::openFile( char* name ) {
-    if( this->_sd.vwd()->isOpen() == false ) {
+    if( _sd.vwd()->isOpen() == false ) {
         return false;
     }
 
@@ -287,14 +287,14 @@ bool Alarm::openFile( char* name ) {
 
         /* Open the specified file */
         if( strlen( name ) > 0 ) {
-            this->currentFile.open( this->_sd.vwd(), name, O_READ );
+            this->currentFile.open( _sd.vwd(), name, O_READ );
 
             this->currentFile.getSFN( this->profile.filename );
         }
 
     } else {
         /* Open the next file in the root directory */
-        this->currentFile.openNext( this->_sd.vwd(), O_READ );
+        this->currentFile.openNext( _sd.vwd(), O_READ );
 
         char buffer[ MAX_LENGTH_ALARM_FILENAME + 1 ];
         this->currentFile.getSFN( buffer );
@@ -303,7 +303,7 @@ bool Alarm::openFile( char* name ) {
            to the next file */
         if( strcmp( this->profile.filename, buffer )
                 == 0 ) {
-            this->currentFile.openNext( this->_sd.vwd(), O_READ );
+            this->currentFile.openNext( _sd.vwd(), O_READ );
         }
 
         strcpy( this->profile.filename, buffer );
@@ -326,12 +326,12 @@ bool Alarm::openFile( char* name ) {
 
         /* invalid extention, close the file and go for the next one */
         this->currentFile.close();
-        this->currentFile.openNext( this->_sd.vwd(), O_READ );
+        this->currentFile.openNext( _sd.vwd(), O_READ );
         this->currentFile.getSFN( this->profile.filename );
     }
 
     if( this->currentFile.isOpen() == false ) {
-        this->_sd.vwd()->rewind();
+        _sd.vwd()->rewind();
         return false;
     }
 
@@ -463,14 +463,14 @@ void Alarm::saveProfile( AlarmProfile* profile, uint8_t id ) {
  * 
  */
 void Alarm::play( uint8_t mode, uint16_t delay ) {
-    if( this->_playMode != ALARM_MODE_OFF ) {
+    if( _playMode != ALARM_MODE_OFF ) {
         this->stop();
     }
 
-    this->_playMode = mode;
-    this->_timerStart = millis();
-    this->_playDelay = delay;
-    this->_snoozeStart = 0;
+    _playMode = mode;
+    _timerStart = millis();
+    _playDelay = delay;
+    _snoozeStart = 0;
 }
 
 
@@ -482,21 +482,21 @@ void Alarm::play( uint8_t mode, uint16_t delay ) {
  * 
  */
 void Alarm::play( uint8_t mode ) {
-    if( this->_playMode != ALARM_MODE_OFF ) {
+    if( _playMode != ALARM_MODE_OFF ) {
         this->stop();
     }
 
     this->detectAlarmSwitchState();
 
-    if( this->_alarm_sw_on == false && ( ( mode & ALARM_MODE_TEST ) == 0 ) ) {
+    if( _alarm_sw_on == false && ( ( mode & ALARM_MODE_TEST ) == 0 ) ) {
         return;
     }
 
-    this->_playMode = mode;
-    this->_timerStart = 0;
-    this->_playDelay = 0;
-    this->_snoozeStart = 0;
-    this->_alarmStart = millis();
+    _playMode = mode;
+    _timerStart = 0;
+    _playDelay = 0;
+    _snoozeStart = 0;
+    _alarmStart = millis();
 
     if( mode & ALARM_MODE_SCREEN ) {
         g_screen.activate( &screen_alarm );
@@ -518,25 +518,25 @@ void Alarm::play( uint8_t mode ) {
  * 
  */
 void Alarm::stop() {
-    if( this->_playMode == ALARM_MODE_OFF ) {
+    if( _playMode == ALARM_MODE_OFF ) {
         return;
     }
 
-    if( this->_playMode & ALARM_MODE_AUDIO ) {
+    if( _playMode & ALARM_MODE_AUDIO ) {
         this->audioStop();
     }
 
-    if( this->_playMode & ALARM_MODE_VISUAL || this->_playMode & ALARM_MODE_LAMP ) {
+    if( _playMode & ALARM_MODE_VISUAL || _playMode & ALARM_MODE_LAMP ) {
         this->visualStop();
     }
 
-    if( this->_playMode & ALARM_MODE_SCREEN ) {
+    if( _playMode & ALARM_MODE_SCREEN ) {
         g_screen.exitScreen();
     }
 
-    this->_playMode = ALARM_MODE_OFF;
-    this->_timerStart = 0;
-    this->_snoozeStart = 0;
+    _playMode = ALARM_MODE_OFF;
+    _timerStart = 0;
+    _snoozeStart = 0;
 }
 
 
@@ -546,9 +546,9 @@ void Alarm::stop() {
  * 
  */
 void Alarm::audioStop() {
-    this->_amplifier.disableOutputs();
+    _amplifier.disableOutputs();
 
-    if( this->_playMode & ALARM_MODE_AUDIO ) {
+    if( _playMode & ALARM_MODE_AUDIO ) {
 
         // cancel all playback
         sciWrite( VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW | VS1053_MODE_SM_CANCEL );
@@ -562,7 +562,7 @@ void Alarm::audioStop() {
  * 
  */
 void Alarm::audioStart() {
-    if( ( this->_playMode & ALARM_MODE_AUDIO ) == 0 ) {
+    if( ( _playMode & ALARM_MODE_AUDIO ) == 0 ) {
         return;
     }
 
@@ -570,7 +570,7 @@ void Alarm::audioStart() {
         g_power.setPowerMode( POWER_MODE_LOW_POWER );
     }
 
-    if( this->profile.gradual == true && ( ( this->_playMode & ALARM_MODE_TEST ) == 0 ) ) {
+    if( this->profile.gradual == true && ( ( _playMode & ALARM_MODE_TEST ) == 0 ) ) {
         this->setVolume( 0 );
 
     } else {
@@ -580,7 +580,7 @@ void Alarm::audioStart() {
     this->openFile( this->profile.filename );
 
     if( this->currentFile.isOpen() == false ) {
-        this->_pgm_audio_ptr = 0;
+        _pgm_audio_ptr = 0;
 
     } else {
         this->currentFile.rewind();
@@ -596,7 +596,7 @@ void Alarm::audioStart() {
     /* As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0 */
     sciWrite( VS1053_REG_DECODETIME, 0x00 );
     sciWrite( VS1053_REG_DECODETIME, 0x00 );
-    this->_amplifier.enableOutputs();
+    _amplifier.enableOutputs();
 }
 
 
@@ -609,7 +609,7 @@ void Alarm::audioStart() {
  * 
  */
 void Alarm::snooze() {
-    if( ( this->_playMode == ALARM_MODE_OFF ) || ( this->_playMode & ALARM_MODE_SNOOZE ) ) {
+    if( ( _playMode == ALARM_MODE_OFF ) || ( _playMode & ALARM_MODE_SNOOZE ) ) {
         return;
     }
 
@@ -619,8 +619,8 @@ void Alarm::snooze() {
         return;
     }
 
-    this->_playMode |= ALARM_MODE_SNOOZE;
-    this->_snoozeStart = g_rtc.getEpoch();
+    _playMode |= ALARM_MODE_SNOOZE;
+    _snoozeStart = g_rtc.getEpoch();
     this->audioStop();
     this->visualStop();
 
@@ -637,18 +637,18 @@ void Alarm::snooze() {
  * 
  */
 void Alarm::resume() {
-    if( this->_playMode == ALARM_MODE_OFF || ( ( this->_playMode & ALARM_MODE_SNOOZE ) == 0 ) ) {
+    if( _playMode == ALARM_MODE_OFF || ( ( _playMode & ALARM_MODE_SNOOZE ) == 0 ) ) {
         return;
     }
 
-    this->_playMode &= ~ALARM_MODE_SNOOZE;
-    this->_snoozeStart = 0;
-    this->_alarmStart = millis();
+    _playMode &= ~ALARM_MODE_SNOOZE;
+    _snoozeStart = 0;
+    _alarmStart = millis();
 
     this->audioStart();
     this->visualStart();
 
-    if( this->_playMode & ALARM_MODE_SCREEN ) {
+    if( _playMode & ALARM_MODE_SCREEN ) {
         g_screen.requestScreenUpdate( true );
     }
 }
@@ -668,7 +668,7 @@ void Alarm::setVolume( uint8_t vol ) {
         vol = 100;
     }
 
-    this->_volume = vol;
+    _volume = vol;
     VS1053::setVolume( 100 - vol, 100 - vol );
 }
 
@@ -681,7 +681,7 @@ void Alarm::setVolume( uint8_t vol ) {
  * 
  */
 bool Alarm::isSnoozing() {
-    return this->_playMode & ALARM_MODE_SNOOZE;
+    return _playMode & ALARM_MODE_SNOOZE;
 }
 
 
@@ -693,7 +693,7 @@ bool Alarm::isSnoozing() {
  * 
  */
 bool Alarm::isPlaying() {
-    return this->_playMode != ALARM_MODE_OFF && ( ( this->_playMode & ALARM_MODE_SNOOZE ) == 0 );
+    return _playMode != ALARM_MODE_OFF && ( ( _playMode & ALARM_MODE_SNOOZE ) == 0 );
 }
 
 
@@ -705,7 +705,7 @@ bool Alarm::isPlaying() {
  * 
  */
 uint8_t Alarm::getPlayMode() {
-    return this->_playMode;
+    return _playMode;
 }
 
 
@@ -717,7 +717,7 @@ uint8_t Alarm::getPlayMode() {
  * 
  */
 uint16_t Alarm::getSnoozeTimeRemaining() {
-    if( ( this->_playMode & ALARM_MODE_SNOOZE ) == 0 ) {
+    if( ( _playMode & ALARM_MODE_SNOOZE ) == 0 ) {
         return 0;
     }
 
@@ -725,7 +725,7 @@ uint16_t Alarm::getSnoozeTimeRemaining() {
         return 0;
     }
 
-    return ( this->profile.snoozeDelay * 60 ) - ( g_rtc.getEpoch() - this->_snoozeStart );
+    return ( this->profile.snoozeDelay * 60 ) - ( g_rtc.getEpoch() - _snoozeStart );
 }
 
 
@@ -737,28 +737,28 @@ uint16_t Alarm::getSnoozeTimeRemaining() {
 void Alarm::visualStart() {
 
     /* Turn on lamp if option enabled */
-    if( this->_playMode & ALARM_MODE_LAMP && profile.lamp.mode != LAMP_MODE_OFF ) {
+    if( _playMode & ALARM_MODE_LAMP && profile.lamp.mode != LAMP_MODE_OFF ) {
         this->profile.lamp.delay_off = 0;
         g_lamp.deactivate( true );
         g_lamp.activate( &this->profile.lamp );
     }
 
     /* Visual mode not enabled */
-    if( ( this->_playMode & ALARM_MODE_VISUAL ) == 0
+    if( ( _playMode & ALARM_MODE_VISUAL ) == 0
             || this->profile.visualMode == ALARM_VISUAL_NONE ) {
         return;
     }
 
-    this->_visualStepReverse = false;
+    _visualStepReverse = false;
 
     switch( this->profile.visualMode ) {
 
         case ALARM_VISUAL_FADING:
-            this->_visualStepValue = g_config.clock.clock_brightness;
+            _visualStepValue = g_config.clock.clock_brightness;
             break;
 
         default:
-            this->_visualStepValue = 0;
+            _visualStepValue = 0;
             break;
     }
 
@@ -778,15 +778,15 @@ inline void Alarm::updateVisualStepDelay() {
 
         case ALARM_VISUAL_FADING:
         case ALARM_VISUAL_RAINBOW:
-            this->_visualStepDelay = 250 / this->profile.effectSpeed;
+            _visualStepDelay = 250 / this->profile.effectSpeed;
             break;
 
         case ALARM_VISUAL_NONE:
-            this->_visualStepDelay = 0;
+            _visualStepDelay = 0;
             break;
 
         default:
-            this->_visualStepDelay = 2000 / this->profile.effectSpeed;
+            _visualStepDelay = 2000 / this->profile.effectSpeed;
             break;
     }
 }
@@ -803,12 +803,12 @@ inline void Alarm::visualStep() {
     }
 
     /* Check if visual effect is enabled */
-    if( this->_visualStepDelay == 0 ) {
+    if( _visualStepDelay == 0 ) {
         return;
     }
 
     /* Check if the effect next step delay is elapsed */
-    if( ( millis() - this->_timerStart ) < this->_visualStepDelay ) {
+    if( ( millis() - _timerStart ) < _visualStepDelay ) {
         return;
     }
 
@@ -816,9 +816,9 @@ inline void Alarm::visualStep() {
         case ALARM_VISUAL_FLASHING:
         case ALARM_VISUAL_RED_FLASH:
 
-            this->_visualStepReverse = !this->_visualStepReverse;
+            _visualStepReverse = !_visualStepReverse;
 
-            g_clock.setBrightness( this->_visualStepReverse ? 0 : ( g_config.clock.clock_brightness + 25 ) );
+            g_clock.setBrightness( _visualStepReverse ? 0 : ( g_config.clock.clock_brightness + 25 ) );
 
             if( this->profile.visualMode == ALARM_VISUAL_RED_FLASH ) {
                 g_clock.setColorFromTable( COLOR_RED );
@@ -827,41 +827,41 @@ inline void Alarm::visualStep() {
             break;
 
         case ALARM_VISUAL_WHITE_FLASH:
-            this->_visualStepReverse = !this->_visualStepReverse;
+            _visualStepReverse = !_visualStepReverse;
 
             g_clock.setBrightness( g_config.clock.clock_brightness + 25 );
-            g_clock.setColorFromTable( this->_visualStepReverse ? COLOR_WHITE : g_config.clock.clock_color );
+            g_clock.setColorFromTable( _visualStepReverse ? COLOR_WHITE : g_config.clock.clock_color );
             break;
 
         case ALARM_VISUAL_FADING:
-            if( this->_visualStepValue
+            if( _visualStepValue
                     < ( ( g_config.clock.clock_brightness < 25 ) ? 5 : ( g_config.clock.clock_brightness - 20 ) ) ) {
-                this->_visualStepReverse = false;
+                _visualStepReverse = false;
             }
 
-            if( this->_visualStepValue > ( g_config.clock.clock_brightness + 20 ) ) {
-                this->_visualStepReverse = true;
+            if( _visualStepValue > ( g_config.clock.clock_brightness + 20 ) ) {
+                _visualStepReverse = true;
             }
 
-            this->_visualStepValue += ( this->_visualStepReverse ? -5 : 5 );
-            g_clock.setBrightness( this->_visualStepValue );
+            _visualStepValue += ( _visualStepReverse ? -5 : 5 );
+            g_clock.setBrightness( _visualStepValue );
             break;
 
         case ALARM_VISUAL_RAINBOW:
             g_clock.setBrightness( g_config.clock.clock_brightness + 25 );
 
-            this->_visualStepValue += 5;
+            _visualStepValue += 5;
 
-            if( this->_visualStepValue < 85 ) {
-                g_clock.setColorRGB( this->_visualStepValue * 3, 255 - this->_visualStepValue * 3, 0 );
+            if( _visualStepValue < 85 ) {
+                g_clock.setColorRGB( _visualStepValue * 3, 255 - _visualStepValue * 3, 0 );
 
-            } else if( this->_visualStepValue < 170 ) {
-                g_clock.setColorRGB( 255 - ( this->_visualStepValue - 85 ) * 3, 0,
-                                     ( this->_visualStepValue - 85 ) * 3 );
+            } else if( _visualStepValue < 170 ) {
+                g_clock.setColorRGB( 255 - ( _visualStepValue - 85 ) * 3, 0,
+                                     ( _visualStepValue - 85 ) * 3 );
 
             } else {
-                g_clock.setColorRGB( 0, ( this->_visualStepValue - 170 ) * 3,
-                                     255 - ( this->_visualStepValue - 170 ) * 3 );
+                g_clock.setColorRGB( 0, ( _visualStepValue - 170 ) * 3,
+                                     255 - ( _visualStepValue - 170 ) * 3 );
             }
 
             break;
@@ -869,7 +869,7 @@ inline void Alarm::visualStep() {
 
     g_clock.update();
 
-    this->_timerStart = millis();
+    _timerStart = millis();
     this->updateVisualStepDelay();
 }
 
@@ -899,12 +899,12 @@ inline void Alarm::visualStop() {
 void Alarm::processEvents() {
 
     /* Detect if the SD card is present, if so, initialize it */
-    if( this->_sd_present != this->detectSDCard() ) {
+    if( _sd_present != this->detectSDCard() ) {
         g_screen.requestScreenUpdate( false );
     }
 
     /* Detect alarm switch state */
-    if( this->_alarm_sw_on != this->detectAlarmSwitchState() ) {
+    if( _alarm_sw_on != this->detectAlarmSwitchState() ) {
         g_power.resetSuspendDelay();
 
         g_clock.requestClockUpdate( true );
@@ -915,8 +915,8 @@ void Alarm::processEvents() {
     }
 
     /* If time has changed, checks for alarms */
-    if( g_rtc.now()->minute() != this->_rtcmin ) {
-        this->_rtcmin = g_rtc.now()->minute();
+    if( g_rtc.now()->minute() != _rtcmin ) {
+        _rtcmin = g_rtc.now()->minute();
 
         DateTime local;
         local = g_rtc.now();
@@ -926,51 +926,51 @@ void Alarm::processEvents() {
     }
 
 
-    if( this->_playMode == ALARM_MODE_OFF ) {
+    if( _playMode == ALARM_MODE_OFF ) {
         return;
     }
 
-    if( this->_alarm_sw_on == false && ( ( this->_playMode & ALARM_MODE_TEST ) == 0 ) ) {
+    if( _alarm_sw_on == false && ( ( _playMode & ALARM_MODE_TEST ) == 0 ) ) {
         this->stop();
         return;
     }
 
-    if( this->_playMode & ALARM_MODE_SNOOZE ) {
-        if( g_rtc.getEpoch() - this->_snoozeStart > ( this->profile.snoozeDelay * 60 ) ) {
+    if( _playMode & ALARM_MODE_SNOOZE ) {
+        if( g_rtc.getEpoch() - _snoozeStart > ( this->profile.snoozeDelay * 60 ) ) {
             this->resume();
         }
 
         return;
     }
 
-    if( this->_playDelay > 0 ) {
-        if( millis() - this->_timerStart < this->_playDelay ) {
+    if( _playDelay > 0 ) {
+        if( millis() - _timerStart < _playDelay ) {
             return;
         }
 
-        this->play( this->_playMode );
+        this->play( _playMode );
     }
 
 
-    if( this->profile.gradual == true && ( ( this->_playMode & ALARM_MODE_TEST ) == 0 ) ) {
-        uint8_t volume = ( uint8_t )( ( unsigned long )( millis() - this->_alarmStart ) / ( 45000 / this->profile.volume ) );
+    if( this->profile.gradual == true && ( ( _playMode & ALARM_MODE_TEST ) == 0 ) ) {
+        uint8_t volume = ( uint8_t )( ( unsigned long )( millis() - _alarmStart ) / ( 45000 / this->profile.volume ) );
 
         if( volume > this->profile.volume ) {
             volume = this->profile.volume;
         }
 
-        if( volume != this->_volume ) {
+        if( volume != _volume ) {
             this->setVolume( volume );
         }
     }
 
 
-    if( this->_playMode & ALARM_MODE_AUDIO ) {
+    if( _playMode & ALARM_MODE_AUDIO ) {
         g_power.resetSuspendDelay();
         this->feedBuffer();
     }
 
-    if( this->_playMode & ALARM_MODE_VISUAL ) {
+    if( _playMode & ALARM_MODE_VISUAL ) {
         this->visualStep();
     }
 }
@@ -982,7 +982,7 @@ void Alarm::processEvents() {
  *
  */
 inline void Alarm::feedBuffer() {
-    if( this->_playMode & ALARM_MODE_SNOOZE ) {
+    if( _playMode & ALARM_MODE_SNOOZE ) {
         return;
     }
 
@@ -995,22 +995,22 @@ inline void Alarm::feedBuffer() {
     if( this->currentFile.isOpen() == false ) {
 
         /* Playback from program memory space */
-        if( this->_pgm_audio_ptr + VS1053_DATABUFFERLEN > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
+        if( _pgm_audio_ptr + VS1053_DATABUFFERLEN > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
 
-            bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - this->_pgm_audio_ptr;
+            bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - _pgm_audio_ptr;
 
-            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[this->_pgm_audio_ptr], bytesRead );
+            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[_pgm_audio_ptr], bytesRead );
 
-            this->_pgm_audio_ptr = 0;
+            _pgm_audio_ptr = 0;
 
         } else {
 
             bytesRead = VS1053_DATABUFFERLEN;
 
-            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[this->_pgm_audio_ptr],
+            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[_pgm_audio_ptr],
                       VS1053_DATABUFFERLEN );
 
-            this->_pgm_audio_ptr += VS1053_DATABUFFERLEN;
+            _pgm_audio_ptr += VS1053_DATABUFFERLEN;
         }
 
 
@@ -1037,7 +1037,7 @@ inline void Alarm::feedBuffer() {
  * 
  */
 bool Alarm::isAlarmSwitchOn() {
-    return this->_alarm_sw_on;
+    return _alarm_sw_on;
 }
 
 
@@ -1050,8 +1050,8 @@ bool Alarm::isAlarmSwitchOn() {
  */
 bool Alarm::detectAlarmSwitchState() {
 
-    this->_alarm_sw_on = ( digitalRead( this->_pin_alarm_sw ) == HIGH );
-    return this->_alarm_sw_on;
+    _alarm_sw_on = ( digitalRead( _pin_alarm_sw ) == HIGH );
+    return _alarm_sw_on;
 }
 
 
@@ -1062,7 +1062,7 @@ bool Alarm::detectAlarmSwitchState() {
  *
  */
 bool Alarm::isAlarmEnabled() {
-    if( this->_alarm_sw_on == false ) {
+    if( _alarm_sw_on == false ) {
         return false;
     }
 
@@ -1085,7 +1085,7 @@ bool Alarm::checkForAlarms( DateTime* now ) {
         return false;
     }
 
-    if( this->_playMode != ALARM_MODE_OFF && ( ( this->_playMode & ALARM_MODE_TEST ) == 0 ) ) {
+    if( _playMode != ALARM_MODE_OFF && ( ( _playMode & ALARM_MODE_TEST ) == 0 ) ) {
         return true;
     }
 

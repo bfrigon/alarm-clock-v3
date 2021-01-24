@@ -36,7 +36,7 @@
  */
 NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin_shdn ) {
 
-    this->_flashTimerStart = millis();
+    _flashTimerStart = millis();
 }
 
 
@@ -50,7 +50,7 @@ void NeoClock::restoreClockDisplay() {
     DateTime local = g_rtc.now();
     g_timezone.toLocal( &local );
 
-    this->_testMode = false;
+    _testMode = false;
     this->hour = local.hour();
     this->minute = local.minute();
     g_clock.hourFlashing = false;
@@ -76,7 +76,7 @@ void NeoClock::update() {
         return;
     }
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
@@ -100,7 +100,7 @@ void NeoClock::update() {
     this->setPixel( pixmap, 0, is_pm );
     this->setPixel( pixmap, 1, this->status_set );
 
-    if( this->hourFlashing == true && this->_flashState == false ) {
+    if( this->hourFlashing == true && _flashState == false ) {
         this->setDigitPixels( pixmap, 2, SEG_SPACE );
         this->setDigitPixels( pixmap, 9, SEG_SPACE );
 
@@ -116,7 +116,7 @@ void NeoClock::update() {
     this->setPixel( pixmap, 16, true );
     this->setPixel( pixmap, 17, true );
 
-    if( this->minutesFlashing == true && this->_flashState == false ) {
+    if( this->minutesFlashing == true && _flashState == false ) {
         this->setDigitPixels( pixmap, 18, SEG_SPACE );
         this->setDigitPixels( pixmap, 25, SEG_SPACE );
 
@@ -134,7 +134,7 @@ void NeoClock::update() {
 
 
     /* Turn on all pixels in test mode */
-    if( this->_testMode == true ) {
+    if( _testMode == true ) {
         pixmap[0] = 0xFF;
         pixmap[1] = 0xFF;
         pixmap[2] = 0xFF;
@@ -157,8 +157,8 @@ void NeoClock::processEvents() {
     
 
     /* If time has changed, update the clock display */
-    if( now != this->_prevDate ) {
-        this->_prevDate = now;
+    if( now != _prevDate ) {
+        _prevDate = now;
 
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
             g_screen.requestScreenUpdate( false );
@@ -168,9 +168,9 @@ void NeoClock::processEvents() {
     }
 
     /* Update the clock display when blinking state changes */
-    if( millis() - this->_flashTimerStart > ( this->flashRate * 10 ) ) {
-        this->_flashTimerStart = millis();
-        this->_flashState = !( this->_flashState );
+    if( millis() - _flashTimerStart > ( this->flashRate * 10 ) ) {
+        _flashTimerStart = millis();
+        _flashState = !( _flashState );
 
         if( this->hourFlashing == true || this->minutesFlashing == true ) {
             _updateRequested = true;
@@ -213,7 +213,7 @@ void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
  * @param   testMode    True to enable pixel test mdoe.
  */
 void NeoClock::setTestMode( bool testMode ) {
-    this->_testMode = testMode;
+    _testMode = testMode;
 }
 
 

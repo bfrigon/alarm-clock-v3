@@ -47,7 +47,7 @@ TPA2016::TPA2016() {
  * 
  */
 void TPA2016::setPins( int8_t pin_shutdown ) {
-    this->_pin_shutdown = pin_shutdown;
+    _pin_shutdown = pin_shutdown;
 }
 
 
@@ -60,10 +60,10 @@ void TPA2016::begin() {
     _init = true;
 
     /* Disable shutdown mode */
-    if( this->_pin_shutdown >= 0 ) {
-        pinMode( this->_pin_shutdown, OUTPUT );
+    if( _pin_shutdown >= 0 ) {
+        pinMode( _pin_shutdown, OUTPUT );
 
-        digitalWrite( this->_pin_shutdown, LOW );
+        digitalWrite( _pin_shutdown, LOW );
     }
 
     /* Sets all config registers with default values */
@@ -88,11 +88,11 @@ void TPA2016::end() {
         return;
     }
 
-    this->_init = false;
+    _init = false;
 
     /* Shutdown mode */
-    if( this->_pin_shutdown >= 0 ) {
-        digitalWrite( this->_pin_shutdown, HIGH );
+    if( _pin_shutdown >= 0 ) {
+        digitalWrite( _pin_shutdown, HIGH );
     }
 }
 
@@ -110,10 +110,10 @@ bool TPA2016::enableOutputs() {
         return false;
     }
 
-    this->_control |= TPA2016_CTRL_LSPK_ON;
-    this->_control |= TPA2016_CTRL_RSPK_ON;
+    _control |= TPA2016_CTRL_LSPK_ON;
+    _control |= TPA2016_CTRL_RSPK_ON;
 
-    return this->write( TPA2016_REG_CONTROL, this->_control );
+    return this->write( TPA2016_REG_CONTROL, _control );
 }
 
 
@@ -130,10 +130,10 @@ bool TPA2016::disableOutputs() {
         return false;
     }
 
-    this->_control &= ~TPA2016_CTRL_LSPK_ON;
-    this->_control &= ~TPA2016_CTRL_RSPK_ON;
+    _control &= ~TPA2016_CTRL_LSPK_ON;
+    _control &= ~TPA2016_CTRL_RSPK_ON;
 
-    return this->write( TPA2016_REG_CONTROL, this->_control );
+    return this->write( TPA2016_REG_CONTROL, _control );
 }
 
 

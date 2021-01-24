@@ -36,9 +36,9 @@
  */
 Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst ) {
 
-    this->_pin_onbatt = pin_onbatt;
-    this->_pin_sysoff = pin_sysoff;
-    this->_pin_cfgrst = pin_cfgrst;
+    _pin_onbatt = pin_onbatt;
+    _pin_sysoff = pin_sysoff;
+    _pin_cfgrst = pin_cfgrst;
 }
 
 
@@ -49,11 +49,11 @@ Power::Power( int8_t pin_onbatt, int8_t pin_sysoff, int8_t pin_cfgrst ) {
  */
 void Power::begin() {
 
-    pinMode( this->_pin_onbatt, INPUT );
-    pinMode( this->_pin_sysoff, OUTPUT );
-    digitalWrite( this->_pin_sysoff, LOW );
+    pinMode( _pin_onbatt, INPUT );
+    pinMode( _pin_sysoff, OUTPUT );
+    digitalWrite( _pin_sysoff, LOW );
 
-    this->_mode = POWER_MODE_NORMAL;
+    _mode = POWER_MODE_NORMAL;
 
     this->detectPowerState();
 
@@ -69,7 +69,7 @@ void Power::begin() {
  * 
  */
 uint8_t Power::getPowerMode() {
-    return this->_mode;
+    return _mode;
 }
 
 
@@ -83,7 +83,7 @@ uint8_t Power::getPowerMode() {
  * 
  */
 uint8_t Power::setPowerMode( uint8_t mode ) {
-    uint8_t prevMode = this->_mode;
+    uint8_t prevMode = _mode;
 
     if( prevMode == mode ) {
         return mode;
@@ -93,7 +93,7 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
         mode = POWER_MODE_NORMAL;
     }
 
-    this->_mode = mode;
+    _mode = mode;
 
 
     this->resetSuspendDelay();
@@ -142,23 +142,23 @@ uint8_t Power::detectPowerState() {
 
     if( this->isOnBatteryPower() ) {
 
-        if( this->_mode == POWER_MODE_NORMAL ) {
+        if( _mode == POWER_MODE_NORMAL ) {
             return this->setPowerMode( POWER_MODE_LOW_POWER );
 
-        } else if( this->_mode == POWER_MODE_LOW_POWER && ( millis() - this->_lpwrTimerStart >= DELAY_BEFORE_SUSPEND ) ) {
+        } else if( _mode == POWER_MODE_LOW_POWER && ( millis() - _lpwrTimerStart >= DELAY_BEFORE_SUSPEND ) ) {
             return this->setPowerMode( POWER_MODE_SUSPEND );
 
-        } else if( this->_mode == POWER_MODE_SUSPEND ) {
+        } else if( _mode == POWER_MODE_SUSPEND ) {
             this->enterSleep();
-            return this->_mode;
+            return _mode;
         }
 
-        return this->_mode;
+        return _mode;
     }
 
     /* Already in normal power mode */
-    if( this->_mode == POWER_MODE_NORMAL ) {
-        return this->_mode;
+    if( _mode == POWER_MODE_NORMAL ) {
+        return _mode;
     }
 
     return this->setPowerMode( POWER_MODE_NORMAL );
@@ -173,7 +173,7 @@ uint8_t Power::detectPowerState() {
  * 
  */
 bool Power::isOnBatteryPower() {
-    return ( digitalRead( this->_pin_onbatt ) == HIGH );
+    return ( digitalRead( _pin_onbatt ) == HIGH );
 }
 
 
@@ -183,7 +183,7 @@ bool Power::isOnBatteryPower() {
  * 
  */
 void Power::resetSuspendDelay() {
-    this->_lpwrTimerStart = millis();
+    _lpwrTimerStart = millis();
 }
 
 
@@ -230,7 +230,7 @@ void Power::enterSleep() {
     power_twi_enable();
 
     /* Re-enable watchdog */
-    if( this->_wdt == true ) {
+    if( _wdt == true ) {
         this->enableWatchdog();
     }
 }
@@ -244,12 +244,12 @@ void Power::enterSleep() {
  */
 void Power::cpuReset() {
 
-    if( this->_pin_cfgrst == -1 ) {
+    if( _pin_cfgrst == -1 ) {
         return;
     }
 
-    pinMode( this->_pin_cfgrst, OUTPUT );
-    digitalWrite( this->_pin_cfgrst, LOW );
+    pinMode( _pin_cfgrst, OUTPUT );
+    digitalWrite( _pin_cfgrst, LOW );
 
     /* Halt */
     while( true );
@@ -282,11 +282,11 @@ void Power::reboot() {
  * 
  */
 bool Power::detectConfigResetButton() {
-    if( this->_pin_cfgrst == -1 ) {
+    if( _pin_cfgrst == -1 ) {
         return false;
     }
 
-    return ( digitalRead( this->_pin_cfgrst ) == LOW );
+    return ( digitalRead( _pin_cfgrst ) == LOW );
 }
 
 
@@ -299,7 +299,7 @@ void Power::enableWatchdog() {
     /* Enable watchdog timer, 8 seconds timeout */
     // wdt_enable( WDTO_8S );
 
-    this->_wdt = true;
+    _wdt = true;
 }
 
 /*! ------------------------------------------------------------------------
@@ -310,7 +310,7 @@ void Power::enableWatchdog() {
 void Power::disableWatchdog() {
 
     wdt_disable();
-    this->_wdt = false;
+    _wdt = false;
 }
 
 

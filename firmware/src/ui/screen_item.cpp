@@ -41,17 +41,17 @@ void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
     struct ScreenItemBase memItem;
     memcpy_P( &memItem, item, sizeof( ScreenItemBase ) );
 
-    this->_type = memItem._type;
-    this->_id = memItem._id;
-    this->_row = memItem._row;
-    this->_col = memItem._col;
-    this->_caption = memItem._caption;
-    this->_value = memItem._value;
-    this->_min = memItem._min;
-    this->_max = memItem._max;
-    this->_length = memItem._length;
-    this->_options = memItem._options;
-    this->_list = memItem._list;
+    _type = memItem._type;
+    _id = memItem._id;
+    _row = memItem._row;
+    _col = memItem._col;
+    _caption = memItem._caption;
+    _value = memItem._value;
+    _min = memItem._min;
+    _max = memItem._max;
+    _length = memItem._length;
+    _options = memItem._options;
+    _list = memItem._list;
 }
 
 
@@ -62,15 +62,15 @@ void ScreenItem::loadFromProgmem( const struct ScreenItemBase* item ) {
  */
 void ScreenItem::unload() {
 
-    this->_type = ITEM_TYPE_NULL;
-    this->_id = 0;
-    this->_row = 0;
-    this->_col = 0;
-    this->_caption = NULL;
-    this->_value = NULL;
-    this->_min = 0;
-    this->_max = 0;
-    this->_length = 0;
-    this->_options = 0;
-    this->_list = NULL;
+    _type = ITEM_TYPE_NULL;
+    _id = 0;
+    _row = 0;
+    _col = 0;
+    _caption = NULL;
+    _value = NULL;
+    _min = 0;
+    _max = 0;
+    _length = 0;
+    _options = 0;
+    _list = NULL;
 }

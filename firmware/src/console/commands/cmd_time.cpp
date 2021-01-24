@@ -364,26 +364,26 @@ void ConsoleBase::showTimezoneInfo() {
 
     /* Print whether the local time is equal, ahead or behind UTC */
     if( current_offset == 0 ) {
-        this->print_P( S_CONSOLE_TZ_EQUAL_UTC );
+        this->println_P( S_CONSOLE_TZ_EQUAL_UTC );
     } else if( current_offset > 0 ) {
         this->print_P( S_CONSOLE_TZ_AHEAD_UTC_PRE );
         this->printTimeInterval( abs( current_offset ) * 60UL , S_DATETIME_SEPARATOR_AND );
-        this->print_P( S_CONSOLE_TZ_AHEAD_UTC );
+        this->println_P( S_CONSOLE_TZ_AHEAD_UTC );
     } else {
         this->print_P( S_CONSOLE_TZ_BEHIND_UTC_PRE );
         this->printTimeInterval( abs( current_offset ) * 60UL, S_DATETIME_SEPARATOR_AND );
-        this->print_P( S_CONSOLE_TZ_BEHIND_UTC );
+        this->println_P( S_CONSOLE_TZ_BEHIND_UTC );
     }
 
     
     if( dst == std ) {
 
         /* DST not observed in this time zone */
-        this->print_P( S_CONSOLE_TZ_NO_DST );
+        this->println_P( S_CONSOLE_TZ_NO_DST );
 
     } else {
 
-        this->printf_P( S_CONSOLE_TZ_IS_DST, (isDst == true ) ? S_YES : S_NO );
+        this->printfln_P( S_CONSOLE_TZ_IS_DST, (isDst == true ) ? S_YES : S_NO );
 
 
         bool show_dst_first = ( std > dst );

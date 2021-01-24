@@ -110,7 +110,7 @@ class DS3231 {
 
     void adjustClock( DateTime *ndt, int16_t delay );
 
-    DateTime* now()     { return &this->_now; }
+    DateTime* now()     { return &_now; }
 
   private:
     uint8_t read( uint8_t reg );

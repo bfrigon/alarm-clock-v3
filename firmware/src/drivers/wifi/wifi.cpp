@@ -299,7 +299,7 @@ wl_status_t WiFi::status() {
  */
 uint32_t WiFi::getLocalIP() 
 {
-    return this->_localip;
+    return _localip;
 }
 
 
@@ -313,7 +313,7 @@ uint32_t WiFi::getLocalIP()
  */
 uint32_t WiFi::getGateway()
 {
-    return this->_gateway;
+    return _gateway;
 }
 
 
@@ -327,7 +327,7 @@ uint32_t WiFi::getGateway()
  */
 uint32_t WiFi::getSubmask()
 {
-    return this->_submask;
+    return _submask;
 }
 
 
@@ -341,7 +341,7 @@ uint32_t WiFi::getSubmask()
  */
 uint32_t WiFi::getDNS()
 {
-    return this->_dns;
+    return _dns;
 }
 
 
@@ -542,7 +542,7 @@ bool WiFi::startHostnameResolve( const char *hostname ) {
         return false;
     }
 
-    if( this->_status != WIFI_STATUS_CONNECTED ) {
+    if( _status != WIFI_STATUS_CONNECTED ) {
 
         this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
@@ -604,7 +604,7 @@ bool WiFi::startPing( const char* hostname ) {
         return false;
     }
 
-    if( this->_status != WIFI_STATUS_CONNECTED ) {
+    if( _status != WIFI_STATUS_CONNECTED ) {
         this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
@@ -639,7 +639,7 @@ bool WiFi::startPing( IPAddress host ) {
         return false;
     }
 
-    if( this->_status != WIFI_STATUS_CONNECTED ) {
+    if( _status != WIFI_STATUS_CONNECTED ) {
         this->endTask( ERR_WIFI_NOT_CONNECTED );
         return false;
     }
@@ -739,7 +739,7 @@ void WiFi::runTasks() {
         /* Current task : Disconnecting from WIFI */
         case TASK_WIFI_DISCONNECT: {
 
-            if( this->_status != WIFI_STATUS_DISCONNECTED ) {
+            if( _status != WIFI_STATUS_DISCONNECTED ) {
                 return;
             }
 

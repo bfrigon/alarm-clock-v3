@@ -107,12 +107,12 @@ void DateTime::set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
         sec = 59;
     }
 
-    this->_y = year;
-    this->_m = month;
-    this->_d = day;
-    this->_hh = hour;
-    this->_mm = min;
-    this->_ss = sec;
+    _y = year;
+    _m = month;
+    _d = day;
+    _hh = hour;
+    _mm = min;
+    _ss = sec;
 }
 
 
@@ -229,12 +229,12 @@ void DateTime::offset( long offset ) {
         return;
     }
 
-    int8_t ss = this->_ss;
-    int8_t mm = this->_mm;
-    int8_t hh = this->_hh;
-    long d = this->_d;
-    int8_t m = this->_m;
-    int16_t y = this->_y;
+    int8_t ss = _ss;
+    int8_t mm = _mm;
+    int8_t hh = _hh;
+    long d = _d;
+    int8_t m = _m;
+    int16_t y = _y;
 
     ss += ( offset % 60L );
     if( ss > 59 ) {
@@ -289,12 +289,12 @@ void DateTime::offset( long offset ) {
         }
     }
 
-    this->_ss = ss;
-    this->_mm = mm;
-    this->_hh = hh;
-    this->_d = d;
-    this->_m = m;
-    this->_y = y;
+    _ss = ss;
+    _mm = mm;
+    _hh = hh;
+    _d = d;
+    _m = m;
+    _y = y;
 }
 
 
@@ -327,23 +327,23 @@ unsigned long DateTime::getEpoch() {
     unsigned long days;
     
     /* Number of days since 1970 */
-    days = (( this->_y - 1970 ) * 365 );        
+    days = (( _y - 1970 ) * 365 );        
 
     /* Add number of leap years since 1972 */
-    days += (( this->_y - 1972 ) / 4 );         
-    days += ( this->_y % 4 ) ? 1 : 0;           
+    days += (( _y - 1972 ) / 4 );         
+    days += ( _y % 4 ) ? 1 : 0;           
 
     /* Add number of days since the begining of the current year 
        until the start of the current month */
     uint8_t i;
-    for( i = 1; i <= this->_m - 1; i++ ) {
-        days += getMonthNumDays( i, this->_y );
+    for( i = 1; i <= _m - 1; i++ ) {
+        days += getMonthNumDays( i, _y );
     }
 
     /* Add number of days in the current month */
-    days += ( this->_d - 1 );                   
+    days += ( _d - 1 );                   
 
-    return ( days * 86400L ) + ( this->_hh * 3600L ) + ( this->_mm * 60L ) + this->_ss;
+    return ( days * 86400L ) + ( _hh * 3600L ) + ( _mm * 60L ) + _ss;
 }
 
 

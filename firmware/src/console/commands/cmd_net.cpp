@@ -45,7 +45,7 @@ bool ConsoleBase::openCommandNetRestart() {
     _taskIndex = 0;
     this->startTask( TASK_CONSOLE_NET_RESTART );
 
-    this->printf_P( S_CONSOLE_NET_RECONNECTING, g_config.network.ssid );
+    this->printfln_P( S_CONSOLE_NET_RECONNECTING, g_config.network.ssid );
     g_wifi.disconnect();
     g_wifi.setAutoReconnect( true, true );
 
@@ -110,7 +110,7 @@ bool ConsoleBase::openCommandNetStart() {
 
     this->startTask( TASK_CONSOLE_NET_START );
 
-    this->printf_P( S_CONSOLE_NET_CONNECTING, g_config.network.ssid );
+    this->printfln_P( S_CONSOLE_NET_CONNECTING, g_config.network.ssid );
     g_wifi.connect();
     g_wifi.setAutoReconnect( true );
 
@@ -180,7 +180,7 @@ void ConsoleBase::printNetStatus() {
     }
     
     /* Print SSID */
-    this->printf_P( S_CONSOLE_NET_SSID, g_config.network.ssid );
+    this->printfln_P( S_CONSOLE_NET_SSID, g_config.network.ssid );
 
     /* Print if DHCP is ON or OFF */
     this->print_P( S_CONSOLE_NET_DHCP );
@@ -188,19 +188,19 @@ void ConsoleBase::printNetStatus() {
 
     /* Print local IP address */
     addr = g_wifi.getLocalIP();
-    this->printf_P( S_CONSOLE_NET_IP, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+    this->printfln_P( S_CONSOLE_NET_IP, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 
     /* Print subnet mask */
     addr = g_wifi.getSubmask();
-    this->printf_P( S_CONSOLE_NET_MASK, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+    this->printfln_P( S_CONSOLE_NET_MASK, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 
     /* Print gateway address */
     addr = g_wifi.getGateway();
-    this->printf_P( S_CONSOLE_NET_GATEWAY, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+    this->printfln_P( S_CONSOLE_NET_GATEWAY, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 
     /* Print DNS server address */
     addr = g_wifi.getDNS();
-    this->printf_P( S_CONSOLE_NET_DNS, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
+    this->printfln_P( S_CONSOLE_NET_DNS, addr[ 0 ], addr[ 1 ], addr[ 2 ], addr[ 3 ] );
 }
 
 
@@ -345,7 +345,7 @@ void ConsoleBase::runCommandPing() {
 
     /* Ping successful */
     if( rtt > 0 ) {
-        this->printf_P( S_CONSOLE_NET_PING_RESULT, ip[ 0 ], ip[ 1 ], ip[ 2 ], ip[ 3 ], rtt );
+        this->printfln_P( S_CONSOLE_NET_PING_RESULT, ip[ 0 ], ip[ 1 ], ip[ 2 ], ip[ 3 ], rtt );
 
         this->endTask( TASK_SUCCESS );
 

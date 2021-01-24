@@ -36,7 +36,7 @@ void TSL2591::suspend() {
 void TSL2591::resume() {
     this->sendCommand( TSL2591_REG_ENABLE, TSL2591_ENABLE_PON | TSL2591_ENABLE_AEN );
 
-    this->_lastIntegrationStart = millis();
+    _lastIntegrationStart = millis();
 }
 
 
@@ -56,11 +56,11 @@ void TSL2591::processEvents() {
 
 
 
-    if( millis() - this->_lastIntegrationStart < 1000 ) {
+    if( millis() - _lastIntegrationStart < 1000 ) {
         return;
     }
 
-    this->_lastIntegrationStart = millis();
+    _lastIntegrationStart = millis();
 
 
     uint16_t vis = this->readWord( TSL2591_REG_C0DATAL );
@@ -68,7 +68,7 @@ void TSL2591::processEvents() {
 
 
     float atime;
-    switch( this->_integration ) {
+    switch( _integration ) {
     
         case TSL2591_INTEGRATION_100MS: atime = 100.0F; break;
         case TSL2591_INTEGRATION_200MS: atime = 200.0F; break;
@@ -78,26 +78,26 @@ void TSL2591::processEvents() {
         case TSL2591_INTEGRATION_600MS: atime = 600.0F; break;
 
         default:
-            this->_lux = -1;
+            _lux = -1;
             return;
     }
 
     float again;
-    switch( this->_gain) {
+    switch( _gain) {
         case TSL2591_GAIN_LOW:      again = 1.0F;   break;
         case TSL2591_GAIN_MEDIUM:   again = 25.0F;  break;
         case TSL2591_GAIN_HIGH:     again = 428.0F; break;
         case TSL2591_GAIN_MAXIMUM:  again = 9876.0F; break;
 
         default:
-            this->_lux = -1;
+            _lux = -1;
             return;
     }
 
     float cpl;
     cpl = ( atime * again ) / TSL2591_LUX_DF;
 
-    this->_lux = (((float)vis - (float)ir)) * (1.0F - ((float)ir / (float)vis)) / cpl;
+    _lux = (((float)vis - (float)ir)) * (1.0F - ((float)ir / (float)vis)) / cpl;
 
     // Serial.print( "vis: ");
     // Serial.print( vis ); 
@@ -121,8 +121,8 @@ void TSL2591::configure( uint8_t gain, uint8_t integration ) {
         gain = TSL2591_GAIN_MAXIMUM;
     }
 
-    this->_integration = integration;
-    this->_gain = gain;
+    _integration = integration;
+    _gain = gain;
 
     uint8_t cfg = ( ( gain & 0x03 ) << 4 ) | ( integration & 0x07 ) ;
 

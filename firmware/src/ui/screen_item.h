@@ -137,49 +137,49 @@ class ScreenItem : protected ScreenItemBase {
 
 
     /* Gets the item type. */
-    uint8_t getType()                   { return this->_type; }
+    uint8_t getType()                   { return _type; }
 
     /* Gets the item ID. */
-    uint8_t getId()                     { return this->_id; }
+    uint8_t getId()                     { return _id; }
 
     /* Gets the zero-based Y position on the LCD. */
-    uint8_t getPositionRow()            { return this->_row; }
+    uint8_t getPositionRow()            { return _row; }
 
     /* Gets the zero-based X position on the LCD. */
-    uint8_t getPositionCol()            { return this->_col; }
+    uint8_t getPositionCol()            { return _col; }
 
     /* Gets a pointer to the caption. */
-    const void* getCaption()            { return this->_caption; }
+    const void* getCaption()            { return _caption; }
 
     /* Gets the item minimum value. */
-    uint8_t getMin()                    { return this->_min; }
+    uint8_t getMin()                    { return _min; }
 
     /* Gets the item maximum value. */
-    uint8_t getMax()                    { return this->_max; }
+    uint8_t getMax()                    { return _max; }
 
     /* Gets the item options */
-    uint8_t getOptions()                { return this->_options; }
+    uint8_t getOptions()                { return _options; }
 
     /* Gets the item field length */
-    uint8_t getLength()                 { return this->_length; }
+    uint8_t getLength()                 { return _length; }
 
     /* Gets a pointer to the list items */
-    const void* getListPtr()            { return this->_list; }
+    const void* getListPtr()            { return _list; }
 
     /* Gets a pointer to the value */
-    void* getValuePtr()                 { return this->_value; }
+    void* getValuePtr()                 { return _value; }
 
     /* Gets the value (unsigned integer)  */
-    uint8_t getValue()                  { return *( ( uint8_t* )this->_value ); }
+    uint8_t getValue()                  { return *( ( uint8_t* )_value ); }
 
     /* Gets the value (boolean)  */
-    bool getValueBoolean()              { return *( ( bool* )this->_value ); }
+    bool getValueBoolean()              { return *( ( bool* )_value ); }
 
     /* Sets the value (unsigned integer )  */
-    void setValue( uint8_t value )      { *( ( uint8_t* )this->_value ) = value; }
+    void setValue( uint8_t value )      { *( ( uint8_t* )_value ) = value; }
 
     /* Sets the value (boolean)  */
-    void setValueBoolean( bool value )  { *( ( bool* )this->_value ) = value; }
+    void setValueBoolean( bool value )  { *( ( bool* )_value ) = value; }
 };
 
 

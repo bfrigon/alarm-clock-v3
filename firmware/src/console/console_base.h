@@ -75,6 +75,7 @@ PROG_STR( S_COMMAND_NET_RESTART,      "net restart" );
 PROG_STR( S_COMMAND_NET_PING,         "net ping" );   /* alias of "ping" */
 PROG_STR( S_COMMAND_NSLOOKUP,         "nslookup" );
 PROG_STR( S_COMMAND_PING,             "ping" );
+PROG_STR( S_COMMAND_FREE,             "free" );
 PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
 PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
 PROG_STR( S_COMMAND_FACTORY_RESET,    "factory reset" );

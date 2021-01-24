@@ -78,8 +78,8 @@ void DS3231::enableInterrupt() {
     control |= DS3231_CTRL_A1IE; /* Enable alarm 1 interrupt */
     this->write( DS3231_REG_CONTROL, control );
 
-    pinMode( this->_pin_irq, INPUT_PULLUP );
-    attachInterrupt( digitalPinToInterrupt( this->_pin_irq ), isr_ds3231, LOW );
+    pinMode( _pin_irq, INPUT_PULLUP );
+    attachInterrupt( digitalPinToInterrupt( _pin_irq ), isr_ds3231, LOW );
 }
 
 
@@ -89,7 +89,7 @@ void DS3231::enableInterrupt() {
  * 
  */
 void DS3231::disableInterrupt() {
-    detachInterrupt( digitalPinToInterrupt( this->_pin_irq ) );
+    detachInterrupt( digitalPinToInterrupt( _pin_irq ) );
 }
 
 
@@ -255,7 +255,7 @@ void DS3231::readTime( DateTime *dt ) {
  * 
  */
 unsigned long DS3231::getEpoch() {
-    return this->_now.getEpoch();
+    return _now.getEpoch();
 }
 
 

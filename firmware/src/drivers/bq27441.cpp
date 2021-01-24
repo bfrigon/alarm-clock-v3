@@ -41,16 +41,16 @@ bool BQ27441::begin( uint16_t capacity ) {
     /* If POR flag is set, initialize data memory parameters. Otherwise,
        device is ready. */
     if( ( this->readWord( BQ27441_COMMAND_FLAGS ) & BQ27441_FLAG_ITPOR ) == 0 ) {
-        this->_init = true;
+        _init = true;
         return true;
     }
 
 
-    this->_init = true;
+    _init = true;
 
     /* Unseal memory access */
     if( this->unseal() == false ) {
-        this->_init = false;
+        _init = false;
         return false;
     }
 
@@ -66,7 +66,7 @@ bool BQ27441::begin( uint16_t capacity ) {
 
     /* Seal memory access */
     if( this->seal() == false ) {
-        this->_init = false;
+        _init = false;
         return false;
     }
 
@@ -89,7 +89,7 @@ bool BQ27441::begin( uint16_t capacity ) {
  * 
  */
 bool BQ27441::enterConfig() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -111,7 +111,7 @@ bool BQ27441::enterConfig() {
  * 
  */
 bool BQ27441::exitConfig() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -133,7 +133,7 @@ bool BQ27441::exitConfig() {
  * 
  */
 bool BQ27441::unseal() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -152,7 +152,7 @@ bool BQ27441::unseal() {
  * 
  */
 bool BQ27441::seal() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -170,7 +170,7 @@ bool BQ27441::seal() {
  * 
  */
 bool BQ27441::isReady() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -190,7 +190,7 @@ bool BQ27441::isReady() {
  * 
  */
 bool BQ27441::isBatteryPresent() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -230,7 +230,7 @@ bool BQ27441::isCharging() {
  * 
  */
 int16_t BQ27441::getAvgPower() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return 0;
     }
 
@@ -247,7 +247,7 @@ int16_t BQ27441::getAvgPower() {
  * 
  */
 int16_t BQ27441::getAvgCurrent() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return 0;
     }
 
@@ -270,7 +270,7 @@ int16_t BQ27441::getAvgCurrent() {
  * 
  */
 uint8_t BQ27441::getBatteryState() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return BATTERY_STATE_NOT_PRESENT;
     }
 
@@ -311,7 +311,7 @@ uint8_t BQ27441::getBatteryState() {
  * 
  */
 uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return 0;
     }
 
@@ -329,7 +329,7 @@ uint16_t BQ27441::getRemainingCapacity( bool filtered ) {
  * 
  */
 uint16_t BQ27441::getFullCapacity( bool filtered ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return 0;
     }
 
@@ -345,7 +345,7 @@ uint16_t BQ27441::getFullCapacity( bool filtered ) {
  * 
  */
 uint16_t BQ27441::getVoltage() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return 0;
     }
 
@@ -362,7 +362,7 @@ uint16_t BQ27441::getVoltage() {
  * 
  */
 int8_t BQ27441::getStateOfHealth() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return -1;
     }
 
@@ -396,7 +396,7 @@ int8_t BQ27441::getStateOfHealth() {
  * 
  */
 uint8_t BQ27441::getStateOfCharge( bool filtered ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return 0;
     }
 
@@ -553,7 +553,7 @@ bool BQ27441::executeControlCommand( uint8_t function ) {
  * 
  */
 bool BQ27441::readDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_t length ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 
@@ -594,7 +594,7 @@ bool BQ27441::readDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_
  * 
  */
 bool BQ27441::writeDataBlock( uint8_t classID, uint8_t offset, void* data, uint8_t length ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return false;
     }
 

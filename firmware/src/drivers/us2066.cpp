@@ -27,11 +27,11 @@
  * 
  */
 US2066::US2066( uint8_t address, uint8_t pin_reset ) {
-    this->_address = address;
-    this->_pin_reset = pin_reset;
+    _address = address;
+    _pin_reset = pin_reset;
 
     /* Initialize IPrint interface */
-    this->_initPrint();
+    _initPrint();
 }
 
 
@@ -41,19 +41,19 @@ US2066::US2066( uint8_t address, uint8_t pin_reset ) {
  * 
  */
 void US2066::begin() {
-    if( this->_init == true ) {
+    if( _init == true ) {
         return;
     }
 
-    this->_init = true;
+    _init = true;
 
     delay( 1 );
-    pinMode( this->_pin_reset, OUTPUT );
+    pinMode( _pin_reset, OUTPUT );
 
     /* Assert the reset pin the LCD module */
-    digitalWrite( this->_pin_reset, LOW );
+    digitalWrite( _pin_reset, LOW );
     delay( 1 );
-    digitalWrite( this->_pin_reset, HIGH );
+    digitalWrite( _pin_reset, HIGH );
     delay( 1 );
 
     /* Disable internal regulator */
@@ -115,14 +115,14 @@ void US2066::begin() {
  * 
  */
 void US2066::end() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         return;
     }
 
-    this->_init = false;
+    _init = false;
 
-    pinMode( this->_pin_reset, OUTPUT );
-    digitalWrite( this->_pin_reset, LOW );
+    pinMode( _pin_reset, OUTPUT );
+    digitalWrite( _pin_reset, LOW );
 
 
 }
@@ -146,7 +146,7 @@ void US2066::selectInstructions( uint8_t iset ) {
         case US2066_ISET_EXTENDED:
 
             /* If current set is oled, go back to extended set */
-            if( this->_current_iset == US2066_ISET_OLED ) {
+            if( _current_iset == US2066_ISET_OLED ) {
                 this->sendCommand( US2066_CMD_OLED_CHAR );
             }
 
@@ -157,11 +157,11 @@ void US2066::selectInstructions( uint8_t iset ) {
 
             fset = US2066_DEF_FSET | US2066_FUNC_BE;
 
-            if( this->_state.cgramBlink == true ) {
+            if( _state.cgramBlink == true ) {
                 fset |= US2066_FUNC_BE;
             }
 
-            if( this->_state.reverseDisplay == true ) {
+            if( _state.reverseDisplay == true ) {
                 fset |= US2066_FUNC_REV;
             }
 
@@ -180,7 +180,7 @@ void US2066::selectInstructions( uint8_t iset ) {
         default:
 
             /* If current set is oled, go back to extended set first */
-            if( this->_current_iset == US2066_ISET_OLED ) {
+            if( _current_iset == US2066_ISET_OLED ) {
                 this->sendCommand( US2066_CMD_OLED_CHAR );
             }
 
@@ -189,7 +189,7 @@ void US2066::selectInstructions( uint8_t iset ) {
             break;
     }
 
-    this->_current_iset = iset;
+    _current_iset = iset;
 }
 
 
@@ -211,7 +211,7 @@ void US2066::selectInstructions( uint8_t iset ) {
 uint8_t US2066::sendCommand( uint8_t cmd ) {
 
 
-    Wire.beginTransmission( this->_address );
+    Wire.beginTransmission( _address );
 
     Wire.write( US2066_MODE_CMD );
     Wire.write( cmd );
@@ -237,13 +237,13 @@ uint8_t US2066::sendCommand( uint8_t cmd ) {
  * 
  */
 uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
-    Wire.beginTransmission( this->_address );
+    Wire.beginTransmission( _address );
 
     Wire.write( US2066_MODE_CMD | US2066_MODE_CONTINUE );
     Wire.write( cmd );
 
     /* Data following commands in extended mode require D/C#=1 */
-    Wire.write( this->_current_iset == US2066_ISET_EXTENDED ? US2066_MODE_DATA : US2066_MODE_CMD );
+    Wire.write( _current_iset == US2066_ISET_EXTENDED ? US2066_MODE_DATA : US2066_MODE_CMD );
     Wire.write( data );
 
     return Wire.endTransmission();
@@ -268,7 +268,7 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
  */
 uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
 
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -278,7 +278,7 @@ uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
 
     for( ch = 0; ch < 8; ch++ ) {
 
-        Wire.beginTransmission( this->_address );
+        Wire.beginTransmission( _address );
         Wire.write( US2066_MODE_CMD | US2066_MODE_CONTINUE );
         Wire.write( US2066_CMD_CGRAM | ( ch << 3 ) );
 
@@ -311,7 +311,7 @@ uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
  * @param   col     Column number (0 based)
  */
 void US2066::setPosition( uint8_t row, uint8_t col ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -327,7 +327,7 @@ void US2066::setPosition( uint8_t row, uint8_t col ) {
  * 
  */
 void US2066::clear() {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -342,7 +342,7 @@ void US2066::clear() {
  * @param   contrast    Contrast value (0-255)
  */
 void US2066::setContrast( uint8_t contrast ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -367,12 +367,12 @@ void US2066::setContrast( uint8_t contrast ) {
  * @param   blinking     Blinking cursor (block).
  */
 void US2066::setCursor( bool underline, bool blinking ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
-    this->_state.cursor = underline;
-    this->_state.blink = blinking;
+    _state.cursor = underline;
+    _state.blink = blinking;
 
     this->updateDisplayState();
 }
@@ -386,12 +386,12 @@ void US2066::setCursor( bool underline, bool blinking ) {
  * @param   reverse     Reverse all pixels on the display.
  */
 void US2066::setDisplay( bool on, bool reverse ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
-    this->_state.display = on;
-    this->_state.reverseDisplay = reverse;
+    _state.display = on;
+    _state.reverseDisplay = reverse;
 
     this->updateDisplayState();
 
@@ -405,9 +405,9 @@ void US2066::setDisplay( bool on, bool reverse ) {
  * 
  */
 void US2066::updateDisplayState() {
-    uint8_t state = this->_state.blink |
-                    this->_state.cursor << 1 |
-                    this->_state.display << 2;
+    uint8_t state = _state.blink |
+                    _state.cursor << 1 |
+                    _state.display << 2;
 
     this->sendCommand( US2066_CMD_DISPLAY | state );
 
@@ -440,7 +440,7 @@ void US2066::updateDisplayState() {
  * 
  */
 void US2066::fill( char c, uint8_t num ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
@@ -465,11 +465,11 @@ void US2066::fill( char c, uint8_t num ) {
  * 
  */
 size_t US2066::_print( char c ) {
-    if( this->_init == false ) {
+    if( _init == false ) {
         this->begin();
     }
 
-    Wire.beginTransmission( this->_address );
+    Wire.beginTransmission( _address );
 
     Wire.write( US2066_MODE_DATA );
     Wire.write( c );
