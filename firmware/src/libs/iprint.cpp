@@ -64,7 +64,7 @@ void IPrint::_initPrint() {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::_print( const char *str, bool ptr_pgm_space ) {
+size_t IPrint::_print( const char *str, bool ptr_pgm_space ) {
     uint8_t num = 0;
 
     while( true ) {
@@ -109,7 +109,7 @@ uint8_t IPrint::_print( const char *str, bool ptr_pgm_space ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::_print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space ) {
+size_t IPrint::_print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space ) {
     uint8_t res;
     uint8_t num = 0;
     uint8_t slen;
@@ -200,7 +200,7 @@ uint8_t IPrint::_print( const char *str, uint8_t length, uint8_t align, bool ptr
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::print( char c ) {
+size_t IPrint::print( char c ) {
 
     /* Call the print function implemented in the parent class */
     return this->_print( c );
@@ -215,7 +215,7 @@ uint8_t IPrint::print( char c ) {
  *
  * @return  Number of characters written
  */
-uint8_t IPrint::print( const char *str ) {
+size_t IPrint::print( const char *str ) {
     return this->_print( str, false );
 }
 
@@ -235,7 +235,7 @@ uint8_t IPrint::print( const char *str ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::print( const char *str, uint8_t length, uint8_t align ) {
+size_t IPrint::print( const char *str, uint8_t length, uint8_t align ) {
     return this->_print( str, length, align, false );
 }
 
@@ -247,7 +247,7 @@ uint8_t IPrint::print( const char *str, uint8_t length, uint8_t align ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::println() {
+size_t IPrint::println() {
     return this->_print( "\r\n", false );
 }
 
@@ -262,7 +262,7 @@ uint8_t IPrint::println() {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::println( const char *str ) {
+size_t IPrint::println( const char *str ) {
     uint8_t n;
 
     n = this->_print( str, false );
@@ -288,7 +288,7 @@ uint8_t IPrint::println( const char *str ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::println( const char *str, uint8_t length, uint8_t align ) {
+size_t IPrint::println( const char *str, uint8_t length, uint8_t align ) {
     uint8_t n;
 
     n = this->_print( str, length, align, false );
@@ -308,7 +308,7 @@ uint8_t IPrint::println( const char *str, uint8_t length, uint8_t align ) {
  * @return  Number of characters printed.
  * 
  */
-uint8_t IPrint::printf( const char *format, ... ) {
+size_t IPrint::printf( const char *format, ... ) {
     va_list args;
     va_start( args, format );
 
@@ -323,6 +323,32 @@ uint8_t IPrint::printf( const char *format, ... ) {
 
 /*! ------------------------------------------------------------------------
  *
+ * @brief   Prints a formated string using a format string contained in SRAM
+ *          and sends a carriage return.
+ *
+ * @param   format    Pointer to the string to print.
+ * @param   ...       Additional arguments.
+ *
+ * @return  Number of characters printed.
+ * 
+ */
+size_t IPrint::printfln( const char *format, ... ) {
+    va_list args;
+    va_start( args, format );
+
+    uint8_t length;
+    length = vfprintf( &_stream, format, args );
+
+    va_end( args );
+
+    length += this->println();
+
+    return length;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
  * @brief   Prints a character array contained in program memory
  *
  * @param   str    Pointer to the string to print.
@@ -330,7 +356,7 @@ uint8_t IPrint::printf( const char *format, ... ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::print_P( const char *str ) {
+size_t IPrint::print_P( const char *str ) {
     return this->_print( str, true );
 }
 
@@ -351,7 +377,7 @@ uint8_t IPrint::print_P( const char *str ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::print_P( const char *str, uint8_t length, uint8_t align ) {
+size_t IPrint::print_P( const char *str, uint8_t length, uint8_t align ) {
     return this->_print( str, length, align, true );
 }
 
@@ -366,7 +392,7 @@ uint8_t IPrint::print_P( const char *str, uint8_t length, uint8_t align ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::println_P( const char *str ) {
+size_t IPrint::println_P( const char *str ) {
     uint8_t n;
 
     n = this->_print( str, true );
@@ -392,7 +418,7 @@ uint8_t IPrint::println_P( const char *str ) {
  * @return  Number of characters written
  * 
  */
-uint8_t IPrint::println_P( const char *str, uint8_t length, uint8_t align ) {
+size_t IPrint::println_P( const char *str, uint8_t length, uint8_t align ) {
     uint8_t n;
 
     n = this->_print( str, length, align, true );
@@ -413,7 +439,7 @@ uint8_t IPrint::println_P( const char *str, uint8_t length, uint8_t align ) {
  * @return  Number of characters printed.
  * 
  */
-uint8_t IPrint::printf_P( const char *format, ... ) {
+size_t IPrint::printf_P( const char *format, ... ) {
     va_list args;
     va_start( args, format );
 
@@ -421,6 +447,32 @@ uint8_t IPrint::printf_P( const char *format, ... ) {
     length = vfprintf_P( &_stream, format, args );
 
     va_end( args );
+
+    return length;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Prints a formated string using a format string contained in 
+ *          program memory and sends a carriage return.
+ *
+ * @param   format    Pointer to the string to print.
+ * @param   ...       Additional arguments.
+ *
+ * @return  Number of characters printed.
+ * 
+ */
+size_t IPrint::printfln_P( const char *format, ... ) {
+    va_list args;
+    va_start( args, format );
+
+    uint8_t length;
+    length = vfprintf_P( &_stream, format, args );
+
+    va_end( args );
+
+    length += this->println();
 
     return length;
 }
@@ -438,7 +490,7 @@ uint8_t IPrint::printf_P( const char *format, ... ) {
  * @return  Number of characters printed.
  * 
  */
-uint8_t IPrint::printTimeInterval( unsigned long time, const char *separator, bool compact ) {
+size_t IPrint::printTimeInterval( unsigned long time, const char *separator, bool compact ) {
 
     uint8_t seconds, minutes, hours;
     seconds = ( time % 60L );

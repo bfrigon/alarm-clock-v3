@@ -34,29 +34,31 @@ class IPrint {
 
   public: 
 
-    uint8_t print( char c );
-    uint8_t print( const char *str );
-    uint8_t print( const char *str, uint8_t length, uint8_t align );
-    uint8_t println();
-    uint8_t println( const char *str );
-    uint8_t println( const char *str, uint8_t length, uint8_t align );
-    uint8_t printf( const char *format, ... );
+    size_t print( char c );
+    size_t print( const char *str );
+    size_t print( const char *str, uint8_t length, uint8_t align );
+    size_t println();
+    size_t println( const char *str );
+    size_t println( const char *str, uint8_t length, uint8_t align );
+    size_t printf( const char *format, ... );
+    size_t printfln( const char *format, ... );
 
-    uint8_t print_P( const char *str );
-    uint8_t print_P( const char *str, uint8_t length, uint8_t align );
-    uint8_t println_P( const char *str );
-    uint8_t println_P( const char *str, uint8_t length, uint8_t align );
-    uint8_t printf_P( const char *format, ... );
+    size_t print_P( const char *str );
+    size_t print_P( const char *str, uint8_t length, uint8_t align );
+    size_t println_P( const char *str );
+    size_t println_P( const char *str, uint8_t length, uint8_t align );
+    size_t printf_P( const char *format, ... );
+    size_t printfln_P( const char *format, ... );
 
-    uint8_t printTimeInterval( unsigned long seconds, const char *separator = S_DATETIME_SEPARATOR_SPACE, bool compact = false );
+    size_t printTimeInterval( unsigned long seconds, const char *separator = S_DATETIME_SEPARATOR_SPACE, bool compact = false );
     
   private:
     FILE _stream = {0};
     static int _cb_putchar( char ch, FILE *stream );
 
     virtual size_t _print( char c ) = 0;
-    uint8_t _print( const char *str, bool ptr_pgm_space = false );
-    uint8_t _print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
+    size_t _print( const char *str, bool ptr_pgm_space = false );
+    size_t _print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
 
   protected:
     void _initPrint();
