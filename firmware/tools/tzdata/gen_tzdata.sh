@@ -26,6 +26,8 @@ DIR_TZDB="./cache"
 
 OUTPUT_TZDATA="src/libs/tzdata.h"
 
+REGION_DATABASE_FILE="../regions.dat"
+
 ## Timezone files to process
 TZ_FILES=(
     "africa"
@@ -35,13 +37,14 @@ TZ_FILES=(
     "europe"
     "northamerica"
     "southamerica"
-    # "etcetera"
-    # "factory"
+    "etcetera"
 )
 
 ## Zones to ignore
-ZONES_BLACKLIST="EST;MST;HST;EST5EDT;CST6CDT;MST7MDT;PST8PDT;CET;EET;WET;MET;Etc/UTC"
+ZONES_BLACKLIST="EST;MST;HST;EST5EDT;CST6CDT;MST7MDT;PST8PDT;CET;EET;WET;MET;Etc/UTC;GMT"
 
+
+PADDING=40
 
 ################################################################################
 function parseTime() {
@@ -234,6 +237,7 @@ for name in "${!zone_link[@]}"; do
     link_to=${zone_link[$name]}
 
     [ -z "${zone[$link_to]}" ] && continue;
+    [[ "$ZONES_BLACKLIST" == *"${name}"* ]] && continue
 
     zone[$name]=${zone[$link_to]}
     zone_std_offset[$name]=${zone_std_offset[$link_to]}
@@ -247,6 +251,23 @@ echo
 
 ##------------------------------------------------------------------------------
 ##
+## Load region assignment
+##
+##------------------------------------------------------------------------------
+declare -A zone_region
+
+while read -ra line; do
+    
+    region=${line[0]^^}
+    name=${line[1]//[$'\t\r\n']}
+
+    zone_region[$name]=$region
+
+done < $REGION_DATABASE_FILE
+
+
+##------------------------------------------------------------------------------
+##
 ## Generate timezone header files
 ##
 ##------------------------------------------------------------------------------
@@ -255,10 +276,12 @@ echo "Build timezone table..."
 filename_tz_names="__zone_names.h"
 filename_abbrev_list="__abbrev_list.h"
 filename_tz_table="__tz_table.h"
+filename_tz_table_indexes="__tz_table_indexes.h"
 
 rm -f $filename_tz_names
 rm -f $filename_abbrev_list
 rm -f $filename_tz_table
+rm -f $filename_tz_table_indexes
 
 
 declare -A abbrev_list
@@ -281,6 +304,9 @@ for zone_name in "${!zone[@]}"; do
     dst_letter=${rule_dst_letter[$zone_rule]}
     dst_save=${rule_dst_save[$zone_rule]}
 
+    var_zone_region=${zone_region[$zone_name]^^}
+    [[ -z "$var_zone_region" ]] && var_zone_region="UNKNOWN"
+
     [[ "$dst_letter" == "-" ]] && dst_letter=""
     [[ "$std_letter" == "-" ]] && std_letter=""
 
@@ -293,7 +319,7 @@ for zone_name in "${!zone[@]}"; do
     var_zone_name=${var_zone_name//'+'/'P'}
     var_zone_name=${var_zone_name//'-'/'_'}
 
-    echo "const char ${var_zone_name^^}[] PROGMEM = { \"$zone_name\" };" >> $filename_tz_names
+    echo "const char ${var_zone_name^^}[] PROGMEM = { \"${zone_name}\" };" >> $filename_tz_names
 
 
     ##--------------------------------------------------------------
@@ -309,7 +335,7 @@ for zone_name in "${!zone[@]}"; do
 
         abbrev_list[$var_abbrev_dst]=$abbrev_dst
     else
-        var_abbrev_dst="TZ_NULL"
+        var_abbrev_dst="NULL"
     fi
 
 
@@ -326,7 +352,7 @@ for zone_name in "${!zone[@]}"; do
 
         abbrev_list[$var_abbrev_std]=$abbrev_std
     else
-        var_abbrev_std="TZ_NULL"
+        var_abbrev_std="NULL"
     fi
 
     
@@ -403,8 +429,8 @@ for zone_name in "${!zone[@]}"; do
     else
         dst_week=0
     fi
-  
 
+    
 
     ##--------------------------------------------------------------
     ## Write the timezone table entry to the output
@@ -424,7 +450,12 @@ for zone_name in "${!zone[@]}"; do
         fi
     fi
 
-    echo "    { $var_zone_name, $std_def, $dst_def }," >> $filename_tz_table
+    echo "${var_zone_region}|${zone_name##*'/'}|    { $var_zone_name, $std_def, $dst_def }," >> $filename_tz_table
+
+
+    if [[ "$var_zone_region" == "UNKNOWN" ]]; then
+        echo "Zone '$zone_name' does not have an assigned region!"
+    fi;
 done
 
 
@@ -435,16 +466,48 @@ for name in "${!abbrev_list[@]}"; do
     echo "const char $name[] PROGMEM = { \"${abbrev_list[$name]}\" };" >> $filename_abbrev_list
 done
 
+
+echo "const char TZ_UTC[] PROGMEM = { \"UTC\" };" >> $filename_abbrev_list
+echo "const char TZ_ETC_UTC[] PROGMEM = { \"Etc/UTC\" };" >> $filename_tz_names
+echo "ETCETERA|UTC|    { TZ_ETC_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC }," >> $filename_tz_table
+
 echo "Sorting table entries..."
 sort -o $filename_tz_names $filename_tz_names
 sort -o $filename_abbrev_list $filename_abbrev_list
 sort -o $filename_tz_table $filename_tz_table
 
 
+
+##--------------------------------------------------------------
+## Determine the starting index and size of each regions
+##--------------------------------------------------------------
+index=0
+current_region=""
+while IFS='|' read -ra line; do
+    region="${line[0]}"
+
+    if [[ "$region" != "$current_region" ]]; then
+
+        if [[ ! -z $current_region ]]; then
+            printf "%-${PADDING}s %d\r\n" "#define TZ_REGION_${current_region}_SIZE" $(( index - current_region_index )) >> $filename_tz_table_indexes
+        fi
+
+        current_region=$region
+        current_region_index=$index;
+        
+        printf "%-${PADDING}s %d\r\n" "#define TZ_REGION_${current_region}_INDEX" ${index} >> $filename_tz_table_indexes
+
+    fi;
+
+    index=$(( ${index} + 1 ))
+done < $filename_tz_table
+
+printf "%-${PADDING}s %d\r\n" "#define TZ_REGION_${current_region}_SIZE" $(( index - current_region_index )) >> $filename_tz_table_indexes
+
+
 ##--------------------------------------------------------------
 ## Assemble the timezone data header file
 ##--------------------------------------------------------------
-
 output="../../../$OUTPUT_TZDATA"
 header_name="${OUTPUT_TZDATA##*/}"
 header_name="${header_name//'.'/'_'}"
@@ -483,27 +546,29 @@ echo "//************************************************************************
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include \"time.h\"
+#include \"timezone.h\"
 " > $output
 
-echo "#define MAX_TIMEZONE_ID     ${#zone[@]}" >> $output
-echo "#define TZ_DB_VERSION       \"$tzdb_version\"" >> $output
+printf "%-${PADDING}s %s\r\n" "#define MAX_TIMEZONE_ID" "$(( ${#zone[@]} + 1 ))" >> $output
+printf "%-${PADDING}s %s\r\n" "#define TZ_DB_VERSION" "\"$tzdb_version\"" >> $output
+echo >> $output
+cat $filename_tz_table_indexes >> $output
 echo >> $output
 echo >> $output
 
-echo "const char TZ_UTC[] PROGMEM = { \"UTC\" };" >> $output
+echo "/* Timezone abbreviations */" >> $output
 cat $filename_abbrev_list >> $output
 echo >> $output
 echo >> $output
 
-echo "const char TZ_ETC_UTC[] PROGMEM = { \"Etc/UTC\" };" >> $output
+echo "/* Timezone names */" >> $output
 cat $filename_tz_names >> $output
 echo >> $output
 echo >> $output
 
+echo "/* Timezone rules table */" >> $output
 echo "const TimeZoneRules TimeZonesTable[] PROGMEM = {" >> $output
-echo "    { TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC }," >> $output
-cat $filename_tz_table >> $output
+cut -d'|' -f3  $filename_tz_table >> $output
 echo "};" >> $output
 
 echo >> $output

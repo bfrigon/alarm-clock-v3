@@ -153,7 +153,6 @@ bool QT1070::writeConfig() {
 uint8_t QT1070::processEvents() {
 
     uint8_t key = 0;
-    int16_t strongestSignal;
     unsigned long lastEventDelay;
 
     /* Calculate the elapsed time since the last event */

@@ -120,10 +120,11 @@ PROG_STR( S_ALARM_NUM2,                 "2." );
 /* Main menu strings */
 PROG_STR( S_MAIN_MENU_SET_ALARMS,       "Set alarms" );
 PROG_STR( S_MAIN_MENU_SET_TIME,         "Set time" );
-PROG_STR( S_MAIN_MENU_DISPLAY,          "Display" );
-PROG_STR( S_MAIN_MENU_NETWORK,          "Network" );
-PROG_STR( S_MAIN_MENU_LAMP,             "Night lamp" );
 PROG_STR( S_MAIN_MENU_PROFILES,         "Profiles" );
+PROG_STR( S_MAIN_MENU_DISPLAY,          "Display" );
+PROG_STR( S_MAIN_MENU_LAMP,             "Night lamp" );
+PROG_STR( S_MAIN_MENU_TIMEZONE,         "Set timezone" );
+PROG_STR( S_MAIN_MENU_NETWORK,          "Network" );
 PROG_STR( S_MAIN_MENU_SERVICES,         "Services" );
 PROG_STR( S_MAIN_MENU_SETTINGS,         "Settings" );
 

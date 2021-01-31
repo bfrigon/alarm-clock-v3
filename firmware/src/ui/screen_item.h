@@ -23,19 +23,22 @@
 
 
 /* Item attributes */
+#define ITEM_NORMAL                     0x00
 #define ITEM_NOCURSOR                   0x08
 #define ITEM_BREAK                      0x10
 #define ITEM_EDIT_FULLSCREEN            0x20
-#define ITEM_NORMAL                     0x00
 #define ITEM_COMPACT                    0x40
 #define ITEM_READONLY                   0x80
+
 #define ITEM_LIST_SRAM_POINTER          0x01
 #define ITEM_LIST_PROGMEM_POINTER       0x00
-#define ITEM_LIST_POINTER_CALLBACK      0x02
+#define ITEM_LIST_VALUE_INT8            0x00
+#define ITEM_LIST_VALUE_INT16           0x02
 #define ITEM_CAPTION_SRAM_POINTER       0x04
 #define ITEM_CAPTION_PROGMEM_POINTER    0x00
 #define ITEM_NUMBER_INC_DIGITS          0x00
 #define ITEM_NUMBER_INC_WHOLE           0x02
+
 
 /* Item types */
 enum {
@@ -152,13 +155,13 @@ class ScreenItem : protected ScreenItemBase {
     const void* getCaption()            { return _caption; }
 
     /* Gets the item minimum value. */
-    uint8_t getMin()                    { return _min; }
+    uint16_t getMin()                   { return _min; }
 
     /* Gets the item maximum value. */
-    uint8_t getMax()                    { return _max; }
+    uint16_t getMax()                   { return _max; }
 
     /* Gets the item options */
-    uint8_t getOptions()                { return _options; }
+    bool getOption( uint8_t mask )   { return ( _options & mask ) == mask; }
 
     /* Gets the item field length */
     uint8_t getLength()                 { return _length; }
@@ -172,11 +175,17 @@ class ScreenItem : protected ScreenItemBase {
     /* Gets the value (unsigned integer)  */
     uint8_t getValue()                  { return *( ( uint8_t* )_value ); }
 
+    /* Gets the value (unsigned short)  */
+    uint16_t getValueShort()             { return *( ( uint16_t* )_value ); }
+
     /* Gets the value (boolean)  */
     bool getValueBoolean()              { return *( ( bool* )_value ); }
 
     /* Sets the value (unsigned integer )  */
     void setValue( uint8_t value )      { *( ( uint8_t* )_value ) = value; }
+
+    /* Sets the value (unsigned short )  */
+    void setValueShort( uint16_t value ) { *( ( uint16_t* )_value ) = value; }
 
     /* Sets the value (boolean)  */
     void setValueBoolean( bool value )  { *( ( bool* )_value ) = value; }

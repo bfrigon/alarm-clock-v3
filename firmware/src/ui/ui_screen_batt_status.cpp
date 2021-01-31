@@ -195,7 +195,7 @@ void battStatus_onTimeout( Screen* screen ) {
  * @param   screen    Pointer to the screen where the event occured.
  * 
  */
-void battStatus_onEnterScreen( Screen* screen ) {
+void battStatus_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
     g_battStatusPage = 0;
 
     screen->setTimeout( 1000 );

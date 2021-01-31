@@ -26,6 +26,7 @@
 #include "../config.h"
 #include "../alarm.h"
 #include "../resources.h"
+#include "../libs/tzdata.h"
 
 
 // ----------------------------------------
@@ -38,9 +39,28 @@ enum {
     ID_MAIN_LIST_PROFILES,
     ID_MAIN_EDIT_DISPLAY,
     ID_MAIN_EDIT_LAMP,
+    ID_MAIN_SELECT_TIMEZONE,
     ID_MAIN_EDIT_NETWORK,
     ID_MAIN_SERVICES,
     ID_MAIN_SETTINGS,
+
+    /* --- Select timezone screen --- */
+    ID_TZ_REGION_AFRICA,
+    ID_TZ_REGION_ANTARCTICA,
+    ID_TZ_REGION_ARCTIC_OCEAN,
+    ID_TZ_REGION_ASIA,
+    ID_TZ_REGION_ATLANTIC_OCEAN,
+    ID_TZ_REGION_AUSTRALIA,
+    ID_TZ_REGION_CARIBBEAN,
+    ID_TZ_REGION_CENTRAL_AMERICA,
+    ID_TZ_REGION_ETCETERA,
+    ID_TZ_REGION_EUROPE,
+    ID_TZ_REGION_INDIAN_OCEAN,
+    ID_TZ_REGION_NORTH_AMERICA,
+    TD_TZ_REGION_MIDDLE_EAST,
+    ID_TZ_REGION_PACIFIC_OCEAN,
+    ID_TZ_REGION_SOUTH_AMERICA,
+    ID_TZ_REGION_UNKNOWN,
 
     /* --- Set alarms screen --- */
     ID_ALARM_ON_1,
@@ -135,6 +155,7 @@ enum {
     SCREEN_ID_BATT_STATUS,
     SCREEN_ID_NET_STATUS,
     SCREEN_ID_SERVICES,
+    SCREEN_ID_SELECT_TIMEZONE,
 };
 
 
@@ -142,31 +163,35 @@ void enableNightLamp();
 void disableNightLamp();
 
 /* default screen events */
-void onEnterScreen( Screen* screen );
+void onEnterScreen( Screen* screen, uint8_t prevScreenID );
 bool onExitScreen( Screen* currentScreen );
 void onValueChange( Screen* screen, ScreenItem* item );
 void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen );
-bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
+bool onDrawItem( Screen* screen, ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col );
 bool onKeypress( Screen* screen, uint8_t key );
 
 /* Root screen events */
-void rootScreen_onEnterScreen( Screen* screen );
 bool rootScreen_onDrawScreen( Screen* screen );
 bool rootScreen_onKeypress( Screen* screen, uint8_t key );
 
 /* Suspend screen events */
-void suspendScreen_onEnterScreen( Screen* screen );
 bool suspendScreen_onKeypress( Screen* screen, uint8_t key );
 bool suspendScreen_onDrawScreen( Screen* screen );
 
 /* Show alarm screen events */
-void showAlarmScreen_onEnterScreen( Screen* screen );
+void showAlarmScreen_onEnterScreen( Screen* screen, uint8_t prevScreenID );
 bool showAlarmScreen_onExitScreen( Screen* screen  );
 bool showAlarmScreen_onKeypress( Screen* screen, uint8_t key );
 bool showAlarmScreen_onDrawScreen( Screen* screen );
 
+/* Select timezone screen */
+void selectTimezone_onEnterScreen( Screen* screen, uint8_t prevScreenID );
+bool selectTimezone_onExitScreen( Screen* screen  );
+bool selectTimezone_onDrawItem( Screen* screen, ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col );
+void selectTimezone_onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen );
+
 /* Active alarm screen events */
-void alarmScreen_onEnterScreen( Screen* currentScreen );
+void alarmScreen_onEnterScreen( Screen* screen, uint8_t prevScreenID );
 bool alarmScreen_onKeypress( Screen* screen, uint8_t key );
 bool alarmScreen_onDrawScreen( Screen* screen );
 void alarmScreen_onTimeout( Screen* screen );
@@ -177,15 +202,15 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item );
 /* Settings manager screen events */
 bool settingsManager_onDrawScreen( Screen* screen );
 bool settingsManager_onKeypress( Screen* screen, uint8_t key );
-void settingsManager_onEnterScreen( Screen* screen );
+void settingsManager_onEnterScreen( Screen* screen, uint8_t prevScreenID );
 
 bool battStatus_onDrawScreen( Screen* screen );
 void battStatus_onTimeout( Screen* screen );
-void battStatus_onEnterScreen( Screen* screen );
+void battStatus_onEnterScreen( Screen* screen, uint8_t prevScreenID );
 bool battStatus_onKeypress( Screen* screen, uint8_t key );
 
 bool netStatus_onDrawScreen( Screen* screen );
-void netStatus_onEnterScreen( Screen* screen );
+void netStatus_onEnterScreen( Screen* screen, uint8_t prevScreenID );
 bool netStatus_onKeypress( Screen* screen, uint8_t key );
 
 
@@ -193,6 +218,7 @@ extern struct Time adjTime;
 extern struct Date adjDate;
 extern uint8_t selectedProfile;
 extern uint8_t selectedAlarm;
+extern uint16_t g_selectedTimezone;
 
 
 
@@ -244,6 +270,75 @@ PROGMEM const ScreenData screen_suspend {
     eventSelectionChanged : NULL,
     eventTimeout          : NULL,
 };
+
+
+// ----------------------------------------
+// Select timezone screen
+// ----------------------------------------
+PROGMEM const struct ScreenItemBase ITEMS_SELECT_TIMEZONE[] = {
+
+    ITEM_LIST( ID_TZ_REGION_AFRICA, 0, 0, S_TZ_REGION_AFRICA, &g_selectedTimezone, NULL,
+               TZ_REGION_AFRICA_INDEX, TZ_REGION_AFRICA_INDEX + TZ_REGION_AFRICA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( ID_TZ_REGION_ANTARCTICA, 1, 0, S_TZ_REGION_ANTARCTICA, &g_selectedTimezone, NULL,
+               TZ_REGION_ANTARCTICA_INDEX, TZ_REGION_ANTARCTICA_INDEX + TZ_REGION_ANTARCTICA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_ARCTIC_OCEAN, 2, 0, S_TZ_REGION_ARCTIC_OCEAN, &g_selectedTimezone, NULL,
+               TZ_REGION_ARCTIC_OCEAN_INDEX, TZ_REGION_ARCTIC_OCEAN_INDEX + TZ_REGION_ARCTIC_OCEAN_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_ASIA, 3, 0, S_TZ_REGION_ASIA, &g_selectedTimezone, NULL,
+               TZ_REGION_ASIA_INDEX, TZ_REGION_ASIA_INDEX + TZ_REGION_ASIA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_ATLANTIC_OCEAN, 4, 0, S_TZ_REGION_ATLANTIC_OCEAN, &g_selectedTimezone, NULL,
+               TZ_REGION_ATLANTIC_OCEAN_INDEX, TZ_REGION_ATLANTIC_OCEAN_INDEX + TZ_REGION_ATLANTIC_OCEAN_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_AUSTRALIA, 5, 0, S_TZ_REGION_AUSTRALIA, &g_selectedTimezone, NULL,
+               TZ_REGION_AUSTRALIA_INDEX, TZ_REGION_AUSTRALIA_INDEX + TZ_REGION_AUSTRALIA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_CARIBBEAN, 6, 0, S_TZ_REGION_CARIBBEAN, &g_selectedTimezone, NULL,
+               TZ_REGION_CARIBBEAN_INDEX, TZ_REGION_CARIBBEAN_INDEX + TZ_REGION_CARIBBEAN_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_CENTRAL_AMERICA, 7, 0, S_TZ_REGION_CENTRAL_AMERICA, &g_selectedTimezone, NULL,
+               TZ_REGION_CENTRAL_AMERICA_INDEX, TZ_REGION_CENTRAL_AMERICA_INDEX + TZ_REGION_CENTRAL_AMERICA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( ID_TZ_REGION_ETCETERA, 8, 0, S_TZ_REGION_ETCETERA, &g_selectedTimezone, NULL,
+               TZ_REGION_ETCETERA_INDEX, TZ_REGION_ETCETERA_INDEX + TZ_REGION_ETCETERA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( ID_TZ_REGION_EUROPE, 9, 0, S_TZ_REGION_EUROPE, &g_selectedTimezone, NULL,
+               TZ_REGION_EUROPE_INDEX, TZ_REGION_EUROPE_INDEX + TZ_REGION_EUROPE_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( ID_TZ_REGION_INDIAN_OCEAN, 10, 0, S_TZ_REGION_INDIAN_OCEAN, &g_selectedTimezone, NULL,
+               TZ_REGION_INDIAN_OCEAN_INDEX, TZ_REGION_INDIAN_OCEAN_INDEX + TZ_REGION_INDIAN_OCEAN_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( TD_TZ_REGION_MIDDLE_EAST, 11, 0, S_TZ_REGION_MIDDLE_EAST, &g_selectedTimezone, NULL,
+               TZ_REGION_MIDDLE_EAST_INDEX, TZ_REGION_MIDDLE_EAST_INDEX + TZ_REGION_MIDDLE_EAST_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
+    ITEM_LIST( ID_TZ_REGION_NORTH_AMERICA, 12, 0, S_TZ_REGION_NORTH_AMERICA, &g_selectedTimezone, NULL,
+               TZ_REGION_NORTH_AMERICA_INDEX, TZ_REGION_NORTH_AMERICA_INDEX + TZ_REGION_NORTH_AMERICA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( ID_TZ_REGION_PACIFIC_OCEAN, 13, 0, S_TZ_REGION_PACIFIC_OCEAN, &g_selectedTimezone, NULL,
+               TZ_REGION_PACIFIC_OCEAN_INDEX, TZ_REGION_PACIFIC_OCEAN_INDEX + TZ_REGION_PACIFIC_OCEAN_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_LIST( ID_TZ_REGION_SOUTH_AMERICA, 14, 0, S_TZ_REGION_SOUTH_AMERICA, &g_selectedTimezone, NULL,
+               TZ_REGION_SOUTH_AMERICA_INDEX, TZ_REGION_SOUTH_AMERICA_INDEX + TZ_REGION_SOUTH_AMERICA_SIZE - 1, 
+               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
+    ITEM_END()
+};
+
+PROGMEM const ScreenData screen_select_timezone {
+    id                    : SCREEN_ID_SELECT_TIMEZONE, 
+    items                 : ITEMS_SELECT_TIMEZONE,
+    customCharacterSet    : CUSTOM_CHARACTERS_DEFAULT,
+    eventEnterScreen      : &selectTimezone_onEnterScreen,
+    eventExitScreen       : &selectTimezone_onExitScreen,
+    eventValueChange      : NULL,
+    eventDrawScreen       : NULL,
+    eventKeypress         : NULL,
+    eventDrawItem         : &selectTimezone_onDrawItem,
+    eventSelectionChanged : &selectTimezone_onSelectionChange,
+    eventTimeout          : NULL,
+};
+
 
 // ----------------------------------------
 // Edit alarm screen
@@ -434,7 +529,7 @@ PROGMEM const ScreenData screen_edit_alarm_lamp {
 PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE[] = {
     ITEM_LIST( ID_PROFILE_FILENAME, 0, 0, S_EDIT_PROFILE_FILENAME, NULL,
                &g_alarm.profile.filename, 0, 0, MAX_LENGTH_ALARM_FILENAME,
-               ITEM_LIST_SRAM_POINTER | ITEM_EDIT_FULLSCREEN ),
+               ITEM_LIST_SRAM_POINTER | ITEM_EDIT_FULLSCREEN | ITEM_COMPACT ),
 
     ITEM_BAR( ID_PROFILE_VOLUME, 1, 0, S_EDIT_PROFILE_VOLUME, &g_alarm.profile.volume,
               MIN_ALARM_VOLUME, MAX_ALARM_VOLUME, 10, ITEM_EDIT_FULLSCREEN ),
@@ -513,11 +608,11 @@ PROGMEM const struct ScreenItemBase ITEMS_DISPLAY_SETTINGS[] = {
 
     ITEM_LIST( ID_DATE_FORMAT, 4, 0, S_MENU_SETTINGS_DATE_FMT, &g_config.clock.date_format,
                _DATE_FORMATS, 0, MAX_DATE_FORMATS - 1, DATE_FORMAT_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN | ITEM_COMPACT ),
 
     ITEM_LIST( ID_ALS_PRESET, 5, 0, S_MENU_SETTINGS_ALS_PRESET, &g_config.clock.als_preset,
                _ALS_PRESET_NAMES, 0, MAX_ALS_PRESETS_NAMES - 1, ALS_PRESET_NAME_LENGTH,
-               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN ),
+               ITEM_LIST_PROGMEM_POINTER | ITEM_EDIT_FULLSCREEN | ITEM_COMPACT ),
 
     ITEM_END()
 };
@@ -709,12 +804,13 @@ PROGMEM const ScreenData screen_menu_services {
 PROGMEM const struct ScreenItemBase ITEMS_MAIN_MENU[] = {
     ITEM_LINK( ID_MAIN_SET_ALARMS, 0, 0, S_MAIN_MENU_SET_ALARMS, &screen_set_alarms, ITEM_NORMAL ),
     ITEM_LINK( ID_MAIN_SET_TIME, 1, 0, S_MAIN_MENU_SET_TIME, &screen_set_time, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_LIST_PROFILES, 2, 0, S_MAIN_MENU_PROFILES, &screen_list_profiles, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_EDIT_DISPLAY, 3, 0, S_MAIN_MENU_DISPLAY, &screen_display, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_EDIT_LAMP, 4, 0, S_MAIN_MENU_LAMP, &screen_edit_night_lamp, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_EDIT_NETWORK, 5, 0, S_MAIN_MENU_NETWORK, &screen_network, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_SERVICES, 6, 0, S_MAIN_MENU_SERVICES, &screen_menu_services, ITEM_NORMAL ),
-    ITEM_LINK( ID_MAIN_SETTINGS, 7, 0, S_MAIN_MENU_SETTINGS, &screen_menu_settings, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_SELECT_TIMEZONE, 2, 0, S_MAIN_MENU_TIMEZONE, &screen_select_timezone, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_LIST_PROFILES, 3, 0, S_MAIN_MENU_PROFILES, &screen_list_profiles, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_EDIT_DISPLAY, 4, 0, S_MAIN_MENU_DISPLAY, &screen_display, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_EDIT_LAMP, 5, 0, S_MAIN_MENU_LAMP, &screen_edit_night_lamp, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_EDIT_NETWORK, 6, 0, S_MAIN_MENU_NETWORK, &screen_network, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_SERVICES, 7, 0, S_MAIN_MENU_SERVICES, &screen_menu_services, ITEM_NORMAL ),
+    ITEM_LINK( ID_MAIN_SETTINGS, 8, 0, S_MAIN_MENU_SETTINGS, &screen_menu_settings, ITEM_NORMAL ),
     ITEM_END()
 };
 

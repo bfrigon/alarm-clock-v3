@@ -246,5 +246,9 @@ void loop() {
         if( g_screen.getId() == SCREEN_ID_ROOT ) {
             g_screen.requestScreenUpdate( false );
         }
+
+        if( g_screen.getId() == SCREEN_ID_NET_STATUS ) {
+            g_screen.requestScreenUpdate( true );
+        }
     }
 }

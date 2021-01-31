@@ -82,8 +82,8 @@ typedef void ( *pfcbValueChange )( Screen* screen, ScreenItem* item );
 typedef void ( *pfcbSelectionChanged )( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool fullscreen );
 typedef bool ( *pfcbDrawScreen )( Screen* screen );
 typedef bool ( *pfcbExitScreen )( Screen* currentScreen );
-typedef void ( *pfcbEnterScreen )( Screen* screen );
-typedef bool ( *pfcbDrawItem )( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
+typedef void ( *pfcbEnterScreen )( Screen* screen, uint8_t prevScreenID );
+typedef bool ( *pfcbDrawItem )( Screen* screen, ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col );
 typedef void ( *pfcbTimeout )( Screen* screen );
 
 
@@ -127,16 +127,13 @@ class Screen {
     void resetTimeout( int16_t timeout = -1 );
     bool hasScreenTimedOut();
     void exitScreen();
-    void activate( const ScreenData* screen, bool selectFirstItem = true );
+    bool activate( const ScreenData* screen, bool selectFirstItem = true );
     void requestScreenUpdate( bool clear );
     void processEvents();
 
 
     /* Gets the screen ID. */
     uint8_t getId()                                     { return _currentScreen.id; }
-
-    /* Gets the current screen data object. */
-    const ScreenData* getCurrentScreen()                { return _breadCrumbScreen[ _breadCrumbIndex ]; }
 
     /* Gets the screen return value. */
     uint8_t getReturnValue()                            { return _returnValue; }
@@ -162,8 +159,14 @@ class Screen {
     /* Returns whether or not any items value has changed. */
     bool hasItemsChanged()                              { return _itemChanged; }
 
+    /* Set item changed flag */
+    void markItemChanged()                              { _itemChanged = true; }
+
     /* Returns whether the current item is shown full screen. */
     bool isItemFullScreen()                             { return _itemFullscreen; }
+
+    /* Returns whether or not the change confirm dialog is currently shown */
+    bool isConfirmDialogShowing()                       { return _isShowConfirmDialog; }
 
     /* Gets whether to changes confirm dialog is enabled when exiting the screen. */
     bool getConfirmChanges()                            { return _confirmChanges; }
@@ -183,6 +186,7 @@ class Screen {
     uint8_t _fieldPos;
     uint8_t _scroll;
     int16_t _timeout;
+    uint16_t _listPrevValue;
     const ScreenData* _breadCrumbScreen[ SCREEN_MAX_BREADCRUMB_ITEMS ];
     uint8_t _breadCrumbSelection[ SCREEN_MAX_BREADCRUMB_ITEMS ];
     uint8_t _breadCrumbIndex;
@@ -196,6 +200,7 @@ class Screen {
     
 
     void drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
+    void printListItemValue( ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col );
     uint8_t printItemCaption( ScreenItem* item );
     void incrementItemValue( ScreenItem* item, bool shift );
     void clearItemValue( ScreenItem* item );
@@ -207,6 +212,7 @@ class Screen {
     uint8_t calcFieldLength( ScreenItem* item );
     char nextValidCharacter( char current );
     uint8_t itemValueToBars( ScreenItem* item );
+    void exitFullScreen();
 
     inline uint8_t getNumDigits( uint8_t number );
 };

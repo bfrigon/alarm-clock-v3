@@ -24,7 +24,7 @@
 #include "drivers/neoclock.h"
 #include "services/ntpclient.h"
 #include "services/telnet_console.h"
-
+#include "libs/tzdata.h"
 
 
 /*! ------------------------------------------------------------------------

@@ -30,13 +30,44 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "time.h"
+#include "timezone.h"
 
-#define MAX_TIMEZONE_ID     426
-#define TZ_DB_VERSION       "2020f"
+#define MAX_TIMEZONE_ID                  458
+#define TZ_DB_VERSION                    "2020f"
+
+#define TZ_REGION_AFRICA_INDEX           0
+#define TZ_REGION_AFRICA_SIZE            52
+#define TZ_REGION_ANTARCTICA_INDEX       52
+#define TZ_REGION_ANTARCTICA_SIZE        11
+#define TZ_REGION_ARCTIC_OCEAN_INDEX     63
+#define TZ_REGION_ARCTIC_OCEAN_SIZE      1
+#define TZ_REGION_ASIA_INDEX             64
+#define TZ_REGION_ASIA_SIZE              69
+#define TZ_REGION_ATLANTIC_OCEAN_INDEX   133
+#define TZ_REGION_ATLANTIC_OCEAN_SIZE    10
+#define TZ_REGION_AUSTRALIA_INDEX        143
+#define TZ_REGION_AUSTRALIA_SIZE         11
+#define TZ_REGION_CARIBBEAN_INDEX        154
+#define TZ_REGION_CARIBBEAN_SIZE         28
+#define TZ_REGION_CENTRAL_AMERICA_INDEX  182
+#define TZ_REGION_CENTRAL_AMERICA_SIZE   18
+#define TZ_REGION_ETCETERA_INDEX         200
+#define TZ_REGION_ETCETERA_SIZE          32
+#define TZ_REGION_EUROPE_INDEX           232
+#define TZ_REGION_EUROPE_SIZE            61
+#define TZ_REGION_INDIAN_OCEAN_INDEX     293
+#define TZ_REGION_INDIAN_OCEAN_SIZE      11
+#define TZ_REGION_MIDDLE_EAST_INDEX      304
+#define TZ_REGION_MIDDLE_EAST_SIZE       15
+#define TZ_REGION_NORTH_AMERICA_INDEX    319
+#define TZ_REGION_NORTH_AMERICA_SIZE     61
+#define TZ_REGION_PACIFIC_OCEAN_INDEX    380
+#define TZ_REGION_PACIFIC_OCEAN_SIZE     38
+#define TZ_REGION_SOUTH_AMERICA_INDEX    418
+#define TZ_REGION_SOUTH_AMERICA_SIZE     40
 
 
-const char TZ_UTC[] PROGMEM = { "UTC" };
+/* Timezone abbreviations */
 const char TZ_ACDT[] PROGMEM = { "ACDT" };
 const char TZ_ACST[] PROGMEM = { "ACST" };
 const char TZ_ACT[] PROGMEM = { "ACT" };
@@ -83,13 +114,16 @@ const char TZ_M04[] PROGMEM = { "-04" };
 const char TZ_M04_M03[] PROGMEM = { "-04/-03" };
 const char TZ_M05[] PROGMEM = { "-05" };
 const char TZ_M05_M04[] PROGMEM = { "-05/-04" };
+const char TZ_M06[] PROGMEM = { "-06" };
 const char TZ_M06_M05[] PROGMEM = { "-06/-05" };
+const char TZ_M07[] PROGMEM = { "-07" };
 const char TZ_M08[] PROGMEM = { "-08" };
 const char TZ_M0930[] PROGMEM = { "-0930" };
 const char TZ_M09[] PROGMEM = { "-09" };
 const char TZ_M10[] PROGMEM = { "-10" };
 const char TZ_M10_M0930[] PROGMEM = { "-10/-0930" };
 const char TZ_M11[] PROGMEM = { "-11" };
+const char TZ_M12[] PROGMEM = { "-12" };
 const char TZ_MDT[] PROGMEM = { "MDT" };
 const char TZ_MSK[] PROGMEM = { "MSK" };
 const char TZ_MST[] PROGMEM = { "MST" };
@@ -98,6 +132,7 @@ const char TZ_NST[] PROGMEM = { "NST" };
 const char TZ_NZDT[] PROGMEM = { "NZDT" };
 const char TZ_NZST[] PROGMEM = { "NZST" };
 const char TZ_P00[] PROGMEM = { "+00" };
+const char TZ_P01[] PROGMEM = { "+01" };
 const char TZ_P01_P00[] PROGMEM = { "+01/+00" };
 const char TZ_P02[] PROGMEM = { "+02" };
 const char TZ_P0330_P0430[] PROGMEM = { "+0330/+0430" };
@@ -134,6 +169,7 @@ const char TZ_PST[] PROGMEM = { "PST" };
 const char TZ_PT[] PROGMEM = { "PT" };
 const char TZ_SAST[] PROGMEM = { "SAST" };
 const char TZ_SST[] PROGMEM = { "SST" };
+const char TZ_UTC[] PROGMEM = { "UTC" };
 const char TZ_WAT[] PROGMEM = { "WAT" };
 const char TZ_WEST[] PROGMEM = { "WEST" };
 const char TZ_WET[] PROGMEM = { "WET" };
@@ -142,7 +178,7 @@ const char TZ_WITA[] PROGMEM = { "WITA" };
 const char TZ_WIT[] PROGMEM = { "WIT" };
 
 
-const char TZ_ETC_UTC[] PROGMEM = { "Etc/UTC" };
+/* Timezone names */
 const char TZ_AFRICA_ABIDJAN[] PROGMEM = { "Africa/Abidjan" };
 const char TZ_AFRICA_ACCRA[] PROGMEM = { "Africa/Accra" };
 const char TZ_AFRICA_ADDIS_ABABA[] PROGMEM = { "Africa/Addis_Ababa" };
@@ -459,6 +495,38 @@ const char TZ_AUSTRALIA_LORD_HOWE[] PROGMEM = { "Australia/Lord_Howe" };
 const char TZ_AUSTRALIA_MELBOURNE[] PROGMEM = { "Australia/Melbourne" };
 const char TZ_AUSTRALIA_PERTH[] PROGMEM = { "Australia/Perth" };
 const char TZ_AUSTRALIA_SYDNEY[] PROGMEM = { "Australia/Sydney" };
+const char TZ_ETC_GMT0[] PROGMEM = { "Etc/GMT0" };
+const char TZ_ETC_GMTP0[] PROGMEM = { "Etc/GMT+0" };
+const char TZ_ETC_GMTP10[] PROGMEM = { "Etc/GMT+10" };
+const char TZ_ETC_GMTP11[] PROGMEM = { "Etc/GMT+11" };
+const char TZ_ETC_GMTP12[] PROGMEM = { "Etc/GMT+12" };
+const char TZ_ETC_GMTP1[] PROGMEM = { "Etc/GMT+1" };
+const char TZ_ETC_GMTP2[] PROGMEM = { "Etc/GMT+2" };
+const char TZ_ETC_GMTP3[] PROGMEM = { "Etc/GMT+3" };
+const char TZ_ETC_GMTP4[] PROGMEM = { "Etc/GMT+4" };
+const char TZ_ETC_GMTP5[] PROGMEM = { "Etc/GMT+5" };
+const char TZ_ETC_GMTP6[] PROGMEM = { "Etc/GMT+6" };
+const char TZ_ETC_GMTP7[] PROGMEM = { "Etc/GMT+7" };
+const char TZ_ETC_GMTP8[] PROGMEM = { "Etc/GMT+8" };
+const char TZ_ETC_GMTP9[] PROGMEM = { "Etc/GMT+9" };
+const char TZ_ETC_GMT[] PROGMEM = { "Etc/GMT" };
+const char TZ_ETC_GMT_0[] PROGMEM = { "Etc/GMT-0" };
+const char TZ_ETC_GMT_10[] PROGMEM = { "Etc/GMT-10" };
+const char TZ_ETC_GMT_11[] PROGMEM = { "Etc/GMT-11" };
+const char TZ_ETC_GMT_12[] PROGMEM = { "Etc/GMT-12" };
+const char TZ_ETC_GMT_13[] PROGMEM = { "Etc/GMT-13" };
+const char TZ_ETC_GMT_14[] PROGMEM = { "Etc/GMT-14" };
+const char TZ_ETC_GMT_1[] PROGMEM = { "Etc/GMT-1" };
+const char TZ_ETC_GMT_2[] PROGMEM = { "Etc/GMT-2" };
+const char TZ_ETC_GMT_3[] PROGMEM = { "Etc/GMT-3" };
+const char TZ_ETC_GMT_4[] PROGMEM = { "Etc/GMT-4" };
+const char TZ_ETC_GMT_5[] PROGMEM = { "Etc/GMT-5" };
+const char TZ_ETC_GMT_6[] PROGMEM = { "Etc/GMT-6" };
+const char TZ_ETC_GMT_7[] PROGMEM = { "Etc/GMT-7" };
+const char TZ_ETC_GMT_8[] PROGMEM = { "Etc/GMT-8" };
+const char TZ_ETC_GMT_9[] PROGMEM = { "Etc/GMT-9" };
+const char TZ_ETC_GREENWICH[] PROGMEM = { "Etc/Greenwich" };
+const char TZ_ETC_UTC[] PROGMEM = { "Etc/UTC" };
 const char TZ_EUROPE_AMSTERDAM[] PROGMEM = { "Europe/Amsterdam" };
 const char TZ_EUROPE_ANDORRA[] PROGMEM = { "Europe/Andorra" };
 const char TZ_EUROPE_ASTRAKHAN[] PROGMEM = { "Europe/Astrakhan" };
@@ -571,8 +639,8 @@ const char TZ_PACIFIC_WAKE[] PROGMEM = { "Pacific/Wake" };
 const char TZ_PACIFIC_WALLIS[] PROGMEM = { "Pacific/Wallis" };
 
 
+/* Timezone rules table */
 const TimeZoneRules TimeZonesTable[] PROGMEM = {
-    { TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC },
     { TZ_AFRICA_ABIDJAN, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
     { TZ_AFRICA_ACCRA, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
     { TZ_AFRICA_ADDIS_ABABA, 180, 0, 0, 0, 0, 0, TZ_EAT, 180, 0, 0, 0, 0, 0, TZ_EAT },
@@ -625,153 +693,6 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_AFRICA_TRIPOLI, 120, 0, 0, 0, 0, 0, TZ_EET, 120, 0, 0, 0, 0, 0, TZ_EET },
     { TZ_AFRICA_TUNIS, 60, 0, 0, 0, 0, 0, TZ_CET, 60, 0, 0, 0, 0, 0, TZ_CET },
     { TZ_AFRICA_WINDHOEK, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
-    { TZ_AMERICA_ADAK, -600, M_NOV, 1, D_SUN, 2, 0, TZ_HST, -540, M_MAR, 2, D_SUN, 2, 0, TZ_HDT },
-    { TZ_AMERICA_ANCHORAGE, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_ANGUILLA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ANTIGUA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ARAGUAINA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_BUENOS_AIRES, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
-    { TZ_AMERICA_ARGENTINA_CATAMARCA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_CORDOBA, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
-    { TZ_AMERICA_ARGENTINA_JUJUY, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_LA_RIOJA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_MENDOZA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_RIO_GALLEGOS, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_SALTA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_SAN_JUAN, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_SAN_LUIS, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARGENTINA_TUCUMAN, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
-    { TZ_AMERICA_ARGENTINA_USHUAIA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_ARUBA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ASUNCION, -240, M_MAR, 4, D_SUN, 0, 0, TZ_M04_M03, -180, M_OCT, 1, D_SUN, 0, 0, TZ_M04_M03 },
-    { TZ_AMERICA_ATIKOKAN, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
-    { TZ_AMERICA_BAHIA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_BAHIA_BANDERAS, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_BARBADOS, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_BELEM, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_BELIZE, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_BLANC_SABLON, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_BOA_VISTA, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
-    { TZ_AMERICA_BOGOTA, -300, 0, 0, 0, 0, 0, TZ_M05_M04, -300, 0, 0, 0, 0, 0, TZ_M05_M04 },
-    { TZ_AMERICA_BOISE, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_CAMBRIDGE_BAY, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_CAMPO_GRANDE, -240, 0, 0, 0, 0, 0, TZ_M04_M03, -240, 0, 0, 0, 0, 0, TZ_M04_M03 },
-    { TZ_AMERICA_CANCUN, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
-    { TZ_AMERICA_CARACAS, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
-    { TZ_AMERICA_CAYENNE, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_CAYMAN, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
-    { TZ_AMERICA_CHICAGO, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_CHIHUAHUA, -420, M_OCT, 5, D_SUN, 2, 0, TZ_MST, -360, M_APR, 1, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_COSTA_RICA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_CRESTON, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_CUIABA, -240, 0, 0, 0, 0, 0, TZ_M04_M03, -240, 0, 0, 0, 0, 0, TZ_M04_M03 },
-    { TZ_AMERICA_CURACAO, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_DANMARKSHAVN, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
-    { TZ_AMERICA_DAWSON, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_DAWSON_CREEK, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_DENVER, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_DETROIT, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_DOMINICA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_EDMONTON, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_EIRUNEPE, -300, 0, 0, 0, 0, 0, TZ_M05, -300, 0, 0, 0, 0, 0, TZ_M05 },
-    { TZ_AMERICA_EL_SALVADOR, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_FORTALEZA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_FORT_NELSON, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_GLACE_BAY, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
-    { TZ_AMERICA_GOOSE_BAY, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
-    { TZ_AMERICA_GRAND_TURK, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_GRENADA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_GUADELOUPE, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_GUATEMALA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_GUAYAQUIL, -300, 0, 0, 0, 0, 0, TZ_M05_M04, -300, 0, 0, 0, 0, 0, TZ_M05_M04 },
-    { TZ_AMERICA_GUYANA, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
-    { TZ_AMERICA_HALIFAX, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
-    { TZ_AMERICA_HAVANA, -300, M_NOV, 1, D_SUN, 1, 0, TZ_CST, -240, M_MAR, 2, D_SUN, 0, 0, TZ_CDT },
-    { TZ_AMERICA_HERMOSILLO, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_INDIANA_INDIANAPOLIS, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_INDIANA_KNOX, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_INDIANA_MARENGO, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_INDIANA_PETERSBURG, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_INDIANA_TELL_CITY, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_INDIANA_VEVAY, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_INDIANA_VINCENNES, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_INDIANA_WINAMAC, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_INUVIK, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_IQALUIT, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_JAMAICA, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
-    { TZ_AMERICA_JUNEAU, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_KENTUCKY_LOUISVILLE, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_KENTUCKY_MONTICELLO, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_KRALENDIJK, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_LA_PAZ, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
-    { TZ_AMERICA_LIMA, -300, 0, 0, 0, 0, 0, TZ_M05_M04, -300, 0, 0, 0, 0, 0, TZ_M05_M04 },
-    { TZ_AMERICA_LOS_ANGELES, -480, M_NOV, 1, D_SUN, 2, 0, TZ_PST, -420, M_MAR, 2, D_SUN, 2, 0, TZ_PDT },
-    { TZ_AMERICA_LOWER_PRINCES, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_MACEIO, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_MANAGUA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_MANAUS, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
-    { TZ_AMERICA_MARIGOT, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_MARTINIQUE, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_MATAMOROS, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_MAZATLAN, -420, M_OCT, 5, D_SUN, 2, 0, TZ_MST, -360, M_APR, 1, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_MENOMINEE, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_MERIDA, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_METLAKATLA, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_MEXICO_CITY, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_MIQUELON, -180, M_NOV, 1, D_SUN, 2, 0, TZ_M03_M02, -120, M_MAR, 2, D_SUN, 2, 0, TZ_M03_M02 },
-    { TZ_AMERICA_MONCTON, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
-    { TZ_AMERICA_MONTERREY, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_MONTEVIDEO, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
-    { TZ_AMERICA_MONTSERRAT, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_NASSAU, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_NEW_YORK, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_NIPIGON, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_NOME, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_NORONHA, -120, 0, 0, 0, 0, 0, TZ_M02, -120, 0, 0, 0, 0, 0, TZ_M02 },
-    { TZ_AMERICA_NORTH_DAKOTA_BEULAH, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_NORTH_DAKOTA_CENTER, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_NORTH_DAKOTA_NEW_SALEM, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_NUUK, -180, M_OCT, 5, D_SUN, -1, 0, TZ_M03_M02, -120, M_MAR, 5, D_SUN, -2, 0, TZ_M03_M02 },
-    { TZ_AMERICA_OJINAGA, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
-    { TZ_AMERICA_PANAMA, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
-    { TZ_AMERICA_PANGNIRTUNG, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_PARAMARIBO, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_PHOENIX, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_PORTO_VELHO, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
-    { TZ_AMERICA_PORT_AU_PRINCE, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_PORT_OF_SPAIN, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_PUERTO_RICO, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_PUNTA_ARENAS, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_RAINY_RIVER, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_RANKIN_INLET, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_RECIFE, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_REGINA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_RESOLUTE, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_RIO_BRANCO, -300, 0, 0, 0, 0, 0, TZ_M05, -300, 0, 0, 0, 0, 0, TZ_M05 },
-    { TZ_AMERICA_SANTAREM, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
-    { TZ_AMERICA_SANTIAGO, -240, M_APR, 1, D_SUN, 0, 0, TZ_M04_M03, -180, M_SEP, 1, D_SUN, 0, 0, TZ_M04_M03 },
-    { TZ_AMERICA_SANTO_DOMINGO, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_SAO_PAULO, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
-    { TZ_AMERICA_SCORESBYSUND, -60, M_OCT, 5, D_SUN, 1, 0, TZ_M01_P00, 0, M_MAR, 5, D_SUN, 0, 0, TZ_M01_P00 },
-    { TZ_AMERICA_SITKA, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_ST_BARTHELEMY, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ST_JOHNS, -210, M_NOV, 1, D_SUN, 2, 0, TZ_NST, -150, M_MAR, 2, D_SUN, 2, 0, TZ_NDT },
-    { TZ_AMERICA_ST_KITTS, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ST_LUCIA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ST_THOMAS, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_ST_VINCENT, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_SWIFT_CURRENT, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_TEGUCIGALPA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
-    { TZ_AMERICA_THULE, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
-    { TZ_AMERICA_THUNDER_BAY, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_TIJUANA, -480, M_NOV, 1, D_SUN, 2, 0, TZ_PST, -420, M_MAR, 2, D_SUN, 2, 0, TZ_PDT },
-    { TZ_AMERICA_TORONTO, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
-    { TZ_AMERICA_TORTOLA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
-    { TZ_AMERICA_VANCOUVER, -480, M_NOV, 1, D_SUN, 2, 0, TZ_PST, -420, M_MAR, 2, D_SUN, 2, 0, TZ_PDT },
-    { TZ_AMERICA_WHITEHORSE, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
-    { TZ_AMERICA_WINNIPEG, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
-    { TZ_AMERICA_YAKUTAT, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_YELLOWKNIFE, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
     { TZ_ANTARCTICA_CASEY, 660, 0, 0, 0, 0, 0, TZ_P11, 660, 0, 0, 0, 0, 0, TZ_P11 },
     { TZ_ANTARCTICA_DAVIS, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ANTARCTICA_DUMONTDURVILLE, 600, 0, 0, 0, 0, 0, TZ_P10, 600, 0, 0, 0, 0, 0, TZ_P10 },
@@ -784,41 +705,31 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_ANTARCTICA_TROLL, 0, M_OCT, 5, D_SUN, 3, 0, TZ_P00, 120, M_MAR, 5, D_SUN, 1, 0, TZ_P02 },
     { TZ_ANTARCTICA_VOSTOK, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
     { TZ_ARCTIC_LONGYEARBYEN, 60, M_OCT, 5, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 5, D_SUN, 2, 0, TZ_CEST },
-    { TZ_ASIA_ADEN, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_ALMATY, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
-    { TZ_ASIA_AMMAN, 120, M_OCT, 5, D_FRI, 1, 0, TZ_EET, 180, M_MAR, 5, D_THU, 24, 0, TZ_EEST },
     { TZ_ASIA_ANADYR, 720, 0, 0, 0, 0, 0, TZ_P12, 720, 0, 0, 0, 0, 0, TZ_P12 },
     { TZ_ASIA_AQTAU, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
     { TZ_ASIA_AQTOBE, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
     { TZ_ASIA_ASHGABAT, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
     { TZ_ASIA_ATYRAU, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
-    { TZ_ASIA_BAGHDAD, 180, 0, 0, 0, 0, 0, TZ_P03_P04, 180, 0, 0, 0, 0, 0, TZ_P03_P04 },
-    { TZ_ASIA_BAHRAIN, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_BAKU, 240, 0, 0, 0, 0, 0, TZ_P04_P05, 240, 0, 0, 0, 0, 0, TZ_P04_P05 },
     { TZ_ASIA_BANGKOK, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ASIA_BARNAUL, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
-    { TZ_ASIA_BEIRUT, 120, M_OCT, 5, D_SUN, 0, 0, TZ_EET, 180, M_MAR, 5, D_SUN, 0, 0, TZ_EEST },
     { TZ_ASIA_BISHKEK, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
     { TZ_ASIA_BRUNEI, 480, 0, 0, 0, 0, 0, TZ_P08, 480, 0, 0, 0, 0, 0, TZ_P08 },
     { TZ_ASIA_CHITA, 540, 0, 0, 0, 0, 0, TZ_P09, 540, 0, 0, 0, 0, 0, TZ_P09 },
     { TZ_ASIA_CHOIBALSAN, 480, 0, 0, 0, 0, 0, TZ_P08_P09, 480, 0, 0, 0, 0, 0, TZ_P08_P09 },
     { TZ_ASIA_COLOMBO, 330, 0, 0, 0, 0, 0, TZ_P0530, 330, 0, 0, 0, 0, 0, TZ_P0530 },
-    { TZ_ASIA_DAMASCUS, 120, M_OCT, 5, D_FRI, 0, 0, TZ_EET, 180, M_MAR, 5, D_FRI, 0, 0, TZ_EEST },
     { TZ_ASIA_DHAKA, 360, 0, 0, 0, 0, 0, TZ_P06_P07, 360, 0, 0, 0, 0, 0, TZ_P06_P07 },
     { TZ_ASIA_DILI, 540, 0, 0, 0, 0, 0, TZ_P09, 540, 0, 0, 0, 0, 0, TZ_P09 },
-    { TZ_ASIA_DUBAI, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
     { TZ_ASIA_DUSHANBE, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
     { TZ_ASIA_FAMAGUSTA, 120, M_OCT, 5, D_SUN, 4, 0, TZ_EET, 180, M_MAR, 5, D_SUN, 3, 0, TZ_EEST },
-    { TZ_ASIA_GAZA, 120, M_OCT, 4, D_SAT, 1, 0, TZ_EET, 180, M_MAR, 4, D_SAT, 0, 0, TZ_EEST },
-    { TZ_ASIA_HEBRON, 120, M_OCT, 4, D_SAT, 1, 0, TZ_EET, 180, M_MAR, 4, D_SAT, 0, 0, TZ_EEST },
+    { TZ_ASIA_HO_CHI_MINH, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ASIA_HONG_KONG, 480, 0, 0, 0, 0, 0, TZ_HKT, 480, 0, 0, 0, 0, 0, TZ_HKT },
     { TZ_ASIA_HOVD, 420, 0, 0, 0, 0, 0, TZ_P07_P08, 420, 0, 0, 0, 0, 0, TZ_P07_P08 },
-    { TZ_ASIA_HO_CHI_MINH, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ASIA_IRKUTSK, 480, 0, 0, 0, 0, 0, TZ_P08, 480, 0, 0, 0, 0, 0, TZ_P08 },
     { TZ_ASIA_ISTANBUL, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_JAKARTA, 420, 0, 0, 0, 0, 0, TZ_WIB, 420, 0, 0, 0, 0, 0, TZ_WIB },
     { TZ_ASIA_JAYAPURA, 540, 0, 0, 0, 0, 0, TZ_WIT, 540, 0, 0, 0, 0, 0, TZ_WIT },
-    { TZ_ASIA_JERUSALEM, 120, M_OCT, 5, D_SUN, 2, 0, TZ_IST, 180, M_MAR, 4, D_FRI, 2, 0, TZ_IDT },
     { TZ_ASIA_KABUL, 270, 0, 0, 0, 0, 0, TZ_P0430, 270, 0, 0, 0, 0, 0, TZ_P0430 },
     { TZ_ASIA_KAMCHATKA, 720, 0, 0, 0, 0, 0, TZ_P12, 720, 0, 0, 0, 0, 0, TZ_P12 },
     { TZ_ASIA_KARACHI, 300, 0, 0, 0, 0, 0, TZ_PKT, 300, 0, 0, 0, 0, 0, TZ_PKT },
@@ -828,12 +739,10 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_ASIA_KRASNOYARSK, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ASIA_KUALA_LUMPUR, 480, 0, 0, 0, 0, 0, TZ_P08, 480, 0, 0, 0, 0, 0, TZ_P08 },
     { TZ_ASIA_KUCHING, 480, 0, 0, 0, 0, 0, TZ_P08, 480, 0, 0, 0, 0, 0, TZ_P08 },
-    { TZ_ASIA_KUWAIT, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_MACAU, 480, 0, 0, 0, 0, 0, TZ_CST, 480, 0, 0, 0, 0, 0, TZ_CST },
     { TZ_ASIA_MAGADAN, 660, 0, 0, 0, 0, 0, TZ_P11, 660, 0, 0, 0, 0, 0, TZ_P11 },
     { TZ_ASIA_MAKASSAR, 480, 0, 0, 0, 0, 0, TZ_WITA, 480, 0, 0, 0, 0, 0, TZ_WITA },
     { TZ_ASIA_MANILA, 480, 0, 0, 0, 0, 0, TZ_PST, 480, 0, 0, 0, 0, 0, TZ_PST },
-    { TZ_ASIA_MUSCAT, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
     { TZ_ASIA_NICOSIA, 120, M_OCT, 5, D_SUN, 4, 0, TZ_EET, 180, M_MAR, 5, D_SUN, 3, 0, TZ_EEST },
     { TZ_ASIA_NOVOKUZNETSK, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ASIA_NOVOSIBIRSK, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
@@ -842,10 +751,8 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_ASIA_PHNOM_PENH, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
     { TZ_ASIA_PONTIANAK, 420, 0, 0, 0, 0, 0, TZ_WIB, 420, 0, 0, 0, 0, 0, TZ_WIB },
     { TZ_ASIA_PYONGYANG, 540, 0, 0, 0, 0, 0, TZ_KST, 540, 0, 0, 0, 0, 0, TZ_KST },
-    { TZ_ASIA_QATAR, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_QOSTANAY, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
     { TZ_ASIA_QYZYLORDA, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
-    { TZ_ASIA_RIYADH, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_SAKHALIN, 660, 0, 0, 0, 0, 0, TZ_P11, 660, 0, 0, 0, 0, 0, TZ_P11 },
     { TZ_ASIA_SAMARKAND, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
     { TZ_ASIA_SEOUL, 540, 0, 0, 0, 0, 0, TZ_KST, 540, 0, 0, 0, 0, 0, TZ_KST },
@@ -855,7 +762,6 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_ASIA_TAIPEI, 480, 0, 0, 0, 0, 0, TZ_CST, 480, 0, 0, 0, 0, 0, TZ_CST },
     { TZ_ASIA_TASHKENT, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
     { TZ_ASIA_TBILISI, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
-    { TZ_ASIA_TEHRAN, 210, M_SEP, 0, 21, 24, 0, TZ_P0330_P0430, 270, M_MAR, 0, 21, 24, 0, TZ_P0330_P0430 },
     { TZ_ASIA_THIMPHU, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
     { TZ_ASIA_TOKYO, 540, 0, 0, 0, 0, 0, TZ_JST, 540, 0, 0, 0, 0, 0, TZ_JST },
     { TZ_ASIA_TOMSK, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
@@ -876,8 +782,8 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_ATLANTIC_MADEIRA, 0, M_OCT, 5, D_SUN, 2, 0, TZ_WET, 60, M_MAR, 5, D_SUN, 1, 0, TZ_WEST },
     { TZ_ATLANTIC_REYKJAVIK, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
     { TZ_ATLANTIC_SOUTH_GEORGIA, -120, 0, 0, 0, 0, 0, TZ_M02, -120, 0, 0, 0, 0, 0, TZ_M02 },
-    { TZ_ATLANTIC_STANLEY, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
     { TZ_ATLANTIC_ST_HELENA, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_ATLANTIC_STANLEY, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
     { TZ_AUSTRALIA_ADELAIDE, 570, M_APR, 1, D_SUN, 3, 0, TZ_ACST, 630, M_OCT, 1, D_SUN, 2, 0, TZ_ACDT },
     { TZ_AUSTRALIA_BRISBANE, 600, 0, 0, 0, 0, 0, TZ_AEST, 600, 0, 0, 0, 0, 0, TZ_AEST },
     { TZ_AUSTRALIA_BROKEN_HILL, 570, M_APR, 1, D_SUN, 3, 0, TZ_ACST, 630, M_OCT, 1, D_SUN, 2, 0, TZ_ACDT },
@@ -889,6 +795,84 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_AUSTRALIA_MELBOURNE, 600, M_APR, 1, D_SUN, 3, 0, TZ_AEST, 660, M_OCT, 1, D_SUN, 2, 0, TZ_AEDT },
     { TZ_AUSTRALIA_PERTH, 480, 0, 0, 0, 0, 0, TZ_AWST, 480, 0, 0, 0, 0, 0, TZ_AWST },
     { TZ_AUSTRALIA_SYDNEY, 600, M_APR, 1, D_SUN, 3, 0, TZ_AEST, 660, M_OCT, 1, D_SUN, 2, 0, TZ_AEDT },
+    { TZ_AMERICA_ANGUILLA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ANTIGUA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ARUBA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_BARBADOS, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_CAYMAN, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
+    { TZ_AMERICA_CURACAO, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_DOMINICA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_GRAND_TURK, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_GRENADA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_GUADELOUPE, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_HAVANA, -300, M_NOV, 1, D_SUN, 1, 0, TZ_CST, -240, M_MAR, 2, D_SUN, 0, 0, TZ_CDT },
+    { TZ_AMERICA_JAMAICA, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
+    { TZ_AMERICA_KRALENDIJK, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_LOWER_PRINCES, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_MARIGOT, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_MARTINIQUE, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_MONTSERRAT, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_NASSAU, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_PORT_AU_PRINCE, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_PORT_OF_SPAIN, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_PUERTO_RICO, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_SANTO_DOMINGO, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ST_BARTHELEMY, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ST_KITTS, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ST_LUCIA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ST_THOMAS, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_ST_VINCENT, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_TORTOLA, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_BAHIA_BANDERAS, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_BELIZE, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_CANCUN, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
+    { TZ_AMERICA_CHIHUAHUA, -420, M_OCT, 5, D_SUN, 2, 0, TZ_MST, -360, M_APR, 1, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_COSTA_RICA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_EL_SALVADOR, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_GUATEMALA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_HERMOSILLO, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_MANAGUA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_MATAMOROS, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_MAZATLAN, -420, M_OCT, 5, D_SUN, 2, 0, TZ_MST, -360, M_APR, 1, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_MERIDA, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_MEXICO_CITY, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_MONTERREY, -360, M_OCT, 5, D_SUN, 2, 0, TZ_CST, -300, M_APR, 1, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_OJINAGA, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_PANAMA, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
+    { TZ_AMERICA_TEGUCIGALPA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_TIJUANA, -480, M_NOV, 1, D_SUN, 2, 0, TZ_PST, -420, M_MAR, 2, D_SUN, 2, 0, TZ_PDT },
+    { TZ_ETC_GMTP0, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_ETC_GMTP10, -600, 0, 0, 0, 0, 0, TZ_M10, -600, 0, 0, 0, 0, 0, TZ_M10 },
+    { TZ_ETC_GMTP11, -660, 0, 0, 0, 0, 0, TZ_M11, -660, 0, 0, 0, 0, 0, TZ_M11 },
+    { TZ_ETC_GMTP12, -720, 0, 0, 0, 0, 0, TZ_M12, -720, 0, 0, 0, 0, 0, TZ_M12 },
+    { TZ_ETC_GMTP1, -60, 0, 0, 0, 0, 0, TZ_M01, -60, 0, 0, 0, 0, 0, TZ_M01 },
+    { TZ_ETC_GMTP2, -120, 0, 0, 0, 0, 0, TZ_M02, -120, 0, 0, 0, 0, 0, TZ_M02 },
+    { TZ_ETC_GMTP3, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_ETC_GMTP4, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_ETC_GMTP5, -300, 0, 0, 0, 0, 0, TZ_M05, -300, 0, 0, 0, 0, 0, TZ_M05 },
+    { TZ_ETC_GMTP6, -360, 0, 0, 0, 0, 0, TZ_M06, -360, 0, 0, 0, 0, 0, TZ_M06 },
+    { TZ_ETC_GMTP7, -420, 0, 0, 0, 0, 0, TZ_M07, -420, 0, 0, 0, 0, 0, TZ_M07 },
+    { TZ_ETC_GMTP8, -480, 0, 0, 0, 0, 0, TZ_M08, -480, 0, 0, 0, 0, 0, TZ_M08 },
+    { TZ_ETC_GMTP9, -540, 0, 0, 0, 0, 0, TZ_M09, -540, 0, 0, 0, 0, 0, TZ_M09 },
+    { TZ_ETC_GMT_0, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_ETC_GMT_10, 600, 0, 0, 0, 0, 0, TZ_P10, 600, 0, 0, 0, 0, 0, TZ_P10 },
+    { TZ_ETC_GMT_11, 660, 0, 0, 0, 0, 0, TZ_P11, 660, 0, 0, 0, 0, 0, TZ_P11 },
+    { TZ_ETC_GMT_12, 720, 0, 0, 0, 0, 0, TZ_P12, 720, 0, 0, 0, 0, 0, TZ_P12 },
+    { TZ_ETC_GMT_13, 780, 0, 0, 0, 0, 0, TZ_P13, 780, 0, 0, 0, 0, 0, TZ_P13 },
+    { TZ_ETC_GMT_14, 840, 0, 0, 0, 0, 0, TZ_P14, 840, 0, 0, 0, 0, 0, TZ_P14 },
+    { TZ_ETC_GMT_1, 60, 0, 0, 0, 0, 0, TZ_P01, 60, 0, 0, 0, 0, 0, TZ_P01 },
+    { TZ_ETC_GMT_2, 120, 0, 0, 0, 0, 0, TZ_P02, 120, 0, 0, 0, 0, 0, TZ_P02 },
+    { TZ_ETC_GMT_3, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_ETC_GMT_4, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
+    { TZ_ETC_GMT_5, 300, 0, 0, 0, 0, 0, TZ_P05, 300, 0, 0, 0, 0, 0, TZ_P05 },
+    { TZ_ETC_GMT_6, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
+    { TZ_ETC_GMT_7, 420, 0, 0, 0, 0, 0, TZ_P07, 420, 0, 0, 0, 0, 0, TZ_P07 },
+    { TZ_ETC_GMT_8, 480, 0, 0, 0, 0, 0, TZ_P08, 480, 0, 0, 0, 0, 0, TZ_P08 },
+    { TZ_ETC_GMT_9, 540, 0, 0, 0, 0, 0, TZ_P09, 540, 0, 0, 0, 0, 0, TZ_P09 },
+    { TZ_ETC_GMT0, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_ETC_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_ETC_GREENWICH, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_ETC_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC },
     { TZ_EUROPE_AMSTERDAM, 60, M_OCT, 5, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 5, D_SUN, 2, 0, TZ_CEST },
     { TZ_EUROPE_ANDORRA, 60, M_OCT, 5, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 5, D_SUN, 2, 0, TZ_CEST },
     { TZ_EUROPE_ASTRAKHAN, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
@@ -961,6 +945,82 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_INDIAN_MAURITIUS, 240, 0, 0, 0, 0, 0, TZ_P04_P05, 240, 0, 0, 0, 0, 0, TZ_P04_P05 },
     { TZ_INDIAN_MAYOTTE, 180, 0, 0, 0, 0, 0, TZ_EAT, 180, 0, 0, 0, 0, 0, TZ_EAT },
     { TZ_INDIAN_REUNION, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
+    { TZ_ASIA_ADEN, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_ASIA_AMMAN, 120, M_OCT, 5, D_FRI, 1, 0, TZ_EET, 180, M_MAR, 5, D_THU, 24, 0, TZ_EEST },
+    { TZ_ASIA_BAGHDAD, 180, 0, 0, 0, 0, 0, TZ_P03_P04, 180, 0, 0, 0, 0, 0, TZ_P03_P04 },
+    { TZ_ASIA_BAHRAIN, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_ASIA_BEIRUT, 120, M_OCT, 5, D_SUN, 0, 0, TZ_EET, 180, M_MAR, 5, D_SUN, 0, 0, TZ_EEST },
+    { TZ_ASIA_DAMASCUS, 120, M_OCT, 5, D_FRI, 0, 0, TZ_EET, 180, M_MAR, 5, D_FRI, 0, 0, TZ_EEST },
+    { TZ_ASIA_DUBAI, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
+    { TZ_ASIA_GAZA, 120, M_OCT, 4, D_SAT, 1, 0, TZ_EET, 180, M_MAR, 4, D_SAT, 0, 0, TZ_EEST },
+    { TZ_ASIA_HEBRON, 120, M_OCT, 4, D_SAT, 1, 0, TZ_EET, 180, M_MAR, 4, D_SAT, 0, 0, TZ_EEST },
+    { TZ_ASIA_JERUSALEM, 120, M_OCT, 5, D_SUN, 2, 0, TZ_IST, 180, M_MAR, 4, D_FRI, 2, 0, TZ_IDT },
+    { TZ_ASIA_KUWAIT, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_ASIA_MUSCAT, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
+    { TZ_ASIA_QATAR, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_ASIA_RIYADH, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_ASIA_TEHRAN, 210, M_SEP, 0, 21, 24, 0, TZ_P0330_P0430, 270, M_MAR, 0, 21, 24, 0, TZ_P0330_P0430 },
+    { TZ_AMERICA_ADAK, -600, M_NOV, 1, D_SUN, 2, 0, TZ_HST, -540, M_MAR, 2, D_SUN, 2, 0, TZ_HDT },
+    { TZ_AMERICA_ANCHORAGE, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
+    { TZ_AMERICA_ATIKOKAN, -300, 0, 0, 0, 0, 0, TZ_EST, -300, 0, 0, 0, 0, 0, TZ_EST },
+    { TZ_AMERICA_NORTH_DAKOTA_BEULAH, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_BLANC_SABLON, -240, 0, 0, 0, 0, 0, TZ_AST, -240, 0, 0, 0, 0, 0, TZ_AST },
+    { TZ_AMERICA_BOISE, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_CAMBRIDGE_BAY, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_NORTH_DAKOTA_CENTER, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_CHICAGO, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_CRESTON, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_DANMARKSHAVN, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
+    { TZ_AMERICA_DAWSON_CREEK, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_DAWSON, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_DENVER, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_DETROIT, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_EDMONTON, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_FORT_NELSON, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_GLACE_BAY, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
+    { TZ_AMERICA_GOOSE_BAY, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
+    { TZ_AMERICA_HALIFAX, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
+    { TZ_AMERICA_INDIANA_INDIANAPOLIS, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_INUVIK, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
+    { TZ_AMERICA_IQALUIT, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_JUNEAU, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
+    { TZ_AMERICA_INDIANA_KNOX, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_LOS_ANGELES, -480, M_NOV, 1, D_SUN, 2, 0, TZ_PST, -420, M_MAR, 2, D_SUN, 2, 0, TZ_PDT },
+    { TZ_AMERICA_KENTUCKY_LOUISVILLE, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_INDIANA_MARENGO, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_MENOMINEE, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_METLAKATLA, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
+    { TZ_AMERICA_MIQUELON, -180, M_NOV, 1, D_SUN, 2, 0, TZ_M03_M02, -120, M_MAR, 2, D_SUN, 2, 0, TZ_M03_M02 },
+    { TZ_AMERICA_MONCTON, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
+    { TZ_AMERICA_KENTUCKY_MONTICELLO, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_NORTH_DAKOTA_NEW_SALEM, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_NEW_YORK, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_NIPIGON, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_NOME, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
+    { TZ_AMERICA_NUUK, -180, M_OCT, 5, D_SUN, -1, 0, TZ_M03_M02, -120, M_MAR, 5, D_SUN, -2, 0, TZ_M03_M02 },
+    { TZ_AMERICA_PANGNIRTUNG, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_INDIANA_PETERSBURG, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_PHOENIX, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_RAINY_RIVER, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_RANKIN_INLET, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_REGINA, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_RESOLUTE, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_SCORESBYSUND, -60, M_OCT, 5, D_SUN, 1, 0, TZ_M01_P00, 0, M_MAR, 5, D_SUN, 0, 0, TZ_M01_P00 },
+    { TZ_AMERICA_SITKA, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
+    { TZ_AMERICA_ST_JOHNS, -210, M_NOV, 1, D_SUN, 2, 0, TZ_NST, -150, M_MAR, 2, D_SUN, 2, 0, TZ_NDT },
+    { TZ_AMERICA_SWIFT_CURRENT, -360, 0, 0, 0, 0, 0, TZ_CST, -360, 0, 0, 0, 0, 0, TZ_CST },
+    { TZ_AMERICA_INDIANA_TELL_CITY, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_THULE, -240, M_NOV, 1, D_SUN, 2, 0, TZ_AST, -180, M_MAR, 2, D_SUN, 2, 0, TZ_ADT },
+    { TZ_AMERICA_THUNDER_BAY, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_TORONTO, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_VANCOUVER, -480, M_NOV, 1, D_SUN, 2, 0, TZ_PST, -420, M_MAR, 2, D_SUN, 2, 0, TZ_PDT },
+    { TZ_AMERICA_INDIANA_VEVAY, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_INDIANA_VINCENNES, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_WHITEHORSE, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
+    { TZ_AMERICA_INDIANA_WINAMAC, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 2, D_SUN, 2, 0, TZ_EDT },
+    { TZ_AMERICA_WINNIPEG, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 2, D_SUN, 2, 0, TZ_CDT },
+    { TZ_AMERICA_YAKUTAT, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 2, D_SUN, 2, 0, TZ_AKDT },
+    { TZ_AMERICA_YELLOWKNIFE, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 2, D_SUN, 2, 0, TZ_MDT },
     { TZ_PACIFIC_APIA, 780, M_APR, 1, D_SUN, 4, 0, TZ_P13_P14, 840, M_SEP, 5, D_SUN, 3, 0, TZ_P13_P14 },
     { TZ_PACIFIC_AUCKLAND, 720, M_APR, 1, D_SUN, 3, 0, TZ_NZST, 780, M_SEP, 5, D_SUN, 2, 0, TZ_NZDT },
     { TZ_PACIFIC_BOUGAINVILLE, 660, 0, 0, 0, 0, 0, TZ_P11, 660, 0, 0, 0, 0, 0, TZ_P11 },
@@ -999,6 +1059,46 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_PACIFIC_TONGATAPU, 780, 0, 0, 0, 0, 0, TZ_P13_P14, 780, 0, 0, 0, 0, 0, TZ_P13_P14 },
     { TZ_PACIFIC_WAKE, 720, 0, 0, 0, 0, 0, TZ_P12, 720, 0, 0, 0, 0, 0, TZ_P12 },
     { TZ_PACIFIC_WALLIS, 720, 0, 0, 0, 0, 0, TZ_P12, 720, 0, 0, 0, 0, 0, TZ_P12 },
+    { TZ_AMERICA_ARAGUAINA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_ASUNCION, -240, M_MAR, 4, D_SUN, 0, 0, TZ_M04_M03, -180, M_OCT, 1, D_SUN, 0, 0, TZ_M04_M03 },
+    { TZ_AMERICA_BAHIA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_BELEM, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_BOA_VISTA, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_AMERICA_BOGOTA, -300, 0, 0, 0, 0, 0, TZ_M05_M04, -300, 0, 0, 0, 0, 0, TZ_M05_M04 },
+    { TZ_AMERICA_ARGENTINA_BUENOS_AIRES, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
+    { TZ_AMERICA_CAMPO_GRANDE, -240, 0, 0, 0, 0, 0, TZ_M04_M03, -240, 0, 0, 0, 0, 0, TZ_M04_M03 },
+    { TZ_AMERICA_CARACAS, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_AMERICA_ARGENTINA_CATAMARCA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_CAYENNE, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_ARGENTINA_CORDOBA, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
+    { TZ_AMERICA_CUIABA, -240, 0, 0, 0, 0, 0, TZ_M04_M03, -240, 0, 0, 0, 0, 0, TZ_M04_M03 },
+    { TZ_AMERICA_EIRUNEPE, -300, 0, 0, 0, 0, 0, TZ_M05, -300, 0, 0, 0, 0, 0, TZ_M05 },
+    { TZ_AMERICA_FORTALEZA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_GUAYAQUIL, -300, 0, 0, 0, 0, 0, TZ_M05_M04, -300, 0, 0, 0, 0, 0, TZ_M05_M04 },
+    { TZ_AMERICA_GUYANA, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_AMERICA_ARGENTINA_JUJUY, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_LA_PAZ, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_AMERICA_ARGENTINA_LA_RIOJA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_LIMA, -300, 0, 0, 0, 0, 0, TZ_M05_M04, -300, 0, 0, 0, 0, 0, TZ_M05_M04 },
+    { TZ_AMERICA_MACEIO, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_MANAUS, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_AMERICA_ARGENTINA_MENDOZA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_MONTEVIDEO, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
+    { TZ_AMERICA_NORONHA, -120, 0, 0, 0, 0, 0, TZ_M02, -120, 0, 0, 0, 0, 0, TZ_M02 },
+    { TZ_AMERICA_PARAMARIBO, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_PORTO_VELHO, -240, 0, 0, 0, 0, 0, TZ_M04, -240, 0, 0, 0, 0, 0, TZ_M04 },
+    { TZ_AMERICA_PUNTA_ARENAS, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_RECIFE, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_RIO_BRANCO, -300, 0, 0, 0, 0, 0, TZ_M05, -300, 0, 0, 0, 0, 0, TZ_M05 },
+    { TZ_AMERICA_ARGENTINA_RIO_GALLEGOS, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_ARGENTINA_SALTA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_ARGENTINA_SAN_JUAN, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_ARGENTINA_SAN_LUIS, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_SANTAREM, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
+    { TZ_AMERICA_SANTIAGO, -240, M_APR, 1, D_SUN, 0, 0, TZ_M04_M03, -180, M_SEP, 1, D_SUN, 0, 0, TZ_M04_M03 },
+    { TZ_AMERICA_SAO_PAULO, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
+    { TZ_AMERICA_ARGENTINA_TUCUMAN, -180, 0, 0, 0, 0, 0, TZ_M03_M02, -180, 0, 0, 0, 0, 0, TZ_M03_M02 },
+    { TZ_AMERICA_ARGENTINA_USHUAIA, -180, 0, 0, 0, 0, 0, TZ_M03, -180, 0, 0, 0, 0, 0, TZ_M03 },
 };
 
 #endif /* TZDATA_H */

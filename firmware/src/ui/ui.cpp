@@ -51,19 +51,18 @@ bool onKeypress( Screen* screen, uint8_t key ) {
  * @param   screen        Pointer to the screen where the event occured.
  * @param   item          Item being drawn.
  * @param   isSelected    TRUE if the item is currently selectedor False otherwise.
+ * @param   index         Currently selected index for list item
  * @param   row           Zero-based Y position where the item is located.
  * @param   col           Zero-based X position where the item is located.
  *
  * @return  TRUE to allow default item drawing, FALSE to override.
  * 
  */
-bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row, uint8_t col ) {
+bool onDrawItem( Screen* screen, ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col ) {
     uint8_t length;
 
     switch( item->getId() ) {
         case ID_PROFILE_FILENAME:
-
-            g_lcd.print( isSelected ? CHAR_SELECT : CHAR_FIELD_BEGIN );
 
             if( g_alarm.profile.filename[0] == 0x00 ) {
                 length = g_lcd.print_P( S_PROFILE_DEF_FILENAME );
@@ -73,7 +72,6 @@ bool onDrawItem( Screen* screen, ScreenItem* item, bool isSelected, uint8_t row,
             }
 
             g_lcd.fill( CHAR_SPACE, item->getLength() - length );
-            g_lcd.print( isSelected ? CHAR_SELECT_REV : CHAR_FIELD_END );
 
             return false;
 
@@ -382,7 +380,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
  * @param   screen    Pointer to the new screen.
  * 
  */
-void onEnterScreen( Screen* screen ) {
+void onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 
     DateTime now;
 

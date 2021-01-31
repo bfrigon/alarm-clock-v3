@@ -124,8 +124,11 @@ bool netStatus_onKeypress( Screen* screen, uint8_t key ) {
  *
  * 
  */
-void netStatus_onEnterScreen( Screen* screen ) {
-    g_netStatusPage = 0;
+void netStatus_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
+
+    if( prevScreenID != SCREEN_ID_SUSPEND ) {
+        g_netStatusPage = 0;
+    }
 
 }
 

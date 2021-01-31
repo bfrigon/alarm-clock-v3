@@ -20,19 +20,6 @@
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Event raised when entering the screen
- *
- * @param   screen    Pointer to the screen where the event occured.
- *
- */
-void suspendScreen_onEnterScreen( Screen* screen ) {
-
-
-}
-
-
-/*! ------------------------------------------------------------------------
- *
  * @brief   Event raised when a key press occurs
  *
  * @param   screen    Pointer to the screen where the event occured.

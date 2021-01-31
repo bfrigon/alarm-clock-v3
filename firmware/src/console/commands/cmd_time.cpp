@@ -19,6 +19,7 @@
 #include "../../task_errors.h"
 #include "../../libs/time.h"
 #include "../../libs/timezone.h"
+#include "../../libs/tzdata.h"
 #include "../../drivers/neoclock.h"
 #include "../../services/ntpclient.h"
 #include "../../ui/ui.h"
@@ -323,6 +324,7 @@ void ConsoleBase::runCommandSetTimeZone() {
 
     /* Set new time zone and save config */
     g_timezone.setTimezoneByID( id );
+    strcpy_P( g_config.clock.timezone, g_timezone.getName() );
     
     g_config.save( EEPROM_SECTION_CLOCK );
 

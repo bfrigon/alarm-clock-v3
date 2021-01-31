@@ -25,7 +25,7 @@
  * @param   screen    Pointer to the screen where the event occured.
  *
  */
-void showAlarmScreen_onEnterScreen( Screen* screen ) {
+void showAlarmScreen_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 
     screen->setTimeout( 3000 );
 
@@ -64,6 +64,8 @@ bool showAlarmScreen_onExitScreen( Screen* screen  ) {
 
     /* Restore clock */
     g_clock.restoreClockDisplay();
+
+    return true;
 }
 
 

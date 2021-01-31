@@ -45,7 +45,7 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
  * @param   screen    Pointer to the screen where the event occured.
  *
  */
-void settingsManager_onEnterScreen( Screen* screen ) {
+void settingsManager_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 
     screen->setTimeout( 0 );
     confirm_action = false;

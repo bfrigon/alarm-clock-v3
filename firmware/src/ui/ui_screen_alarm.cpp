@@ -28,7 +28,7 @@ bool showHelpMsg = false;
  * @param   screen    Pointer to the screen where the event occured.
  * 
  */
-void alarmScreen_onEnterScreen( Screen *screen ) {
+void alarmScreen_onEnterScreen( Screen *screen, uint8_t prevScreenID ) {
 
     screen->setTimeout( 3000 );
 

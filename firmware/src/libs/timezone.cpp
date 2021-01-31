@@ -16,6 +16,7 @@
 //
 //******************************************************************************
 #include "timezone.h"
+#include "tzdata.h"
 #include "../config.h"
 
 
@@ -25,10 +26,9 @@
  *
  */
 TimeZone::TimeZone() {
-    _id = 0;
 
     /* set default timezone to Etc/UTC */
-    memcpy_P( &_tz, &TimeZonesTable[ 0 ], sizeof( TimeZoneRules ));
+    this->setTimezoneByID( 0 );
 }
 
 
@@ -48,7 +48,6 @@ bool TimeZone::setTimezoneByID( uint16_t id ) {
     _id = id;
 
     memcpy_P( &_tz, &TimeZonesTable[ id ], sizeof( TimeZoneRules ));
-    strcpy_P( g_config.clock.timezone, this->getName() );
 
     return true;
 }
@@ -72,6 +71,8 @@ bool TimeZone::setTimezoneByName( char *name ) {
     }
 
     this->setTimezoneByID( id );
+
+    return true;
 }
 
 

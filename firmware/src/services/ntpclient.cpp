@@ -23,6 +23,7 @@
 #include "../drivers/neoclock.h"
 #include "../console/console_base.h"
 #include "../libs/timezone.h"
+#include "../libs/tzdata.h"
 
 
 /*! ------------------------------------------------------------------------

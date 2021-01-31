@@ -38,36 +38,32 @@ enum {
     DATETIME_FORMAT_WDMMMDDYYYY    
 };
 
-#define M_JAN       1
-#define M_FEB       2
-#define M_MAR       3
-#define M_APR       4
-#define M_MAY       5
-#define M_JUN       6
-#define M_JUL       7
-#define M_AUG       8
-#define M_SEP       9
-#define M_OCT       10
-#define M_NOV       11
-#define M_DEC       12
+enum {
+    M_JAN = 1,
+    M_FEB,
+    M_MAR,
+    M_APR,
+    M_MAY,
+    M_JUN,
+    M_JUL,
+    M_AUG,
+    M_SEP,
+    M_OCT,
+    M_NOV,
+    M_DEC,
+};
 
-#define D_SUN       0
-#define D_MON       1
-#define D_TUE       2
-#define D_WED       3
-#define D_THU       4
-#define D_FRI       5
-#define D_SAT       6
-
-
-
-const char TZ_NULL[] PROGMEM = { "" };
-
+enum {
+    D_SUN = 0,
+    D_MON,
+    D_TUE,
+    D_WED,
+    D_THU,
+    D_FRI,
+    D_SAT,
+};
 
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))
-
-
-
 
 struct Time {
     uint8_t hour;
@@ -80,25 +76,7 @@ struct Date {
     uint8_t year;
 };
 
-struct TimeZoneRules {
-    const char *name;
 
-    int16_t std_offset;
-    uint8_t std_month: 4;
-    uint8_t std_week: 3;
-    uint8_t std_dow: 6;
-    uint8_t std_hour: 5;
-    uint8_t std_min: 6;
-    const char *std_abbvr;
-
-    int16_t dst_offset;
-    uint8_t dst_month: 4;
-    uint8_t dst_week: 3;
-    uint8_t dst_dow: 6;
-    uint8_t dst_hour: 5;
-    uint8_t dst_min: 6;
-    const char *dst_abbvr;
-};
 
 class DateTime {
   public:
