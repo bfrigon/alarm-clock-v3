@@ -51,8 +51,6 @@ void ConsoleBase::runCommandConfigBackup() {
         if( this->processInput() == false ) {
             return;
         }
-
-        this->trimInput();
     }
 
     /* Check for a filename in the command parameters */
@@ -199,8 +197,6 @@ void ConsoleBase::runCommandConfigRestore() {
         if( this->processInput() == false ) {
             return;
         }
-
-        this->trimInput();
     }
 
     /* Check for a filename in the command parameters */
@@ -333,8 +329,6 @@ void ConsoleBase::runCommandFactoryReset() {
         if( this->processInput() == false ) {
             return;
         }
-
-        this->trimInput();
     }
 
     switch( _taskIndex++ ) {

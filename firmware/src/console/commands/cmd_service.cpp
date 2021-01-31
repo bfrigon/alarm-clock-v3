@@ -65,8 +65,8 @@ void ConsoleBase::openCommandService() {
     /* Split parameters. first one is the service name, second one is 
        the action to take */
     char *param_name, *param_action, *ptr;
-    param_name = strtok_rP( param, S_CONSOLE_PARAMS_DELIMITER, &ptr );
-    param_action = strtok_rP( NULL, S_CONSOLE_PARAMS_DELIMITER, &ptr );
+    param_name = strtok_rP( param, PSTR( "\x20" ), &ptr );
+    param_action = strtok_rP( NULL, PSTR( "\x20" ), &ptr );
 
     if( strlen( param_name ) == 0 || strlen( param_action ) == 0 ) {
         

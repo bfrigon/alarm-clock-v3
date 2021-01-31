@@ -396,8 +396,6 @@ void ConsoleBase::runCommandNetworkConfig() {
         if( this->processInput() == false ) {
             return;
         }
-
-        this->trimInput();
     }
 
     switch( _taskIndex++ ) {

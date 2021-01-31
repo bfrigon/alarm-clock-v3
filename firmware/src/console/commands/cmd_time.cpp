@@ -29,6 +29,36 @@
 static char* param_tz_name;
 static DateTime cmd_time_adj;
 bool cmd_time_use_ntp;
+uint8_t selected_region;
+
+/* Set timezone command task steps */
+enum {
+    STEP_PRINT_REGION_LIST = 0,
+    STEP_PROMPT_SELECT_REGION = MAX_TZ_REGION_NAMES,
+    STEP_VALIDATE_REGION,
+    STEP_PRINT_TZ_LIST,
+    STEP_PROMPT_SELECT_TZ  = STEP_PRINT_TZ_LIST + MAX_TIMEZONE_ID,
+    STEP_VALIDATE_TZ_INDEX,
+    STEP_VALIDATE_TZ_NAME,
+    STEP_SET_TZ,
+};
+
+/* Set date command task steps */
+enum {
+    STEP_DISPLAY_SYNC_NTP_PROMPT,
+    STEP_VALIDATE_SYNC_NTP_PROMPT,
+    STEP_DISPLAY_DATE_PROMPT,
+    STEP_VALIDATE_DATE_PROMPT,
+    STEP_DISPLAY_TIME_PROMPT,
+    STEP_VALIDATE_TIME_PROMPT,
+    STEP_DISPLAY_APPLY_SETTINGS_PROMPT,
+    STEP_VALIDATE_APPLY_SETTINGS_PROMPT,
+    STEP_MONITOR_NTP_SYNC_COMPLETION,
+    
+
+};
+
+
 
 /*! ------------------------------------------------------------------------
  *
@@ -38,7 +68,7 @@ bool cmd_time_use_ntp;
  *           
  */
 bool ConsoleBase::openCommandSetDate() {
-    _taskIndex = 0;
+    _taskIndex = STEP_DISPLAY_SYNC_NTP_PROMPT;
 
     cmd_time_adj = g_rtc.now();
     g_timezone.toLocal( &cmd_time_adj );
@@ -66,15 +96,13 @@ void ConsoleBase::runCommandSetDate() {
         if( this->processInput() == false ) {
             return;
         }
-
-        this->trimInput();
     }
     
 
     switch( _taskIndex++ ) {
 
         /* Display 'synchronize with ntp' prompt */
-        case 0:
+        case STEP_DISPLAY_SYNC_NTP_PROMPT:
             _inputBufferLimit = 1;
 
             this->println();
@@ -82,11 +110,11 @@ void ConsoleBase::runCommandSetDate() {
             break;
 
         /* Validate 'synchronize with ntp' response */
-        case 1:
+        case STEP_VALIDATE_SYNC_NTP_PROMPT:
             if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 cmd_time_use_ntp = true;
-                _taskIndex = 6;
+                _taskIndex = STEP_DISPLAY_APPLY_SETTINGS_PROMPT;
 
             } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
 
@@ -96,57 +124,57 @@ void ConsoleBase::runCommandSetDate() {
 
                 /* If using ntp, skip manual time set */
                 if( cmd_time_use_ntp == true ) {
-                    _taskIndex = 6;
+                    _taskIndex = STEP_DISPLAY_APPLY_SETTINGS_PROMPT;
                 }
 
             } else {
                 this->println_P( S_CONSOLE_INVALID_INPUT_BOOL );
 
                 /* try again */
-                _taskIndex = 0;
+                _taskIndex = STEP_DISPLAY_SYNC_NTP_PROMPT;
             }
             break;
 
         /* Display 'enter date' prompt */
-        case 2:
+        case STEP_DISPLAY_DATE_PROMPT:
             _inputBufferLimit = INPUT_BUFFER_LENGTH;
 
             this->printf_P( S_CONSOLE_TIME_CFG_DATE, cmd_time_adj.year(), cmd_time_adj.month(), cmd_time_adj.day() );
             break;
 
         /* Validate 'enter date' response */
-        case 3:
+        case STEP_VALIDATE_DATE_PROMPT:
             
             if( strlen( _inputBuffer ) > 0 && ( strptime( _inputBuffer, "%Y-%m-%d", &cmd_time_adj ) == NULL )) {
                 this->println_P( S_CONSOLE_INVALID_DATE_FMT );
                 this->println();
 
                 /* try again */
-                _taskIndex = 2;
+                _taskIndex = STEP_DISPLAY_DATE_PROMPT;
             }
             break;
 
         /* Display 'enter time' prompt */
-        case 4:
+        case STEP_DISPLAY_TIME_PROMPT:
             _inputBufferLimit = INPUT_BUFFER_LENGTH;
 
             this->printf_P( S_CONSOLE_TIME_CFG_TIME, cmd_time_adj.hour(), cmd_time_adj.minute() );
             break;
 
         /* Validate 'enter time' response */
-        case 5:
+        case STEP_VALIDATE_TIME_PROMPT:
             if( strlen( _inputBuffer ) > 0 && ( strptime( _inputBuffer, "%H:%M", &cmd_time_adj ) == NULL )) {
                 this->println_P( S_CONSOLE_INVALID_TIME_FMT );
                 this->println();
 
                 /* try again */
-                _taskIndex = 4;
+                _taskIndex = STEP_DISPLAY_TIME_PROMPT;
             }
 
             break;
 
         /* Display 'apply settings' prompt */
-        case 6:
+        case STEP_DISPLAY_APPLY_SETTINGS_PROMPT:
             _inputBufferLimit = 1;
 
             this->println();
@@ -155,7 +183,7 @@ void ConsoleBase::runCommandSetDate() {
             break;
 
         /* Validate 'apply settings' response */
-        case 7:
+        case STEP_VALIDATE_APPLY_SETTINGS_PROMPT:
             if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 g_config.clock.use_ntp = cmd_time_use_ntp;
@@ -168,7 +196,7 @@ void ConsoleBase::runCommandSetDate() {
                     /* Enable auto sync and synchronize now */
                     g_ntp.setAutoSync( true, this );
 
-                    _taskIndex = 8;
+                    _taskIndex = STEP_MONITOR_NTP_SYNC_COMPLETION;
                     break;
 
                 } else {
@@ -203,12 +231,12 @@ void ConsoleBase::runCommandSetDate() {
                 
 
                 /* try again */
-                _taskIndex = 6;
+                _taskIndex = STEP_DISPLAY_APPLY_SETTINGS_PROMPT;
             }
             break;
 
         /* Monitor NTP sync completion */
-        case 8:
+        case STEP_MONITOR_NTP_SYNC_COMPLETION:
 
             if( g_ntp.isBusy() == false ) {
 
@@ -216,7 +244,7 @@ void ConsoleBase::runCommandSetDate() {
                 return;
             }
 
-            _taskIndex = 8;
+            _taskIndex = STEP_MONITOR_NTP_SYNC_COMPLETION;
     }
 
     this->resetInput();
@@ -267,7 +295,6 @@ void ConsoleBase::runCommandPrintDateTime() {
  *           
  */
 bool ConsoleBase::openCommandSetTimeZone() {
-
     
     param_tz_name = this->getInputParameter();
 
@@ -276,9 +303,10 @@ bool ConsoleBase::openCommandSetTimeZone() {
         this->print_P( S_CONSOLE_TIME_CURRENT_TZ );
         this->println_P( g_timezone.getName() );
         this->println();
-
-        this->print_P( S_CONSOLE_TIME_ENTER_TZ );
     }
+
+    _taskIndex = STEP_PRINT_REGION_LIST;
+    selected_region = 0;
 
     this->startTask( TASK_CONSOLE_SET_TZ );
     return true;
@@ -292,47 +320,193 @@ bool ConsoleBase::openCommandSetTimeZone() {
  *           
  */
 void ConsoleBase::runCommandSetTimeZone() {
-    int16_t id;
-
+    int16_t zone_id;
     
-    if( param_tz_name == 0 ) {
+    if( param_tz_name > 0 ) {
+        
+        zone_id = findTimezoneByName( param_tz_name );
+
+        if( zone_id < 0 ) {
+            this->endTask( ERR_CONSOLE_INVALID_TIMEZONE );
+            return;
+        }
+
+        _taskIndex = STEP_SET_TZ;
+    }
+
+
+    /* Print time zone region list */
+    if( _taskIndex < STEP_PROMPT_SELECT_REGION ) {
+        this->printf_P( PSTR( "%2d) %-20S " ), _taskIndex + 1, _TZ_REGION_NAMES[ _taskIndex ]);
+
+        if( _taskIndex % 2 || _taskIndex == STEP_PROMPT_SELECT_REGION - 1 ) {
+            this->println();
+        }
+
+        if( _taskIndex == STEP_PROMPT_SELECT_REGION - 1 ) {
+            this->println();
+
+            this->println_P( S_CONSOLE_TIME_EXIT_MENU );
+            this->println();
+        }
+
+        _taskIndex++;
+        return;
+    }
+
+
+    /* Print select region prompt */
+    if( _taskIndex == STEP_PROMPT_SELECT_REGION ) {
+        this->print_P( S_CONSOLE_TIME_ENTER_TZ_NAME );
+
+        _taskIndex++;
+        return;
+    }
+
+
+    /* Validate select region prompt */
+    if( _taskIndex == STEP_VALIDATE_REGION ) {
+
         if( this->processInput() == false ) {
             return;
         }
 
-        this->trimInput();
+        if( atoi( _inputBuffer ) > 0 ) {
+            selected_region = atoi( _inputBuffer ) - 1;
 
-        /* If empty, keep existing time zone */
-        if( strlen( _inputBuffer ) == 0 ) {
-            this->endTask( TASK_SUCCESS );
+            if( selected_region >= MAX_TZ_REGION_NAMES ) {
+                this->println_P( S_CONSOLE_TIME_INVALID_SEL );
+                this->println();
+
+                _taskIndex = STEP_PROMPT_SELECT_REGION;
+
+                this->resetInput();
+                return;
+            }
+
+            this->println();
+            _taskIndex = STEP_PRINT_TZ_LIST + getTzRegionStartIndex( selected_region );
+
+            this->resetInput();
             return;
+            
+        } else {
+
+            /* If empty, keep existing time zone */
+            if( strlen( _inputBuffer ) == 0 ) {
+
+                this->endTask( TASK_SUCCESS );
+                return;
+            }
+
+            zone_id = findTimezoneByName( _inputBuffer );
+
+            if( zone_id < 0 )  {
+
+                this->println_P( S_CONSOLE_TIME_INVALID_TZ );
+                this->println();
+
+                _taskIndex = STEP_PROMPT_SELECT_REGION;
+
+                this->resetInput();
+                return;
+            }
+
+            this->resetInput();
+
+            _taskIndex = STEP_SET_TZ;
         }
-
-        
-        id = g_timezone.findTimezoneByName( _inputBuffer );
-
-    /* Timezone provided as a parameter */
-    } else {
-        id = g_timezone.findTimezoneByName( param_tz_name );
     }
 
-    if( id < 0 )  {
 
-        this->endTask( ERR_CONSOLE_INVALID_TIMEZONE );
+    /* Print time zones list within selected region */
+    if( _taskIndex <= getTzRegionEndIndex( selected_region ) + STEP_PRINT_TZ_LIST ) {
+
+        TimeZone tz;
+        tz.setTimezoneByID( _taskIndex - STEP_PRINT_TZ_LIST );
+        
+        this->printf_P( PSTR( "%2d) %-36S " ), 
+                        _taskIndex - STEP_PRINT_TZ_LIST - getTzRegionStartIndex( selected_region ) + 1, 
+                        tz.getName() );
+
+        if(( _taskIndex - STEP_PRINT_TZ_LIST ) % 2 || _taskIndex == getTzRegionEndIndex( selected_region ) + STEP_PRINT_TZ_LIST ) {
+            this->println();
+        }
+
+        if( _taskIndex == getTzRegionEndIndex( selected_region ) + STEP_PRINT_TZ_LIST ) {
+
+            this->println();
+            this->println_P( S_CONSOLE_TIME_INSTR_RETURN );
+            this->println();
+
+            _taskIndex = STEP_PROMPT_SELECT_TZ;
+
+        } else {
+            _taskIndex++;
+        }
+        
         return;
     }
 
-    /* Set new time zone and save config */
-    g_timezone.setTimezoneByID( id );
-    strcpy_P( g_config.clock.timezone, g_timezone.getName() );
-    
-    g_config.save( EEPROM_SECTION_CLOCK );
 
-    this->print_P( S_CONSOLE_TIME_NEW_TZ );
-    this->println_P( g_timezone.getName() );
+    /* Print select timezone prompt */
+    if( _taskIndex == STEP_PROMPT_SELECT_TZ ) {
+        this->print_P( S_CONSOLE_TIME_SELECT_TZ );
 
-    /* Request clock display update */
-    g_clock.requestClockUpdate();
+        _taskIndex++;
+        return;
+    }
+
+
+    /* Validate select timezone prompt */
+    if( _taskIndex == STEP_VALIDATE_TZ_INDEX ) {
+
+        if( this->processInput() == false ) {
+            return;
+        }
+        
+        if( strlen( _inputBuffer ) == 0 || strcasecmp_P( _inputBuffer, PSTR( "0")) == 0 ) { 
+            _taskIndex = STEP_PRINT_REGION_LIST;
+
+            this->resetInput();
+            return;
+        }
+
+        zone_id = ( atoi( _inputBuffer ) - 1 ) + getTzRegionStartIndex( selected_region );
+        Serial.println( zone_id );
+
+        /* Checks if selected zone is within region boundaries */
+        if( zone_id < getTzRegionStartIndex( selected_region ) || 
+            zone_id > getTzRegionEndIndex( selected_region )) {
+
+            this->println_P( S_CONSOLE_TIME_INVALID_SEL );
+            this->println();
+
+            _taskIndex = STEP_PROMPT_SELECT_TZ;
+
+            this->resetInput();
+            return;
+        }
+        
+        _taskIndex = STEP_SET_TZ;
+    }
+
+
+    /* Set new timezone */
+    if( _taskIndex == STEP_SET_TZ ) {
+
+        g_timezone.setTimezoneByID( zone_id );
+        strcpy_P( g_config.clock.timezone, g_timezone.getName() );
+        
+        g_config.save( EEPROM_SECTION_CLOCK );
+
+        this->println();
+        this->print_P( S_CONSOLE_TIME_NEW_TZ );
+        this->println_P( g_timezone.getName() );
+
+        /* Request clock display update */
+        g_clock.requestClockUpdate();
+    }
 
     this->endTask( TASK_SUCCESS );
 }

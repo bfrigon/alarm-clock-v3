@@ -33,7 +33,7 @@
 #include "timezone.h"
 
 #define MAX_TIMEZONE_ID                  458
-#define TZ_DB_VERSION                    "2020f"
+#define TZ_DB_VERSION                    "2021a"
 
 #define TZ_REGION_AFRICA_INDEX           0
 #define TZ_REGION_AFRICA_SIZE            52
@@ -666,7 +666,7 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_AFRICA_GABORONE, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
     { TZ_AFRICA_HARARE, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
     { TZ_AFRICA_JOHANNESBURG, 120, 0, 0, 0, 0, 0, TZ_SAST, 120, 0, 0, 0, 0, 0, TZ_SAST },
-    { TZ_AFRICA_JUBA, 180, 0, 0, 0, 0, 0, TZ_EAT, 180, 0, 0, 0, 0, 0, TZ_EAT },
+    { TZ_AFRICA_JUBA, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
     { TZ_AFRICA_KAMPALA, 180, 0, 0, 0, 0, 0, TZ_EAT, 180, 0, 0, 0, 0, 0, TZ_EAT },
     { TZ_AFRICA_KHARTOUM, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
     { TZ_AFRICA_KIGALI, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },

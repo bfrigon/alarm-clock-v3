@@ -64,7 +64,7 @@ bool TimeZone::setTimezoneByID( uint16_t id ) {
  */
 bool TimeZone::setTimezoneByName( char *name ) {
     int16_t id;
-    id = this->findTimezoneByName( name );
+    id = findTimezoneByName( name );
 
     if( id < 0 ) {
         return false;
@@ -73,32 +73,6 @@ bool TimeZone::setTimezoneByName( char *name ) {
     this->setTimezoneByID( id );
 
     return true;
-}
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Find a timezone index in the table from it's name.
- *
- * @param   name   Pointer to an array of character containg the name 
- *                 to search for
- *
- * @return  The timezone index in the table
- * 
- */
-int16_t TimeZone::findTimezoneByName( char* name ) {
-
-    int16_t i;
-    for( i = 0; i < MAX_TIMEZONE_ID; i++ ) {
-        char *tz_name_ptr;
-        tz_name_ptr = (char *)pgm_read_word( &( TimeZonesTable[ i ].name ));
-
-        if ( strcasecmp_P( name, tz_name_ptr ) == 0 ) {
-            return i;
-        }
-    }
-
-    return -1;
 }
 
 
@@ -306,4 +280,109 @@ int16_t TimeZone::getStdUtcOffset() {
  */
 int16_t TimeZone::getDstUtcOffset() {
     return _tz.dst_offset;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Find a timezone index in the table from it's name.
+ *
+ * @param   name   Pointer to an array of character containg the name 
+ *                 to search for
+ *
+ * @return  The timezone index in the table
+ * 
+ */
+int16_t findTimezoneByName( char* name ) {
+
+    int16_t i;
+    for( i = 0; i < MAX_TIMEZONE_ID; i++ ) {
+        char *tz_name_ptr;
+        tz_name_ptr = (char *)pgm_read_word( &( TimeZonesTable[ i ].name ));
+
+        if ( strcasecmp_P( name, tz_name_ptr ) == 0 ) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Gets a region starting index in the timezone table
+ *
+ * @param   region    Region ID
+ *
+ * @return  The starting index of the region block OR 0 if invalid region
+ *          is specified.
+ * 
+ */
+uint16_t getTzRegionStartIndex( uint8_t region ) {
+    switch( region ) {
+        case TZ_REGION_AFRICA:          return TZ_REGION_AFRICA_INDEX;
+        case TZ_REGION_ANTARCTICA:      return TZ_REGION_ANTARCTICA_INDEX;
+        case TZ_REGION_ARCTIC_OCEAN:    return TZ_REGION_ARCTIC_OCEAN_INDEX;
+        case TZ_REGION_ASIA:            return TZ_REGION_ASIA_INDEX;
+        case TZ_REGION_ATLANTIC_OCEAN:  return TZ_REGION_ATLANTIC_OCEAN_INDEX;
+        case TZ_REGION_AUSTRALIA:       return TZ_REGION_AUSTRALIA_INDEX;
+        case TZ_REGION_CARIBBEAN:       return TZ_REGION_CARIBBEAN_INDEX;
+        case TZ_REGION_CENTRAL_AMERICA: return TZ_REGION_CENTRAL_AMERICA_INDEX;
+        case TZ_REGION_ETCETERA:        return TZ_REGION_ETCETERA_INDEX;
+        case TZ_REGION_EUROPE:          return TZ_REGION_EUROPE_INDEX;
+        case TZ_REGION_INDIAN_OCEAN:    return TZ_REGION_INDIAN_OCEAN_INDEX;
+        case TZ_REGION_MIDDLE_EAST:     return TZ_REGION_MIDDLE_EAST_INDEX;
+        case TZ_REGION_NORTH_AMERICA:   return TZ_REGION_NORTH_AMERICA_INDEX;
+        case TZ_REGION_PACIFIC_OCEAN:   return TZ_REGION_PACIFIC_OCEAN_INDEX;
+        case TZ_REGION_SOUTH_AMERICA:   return TZ_REGION_SOUTH_AMERICA_INDEX;
+        default:                        return 0;
+    }
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Gets a region block size in the timezone table
+ *
+ * @param   region    Region ID
+ *
+ * @return  The size of the region block OR 0 if invalid region
+ *          is specified.
+ * 
+ */
+uint16_t getTzRegionSize( uint8_t region ) {
+    switch( region ) {
+        case TZ_REGION_AFRICA:          return TZ_REGION_AFRICA_SIZE;
+        case TZ_REGION_ANTARCTICA:      return TZ_REGION_ANTARCTICA_SIZE;
+        case TZ_REGION_ARCTIC_OCEAN:    return TZ_REGION_ARCTIC_OCEAN_SIZE;
+        case TZ_REGION_ASIA:            return TZ_REGION_ASIA_SIZE;
+        case TZ_REGION_ATLANTIC_OCEAN:  return TZ_REGION_ATLANTIC_OCEAN_SIZE;
+        case TZ_REGION_AUSTRALIA:       return TZ_REGION_AUSTRALIA_SIZE;
+        case TZ_REGION_CARIBBEAN:       return TZ_REGION_CARIBBEAN_SIZE;
+        case TZ_REGION_CENTRAL_AMERICA: return TZ_REGION_CENTRAL_AMERICA_SIZE;
+        case TZ_REGION_ETCETERA:        return TZ_REGION_ETCETERA_SIZE;
+        case TZ_REGION_EUROPE:          return TZ_REGION_EUROPE_SIZE;
+        case TZ_REGION_INDIAN_OCEAN:    return TZ_REGION_INDIAN_OCEAN_SIZE;
+        case TZ_REGION_MIDDLE_EAST:     return TZ_REGION_MIDDLE_EAST_SIZE;
+        case TZ_REGION_NORTH_AMERICA:   return TZ_REGION_NORTH_AMERICA_SIZE;
+        case TZ_REGION_PACIFIC_OCEAN:   return TZ_REGION_PACIFIC_OCEAN_SIZE;
+        case TZ_REGION_SOUTH_AMERICA:   return TZ_REGION_SOUTH_AMERICA_SIZE;
+        default:                        return 0;
+    }
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Gets a region ending index in the timezone table
+ *
+ * @param   region    Region ID
+ *
+ * @return  The ending index of the region block OR 0 if invalid region
+ *          is specified.
+ * 
+ */
+uint16_t getTzRegionEndIndex( uint8_t region ) {
+    return getTzRegionStartIndex( region ) + getTzRegionSize( region ) - 1;
 }

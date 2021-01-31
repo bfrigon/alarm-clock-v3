@@ -307,6 +307,9 @@ bool ConsoleBase::processInput() {
 
         this->println();
 
+        /* Remove unnecessary spaces */
+        this->trimInput();
+
         return true;
 
     /* Control sequence start */
@@ -553,6 +556,7 @@ void ConsoleBase::parseCommand() {
     /* 'free' command */
     } else if( this->matchCommandName( S_COMMAND_FREE, false ) == true ) {
         this->printfln_P( S_CONSOLE_FREEMEM, g_freeMemory );
+        this->printfln_P( S_CONSOLE_TOTALMEM, RAMEND - RAMSTART + 1 );
         this->println();
         
 
@@ -600,8 +604,7 @@ void ConsoleBase::runTasks() {
         /* If no task is running, process the input buffer */
         if( this->processInput() == true ) {
 
-            /* Remove unnecessary spaces */
-            this->trimInput();
+            
 
             /* Store the command in the history buffer */
             this->writeHistoryBuffer();

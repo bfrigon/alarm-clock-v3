@@ -43,23 +43,25 @@ enum {
     TZ_REGION_UNKNOWN,
 };
 
-
-PROG_STR( S_TZ_REGION_AFRICA,           "Africa" );
-PROG_STR( S_TZ_REGION_NORTH_AMERICA,    "North america" );
-PROG_STR( S_TZ_REGION_SOUTH_AMERICA,    "South america" );
-PROG_STR( S_TZ_REGION_EUROPE,           "Europe" );
-PROG_STR( S_TZ_REGION_CENTRAL_AMERICA,  "Central amer." );
-PROG_STR( S_TZ_REGION_CARIBBEAN,        "Caribbean" );
-PROG_STR( S_TZ_REGION_PACIFIC_OCEAN,    "Pacific ocean" );
-PROG_STR( S_TZ_REGION_ATLANTIC_OCEAN,   "Atlantic ocean" );
-PROG_STR( S_TZ_REGION_ARCTIC_OCEAN,     "Arctic ocean" );
-PROG_STR( S_TZ_REGION_INDIAN_OCEAN,     "Indian ocean" );
-PROG_STR( S_TZ_REGION_MIDDLE_EAST,      "Middle east" );
-PROG_STR( S_TZ_REGION_AUSTRALIA,        "Australia" );
-PROG_STR( S_TZ_REGION_ASIA,             "Asia" );
-PROG_STR( S_TZ_REGION_ANTARCTICA,       "Antarctica" );
-PROG_STR( S_TZ_REGION_ETCETERA,         "Etcetera" );
-
+#define MAX_TZ_REGION_NAMES        15
+#define TZ_REGION_NAME_LENGTH      14
+const char _TZ_REGION_NAMES[ MAX_TZ_REGION_NAMES ][ TZ_REGION_NAME_LENGTH + 1 ] PROGMEM = {
+  "Africa",
+  "Antarctica",
+  "Arctic ocean",
+  "Asia",
+  "Atlantic ocean",
+  "Australia",
+  "Caribbean",
+  "Central amer.",
+  "Etcetera",
+  "Europe",
+  "Indian ocean",
+  "Middle east",
+  "North america",
+  "Pacific ocean",
+  "South america",
+};
 
 
 struct TimeZoneRules {
@@ -82,6 +84,11 @@ struct TimeZoneRules {
     const char *dst_abbvr;
 };
 
+int16_t findTimezoneByName( char* name );
+uint16_t getTzRegionStartIndex( uint8_t region );
+uint16_t getTzRegionEndIndex( uint8_t region );
+uint16_t getTzRegionSize( uint8_t region );
+
 
 class TimeZone {
   public: 
@@ -89,7 +96,7 @@ class TimeZone {
 
     bool setTimezoneByID( uint16_t id );
     bool setTimezoneByName( char *name );
-    int16_t findTimezoneByName( char* name );
+    
     const char* getName();
     const char* getAbbreviation( DateTime *local );
 
@@ -101,7 +108,6 @@ class TimeZone {
     bool isDST( DateTime *local );
     void getStdTransition( int16_t year, DateTime *std );
     void getDstTransition( int16_t year, DateTime *dst );
-
 
   private:
     uint16_t _id = 0;

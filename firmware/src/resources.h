@@ -225,7 +225,7 @@ PROG_STR( S_SSID,                       "SSID" );
 
 PROG_STR( S_CONSOLE_CONNECT_REFUSE,     "Another telnet session is active.\r\n" );
 
-PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw date: " __DATE__ ")\r\n" \
+PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw date: " __DATE__ ")\r\n" 
                                         "https://github.com/bfrigon/alarm-clock-v3\r\n"
                                         "\r\n"
                                         "Type 'help' for a list of commands" );
@@ -244,7 +244,8 @@ PROG_STR( S_CONSOLE_CONTINUE,           "Do you want to continue? " );
 PROG_STR( S_CONSOLE_UNKNOWN_ERROR,      "Unknown error! (%d)" );
 PROG_STR( S_CONSOLE_SUCCESS,            "Success" );
 PROG_STR( S_CONSOLE_NONE,               "None" );
-PROG_STR( S_CONSOLE_FREEMEM,            "Free SRAM : %hd bytes" );
+PROG_STR( S_CONSOLE_FREEMEM,            "Free SRAM  : %hd bytes" );
+PROG_STR( S_CONSOLE_TOTALMEM,           "Total SRAM : %hd bytes" );
 PROG_STR( S_CONSOLE_INVALID_COMMAND,    "Invalid command!" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_BOOL, "Invalid input! Enter 'Y' or 'N'" );
 PROG_STR( S_CONSOLE_INVALID_INPUT_IP,   "Invalid IP address" );
@@ -294,12 +295,14 @@ PROG_STR( S_CONSOLE_TIME_CFG_NTP,       "Syncrhonise clock automatically using N
 PROG_STR( S_CONSOLE_TIME_CFG_APPLY,     "Apply clock settings? " );
 PROG_STR( S_CONSOLE_TIME_CURRENT_TZ,    "Current time zone : " );
 PROG_STR( S_CONSOLE_TIME_NEW_TZ,        "New time zone : " );
-PROG_STR( S_CONSOLE_TIME_ENTER_TZ,      "Enter new time zone (leave empty to keep current one) : " );
+PROG_STR( S_CONSOLE_TIME_EXIT_MENU,     "Leave empty to keep current timezone" );
+PROG_STR( S_CONSOLE_TIME_ENTER_TZ_NAME, "Enter new time zone name or select region : " );
+PROG_STR( S_CONSOLE_TIME_SELECT_TZ,     "Select time zone : " );
 PROG_STR( S_CONSOLE_TIME_INVALID_TZ,    "Invalid time zone" );
+PROG_STR( S_CONSOLE_TIME_INVALID_SEL,   "Invalid selection" );
+PROG_STR( S_CONSOLE_TIME_INSTR_RETURN,  " 0) Return to the previous menu" );
 PROG_STR( S_CONSOLE_INVALID_DATE_FMT,   "Invalid date! (expects YYYY-MM-DD)" );
 PROG_STR( S_CONSOLE_INVALID_TIME_FMT,   "Invalid time! (expects HH:MM)" );
-
-
 PROG_STR( S_CONSOLE_TZ_IS_DST,          "Currently on daylight saving time: %S");
 PROG_STR( S_CONSOLE_TZ_NO_DST,          "Daylight saving time not observed");
 PROG_STR( S_CONSOLE_TZ_EQUAL_UTC,       "Local time is the same as UTC/GMT");
@@ -343,7 +346,6 @@ PROG_STR( S_CONSOLE_TELNET_SESS_ACTIVE, "Session active from %d.%d.%d.%d on port
 PROG_STR( S_CONSOLE_TELNET_NO_SESS,     "No active session" );
 
 
-PROG_STR( S_CONSOLE_PARAMS_DELIMITER,   "\x20," );
 
 //--------------------------------------------------------------------------
 //
