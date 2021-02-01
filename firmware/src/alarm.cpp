@@ -20,7 +20,7 @@
 #include "ui/ui.h"
 
 
-uint8_t vs1053_buffer[VS1053_DATABUFFERLEN];
+uint8_t vs1053_buffer[VS1053_DATA_BLOCK_SIZE];
 
 
 /*! ------------------------------------------------------------------------
@@ -985,47 +985,53 @@ inline void Alarm::feedBuffer() {
     if( _playMode & ALARM_MODE_SNOOZE ) {
         return;
     }
+    
+    size_t bytesRead;
 
-    if( this->readyForData() == false ) {
-        return;
-    }
+    uint8_t blocks = VS1053_BLOCKS_PER_RUN;
+    while( blocks-- > 0 ) {
 
-    uint8_t bytesRead;
+        /* Check if the codec is ready to receive the next block */
+        if( this->readyForData() == false ) {
+            break;
+        }
+    
+        if( this->currentFile.isOpen() == false ) {
 
-    if( this->currentFile.isOpen() == false ) {
+            /* Playback from program memory space */
+            if( _pgm_audio_ptr + VS1053_DATA_BLOCK_SIZE > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
 
-        /* Playback from program memory space */
-        if( _pgm_audio_ptr + VS1053_DATABUFFERLEN > DEFAULT_ALARMSOUND_DATA_LENGTH ) {
+                bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - _pgm_audio_ptr;
 
-            bytesRead = DEFAULT_ALARMSOUND_DATA_LENGTH - _pgm_audio_ptr;
+                memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[_pgm_audio_ptr], bytesRead );
 
-            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[_pgm_audio_ptr], bytesRead );
+                _pgm_audio_ptr = 0;
 
-            _pgm_audio_ptr = 0;
+            } else {
+
+                bytesRead = VS1053_DATA_BLOCK_SIZE;
+
+                memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[_pgm_audio_ptr],
+                        VS1053_DATA_BLOCK_SIZE );
+
+                _pgm_audio_ptr += VS1053_DATA_BLOCK_SIZE;
+            }
+
 
         } else {
+            /* Playback from file on SD card */
+            bytesRead = this->currentFile.read( vs1053_buffer, VS1053_DATA_BLOCK_SIZE );
 
-            bytesRead = VS1053_DATABUFFERLEN;
+            if( bytesRead == 0 ) {
 
-            memcpy_P( &vs1053_buffer, &_DEFAULT_ALARMSOUND_DATA[_pgm_audio_ptr],
-                      VS1053_DATABUFFERLEN );
+                /* Play the file in loop */
+                this->currentFile.rewind();
 
-            _pgm_audio_ptr += VS1053_DATABUFFERLEN;
+            }
         }
 
-
-    } else {
-        /* Playback from file on SD card */
-        bytesRead = this->currentFile.read( vs1053_buffer, VS1053_DATABUFFERLEN );
-
-        if( bytesRead == 0 ) {
-
-            /* Play the file in loop */
-            this->currentFile.rewind();
-        }
+        this->playData( vs1053_buffer, bytesRead );
     }
-
-    this->playData( vs1053_buffer, bytesRead );
 }
 
 

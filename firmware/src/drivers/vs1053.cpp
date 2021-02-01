@@ -120,7 +120,7 @@ bool VS1053::readyForData() {
  * @param   bufsize    Size of the data block
  * 
  */
-void VS1053::playData( uint8_t *buffer, uint8_t buffsiz ) {
+void VS1053::playData( uint8_t *buffer, size_t buffsiz ) {
     if( _init == false ) {
         this->begin();
     }
@@ -293,7 +293,7 @@ inline void VS1053::spiwrite( uint8_t c ) {
  * @param   size      Size of the data block.
  * 
  */
-void VS1053::spiwrite( uint8_t *buffer, uint16_t size ) {
+void VS1053::spiwrite( uint8_t *buffer, size_t size ) {
     while( size-- ) {
         SPI.transfer( *buffer++ );
     }

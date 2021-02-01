@@ -57,7 +57,8 @@
 #define ALARM_VISUAL_WHITE_FLASH    4
 #define ALARM_VISUAL_RED_FLASH      5
 
-
+#define VS1053_DATA_BLOCK_SIZE      32
+#define VS1053_BLOCKS_PER_RUN       16
 
 
 class Alarm : private VS1053 {

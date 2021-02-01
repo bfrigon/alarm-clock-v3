@@ -64,7 +64,7 @@
 #define VS1053_SCI_AICTRL2      0x0E
 #define VS1053_SCI_AICTRL3      0x0F
 
-#define VS1053_DATABUFFERLEN    32
+
 
 
 #define VS1053_CONTROL_SPI_SETTING      SPISettings( 250000,  MSBFIRST, SPI_MODE0 )
@@ -80,7 +80,7 @@ class VS1053 {
     void end();
 
     bool readyForData();
-    void playData( uint8_t *buffer, uint8_t buffsiz );
+    void playData( uint8_t *buffer, size_t buffsiz );
     void setVolume( uint8_t left, uint8_t right );
     void softReset();
     void reset();
@@ -89,7 +89,7 @@ class VS1053 {
     uint16_t sciRead( uint8_t addr );
     void sciWrite( uint8_t addr, uint16_t data );
     inline void spiwrite( uint8_t c );
-    void spiwrite( uint8_t *buffer, uint16_t num );
+    void spiwrite( uint8_t *buffer, size_t num );
 
   private:
     bool _init = false;
