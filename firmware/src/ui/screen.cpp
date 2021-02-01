@@ -1032,7 +1032,7 @@ void Screen::selectItem( uint8_t index ) {
                     _clearScreenRequested = true;
                 }
 
-                if( _currentItem.getType() == ITEM_TYPE_LIST ) {
+                if( _currentItem.getType() == ITEM_TYPE_LIST && _currentItem.getValuePtr() != NULL ) {
 
                     /* Check if the starting value is within list boundary */
                     if( _currentItem.getOption( ITEM_LIST_VALUE_INT16 ) == true ) {
@@ -1583,10 +1583,18 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
                     item->setValueShort( item->getMin() );
                 }
 
+                if( item->getValueShort() < item->getMin() ) {
+                    item->setValueShort( item->getMin() );
+                }
+
             } else {
                 item->setValue( item->getValue() + 1 );
 
                 if( (uint16_t)item->getValue() > item->getMax() ) {
+                    item->setValue( item->getMin() );
+                }
+
+                if( item->getValue() < item->getMin() ) {
                     item->setValue( item->getMin() );
                 }
             }
