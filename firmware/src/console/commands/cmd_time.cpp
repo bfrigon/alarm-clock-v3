@@ -70,6 +70,9 @@ enum {
 bool ConsoleBase::openCommandSetDate() {
     _taskIndex = STEP_DISPLAY_SYNC_NTP_PROMPT;
 
+
+    cmd_time_use_ntp = g_config.clock.use_ntp;
+
     cmd_time_adj = g_rtc.now();
     g_timezone.toLocal( &cmd_time_adj );
 
@@ -89,17 +92,7 @@ bool ConsoleBase::openCommandSetDate() {
  */
 void ConsoleBase::runCommandSetDate() {
     
-
-    /* Even index display the prompt, odd index process user input */
-    if( _taskIndex % 2 ) {
-
-        if( this->processInput() == false ) {
-            return;
-        }
-    }
-    
-
-    switch( _taskIndex++ ) {
+    switch( _taskIndex ) {
 
         /* Display 'synchronize with ntp' prompt */
         case STEP_DISPLAY_SYNC_NTP_PROMPT:
@@ -107,14 +100,23 @@ void ConsoleBase::runCommandSetDate() {
 
             this->println();
             this->printf_P( S_CONSOLE_TIME_CFG_NTP, ( g_config.clock.use_ntp == true ) ? "Y" : "N" );
+
+            this->resetInput();
             break;
 
         /* Validate 'synchronize with ntp' response */
         case STEP_VALIDATE_SYNC_NTP_PROMPT:
+
+            if( this->processInput() == false ) {
+                return;
+            }
+
             if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 cmd_time_use_ntp = true;
+
                 _taskIndex = STEP_DISPLAY_APPLY_SETTINGS_PROMPT;
+                return;
 
             } else if ( tolower( _inputBuffer[ 0 ] ) == 'n' ) {
 
@@ -124,7 +126,9 @@ void ConsoleBase::runCommandSetDate() {
 
                 /* If using ntp, skip manual time set */
                 if( cmd_time_use_ntp == true ) {
+
                     _taskIndex = STEP_DISPLAY_APPLY_SETTINGS_PROMPT;
+                    return;
                 }
 
             } else {
@@ -132,7 +136,9 @@ void ConsoleBase::runCommandSetDate() {
 
                 /* try again */
                 _taskIndex = STEP_DISPLAY_SYNC_NTP_PROMPT;
+                return;
             }
+
             break;
 
         /* Display 'enter date' prompt */
@@ -140,10 +146,16 @@ void ConsoleBase::runCommandSetDate() {
             _inputBufferLimit = INPUT_BUFFER_LENGTH;
 
             this->printf_P( S_CONSOLE_TIME_CFG_DATE, cmd_time_adj.year(), cmd_time_adj.month(), cmd_time_adj.day() );
+
+            this->resetInput();
             break;
 
         /* Validate 'enter date' response */
         case STEP_VALIDATE_DATE_PROMPT:
+
+            if( this->processInput() == false ) {
+                return;
+            }
             
             if( strlen( _inputBuffer ) > 0 && ( strptime( _inputBuffer, "%Y-%m-%d", &cmd_time_adj ) == NULL )) {
                 this->println_P( S_CONSOLE_INVALID_DATE_FMT );
@@ -151,7 +163,10 @@ void ConsoleBase::runCommandSetDate() {
 
                 /* try again */
                 _taskIndex = STEP_DISPLAY_DATE_PROMPT;
+                return;
             }
+
+            this->resetInput();
             break;
 
         /* Display 'enter time' prompt */
@@ -159,16 +174,24 @@ void ConsoleBase::runCommandSetDate() {
             _inputBufferLimit = INPUT_BUFFER_LENGTH;
 
             this->printf_P( S_CONSOLE_TIME_CFG_TIME, cmd_time_adj.hour(), cmd_time_adj.minute() );
+
+            this->resetInput();
             break;
 
         /* Validate 'enter time' response */
         case STEP_VALIDATE_TIME_PROMPT:
+
+            if( this->processInput() == false ) {
+                return;
+            }
+
             if( strlen( _inputBuffer ) > 0 && ( strptime( _inputBuffer, "%H:%M", &cmd_time_adj ) == NULL )) {
                 this->println_P( S_CONSOLE_INVALID_TIME_FMT );
                 this->println();
 
                 /* try again */
                 _taskIndex = STEP_DISPLAY_TIME_PROMPT;
+                return;
             }
 
             break;
@@ -180,10 +203,16 @@ void ConsoleBase::runCommandSetDate() {
             this->println();
             this->print_P( S_CONSOLE_TIME_CFG_APPLY );
 
+            this->resetInput();
             break;
 
         /* Validate 'apply settings' response */
         case STEP_VALIDATE_APPLY_SETTINGS_PROMPT:
+
+            if( this->processInput() == false ) {
+                return;
+            }
+
             if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
 
                 g_config.clock.use_ntp = cmd_time_use_ntp;
@@ -197,7 +226,7 @@ void ConsoleBase::runCommandSetDate() {
                     g_ntp.setAutoSync( true, this );
 
                     _taskIndex = STEP_MONITOR_NTP_SYNC_COMPLETION;
-                    break;
+                    return;
 
                 } else {
 
@@ -232,6 +261,7 @@ void ConsoleBase::runCommandSetDate() {
 
                 /* try again */
                 _taskIndex = STEP_DISPLAY_APPLY_SETTINGS_PROMPT;
+                return;
             }
             break;
 
@@ -245,9 +275,11 @@ void ConsoleBase::runCommandSetDate() {
             }
 
             _taskIndex = STEP_MONITOR_NTP_SYNC_COMPLETION;
+            return;
     }
 
-    this->resetInput();
+    /* Go to the next step */
+    _taskIndex++;
 }
 
 
