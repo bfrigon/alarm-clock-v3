@@ -115,6 +115,11 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
     /* Apply ambiant light dimming percentage */
     brightness = brightness * ( 100 - _ambientDimming ) / 100;
 
+    /* Keep the ambient dimming from turning the pixel off completely */
+    if( _brightness > 0 && brightness < 1 ) {
+        brightness = 1;
+    }
+
     if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
 
         /* limit brightness in low power mode */
