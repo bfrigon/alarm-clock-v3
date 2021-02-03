@@ -173,6 +173,7 @@ class US2066 : public IPrint {
     void clear();
     void setPosition( uint8_t row, uint8_t col );
     void setContrast( uint8_t contrast );
+    void setAmbientDimming( uint8_t factor );
     void setCursor( bool underline, bool blinking );
     void setDisplay( bool on, bool reverse );
     uint8_t setCustomCharacters( const char *pchrmap );
@@ -188,6 +189,8 @@ class US2066 : public IPrint {
     bool _init = false;
     uint8_t _address = US2066_DEF_I2C_ADDR;
     uint8_t _pin_reset;
+    uint8_t _ambientDimming;
+    uint8_t _contrast;
 
     uint8_t _current_iset = US2066_ISET_STANDARD;
     FILE _lcdout = {0};

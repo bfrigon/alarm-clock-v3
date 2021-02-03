@@ -425,7 +425,7 @@ void ConsoleBase::runCommandSetTimeZone() {
         TimeZone tz;
         tz.setTimezoneByID( _taskIndex - STEP_PRINT_TZ_LIST );
         
-        this->printf_P( PSTR( "%2d) %-36S " ), 
+        this->printf_P( PSTR( "%2d) %-34S " ), 
                         _taskIndex - STEP_PRINT_TZ_LIST - getTzRegionStartIndex( selected_region ) + 1, 
                         tz.getName() );
 

@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/drivers/tsl2591.h
+// File    : src/drivers/als.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,17 +15,16 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef _TSL2591_H
-#define _TSL2591_H
+#ifndef _ALS_H
+#define _ALS_H
 
 #include <Arduino.h>
 #include <Wire.h>
 #include "../libs/itask.h"
 
-#define TSL2591_LUX_DF          428.0F
-
 #define TSL2591_I2C_ADDR        0x29
 
+/* TSL2591 registers */
 #define TSL2591_REG_ENABLE      0x00
 #define TSL2591_REG_CONFIG      0x01
 #define TSL2591_REG_AILTL       0x04
@@ -45,16 +44,17 @@
 #define TSL2591_REG_C1DATAL     0x16
 #define TSL2591_REG_C1DATAH     0x17
 
-
 #define TSL2591_COMMAND_SELECT      0x80
 #define TSL2591_TRANSACTION_NORMAL  0x20
 #define TSL2591_TRANSACTION_SPECIAL 0x60
 
+/* TSL2591 gain setting */
 #define TSL2591_GAIN_LOW            0x00
 #define TSL2591_GAIN_MEDIUM         0x01
 #define TSL2591_GAIN_HIGH           0x02
 #define TSL2591_GAIN_MAXIMUM        0x03
 
+/* TSL2591 integration time setting */
 #define TSL2591_INTEGRATION_100MS   0x00
 #define TSL2591_INTEGRATION_200MS   0x01
 #define TSL2591_INTEGRATION_300MS   0x02
@@ -63,7 +63,7 @@
 #define TSL2591_INTEGRATION_600MS   0x05
 #define TSL2591_INTEGRATION_MAX     0x05
 
-
+/* TSL2591 registers */
 #define TSL2591_ENABLE_PON          0x01
 #define TSL2591_ENABLE_AEN          0x02
 #define TSL2591_ENABLE_AIEN         0x10
@@ -72,12 +72,24 @@
 #define TSL2591_ENABLE_OFF          0x00
 
 
-class TSL2591 {
+#define ALS_MINIMUM_STABLE_DELAY    2000
+#define ALS_STABLE_RANGE            5
+#define ALS_FADE_STEPS_MS           8
+
+
+/* Ambient light auto-dimming presets */
+enum {
+    ALS_PRESET_DISABLED = 0,
+    ALS_PRESET_LOW,
+    ALS_PRESET_MEDIUM,
+    ALS_PRESET_HIGH
+};
+
+
+class ALS {
 
   public:
-    TSL2591();
-
-    void configure( uint8_t gain, uint8_t integration );
+    ALS();
 
     void onPowerStateChange( uint8_t state );
     void suspend();
@@ -89,21 +101,22 @@ class TSL2591 {
 
   private:
 
-
-    void sendCommand( uint8_t command, uint8_t value );
+    bool configure( uint8_t gain, uint8_t integration );
+    bool writeByte( uint8_t command, uint8_t value );
     uint8_t readByte( uint8_t address );
     uint16_t readWord( uint8_t address );
 
     bool _init = false;
     uint32_t _lastIntegrationStart;
-    uint8_t _integration;
-    uint8_t _gain;
-    uint8_t _integrationDelay;
-    float _lux;
+    uint32_t _lastValueChange;
+    uint8_t _currentAmbientDimming;
+    uint8_t _targetAmbientDimming;
+
+    uint8_t calculateAmbientDimming();
 
 };
 
-extern TSL2591 g_als;
+extern ALS g_als;
 
 
 #endif  /* _TSL2591_H */

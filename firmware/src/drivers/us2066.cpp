@@ -29,6 +29,7 @@
 US2066::US2066( uint8_t address, uint8_t pin_reset ) {
     _address = address;
     _pin_reset = pin_reset;
+    _ambientDimming = 0;
 
     /* Initialize IPrint interface */
     _initPrint();
@@ -339,15 +340,21 @@ void US2066::clear() {
  *
  * @brief   Set the display contrast
  * 
- * @param   contrast    Contrast value (0-255)
+ * @param   contrast    Contrast value (0-100)
  */
 void US2066::setContrast( uint8_t contrast ) {
     if( _init == false ) {
         this->begin();
     }
 
-    contrast = pgm_read_byte( &_GAMMA_TABLE[ 255 * contrast / 100 ] ),
+    if( contrast > 100 ) {
+        contrast = 100;
+    }
 
+    _contrast = contrast;
+
+    /* Apply ambiant light dimming percentage */
+    contrast = contrast * ( 100 - _ambientDimming ) / 100;
 
     /* Select OLED instruction set */
     this->selectInstructions( US2066_ISET_OLED );   /* RE=1, SD=1 */
@@ -356,6 +363,27 @@ void US2066::setContrast( uint8_t contrast ) {
 
     /* Return to standard instruction set */
     this->selectInstructions( US2066_ISET_STANDARD ); /* RE=0, SD=0, SI=0 */
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Sets the ambient dimming percentage
+ *
+ * @param   dimming    Dimming percentage ( 0-100 )
+ * 
+ */
+void US2066::setAmbientDimming( uint8_t dimming ) {
+
+    if( dimming > 100 ) {
+        dimming = 100;
+    }
+
+    if( dimming != _ambientDimming ) {
+        _ambientDimming = dimming;
+
+        this->setContrast( _contrast );
+    }
 }
 
 

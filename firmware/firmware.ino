@@ -33,7 +33,7 @@ QT1070          g_keypad( PIN_INT_KEYPAD );
 US2066          g_lcd( I2C_ADDR_OLED, PIN_OLED_RESET );
 Power           g_power( PIN_ON_BATTERY, PIN_SYSOFF, PIN_FACTORY_RESET );
 DS3231          g_rtc( PIN_INT_RTC );
-TSL2591         g_als;
+ALS             g_als;
 BQ27441         g_battery;
 ConfigManager   g_config;
 Console         g_console;
@@ -122,7 +122,6 @@ void setup() {
 
     /* Initialize ambiant light detector */
     g_als.begin();
-    g_als.configure( TSL2591_GAIN_HIGH, TSL2591_INTEGRATION_200MS );
 
     /* Check for factory reset sequence */
     if( checkFactoryReset() == false ) {

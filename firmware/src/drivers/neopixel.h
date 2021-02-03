@@ -34,6 +34,7 @@ class NeoPixel {
     void setColorRGB( uint8_t r, uint8_t g, uint8_t b );
     void setColorFromTable( uint8_t id );
     void setBrightness( uint8_t brightness );
+    void setAmbientDimming( uint8_t dimming );
 
     virtual void update() = 0;
 
@@ -44,13 +45,13 @@ class NeoPixel {
     inline uint8_t getColorBrigthness( uint8_t color );
 
 
-    bool _gammaCorrection = true;
     int8_t _pin_leds;
     int8_t _pin_shdn;
     uint8_t _brightness = 10;
     uint8_t _g = 0x00;
     uint8_t _b = 0x00;
     uint8_t _r = 0xFF;
+    uint8_t _ambientDimming = 0;
     bool _init = false;
 
 };

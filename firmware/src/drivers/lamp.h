@@ -56,7 +56,7 @@ class Lamp : public NeoPixel {
     void setDelayOff( uint8_t delay );
     void update();
     bool isActive();
-
+    void setAmbientDimming( uint8_t dimming ) { _ambientDimming = 0; }; /* Not implemented */
 
   private:
     uint8_t _delay_off = 0;
@@ -73,6 +73,7 @@ class Lamp : public NeoPixel {
     
 
     void updateVisualStepDelay();
+    
 };
 
 extern Lamp g_lamp;

@@ -31,6 +31,8 @@
 NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
     _pin_leds = pin_leds;
     _pin_shdn = pin_shdn;
+
+    _ambientDimming = 0;
 }
 
 
@@ -110,16 +112,18 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 
     uint8_t brightness = _brightness;
 
+    /* Apply ambiant light dimming percentage */
+    brightness = brightness * ( 100 - _ambientDimming ) / 100;
+
     if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
+
         /* limit brightness in low power mode */
-        brightness = ( _brightness > 25 ) ? 25 : _brightness;
+        if( brightness > 25 ) {
+            brightness = 25;
+        }
     }
 
     color = ( ( uint16_t )color * ( uint16_t )brightness ) / 100;
-
-    if( _gammaCorrection == true ) {
-        color = pgm_read_byte( &_GAMMA_TABLE[ color ] );
-    }
 
     return color;
 }
@@ -280,6 +284,27 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
     }
 
     _brightness = brightness;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Sets the ambient dimming percentage
+ *
+ * @param   dimming    Ambient dimming percentage ( 0-100 )
+ * 
+ */
+void NeoPixel::setAmbientDimming( uint8_t dimming ) {
+
+    if( dimming > 100 ) {
+        dimming = 100;
+    }
+
+    if( dimming != _ambientDimming ) {
+
+        _ambientDimming = dimming;
+        this->update();
+    }
 }
 
 
