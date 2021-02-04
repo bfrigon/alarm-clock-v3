@@ -202,6 +202,7 @@ class ConsoleBase : public IPrint, protected ITask {
     bool _inputHidden;
     uint8_t _escapeSequence;
     uint16_t _taskIndex;
+    bool _cmdHistoryEnabled;
     
     bool processInput();
     void trimInput();

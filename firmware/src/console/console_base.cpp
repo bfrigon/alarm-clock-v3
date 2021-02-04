@@ -38,7 +38,9 @@ ConsoleBase::ConsoleBase() {
     _inputHidden = false;
     _taskIndex = 0;
     _escapeSequence = 0;
+    _cmdHistoryEnabled = false;
 
+    
     this->resetInput();
 
     /* Initialize IPrint interface */
@@ -346,6 +348,10 @@ void ConsoleBase::readHistoryBuffer( bool forward ) {
 
     char *pos = _cmdHistoryPtr;
 
+    if( _cmdHistoryEnabled == false ) {
+        return;
+    }
+
     if( forward ) {
 
         if( pos == NULL ) {
@@ -414,6 +420,10 @@ void ConsoleBase::readHistoryBuffer( bool forward ) {
  * 
  */
 void ConsoleBase::writeHistoryBuffer() {
+
+    if( _cmdHistoryEnabled == false ) {
+        return;
+    }
 
     /* Don't add empty lines in the history buffer */
     if( strlen( _inputBuffer ) == 0 ) {
@@ -601,6 +611,9 @@ void ConsoleBase::runTasks() {
         _inputBufferLimit = INPUT_BUFFER_LENGTH;
         _inputHidden = false;
 
+        /* Enable history buffer */
+        _cmdHistoryEnabled = true;
+
         /* If no task is running, process the input buffer */
         if( this->processInput() == true ) {
 
@@ -608,6 +621,9 @@ void ConsoleBase::runTasks() {
 
             /* Store the command in the history buffer */
             this->writeHistoryBuffer();
+
+            /* Disable history buffer while running a command */
+            _cmdHistoryEnabled = false;
             
             /* If new line is found, parse the line */
             this->parseCommand();
