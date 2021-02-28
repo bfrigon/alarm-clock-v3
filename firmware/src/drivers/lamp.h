@@ -19,8 +19,8 @@
 #define LAMP_H
 
 #include <Arduino.h>
+#include <config.h>
 
-#include "../config.h"
 #include "neopixel.h"
 
 

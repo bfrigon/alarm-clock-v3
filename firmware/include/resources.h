@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/resources.h
+// File    : include/resources.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@
 //
 //--------------------------------------------------------------------------
 
-const char CUSTOM_CHARACTERS_DEFAULT[] PROGMEM = {
+const unsigned char CUSTOM_CHARACTERS_DEFAULT[] PROGMEM = {
 
     0x00, 0x00, 0x04, 0x0A, 0x04, 0x00, 0x00, 0x00,     /* unchecked */
     0x00, 0x01, 0x03, 0x16, 0x1C, 0x08, 0x00, 0x00,     /* checked */
@@ -50,7 +50,7 @@ const char CUSTOM_CHARACTERS_DEFAULT[] PROGMEM = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,     /* --Unused-- */
 };
 
-const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
+const unsigned char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
     0x00, 0x01, 0x01, 0x05, 0x05, 0x15, 0x00, 0x00,     /* Wifi connected */
     0x06, 0x0E, 0x1E, 0x1E, 0x1E, 0x1E, 0x00, 0x00,     /* NO SD Card */
     0x00, 0x0E, 0x0A, 0x0E, 0x00, 0x00, 0x00, 0x00,     /* Degree */
@@ -72,32 +72,6 @@ const char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 PROG_STR( S_DEFAULT_NTPSERVER,          "pool.ntp.org" );
-
-/* Date/time formatting */
-PROG_STR( S_DATETIME_DHM,               "%dd, %dh. %d min." );
-PROG_STR( S_DATETIME_HM,                "%dh. %d min." );
-PROG_STR( S_DATETIME_MS,                "%d min. %d sec." );
-PROG_STR( S_DATETIME_1M,                "1m" );
-PROG_STR( S_DATETIME_1MM,               "1 minute" );
-PROG_STR( S_DATETIME_M,                 "%dm" );
-PROG_STR( S_DATETIME_MM,                "%d minutes" );
-PROG_STR( S_DATETIME_1H,                "1h" );
-PROG_STR( S_DATETIME_1HH,               "1 hour" );
-PROG_STR( S_DATETIME_H,                 "%dh" );
-PROG_STR( S_DATETIME_HH,                "%d hours" );
-PROG_STR( S_DATETIME_1S,                "1s" );
-PROG_STR( S_DATETIME_S,                 "%ds" );
-PROG_STR( S_DATETIME_1SS,               "1 second" );
-PROG_STR( S_DATETIME_SS,                "%d seconds" );
-PROG_STR( S_DATETIME_1D,                "1d" );
-PROG_STR( S_DATETIME_D,                 "%dd" );
-PROG_STR( S_DATETIME_1DD,               "1 day" );
-PROG_STR( S_DATETIME_DD,                "%d days" );
-PROG_STR( S_DATETIME_24H,               "24 hours" );
-PROG_STR( S_DATETIME_SEPARATOR_COMMA,   ", " );
-PROG_STR( S_DATETIME_SEPARATOR_AND,     " and " );
-PROG_STR( S_DATETIME_SEPARATOR_SPACE,   " " );
-
 
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
@@ -353,28 +327,7 @@ PROG_STR( S_CONSOLE_TELNET_NO_SESS,     "No active session" );
 //
 //--------------------------------------------------------------------------
 
-const char _TEMP_UNITS[ 2 ][ 2 ] PROGMEM = {
-    "F", "C"
-};
 
-const char _MONTHS_SHORT[ 12 ][ 4 ] PROGMEM = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-};
-
-const char _MONTHS[ 12 ][ 10 ] PROGMEM = {
-    "January", "Febuary", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-};
-
-const char _DAYS_SHORT[ 7 ][ 4 ] PROGMEM = {
-    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-};
-
-const char _DAYS[ 7 ][ 10 ] PROGMEM = {
-    "Sunday", "Monday", "Tuesday", "Wednesday",
-    "Thursday", "Friday", "Saturday"
-};
 
 #define MAX_ALS_PRESETS_NAMES   4
 #define ALS_PRESET_NAME_LENGTH  8

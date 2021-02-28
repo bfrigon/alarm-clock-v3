@@ -22,8 +22,9 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <Wire.h>
-#include "../resources.h"
-#include "../libs/iprint.h"
+#include <resources.h>
+#include <iprint.h>
+
 #include "power.h"
 
 
@@ -176,7 +177,7 @@ class US2066 : public IPrint {
     void setAmbientDimming( uint8_t factor );
     void setCursor( bool underline, bool blinking );
     void setDisplay( bool on, bool reverse );
-    uint8_t setCustomCharacters( const char *pchrmap );
+    uint8_t setCustomCharacters( const unsigned char *pchrmap );
     void fill( char c, uint8_t num );
 
   private:

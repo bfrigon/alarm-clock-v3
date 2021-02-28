@@ -18,14 +18,15 @@
 #ifndef WIFI_H
 #define WIFI_H
 
-
 #include <Arduino.h>
 #include <IPAddress.h>
 #include <winc1500api.h>
+#include <itask.h>
+#include <time.h>
+
 #include "wifisocket.h"
 
-#include "../../libs/itask.h"
-#include "../../libs/time.h"
+
 
 
 extern "C" {
@@ -66,10 +67,10 @@ typedef enum {
 
 
 
-static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg );
-static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp );
-static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg );
-static void wifimanager_ping_cb( uint32 u32IPAddr, uint32 u32RTT, uint8 u8ErrorCode );
+void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg );
+void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp );
+void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg );
+void wifimanager_ping_cb( uint32 u32IPAddr, uint32 u32RTT, uint8 u8ErrorCode );
 
 
 

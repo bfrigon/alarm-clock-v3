@@ -15,9 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <config.h>
+#include <drivers/bq27441.h>
+
 #include "ui.h"
-#include "../config.h"
-#include "../drivers/bq27441.h"
+
 
 
 uint8_t g_battStatusPage = 0;

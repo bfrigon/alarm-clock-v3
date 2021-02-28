@@ -20,7 +20,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "../libs/time.h"
+#include <time.h>
 
 
 /* --- I2C address --- */
@@ -80,15 +80,6 @@
 #define RTC_ALARM_EVERY_SECOND  1
 #define RTC_ALARM_EVERY_HOUR    2
 
-
-
-
-static uint8_t bcd2bin( uint8_t val ) {
-    return val - 6 * ( val >> 4 );
-}
-static uint8_t bin2bcd( uint8_t val ) {
-    return val + 6 * ( val / 10 );
-}
 
 class DS3231 {
 

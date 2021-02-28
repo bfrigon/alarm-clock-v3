@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/iprint.cpp
+// File    : lib/iprint/iprint.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,8 +15,8 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "iprint.h"
-#include "time.h"
+#include <iprint.h>
+#include <time.h>
 
 
 /*! ------------------------------------------------------------------------
@@ -492,6 +492,8 @@ size_t IPrint::printfln_P( const char *format, ... ) {
  */
 size_t IPrint::printTimeInterval( unsigned long time, const char *separator, bool compact ) {
 
+    size_t length = 0;
+
     uint8_t seconds, minutes, hours;
     seconds = ( time % 60L );
     minutes = (( time % 3600 ) / 60L );
@@ -502,49 +504,51 @@ size_t IPrint::printTimeInterval( unsigned long time, const char *separator, boo
 
     /* Prints the number of days, if any */
     if( days == 1 ) {
-        this->print_P( (compact == true) ? S_DATETIME_1D : S_DATETIME_1DD );
+        length += this->print_P( (compact == true) ? S_DATETIME_1D : S_DATETIME_1DD );
     } else if ( days > 1 && compact == true ) {
-        this->printf_P( S_DATETIME_D, days );
+        length += this->printf_P( S_DATETIME_D, days );
     } else if ( days > 1 && compact == false ) {
-        this->printf_P( S_DATETIME_DD, days );
+        length += this->printf_P( S_DATETIME_DD, days );
     }
 
     if( days > 0 && ( hours > 0 || minutes > 0 || seconds > 0 )) {
-        this->print_P( separator );
+        length += this->print_P( separator );
     }
 
     /* Prints the number of hours, if any */
     if( hours == 1 ) {
-        this->print_P( (compact == true) ? S_DATETIME_1H : S_DATETIME_1HH );
+        length += this->print_P( (compact == true) ? S_DATETIME_1H : S_DATETIME_1HH );
     } else if ( hours > 1 && compact == true ) {
-        this->printf_P( S_DATETIME_H, hours );
+        length += this->printf_P( S_DATETIME_H, hours );
     } else if ( hours > 1 && compact == false ) {
-        this->printf_P( S_DATETIME_HH, hours );
+        length += this->printf_P( S_DATETIME_HH, hours );
     }
 
     if( hours > 0 && ( minutes > 0 || seconds > 0 )) {
-        this->print_P( separator );
+        length += this->print_P( separator );
     }
 
     /* Prints the number of minutes, if any */
     if( minutes == 1 ) {
-        this->print_P( (compact == true) ? S_DATETIME_1M : S_DATETIME_1MM );
+        length += this->print_P( (compact == true) ? S_DATETIME_1M : S_DATETIME_1MM );
     } else if ( minutes > 1 && compact == true ) {
-        this->printf_P( S_DATETIME_M, minutes );
+        length += this->printf_P( S_DATETIME_M, minutes );
     } else if ( minutes > 1 && compact == false ) {
-        this->printf_P( S_DATETIME_MM, minutes );
+        length += this->printf_P( S_DATETIME_MM, minutes );
     }
 
     if( minutes > 0 && ( seconds > 0 )) {
-        this->print_P( separator );
+        length += this->print_P( separator );
     }
 
     /* Prints the number of seconds, if any */
     if( seconds == 1 ) {
-        this->print_P( (compact == true) ? S_DATETIME_1S : S_DATETIME_1SS );
+        length += this->print_P( (compact == true) ? S_DATETIME_1S : S_DATETIME_1SS );
     } else if ( seconds > 1 && compact == true ) {
-        this->printf_P( S_DATETIME_S, seconds );
+        length += this->printf_P( S_DATETIME_S, seconds );
     } else if ( seconds > 1 && compact == false ) {
-        this->printf_P( S_DATETIME_SS, seconds );
+        length += this->printf_P( S_DATETIME_SS, seconds );
     }
+
+    return length;
 }

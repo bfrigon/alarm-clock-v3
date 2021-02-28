@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/cmd_settings.cpp
+// File    : src/console/cmd_settings.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,10 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console_base.h"
-#include "../../config.h"
-#include "../../task_errors.h"
-#include "../../drivers/power.h"
+
+#include <config.h>
+#include <task_errors.h>
+#include <drivers/power.h>
+
+#include "console_base.h"
 
 
 /*! ------------------------------------------------------------------------

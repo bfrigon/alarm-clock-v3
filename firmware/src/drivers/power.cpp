@@ -15,12 +15,14 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <ui/screen.h>
+#include <ui/ui.h>
+#include <hardware.h>
+#include <alarm.h>
+#include <services/telnet_console.h>
+
 #include "power.h"
-#include "../ui/screen.h"
-#include "../ui/ui.h"
-#include "../hardware.h"
-#include "../alarm.h"
-#include "../services/telnet_console.h"
 
 
 /*! ------------------------------------------------------------------------

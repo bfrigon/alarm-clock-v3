@@ -15,11 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "telnet_console.h"
 
-#include "../drivers/wifi/wifi.h"
-#include "../drivers/wifi/wifisocket.h"
-#include "../task_errors.h"
+#include <drivers/wifi/wifi.h>
+#include <drivers/wifi/wifisocket.h>
+#include <task_errors.h>
+
+#include "telnet_console.h"
 
 
 /*! ------------------------------------------------------------------------

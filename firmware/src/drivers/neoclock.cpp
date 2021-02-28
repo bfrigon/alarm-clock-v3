@@ -15,15 +15,18 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <alarm.h>
+#include <resources.h>
+#include <ui/screen.h>
+#include <ui/ui.h>
+#include <config.h>
+
 #include "neoclock.h"
 #include "rtc.h"
 #include "power.h"
-#include "../config.h"
-#include "../alarm.h"
-#include "../libs/time.h"
-#include "../resources.h"
-#include "../ui/screen.h"
-#include "../ui/ui.h"
+
+
 
 
 /*! ------------------------------------------------------------------------

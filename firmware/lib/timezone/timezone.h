@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/timezone.h
+// File    : lib/timezone/timezone.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -20,8 +20,8 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "time.h"
-#include "iprint.h"
+#include <time.h>
+
 
 
 enum {
@@ -71,7 +71,7 @@ struct TimeZoneRules {
     uint8_t std_month: 4;
     uint8_t std_week: 3;
     uint8_t std_dow: 6;
-    uint8_t std_hour: 5;
+    int8_t std_hour: 5;
     uint8_t std_min: 6;
     const char *std_abbvr;
 
@@ -79,14 +79,14 @@ struct TimeZoneRules {
     uint8_t dst_month: 4;
     uint8_t dst_week: 3;
     uint8_t dst_dow: 6;
-    uint8_t dst_hour: 5;
+    int8_t dst_hour: 5;
     uint8_t dst_min: 6;
     const char *dst_abbvr;
 };
 
 int16_t findTimezoneByName( char* name );
-uint16_t getTzRegionStartIndex( uint8_t region );
-uint16_t getTzRegionEndIndex( uint8_t region );
+int16_t getTzRegionStartIndex( uint8_t region );
+int16_t getTzRegionEndIndex( uint8_t region );
 uint16_t getTzRegionSize( uint8_t region );
 
 

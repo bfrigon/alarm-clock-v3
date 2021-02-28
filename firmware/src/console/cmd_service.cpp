@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/cmd_service.cpp
+// File    : src/console/cmd_service.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,11 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console_base.h"
-#include "../../resources.h"
-#include "../../services/ntpclient.h"
-#include "../../services/telnet_console.h"
 
+#include <resources.h>
+#include <services/ntpclient.h>
+#include <services/telnet_console.h>
+
+#include "console_base.h"
 
 
 PROG_STR( S_ACTION_ENABLE, "enable" );

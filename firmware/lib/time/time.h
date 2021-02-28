@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/time.h
+// File    : lib/time/time.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -20,9 +20,6 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "../resources.h"
-
-
 
 #define EPOCH_NTP_OFFSET            2208988800
 
@@ -74,6 +71,25 @@ struct Date {
     uint8_t day;
     uint8_t month;
     uint8_t year;
+};
+
+const char _MONTHS_SHORT[ 12 ][ 4 ] PROGMEM = {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+
+const char _MONTHS[ 12 ][ 10 ] PROGMEM = {
+    "January", "Febuary", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+};
+
+const char _DAYS_SHORT[ 7 ][ 4 ] PROGMEM = {
+    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+};
+
+const char _DAYS[ 7 ][ 10 ] PROGMEM = {
+    "Sunday", "Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday", "Saturday"
 };
 
 

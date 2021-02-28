@@ -19,9 +19,9 @@
 #define CONSOLE_BASE_H
 
 #include <Arduino.h>
-#include "../resources.h"
-#include "../libs/itask.h"
-#include "../libs/iprint.h"
+#include <resources.h>
+#include <itask.h>
+#include <iprint.h>
 
 
 #define INPUT_BUFFER_LENGTH         80
@@ -201,7 +201,7 @@ class ConsoleBase : public IPrint, protected ITask {
     uint8_t _inputBufferLimit;
     bool _inputHidden;
     uint8_t _escapeSequence;
-    uint16_t _taskIndex;
+    int16_t _taskIndex;
     bool _cmdHistoryEnabled;
     
     bool processInput();

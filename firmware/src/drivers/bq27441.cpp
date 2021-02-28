@@ -15,6 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "bq27441.h"
 
 
@@ -58,7 +59,7 @@ bool BQ27441::begin( uint16_t capacity ) {
     this->enterConfig();
 
     /* Set design battery capacity */
-    uint8_t data[2] = { capacity >> 8, capacity & 0x00FF };
+    uint8_t data[2] = { (uint8_t)( capacity >> 8 ), (uint8_t)( capacity & 0x00FF ) };
     this->writeDataBlock( BQ27441_ID_STATE, 10, data, sizeof( data ) );
 
     /* Exit config update mode */
@@ -140,7 +141,7 @@ bool BQ27441::unseal() {
     this->readControlData( BQ27441_UNSEAL_KEY );
     this->readControlData( BQ27441_UNSEAL_KEY );
 
-    return ( ( this->readControlData( BQ27441_CONTROL_STATUS ) & BQ27441_STATUS_SS ) == 0 );
+    return (( this->readControlData( BQ27441_CONTROL_STATUS ) & BQ27441_STATUS_SS ) == 0 );
 }
 
 
@@ -515,7 +516,7 @@ uint16_t BQ27441::readWord( uint8_t reg ) {
  * @return  Function result (2 bytes)
  * 
  */
-uint16_t BQ27441::readControlData( uint8_t function ) {
+uint16_t BQ27441::readControlData( uint16_t function ) {
     if( this->executeControlCommand( function ) == false ) {
         return 0;
     }
@@ -533,8 +534,8 @@ uint16_t BQ27441::readControlData( uint8_t function ) {
  * @return  TRUE if successful or FALSE otherwise.
  * 
  */
-bool BQ27441::executeControlCommand( uint8_t function ) {
-    uint8_t data[2] = { function & 0x00FF, function >> 8};
+bool BQ27441::executeControlCommand( uint16_t function ) {
+    uint8_t data[2] = { (uint8_t)( function & 0x00FF ), (uint8_t)( function >> 8 )};
 
     return ( this->write( BQ27441_COMMAND_CONTROL, data, 2 ) == 0 );
 }

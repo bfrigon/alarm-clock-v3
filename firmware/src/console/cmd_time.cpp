@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/cmd_time.cpp
+// File    : src/console/cmd_time.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,15 +15,17 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console_base.h"
-#include "../../task_errors.h"
-#include "../../libs/time.h"
-#include "../../libs/timezone.h"
-#include "../../libs/tzdata.h"
-#include "../../drivers/neoclock.h"
-#include "../../services/ntpclient.h"
-#include "../../ui/ui.h"
-#include "../../config.h"
+
+#include <time.h>
+#include <timezone.h>
+#include <tzdata.h>
+#include <task_errors.h>
+#include <drivers/neoclock.h>
+#include <services/ntpclient.h>
+#include <ui/ui.h>
+#include <config.h>
+
+#include "console_base.h"
 
 
 static char* param_tz_name;
@@ -291,9 +293,7 @@ void ConsoleBase::runCommandSetDate() {
 void ConsoleBase::runCommandPrintDateTime() {
 
     DateTime now;
-    const char *month;
-    const char *dow;
-    const char *abbvr;
+    const char* abbvr;
 
     this->print_P( S_CONSOLE_TIME_CURRENT_TZ );
     this->println_P( g_timezone.getName() );
@@ -302,17 +302,12 @@ void ConsoleBase::runCommandPrintDateTime() {
     now = g_rtc.now();
     uint16_t ms = g_rtc.getMillis();
 
-    month = getMonthName( now.month(), true );
-    dow = getDayName( now.dow(), true );
-
     this->printDateTime( &now, TZ_UTC, ms );
     this->println();
     
     g_timezone.toLocal( &now );
 
     abbvr = g_timezone.getAbbreviation( &now );
-    month = getMonthName( now.month(), true );
-    dow = getDayName( now.dow(), true );
 
     this->printDateTime( &now, abbvr, ms );
     this->println();

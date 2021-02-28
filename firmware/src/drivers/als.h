@@ -20,7 +20,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "../libs/itask.h"
+#include <itask.h>
 
 #define TSL2591_I2C_ADDR        0x29
 

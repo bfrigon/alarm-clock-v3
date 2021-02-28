@@ -19,10 +19,9 @@
 #define TELNET_CONSOLE_H
 
 #include <Arduino.h>
-#include "../console/console_base.h"
-#include "../drivers/wifi/wifisocket.h"
-#include "../drivers/wifi/tcpclient.h"
-#include "../libs/itask.h"
+#include <console/console_base.h>
+#include <drivers/wifi/wifisocket.h>
+#include <drivers/wifi/tcpclient.h>
 
 
 #define TELNET_PORT                 23

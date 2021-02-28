@@ -24,13 +24,10 @@
 #include <EEPROM.h>
 #include <SdFat.h>
 #include <avr/pgmspace.h>
-
-
-#include "libs/time.h"
-#include "libs/itask.h"
-#include "hardware.h"
-#include "resources.h"
-#include "config.h"
+#include <time.h>
+#include <hardware.h>
+#include <resources.h>
+#include <config.h>
 
 
 

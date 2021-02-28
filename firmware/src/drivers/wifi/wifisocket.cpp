@@ -160,7 +160,12 @@ void WiFiSocket::handleEvent( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
 
         /* Socket data sent. */
         case SOCKET_MSG_SEND: {
-            // sint16 *s16Sent = (sint16 *)pvMsg;
+            sint16 *s16Sent = (sint16 *)pvMsg;
+
+            /* Close socket if acknowledge is not received */
+            if( s16Sent <= 0 ) {
+                this->close( sock );
+            }
         }
         break;
 

@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/tzdata.h
+// File    : lib/tzdata/tzdata.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include "timezone.h"
+#include <timezone.h>
 
 #define MAX_TIMEZONE_ID                  458
 #define TZ_DB_VERSION                    "2021a"

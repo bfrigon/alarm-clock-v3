@@ -15,16 +15,44 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <time.h>
+
 #include "rtc.h"
 #include "power.h"
 #include "neoclock.h"
 #include "wifi/wifi.h"
 
-#include "../libs/time.h"
+
 
 
 volatile bool rtc_event = false;
 
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Convert a binary coded decimal to an 8-bit integer.
+ *
+ * @param   val    Binary coded decimal to convert.
+ * 
+ * @return  8-bit integer
+ */
+uint8_t bcd2bin( uint8_t val ) {
+    return val - 6 * ( val >> 4 );
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Convert a 8-bit integer to a binary coded decimal.
+ *
+ * @param   val    8-bit integer to convert
+ * 
+ * @return  Binary coded decimal
+ */
+uint8_t bin2bcd( uint8_t val ) {
+    return val + 6 * ( val / 10 );
+}
 
 
 /*! ------------------------------------------------------------------------
@@ -158,7 +186,7 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
  */
 bool DS3231::processEvents() {
 
-    if( _adjustDelay >= 0 && millis() - _delayStart >= _adjustDelay ) {
+    if( _adjustDelay >= 0 && millis() - _delayStart >= (unsigned long)_adjustDelay ) {
         
         this->writeTime( &_adjust );
         _now = _adjust;
@@ -230,7 +258,7 @@ void DS3231::readTime( DateTime *dt ) {
     uint8_t hrreg = Wire.read();
     uint8_t hh = bcd2bin( ( hrreg & ~DS3231_HOUR_24H ) );  //Ignore 24 Hour bit
 
-    uint8_t  wd = Wire.read();
+    Wire.read();    /* Discard weekday value */
     uint8_t  d = bcd2bin( Wire.read() );
     uint8_t  m = bcd2bin( Wire.read() );
     uint16_t y = bcd2bin( Wire.read() ) + 2000;

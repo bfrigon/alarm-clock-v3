@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/timezone.cpp
+// File    : lib/timezone/timezone.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -16,8 +16,7 @@
 //
 //******************************************************************************
 #include "timezone.h"
-#include "tzdata.h"
-#include "../config.h"
+#include <tzdata.h>
 
 
 /*! ------------------------------------------------------------------------
@@ -226,10 +225,20 @@ void TimeZone::getStdTransition( int16_t year, DateTime *std ) {
         std_day = findDayByDow( year, _tz.std_month, _tz.std_dow, _tz.std_week );
     }
 
-    std->set( year, _tz.std_month, std_day, _tz.std_hour % 24, _tz.std_min, 0 );
+    uint8_t hour;
+    if( _tz.std_hour < 0 ) {
+        hour = 24 - abs( _tz.std_hour );
+    } else {
+        hour = _tz.std_hour % 24;
+    }
+
+    std->set( year, _tz.std_month, std_day, hour, _tz.std_min, 0 );
 
     if( _tz.std_hour > 23 ) {
         std->offset( 86400 );
+    }
+    if( _tz.std_hour < 0 ) {
+        std->offset( -86400 );
     }
 }
 
@@ -251,10 +260,21 @@ void TimeZone::getDstTransition( int16_t year, DateTime *dst ) {
         dst_day = findDayByDow( year, _tz.dst_month, _tz.dst_dow, _tz.dst_week );
     }
 
-    dst->set( year, _tz.dst_month, dst_day, _tz.dst_hour % 24, _tz.dst_min, 0 );
+    uint8_t hour;
+    if( _tz.dst_hour < 0 ) {
+        hour = 24 - abs( _tz.dst_hour );
+    } else {
+        hour = _tz.dst_hour % 24;
+    }
+
+    dst->set( year, _tz.dst_month, dst_day, hour, _tz.dst_min, 0 );
 
     if( _tz.dst_hour > 23 ) {
         dst->offset( 86400 );
+    }
+
+    if( _tz.dst_hour < 0 ) {
+        dst->offset( -86400 );
     }
 }
 
@@ -319,7 +339,7 @@ int16_t findTimezoneByName( char* name ) {
  *          is specified.
  * 
  */
-uint16_t getTzRegionStartIndex( uint8_t region ) {
+int16_t getTzRegionStartIndex( uint8_t region ) {
     switch( region ) {
         case TZ_REGION_AFRICA:          return TZ_REGION_AFRICA_INDEX;
         case TZ_REGION_ANTARCTICA:      return TZ_REGION_ANTARCTICA_INDEX;
@@ -383,6 +403,6 @@ uint16_t getTzRegionSize( uint8_t region ) {
  *          is specified.
  * 
  */
-uint16_t getTzRegionEndIndex( uint8_t region ) {
+int16_t getTzRegionEndIndex( uint8_t region ) {
     return getTzRegionStartIndex( region ) + getTzRegionSize( region ) - 1;
 }

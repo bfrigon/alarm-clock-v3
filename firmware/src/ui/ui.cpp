@@ -16,8 +16,10 @@
 //
 //******************************************************************************
 
+#include <services/ntpclient.h>
+#include <time.h>
+
 #include "ui.h"
-#include "../services/ntpclient.h"
 
 
 uint8_t selectedProfile = 0;
@@ -449,9 +451,6 @@ bool onExitScreen( Screen* screen  ) {
         case SCREEN_ID_SET_TIME:
 
             if( save == true ) {
-
-                uint8_t dow;
-                dow = getDayOfWeek( adjDate.year, adjDate.month, adjDate.day );
 
                 DateTime nDate( (uint16_t)adjDate.year + 2000, adjDate.month, adjDate.day,
                                 adjTime.hour, adjTime.minute, 0 );

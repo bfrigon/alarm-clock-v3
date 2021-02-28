@@ -15,9 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "ui.h"
-#include "../config.h"
+
+#include <config.h>
 #include <IPAddress.h>
+
+#include "ui.h"
+
 
 uint8_t g_netStatusPage = 0;
 
@@ -32,8 +35,6 @@ uint8_t g_netStatusPage = 0;
  * 
  */
 bool netStatus_onDrawScreen( Screen* screen ) {
-
-    char buffer[ DISPLAY_WIDTH + 1 ];
 
     IPAddress addr;
 

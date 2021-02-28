@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/freemem.h
+// File    : lib/freemem/freemem.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,13 +15,22 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#ifndef FREEMEM_H
-#define FREEMEM_H
 
-#include <Arduino.h>
+#include "freemem.h"
 
-extern int g_freeMemory;
+extern char *__brkval;
+int g_freeMemory;
 
-int freeMemory();
 
-#endif /* FREEMEM_H */
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Calculate the free SRAM memory
+ * 
+ * @return  Free memory amount in bytes
+ */
+int freeMemory() {
+  char top;
+
+  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+}
+

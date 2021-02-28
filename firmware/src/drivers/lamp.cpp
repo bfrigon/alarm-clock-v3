@@ -15,6 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "lamp.h"
 #include "power.h"
 
@@ -385,7 +386,7 @@ void Lamp::processEvents() {
  */
 void Lamp::update() {
     uint8_t pixmap[] = {
-        ( ( _mode == LAMP_MODE_OFF || g_power.getPowerMode() != POWER_MODE_NORMAL ) ? 0x00 : 0xFF )
+        (uint8_t)(( _mode == LAMP_MODE_OFF || g_power.getPowerMode() != POWER_MODE_NORMAL ) ? 0x00 : 0xFF )
     };
 
     this->show( pixmap, 3 );

@@ -21,7 +21,7 @@
 #include <Arduino.h>
 
 #include "screen_item.h"
-#include "../libs/time.h"
+
 
 
 
@@ -96,7 +96,7 @@ struct ScreenData {
 
     uint8_t id;
     const struct ScreenItemBase* items;
-    const char* customCharacterSet;
+    const unsigned char* customCharacterSet;
     
     pfcbEnterScreen eventEnterScreen;
     pfcbExitScreen eventExitScreen;
@@ -185,7 +185,7 @@ class Screen {
     uint8_t _returnValue;
     uint8_t _fieldPos;
     uint8_t _scroll;
-    int16_t _timeout;
+    uint16_t _timeout;
     uint16_t _listPrevValue;
     const ScreenData* _breadCrumbScreen[ SCREEN_MAX_BREADCRUMB_ITEMS ];
     uint8_t _breadCrumbSelection[ SCREEN_MAX_BREADCRUMB_ITEMS ];

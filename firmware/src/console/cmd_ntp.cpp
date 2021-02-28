@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/commands/cmd_net.cpp
+// File    : src/console/cmd_net.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,8 +15,10 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "../console_base.h"
-#include "../../services/ntpclient.h"
+
+#include <services/ntpclient.h>
+
+#include "console_base.h"
 
 
 /*! ------------------------------------------------------------------------

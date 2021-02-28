@@ -34,5 +34,6 @@ _autosave-*
 # Arduino builds
 ##########################
 .build
+.pio
 .vscode
 *.code-workspace

@@ -16,14 +16,15 @@
 //
 //******************************************************************************
 
+#include <task_errors.h>
+#include <drivers/wifi/wifi.h>
+#include <drivers/rtc.h>
+#include <drivers/neoclock.h>
+#include <console/console_base.h>
+#include <timezone.h>
+#include <tzdata.h>
+
 #include "ntpclient.h"
-#include "../task_errors.h"
-#include "../drivers/wifi/wifi.h"
-#include "../drivers/rtc.h"
-#include "../drivers/neoclock.h"
-#include "../console/console_base.h"
-#include "../libs/timezone.h"
-#include "../libs/tzdata.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -198,7 +199,7 @@ bool NtpClient::sendNtpPacket() {
 bool NtpClient::readNtpResponse() {
 
     /* Check if we received a valid NTP packet */
-    if( _udp.read( (char*)&_packet, sizeof( ntp_packet_t )) < sizeof( ntp_packet_t )) {
+    if( _udp.read( (char*)&_packet, sizeof( ntp_packet_t )) < (int)sizeof( ntp_packet_t )) {
 
         /* Close the socket */
         _udp.stop();

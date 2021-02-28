@@ -21,11 +21,12 @@
 //
 //******************************************************************************
 
+#include <task_errors.h>
+#include <hardware.h>
+#include <config.h>
+#include <services/telnet_console.h>
+
 #include "wifi.h"
-#include "../../task_errors.h"
-#include "../../hardware.h"
-#include "../../config.h"
-#include "../../services/telnet_console.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -137,6 +138,8 @@ int WiFi::init() {
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA | 
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA256 );
     }
+
+    Serial.println(ret);
 
     return ret;
 }
@@ -711,15 +714,24 @@ void WiFi::runTasks() {
                 return;
             }
 
+            if( _status != WIFI_STATUS_IDLE ) {
+                Serial.print( _status );
+            }
+
             switch( _status ) {
                 case WIFI_STATUS_DISCONNECTED:
                 case WIFI_STATUS_CONNECT_FAILED:
                 case WIFI_STATUS_NO_SSID_AVAIL:
+                case WIFI_STATUS_CONNECTION_LOST:
                     this->endTask( _status );
                     return;
 
                 case WIFI_STATUS_CONNECTED:
                     this->endTask( WIFI_STATUS_CONNECTED );
+                    return;
+
+                /* WIFI_STATUS_IDLE */
+                default:
                     return;
             }
         }
@@ -831,8 +843,7 @@ bool WiFi::setSystemTime( DateTime *ndt ) {
  * @param   pvMsg        Pointer to message structure
  * 
  */
-static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
-
+void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
     g_wifi.handleEvent( u8MsgType, pvMsg );
 }
 
@@ -845,7 +856,7 @@ static void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg ) {
  * @param   hostIp      IP address of the host
  * 
  */
-static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp ) 
+void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp ) 
 {
     g_wifi.handleResolve( hostName, hostIp );
 }
@@ -860,7 +871,7 @@ static void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp )
  * @param   pvMsg     Pointer to message structure
  * 
  */
-static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
+void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
 
     g_wifisocket.handleEvent( sock, u8Msg, pvMsg );   
 }
@@ -875,7 +886,7 @@ static void wifimanager_socket_cb( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
  * @param   error    Error code or PING_ERR_SUCCESS if successful.
  * 
  */
-static void wifimanager_ping_cb( uint32 ip, uint32 rtt, uint8 error ) {
+void wifimanager_ping_cb( uint32 ip, uint32 rtt, uint8 error ) {
 
     g_wifi.handlePingResponse( ip, rtt, error );
 }

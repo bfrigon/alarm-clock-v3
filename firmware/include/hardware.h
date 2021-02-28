@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/hardware.h
+// File    : include/hardware.h
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -24,9 +24,6 @@
 #include <Wire.h>
 #include <avr/wdt.h>
 #include <avr/pgmspace.h>
-
-#include "libs/time.h"
-#include "libs/timezone.h"
 
 #include "drivers/tpa2016.h"
 #include "drivers/vs1053.h"

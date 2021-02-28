@@ -20,11 +20,11 @@
 
 #include <Arduino.h>
 
-#include "../libs/itask.h"
-#include "../drivers/wifi/wifi.h"
-#include "../console/console_base.h"
-#include "../config.h"
-#include "../drivers/wifi/udpclient.h"
+#include <itask.h>
+#include <drivers/wifi/wifi.h>
+#include <console/console_base.h>
+#include <config.h>
+#include <drivers/wifi/udpclient.h>
 
 
 #define NTPCLIENT_NTP_PORT      123

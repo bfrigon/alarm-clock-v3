@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/libs/time.cpp
+// File    : lib/time/time.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -596,7 +596,7 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
             hour = 12;
         }
 
-        length = sprintf_P( buffer, PSTR( "%d:%02d %S" ), hour, time->minute, ( is_pm ? S_PM : S_AM ) );
+        length = sprintf_P( buffer, PSTR( "%d:%02d %S" ), hour, time->minute, ( is_pm ? PSTR( "pm" ) : PSTR( "am" )));
 
     } else {
         length = sprintf_P( buffer, PSTR( "%d:%02d" ), time->hour, time->minute );

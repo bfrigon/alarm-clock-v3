@@ -24,7 +24,7 @@
 ## Directory where to download the timezone database
 DIR_TZDB="./cache"
 
-OUTPUT_TZDATA="src/libs/tzdata.h"
+OUTPUT_TZDATA="lib/tzdata/tzdata.h"
 
 REGION_DATABASE_FILE="../regions.dat"
 
@@ -546,7 +546,7 @@ echo "//************************************************************************
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
-#include \"timezone.h\"
+#include <timezone.h>
 " > $output
 
 printf "%-${PADDING}s %s\r\n" "#define MAX_TIMEZONE_ID" "$(( ${#zone[@]} + 1 ))" >> $output

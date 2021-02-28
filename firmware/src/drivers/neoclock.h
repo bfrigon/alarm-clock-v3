@@ -20,9 +20,8 @@
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>
+#include <time.h>
 
-#include "../libs/itask.h"
-#include "../libs/time.h"
 #include "neopixel.h"
 
 

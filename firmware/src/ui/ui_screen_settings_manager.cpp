@@ -15,10 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <task_errors.h>
+#include <drivers/power.h>
+#include <alarm.h>
+
 #include "ui.h"
-#include "../task_errors.h"
-#include "../drivers/power.h"
-#include "../alarm.h"
 
 
 uint8_t menuSettings_selectedItem = 0;

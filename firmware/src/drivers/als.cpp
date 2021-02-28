@@ -15,11 +15,14 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <config.h>
+
 #include "als.h"
 #include "power.h"
 #include "neoclock.h"
 #include "us2066.h"
-#include "../config.h"
+
 
 
 /*! ------------------------------------------------------------------------

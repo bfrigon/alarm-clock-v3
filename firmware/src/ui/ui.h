@@ -19,14 +19,12 @@
 #define UI_H
 
 #include <Arduino.h>
-
+#include <tzdata.h>
+#include <config.h>
+#include <alarm.h>
+#include <resources.h>
 
 #include "screen.h"
-#include "../libs/time.h"
-#include "../config.h"
-#include "../alarm.h"
-#include "../resources.h"
-#include "../libs/tzdata.h"
 
 
 // ----------------------------------------

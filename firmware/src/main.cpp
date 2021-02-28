@@ -15,13 +15,15 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
-#include "src/hardware.h"
-#include "src/services/console.h"
-#include "src/services/telnet_console.h"
-#include "src/ui/ui.h"
-#include "src/config.h"
-#include "src/services/ntpclient.h"
-#include "src/libs/freemem.h"
+
+#include <hardware.h>
+#include <config.h>
+#include <freemem.h>
+
+#include "services/console.h"
+#include "services/telnet_console.h"
+#include "services/ntpclient.h"
+#include "ui/ui.h"
 
 
 Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,

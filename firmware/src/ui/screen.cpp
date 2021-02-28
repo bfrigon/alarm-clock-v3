@@ -15,10 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <config.h>
+#include <resources.h>
+
 #include "screen.h"
 #include "screen_item.h"
-#include "../config.h"
-#include "../resources.h"
 #include "ui.h"
 
 

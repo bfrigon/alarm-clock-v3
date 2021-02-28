@@ -165,8 +165,8 @@ class BQ27441 {
     uint8_t calcBlockChecksum();
     
     uint16_t readWord( uint8_t reg );
-    uint16_t readControlData( uint8_t function );
-    bool executeControlCommand( uint8_t function );
+    uint16_t readControlData( uint16_t function );
+    bool executeControlCommand( uint16_t function );
     bool enterConfig();
     bool exitConfig();
     bool seal();

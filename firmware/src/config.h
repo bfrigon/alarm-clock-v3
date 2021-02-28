@@ -18,16 +18,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <SdFat.h>
 #include <avr/pgmspace.h>
 #include <IPAddress.h>
-
-#include "libs/time.h"
-#include "libs/itask.h"
-#include "resources.h"
+#include <time.h>
+#include <itask.h>
+#include <resources.h>
 
 
 #define IPADDRESS_TO_ARRAY( src, dest )   dest[ 0 ] = src[ 0 ]; \

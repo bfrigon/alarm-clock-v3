@@ -23,8 +23,6 @@
 #include <avr/power.h>
 #include <avr/wdt.h>
 
-#include "../libs/itask.h"
-
 
 #define DELAY_BEFORE_SUSPEND        5000
 

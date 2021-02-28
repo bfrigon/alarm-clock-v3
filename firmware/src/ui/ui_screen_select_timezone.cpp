@@ -15,10 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <timezone.h>
+#include <tzdata.h>
+
 #include "ui.h"
-#include "../libs/timezone.h"
-#include "../libs/tzdata.h"
-#include "../libs/freemem.h"
+
 
 uint16_t g_selectedTimezone;
 

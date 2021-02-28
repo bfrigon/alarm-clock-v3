@@ -15,6 +15,7 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "us2066.h"
 
 
@@ -267,7 +268,7 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
  * @retval  4   Other error
  * 
  */
-uint8_t US2066::setCustomCharacters( const char *pchrmap ) {
+uint8_t US2066::setCustomCharacters( const unsigned char *pchrmap ) {
 
     if( _init == false ) {
         this->begin();

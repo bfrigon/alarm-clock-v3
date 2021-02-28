@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/console.cpp
+// File    : src/console/console_base.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -15,11 +15,13 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
+#include <hardware.h>
+#include <task_errors.h>
+#include <services/ntpclient.h>
+#include <freemem.h>
+
 #include "console_base.h"
-#include "../hardware.h"
-#include "../task_errors.h"
-#include "../services/ntpclient.h"
-#include "../libs/freemem.h"
 
 
 /*! ------------------------------------------------------------------------
@@ -227,7 +229,6 @@ char* ConsoleBase::getInputParameter() {
  * 
  */
 void ConsoleBase::trimInput() {
-    uint8_t i;
     uint8_t length = strlen( _inputBuffer );
 
     if( length == 0 ) {
