@@ -553,15 +553,18 @@ void ConsoleBase::showTimezoneInfo() {
     g_timezone.toLocal( &now );
 
     bool isDst = g_timezone.isDST( &now );
-    
+
     int16_t std_offset, dst_offset, current_offset;
     std_offset = g_timezone.getStdUtcOffset();
     dst_offset = g_timezone.getDstUtcOffset();
     current_offset = ( isDst == true ) ? dst_offset : std_offset;
 
+    /* Calculate the difference between daylight saving time and standard time */
+    int16_t dst_diff = abs( dst_offset - std_offset );
+
     DateTime std, dst;
-    g_timezone.getStdTransition( g_rtc.now()->year(), &std );
-    g_timezone.getDstTransition( g_rtc.now()->year(), &dst );
+    g_timezone.getTransition( g_rtc.now()->year(), false, &std );
+    g_timezone.getTransition( g_rtc.now()->year(), true, &dst );
 
 
 
@@ -593,6 +596,7 @@ void ConsoleBase::showTimezoneInfo() {
 
         for( uint8_t i = 0; i < 2; i++ ) {
 
+            /* Print standard time to daylight saving time transition date */
             if( show_dst_first == true ) {
                 this->println();
                 this->printf_P( S_CONSOLE_TZ_DST_TRANS, 
@@ -603,13 +607,14 @@ void ConsoleBase::showTimezoneInfo() {
                                 dst.hour(),
                                 dst.minute() );
 
-                this->printTimeInterval( abs( dst_offset - std_offset ) * 60, S_DATETIME_SEPARATOR_AND );
+                this->printTimeInterval( (unsigned long)dst_diff * 60, S_DATETIME_SEPARATOR_AND );
                 this->println();
                 
                 show_dst_first = false;
                 continue;
             }
 
+            /* Print daylight saving time to standard time transition date */
             if( show_dst_first == false ) {
 
                 this->println();
@@ -621,7 +626,7 @@ void ConsoleBase::showTimezoneInfo() {
                                 std.hour(),
                                 std.minute() );
 
-                this->printTimeInterval( abs( std_offset - dst_offset ) * 60, S_DATETIME_SEPARATOR_AND );
+                this->printTimeInterval( (unsigned long)dst_diff * 60, S_DATETIME_SEPARATOR_AND );
                 this->println();
                 
                 show_dst_first = true;

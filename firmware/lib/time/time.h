@@ -58,6 +58,7 @@ enum {
     D_THU,
     D_FRI,
     D_SAT,
+    D_NONE,
 };
 
 #define LEAP_YEAR(Y)     ( (Y>0) && !(Y%4) && ( (Y%100) || !(Y%400) ))
@@ -135,7 +136,6 @@ class DateTime {
 const char* getMonthName( uint8_t month, bool shortName );
 const char* getDayName( uint8_t day, bool shortName );
 uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day );
-uint8_t findDayByDow( uint16_t year, uint8_t month, uint8_t dow, uint8_t order );
 uint8_t getMonthNumDays( uint8_t month, uint16_t year );
 
 

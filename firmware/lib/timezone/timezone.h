@@ -69,16 +69,16 @@ struct TimeZoneRules {
 
     int16_t std_offset;
     uint8_t std_month: 4;
-    uint8_t std_week: 3;
-    uint8_t std_dow: 6;
+    uint8_t std_day: 6;
+    uint8_t std_dow: 3;
     int8_t std_hour: 5;
     uint8_t std_min: 6;
     const char *std_abbvr;
 
     int16_t dst_offset;
     uint8_t dst_month: 4;
-    uint8_t dst_week: 3;
-    uint8_t dst_dow: 6;
+    uint8_t dst_day: 6;
+    uint8_t dst_dow: 3;
     int8_t dst_hour: 5;
     uint8_t dst_min: 6;
     const char *dst_abbvr;
@@ -106,8 +106,7 @@ class TimeZone {
     int16_t getDstUtcOffset();
 
     bool isDST( DateTime *local );
-    void getStdTransition( int16_t year, DateTime *std );
-    void getDstTransition( int16_t year, DateTime *dst );
+    void getTransition( int16_t year, bool stdToDst, DateTime *dt );
 
   private:
     uint16_t _id = 0;

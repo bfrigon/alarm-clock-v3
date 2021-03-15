@@ -188,8 +188,8 @@ void TimeZone::toUTC( DateTime *local ) {
 bool TimeZone::isDST( DateTime *local ) {
 
     DateTime dst, std;
-    this->getStdTransition( local->year(), &std );
-    this->getDstTransition( local->year(), &dst );
+    this->getTransition( local->year(), false, &std );
+    this->getTransition( local->year(), true, &dst );
 
     /* DST not observed in this time zone */
     if( dst == std ) {
@@ -210,71 +210,55 @@ bool TimeZone::isDST( DateTime *local ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Set the specified DateTime object to the DST->STD transition 
+ * @brief   Set the specified DateTime object to the daylight saving transition
  *          for this timezone.
  *
- * @param   year    Current year
- * @param   std     DateTime object to write the result to
+ * @param   year     Current year
+ * @param   stdToDst TRUE for the begining of the daylight saving time 
+ *                   period, FALSE otherwise
+ * @param   std      DateTime object to write the result to
  * 
  */
-void TimeZone::getStdTransition( int16_t year, DateTime *std ) {
-    uint8_t std_day;
-    if( _tz.std_week == 0 ) {
-        std_day = _tz.dst_dow;
-    } else {
-        std_day = findDayByDow( year, _tz.std_month, _tz.std_dow, _tz.std_week );
+void TimeZone::getTransition( int16_t year, bool stdToDst, DateTime *dt ) {
+
+    uint8_t trans_day = (stdToDst ? _tz.dst_day : _tz.std_day );
+    uint8_t trans_dow = (stdToDst ? _tz.dst_dow : _tz.std_dow );
+    uint8_t trans_month = (stdToDst ? _tz.dst_month : _tz.std_month );
+    int8_t trans_hour = (stdToDst ? _tz.dst_hour : _tz.std_hour );
+    uint8_t trans_min = (stdToDst ? _tz.dst_min : _tz.std_min );
+
+
+    /* If DOW is defined, transition occurs on the day-of-week following the 
+       specified date. */
+    if( trans_dow != D_NONE ) {
+        
+        if( trans_day > getMonthNumDays( trans_month, year )) {
+            trans_day = getMonthNumDays( trans_month, year );
+        }
+
+        uint8_t start_dow = getDayOfWeek( year, trans_month, trans_day );
+        trans_day += ( start_dow > trans_dow ) ? 7 + trans_dow - start_dow : trans_dow - start_dow;
+
+        if( trans_day > getMonthNumDays( trans_month, year )) {
+            trans_day -= 7;
+        }
     }
 
-    uint8_t hour;
-    if( _tz.std_hour < 0 ) {
-        hour = 24 - abs( _tz.std_hour );
-    } else {
-        hour = _tz.std_hour % 24;
+    dt->set( year, 
+        trans_month, 
+        trans_day, 
+        ( trans_hour < 0 ) ? 24 - abs( trans_hour ) : trans_hour % 24, 
+        trans_min, 
+        0 );
+
+    /* Increment the date if the transition occurs in the following day */
+    if( trans_hour > 23 ) {
+        dt->offset( 86400 );
     }
 
-    std->set( year, _tz.std_month, std_day, hour, _tz.std_min, 0 );
-
-    if( _tz.std_hour > 23 ) {
-        std->offset( 86400 );
-    }
-    if( _tz.std_hour < 0 ) {
-        std->offset( -86400 );
-    }
-}
-
-
-/*! ------------------------------------------------------------------------
- *
- * @brief   Set the specified DateTime object to the STD->DST transition 
- *          for this timezone.
- *
- * @param   year    Current year
- * @param   std     DateTime object to write the result to
- * 
- */
-void TimeZone::getDstTransition( int16_t year, DateTime *dst ) {
-    uint8_t dst_day;
-    if( _tz.dst_week == 0 ) {
-        dst_day = _tz.dst_dow;
-    } else {
-        dst_day = findDayByDow( year, _tz.dst_month, _tz.dst_dow, _tz.dst_week );
-    }
-
-    uint8_t hour;
-    if( _tz.dst_hour < 0 ) {
-        hour = 24 - abs( _tz.dst_hour );
-    } else {
-        hour = _tz.dst_hour % 24;
-    }
-
-    dst->set( year, _tz.dst_month, dst_day, hour, _tz.dst_min, 0 );
-
-    if( _tz.dst_hour > 23 ) {
-        dst->offset( 86400 );
-    }
-
-    if( _tz.dst_hour < 0 ) {
-        dst->offset( -86400 );
+    /* Decrement the date if the transition occurs in the previous day */
+    if( trans_hour < 0 ) {
+        dt->offset( -86400 );
     }
 }
 

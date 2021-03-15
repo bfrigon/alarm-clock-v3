@@ -515,46 +515,6 @@ uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day ) {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Find the day in the month corresponding to the 'x' occurence 
- *          of a weekday
- *
- * @param   year     year
- * @param   month    Month (1-12)  
- * @param   dow      Day of week to find (0=Sunday, 6=Saturday)
- * @param   order    Which occurence of the day to search for 
- *                   ( 1=first, 2=second, ..., 5=last )
- *
- * @return  The day of the month matching search criteria
- * 
- */
-uint8_t findDayByDow( uint16_t year, uint8_t month, uint8_t dow, uint8_t order ) {
-
-    if( dow > 6 ) {
-        dow = 6;
-    }
-
-    if( order < 1 ) {
-        order = 1;
-    }
-
-    int8_t day;
-    day = 1 + (dow - getDayOfWeek( year, month, 1 ));
-
-    if( day < 1 ) {
-        day += 7;
-    }
-
-    day += ( 7 * ( order - 1 ));
-    while( day > getMonthNumDays( month, year )) {
-        day -= 7;
-    }
-    
-    return day;
-}
-
-
-/*! ------------------------------------------------------------------------
- *
  * @brief   Prints the time from a given date/time structure into a string.
  *
  * @param   buffer     Pointer to the string to write to.

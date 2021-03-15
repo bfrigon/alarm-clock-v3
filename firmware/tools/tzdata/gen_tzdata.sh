@@ -410,24 +410,24 @@ for zone_name in "${!zone[@]}"; do
     
     ## Parse standard time starting week/day
     if [[ "${std_day:0:4}" == "last" ]]; then 
-        std_week=5
-        std_day="D_${std_day:4}"
+        std_dow="D_${std_day:4}"
+        std_day="31"
     elif [[ "${std_day:3:2}" == ">=" ]]; then 
-        std_week=$(( ${std_day:5} / 7 + 1 ))
-        std_day="D_${std_day:0:3}"
+        std_dow="D_${std_day:0:3}"
+        std_day="${std_day:5}"
     else
-        std_week=0
+        std_dow="D_NONE"
     fi
 
     ## Parse daylight saving time starting week/day
     if [[ "${dst_day:0:4}" == "last" ]]; then 
-        dst_week=5
-        dst_day="D_${dst_day:4}"
+        dst_dow="D_${dst_day:4}"
+        dst_day="31"
     elif [[ "${dst_day:3:2}" == ">=" ]]; then 
-        dst_week=$(( ${dst_day:5} / 7 + 1 ))
-        dst_day="D_${dst_day:0:3}"
+        dst_dow="D_${dst_day:0:3}"
+        dst_day="${dst_day:5}"
     else
-        dst_week=0
+        dst_dow="D_NONE"
     fi
 
     
@@ -442,11 +442,11 @@ for zone_name in "${!zone[@]}"; do
     else
 
         if [[ $negative_dst -eq 1 ]]; then 
-            std_def="$std_offset, M_${dst_month^^}, $dst_week, ${dst_day^^}, $dst_at_hour, $dst_at_min, $var_abbrev_dst"
-            dst_def="$dst_offset, M_${std_month^^}, $std_week, ${std_day^^}, $std_at_hour, $std_at_min, $var_abbrev_std"
+            std_def="$std_offset, M_${dst_month^^}, $dst_day, ${dst_dow^^}, $dst_at_hour, $dst_at_min, $var_abbrev_dst"
+            dst_def="$dst_offset, M_${std_month^^}, $std_day, ${std_dow^^}, $std_at_hour, $std_at_min, $var_abbrev_std"
         else
-            std_def="$std_offset, M_${std_month^^}, $std_week, ${std_day^^}, $std_at_hour, $std_at_min, $var_abbrev_std"
-            dst_def="$dst_offset, M_${dst_month^^}, $dst_week, ${dst_day^^}, $dst_at_hour, $dst_at_min, $var_abbrev_dst"
+            std_def="$std_offset, M_${std_month^^}, $std_day, ${std_dow^^}, $std_at_hour, $std_at_min, $var_abbrev_std"
+            dst_def="$dst_offset, M_${dst_month^^}, $dst_day, ${dst_dow^^}, $dst_at_hour, $dst_at_min, $var_abbrev_dst"
         fi
     fi
 
