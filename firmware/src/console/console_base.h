@@ -79,7 +79,7 @@ PROG_STR( S_COMMAND_FREE,             "free" );
 PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
 PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
 PROG_STR( S_COMMAND_FACTORY_RESET,    "factory reset" );
-
+PROG_STR( S_COMMAND_BATT_STATUS,      "batt status");
 
 // ----------------------------------------
 // Command help strings
@@ -101,6 +101,7 @@ PROG_STR( S_HELP_SERVICE,             "Disable/enable service." );
 PROG_STR( S_HELP_SETTING_BACKUP,      "Save settings to a file on the SD card." );
 PROG_STR( S_HELP_SETTING_RESTORE,     "Restore settings from a file on the SD card." );
 PROG_STR( S_HELP_FACTORY_RESET,       "Restore settings to their default values." );
+PROG_STR( S_HELP_BATT_STATUS,         "Get the battery health status" );
 
 
 // ----------------------------------------
@@ -114,7 +115,7 @@ PROG_STR( S_USAGE_SERVICE,            "service [name] (enable|disable|status)" )
 // ----------------------------------------
 // Commands listed on the help menu
 // ----------------------------------------
-#define CONSOLE_HELP_MENU_ITEMS       17
+#define CONSOLE_HELP_MENU_ITEMS       18
 const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_HELP,
     S_COMMAND_DATE,
@@ -132,6 +133,7 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_SETTING_BACKUP,
     S_COMMAND_SETTING_RESTORE,
     S_COMMAND_FACTORY_RESET,
+    S_COMMAND_BATT_STATUS,
     S_COMMAND_REBOOT,
 };
 const char* const S_HELP_COMMANDS[] PROGMEM = {
@@ -151,6 +153,7 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_SETTING_BACKUP,
     S_HELP_SETTING_RESTORE,
     S_HELP_FACTORY_RESET,
+    S_HELP_BATT_STATUS,
     S_HELP_REBOOT,
 };
 
@@ -284,6 +287,9 @@ class ConsoleBase : public IPrint, protected ITask {
 
     /* 'service' command */
     void openCommandService();
+
+    /* 'batt status' command */
+    void printBattStatus();
 
 };
 

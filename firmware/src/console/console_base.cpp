@@ -569,7 +569,11 @@ void ConsoleBase::parseCommand() {
         this->printfln_P( S_CONSOLE_FREEMEM, g_freeMemory );
         this->printfln_P( S_CONSOLE_TOTALMEM, RAMEND - RAMSTART + 1 );
         this->println();
-        
+
+    /* 'batt status' command */
+    } else if( this->matchCommandName( S_COMMAND_BATT_STATUS, false ) == true ) {
+         this->printBattStatus();
+         this->println();
 
     /* No command entered, display the prompt again */
     } else if( strlen( _inputBuffer ) == 0 ) {

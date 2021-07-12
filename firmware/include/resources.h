@@ -320,6 +320,21 @@ PROG_STR( S_CONSOLE_TELNET_SESS_ACTIVE, "Session active from %d.%d.%d.%d on port
 PROG_STR( S_CONSOLE_TELNET_NO_SESS,     "No active session" );
 
 
+PROG_STR( S_CONSOLE_BATT_STATE,         "State    : " );
+PROG_STR( S_CONSOLE_BATT_VOLTAGE,       "Voltage  : %d.%03d V" );
+PROG_STR( S_CONSOLE_BATT_CHARGE,        "Charge   : %d%%" );
+PROG_STR( S_CONSOLE_BATT_CAPACITY,      "Capacity : %d mAh / %d mAh" );
+PROG_STR( S_CONSOLE_BATT_CURRENT,       "Current  : %d mA" );
+PROG_STR( S_CONSOLE_BATT_SOH,           "SOH      : %d%%" );
+
+
+PROG_STR( S_CONSOLE_BATT_STATE_CHG,     "Charging" );
+PROG_STR( S_CONSOLE_BATT_STATE_DISCHG,  "Discharging" );
+PROG_STR( S_CONSOLE_BATT_STATE_IDLE,    "Idle" );
+PROG_STR( S_CONSOLE_BATT_STATE_UNKNOWN, "Unknown" );
+PROG_STR( S_CONSOLE_BATT_STATE_MISSING, "No battery detected!" );
+
+
 
 //--------------------------------------------------------------------------
 //
