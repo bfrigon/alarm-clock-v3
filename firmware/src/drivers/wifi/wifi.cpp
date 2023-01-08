@@ -25,6 +25,7 @@
 #include <hardware.h>
 #include <config.h>
 #include <services/telnet_console.h>
+#include <services/logger.h>
 
 #include "wifi.h"
 
@@ -225,6 +226,7 @@ wl_status_t WiFi::connect() {
     if( m2m_wifi_connect( (char*)ssid, strlen(ssid), M2M_WIFI_SEC_WPA_PSK, (void*)pvAuthInfo, M2M_WIFI_CH_ALL) < 0 ) {
         _status = WIFI_STATUS_CONNECT_FAILED;
 
+        g_log.add( EVENT_WIFI_CONNECT_FAIL, 0 );
         this->endTask( _status );
         return _status;
     }
@@ -250,10 +252,6 @@ wl_status_t WiFi::connect() {
 void WiFi::disconnect() {
 
     if( _init == false ) {
-        return;
-    }
-
-    if( _status != WIFI_STATUS_CONNECTED ) {
         return;
     }
 
@@ -372,6 +370,8 @@ void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
             } else {
 
                 if( this->getCurrentTask() == TASK_WIFI_CONNECT ) {
+
+                    g_log.add( EVENT_WIFI_CONNECT_FAIL, WIFI_STATUS_DISCONNECTED );
                     this->endTask( WIFI_STATUS_DISCONNECTED );
                 }
 
@@ -710,23 +710,23 @@ void WiFi::runTasks() {
 
             if( this->getTaskRunningTime() > WIFI_CONNECT_TIMEOUT ) {
 
+                g_log.add( EVENT_WIFI_CONNECT_FAIL, WIFI_STATUS_CONNECT_TIMEOUT );
                 this->endTask( ERR_WIFI_CANNOT_CONNECT );
                 return;
-            }
-
-            if( _status != WIFI_STATUS_IDLE ) {
-                Serial.print( _status );
             }
 
             switch( _status ) {
                 case WIFI_STATUS_DISCONNECTED:
                 case WIFI_STATUS_CONNECT_FAILED:
-                case WIFI_STATUS_NO_SSID_AVAIL:
                 case WIFI_STATUS_CONNECTION_LOST:
+
+                    g_log.add( EVENT_WIFI_CONNECT_FAIL, _status );
                     this->endTask( _status );
                     return;
 
                 case WIFI_STATUS_CONNECTED:
+                    
+                    g_log.add( EVENT_WIFI_CONNECTED, 0 );
                     this->endTask( WIFI_STATUS_CONNECTED );
                     return;
 
@@ -755,10 +755,14 @@ void WiFi::runTasks() {
                 return;
             }
 
+            
+
             if( _autoReconnect == true && ( millis() - _lastConnectAttempt > WIFI_RECONNECT_ATTEMPT_DELAY )) {
                 this->connect();
                 
             } else {
+
+                g_log.add( EVENT_WIFI_DISCONNECTED );
                 this->endTask( WIFI_STATUS_DISCONNECTED );
             }
 

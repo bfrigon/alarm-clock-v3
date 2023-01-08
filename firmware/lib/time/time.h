@@ -103,6 +103,7 @@ class DateTime {
         
     void set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec );
     void offset( long offset );
+    
 
     bool operator==( const DateTime &right ) const;
     bool operator!=( const DateTime &right ) const;
@@ -110,6 +111,12 @@ class DateTime {
     bool operator>( const DateTime &right ) const;
     bool operator<=( const DateTime &right ) const;
     bool operator>=( const DateTime &right ) const;
+    DateTime& operator-=( const uint32_t &right );
+    DateTime& operator-( const uint32_t &right );
+    DateTime& operator+=( const uint32_t &right );
+    DateTime& operator+( const uint32_t &right );
+    DateTime& operator=( const DateTime &right );
+    DateTime& operator=( const uint32_t &right );
 
     uint8_t second()    { return _ss; }
     uint8_t minute()    { return _mm; }

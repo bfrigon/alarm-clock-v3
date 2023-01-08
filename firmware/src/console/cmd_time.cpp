@@ -24,7 +24,7 @@
 #include <services/ntpclient.h>
 #include <ui/ui.h>
 #include <config.h>
-
+#include <services/logger.h>
 #include "console_base.h"
 
 
@@ -69,7 +69,7 @@ enum {
  * @return  TRUE if successful, FALSE otherwise
  *           
  */
-bool ConsoleBase::openCommandSetDate() {
+bool ConsoleBase::beginTaskSetDate() {
     _taskIndex = STEP_DISPLAY_SYNC_NTP_PROMPT;
 
 
@@ -92,7 +92,7 @@ bool ConsoleBase::openCommandSetDate() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runCommandSetDate() {
+void ConsoleBase::runTaskSetDate() {
     
     switch( _taskIndex ) {
 
@@ -247,6 +247,8 @@ void ConsoleBase::runCommandSetDate() {
                     /* Request clock display update */
                     g_clock.requestClockUpdate();
                     g_screen.requestScreenUpdate( false );
+
+                    g_log.add( EVENT_CON_ADJ_DATETIME, 0 );
                 }
 
                 this->endTask( TASK_SUCCESS );
@@ -290,7 +292,7 @@ void ConsoleBase::runCommandSetDate() {
  * @brief   Print the current date and time to the console
  *           
  */
-void ConsoleBase::runCommandPrintDateTime() {
+void ConsoleBase::runCommandPrintCurrentTime() {
 
     DateTime now;
     const char* abbvr;
@@ -321,7 +323,7 @@ void ConsoleBase::runCommandPrintDateTime() {
  * @return  TRUE if successful, FALSE otherwise
  *           
  */
-bool ConsoleBase::openCommandSetTimeZone() {
+bool ConsoleBase::beginTaskSetTimeZone() {
     
     param_tz_name = this->getInputParameter();
 
@@ -346,7 +348,7 @@ bool ConsoleBase::openCommandSetTimeZone() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runCommandSetTimeZone() {
+void ConsoleBase::runTaskSetTimeZone() {
     int16_t zone_id;
     
     if( param_tz_name > 0 ) {
@@ -531,6 +533,8 @@ void ConsoleBase::runCommandSetTimeZone() {
         this->print_P( S_CONSOLE_TIME_NEW_TZ );
         this->println_P( g_timezone.getName() );
 
+        g_log.add( EVENT_CON_ADJ_TZ, zone_id );
+
         /* Request clock display update */
         g_clock.requestClockUpdate();
     }
@@ -546,7 +550,7 @@ void ConsoleBase::runCommandSetTimeZone() {
  */
 void ConsoleBase::showTimezoneInfo() {
     
-    this->runCommandPrintDateTime();
+    this->runCommandPrintCurrentTime();
     this->println();
 
     DateTime now = g_rtc.now();

@@ -22,7 +22,7 @@
 //******************************************************************************
 
 #include "udpclient.h"
-#include "WiFi.h"
+#include "wifi.h"
 #include "wifisocket.h"
 
 

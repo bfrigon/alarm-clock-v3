@@ -21,6 +21,7 @@
 #include <hardware.h>
 #include <alarm.h>
 #include <services/telnet_console.h>
+#include <services/logger.h>
 
 #include "power.h"
 
@@ -97,6 +98,12 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
 
     _mode = mode;
 
+    if( mode == POWER_MODE_NORMAL ) {
+        g_log.add( EVENT_POWER_RESTORED );
+    } else if( mode != POWER_MODE_NORMAL && prevMode == POWER_MODE_NORMAL ) {
+        g_log.add( EVENT_POWER_ON_BATTERY );
+    }
+
 
     this->resetSuspendDelay();
 
@@ -142,7 +149,7 @@ void Power::processEvents() {
  */
 uint8_t Power::detectPowerState() {
 
-    if( this->isOnBatteryPower() ) {
+    if( this->isOnBatteryPower() == true ) {
 
         if( _mode == POWER_MODE_NORMAL ) {
             return this->setPowerMode( POWER_MODE_LOW_POWER );

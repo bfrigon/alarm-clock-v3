@@ -47,6 +47,7 @@ enum {
     TASK_CONSOLE_FACTORY_RESET,
     TASK_CONSOLE_SET_DATE,
     TASK_CONSOLE_NTP_SYNC,
+    TASK_CONSOLE_PRINT_LOGS,
 };
 
 
@@ -81,6 +82,7 @@ PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
 PROG_STR( S_COMMAND_FACTORY_RESET,    "factory reset" );
 PROG_STR( S_COMMAND_BATT_STATUS,      "batt status");
 
+
 // ----------------------------------------
 // Command help strings
 // ----------------------------------------
@@ -90,7 +92,7 @@ PROG_STR( S_HELP_SET_TIMEZONE,        "Set the time zone." );
 PROG_STR( S_HELP_SET_DATE,            "Set the clock." );
 PROG_STR( S_HELP_DATE,                "Display the current time and time zone" );
 PROG_STR( S_HELP_NTPSYNC,             "Synchronize the clock using the configured NTP server" );
-PROG_STR( S_HELP_LOGS,                "Print the event log stored on the SD card." );
+PROG_STR( S_HELP_LOGS,                "Print the events log" );
 PROG_STR( S_HELP_NET_STATUS,          "Show the status of the WiFi connection." );
 PROG_STR( S_HELP_NET_CONFIG,          "Configure the network settings.");
 PROG_STR( S_HELP_NET_RESTART,         "Restart the WiFi manager." );
@@ -226,71 +228,74 @@ class ConsoleBase : public IPrint, protected ITask {
     // ----------------------------------------
 
     /* 'help' command */
-    void openCommandPrintHelp();
-    void runCommandPrintHelp();
+    void beginTaskPrintHelp();
+    void runTaskPrintHelp();
     
     /* 'net restart' command */
-    bool openCommandNetRestart();
-    void runCommandNetRestart();
+    bool beginTaskNetRestart();
+    void runTaskNetRestart();
 
     /* 'net start' command */
-    bool openCommandNetStart();
+    bool beginTaskNetStart();
 
     /* 'net stop' command */
-    bool openCommandNetStop();
-    void runCommandNetStop();
+    bool beginTaskNetStop();
+    void runTaskNetStop();
 
     /* 'net status' command */
     void printNetStatus();
 
     /* 'nslookup' command */
-    bool openCommandNslookup();
-    void runCommandNsLookup();
+    bool beginTaskNslookup();
+    void runTaskNsLookup();
 
     /* 'ping' command */
-    bool openCommandPing();
-    void runCommandPing();
+    bool beginTaskPing();
+    void runTaskPing();
 
     /* 'net config' command */
-    bool openCommandNetworkConfig();
-    void runCommandNetworkConfig();
+    bool beginTaskNetworkConfig();
+    void runTaskNetworkConfig();
     
     /* 'set date' command */
-    bool openCommandSetDate();
-    void runCommandSetDate();
+    bool beginTaskSetDate();
+    void runTaskSetDate();
 
     /* 'date' command */
-    void runCommandPrintDateTime();
+    void runCommandPrintCurrentTime();
 
     /* 'set timezone' and 'tz set' command */
-    bool openCommandSetTimeZone();
-    void runCommandSetTimeZone();
+    bool beginTaskSetTimeZone();
+    void runTaskSetTimeZone();
 
     /* 'tz info' command */
     void showTimezoneInfo();
     
     /* 'config backup' command */
-    bool openCommandConfigBackup();
-    void runCommandConfigBackup();
+    bool beginTaskConfigBackup();
+    void runTaskConfigBackup();
 
     /* 'config restore' command */
-    bool openCommandConfigRestore();
-    void runCommandConfigRestore();
+    bool beginTaskConfigRestore();
+    void runTaskConfigRestore();
 
     /* 'factory reset' command */
-    bool openCommandFactoryReset();
-    void runCommandFactoryReset();
+    bool beginTaskFactoryReset();
+    void runTaskFactoryReset();
 
     /* 'ntp sync' command */
-    bool openCommandNtpSync();
-    void runCommandNtpSync();
+    bool beginTaskNtpSync();
+    void runTaskNtpSync();
 
     /* 'service' command */
-    void openCommandService();
+    void runCommandService();
 
     /* 'batt status' command */
     void printBattStatus();
 
+    /* 'logs' command */
+    void beginCommandPrintLogs(); 
+    void runCommandPrintLogs();
 };
 
 

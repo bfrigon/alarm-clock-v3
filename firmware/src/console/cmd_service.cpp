@@ -48,7 +48,7 @@ enum {
  * @brief   Run the 'service' command
  *           
  */
-void ConsoleBase::openCommandService() {
+void ConsoleBase::runCommandService() {
 
     /* Check if parameters are provided */
     char *param = this->getInputParameter();

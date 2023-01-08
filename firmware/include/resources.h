@@ -231,6 +231,7 @@ PROG_STR( S_CONSOLE_NET_NOT_CONNECTED,  "Not connected to the WiFi network" );
 PROG_STR( S_CONSOLE_NET_ALREADY_CONN,   "Already connected to the WiFi network" );
 PROG_STR( S_CONSOLE_NET_RECONNECTING,   "Re-connecting to %s..." );
 PROG_STR( S_CONSOLE_NET_CONNECTING,     "Connecting to %s..." );
+PROG_STR( S_CONSOLE_NET_CONN_FAIL,      "Unable to connect" );
 PROG_STR( S_CONSOLE_NET_INVALID_HOST,   "Invalid hostname" );
 PROG_STR( S_CONSOLE_NET_DNS_QUERY,      "Resolving %s..." );
 PROG_STR( S_CONSOLE_NET_PING_HOSTNAME,  "Pinging %s..." );
@@ -326,14 +327,40 @@ PROG_STR( S_CONSOLE_BATT_CHARGE,        "Charge   : %d%%" );
 PROG_STR( S_CONSOLE_BATT_CAPACITY,      "Capacity : %d mAh / %d mAh" );
 PROG_STR( S_CONSOLE_BATT_CURRENT,       "Current  : %d mA" );
 PROG_STR( S_CONSOLE_BATT_SOH,           "SOH      : %d%%" );
-
-
 PROG_STR( S_CONSOLE_BATT_STATE_CHG,     "Charging" );
 PROG_STR( S_CONSOLE_BATT_STATE_DISCHG,  "Discharging" );
 PROG_STR( S_CONSOLE_BATT_STATE_IDLE,    "Idle" );
 PROG_STR( S_CONSOLE_BATT_STATE_UNKNOWN, "Unknown" );
 PROG_STR( S_CONSOLE_BATT_STATE_MISSING, "No battery detected!" );
 
+PROG_STR( S_LOG_REPEAT,                 " <- Occured %d times" );
+PROG_STR( S_LOG_REPEAT_LIMIT,           " <- Occured more than 250 times!" );
+
+
+PROG_STR( S_LOGMSG_UNKNOWN,                     "**Unknown log entry type!** (type: %d, flags: %ld)" );
+PROG_STR( S_LOGMSG_RESET,                       "System reset (MCUSR: 0x%02X)" );
+PROG_STR( S_LOGMSG_TELNET_SERVICE_ENABLED,      "Telnet server enabled" );
+PROG_STR( S_LOGMSG_TELNET_SERVICE_DISABLED,     "Telnet server disabled" );
+PROG_STR( S_LOGMSG_TELNET_SESSION_END,          "Telnet session ended" );
+PROG_STR( S_LOGMSG_TELNET_SESSION_TIMEOUT,      "Telnet session timed out" );
+PROG_STR( S_LOGMSG_TELNET_SESSION_START,        "Client started a telnet session from %d.%d.%d.%d" );
+PROG_STR( S_LOGMSG_WIFI_CONNECTED,              "WiFi connected" );
+PROG_STR( S_LOGMSG_WIFI_DISCONNECTED,           "WiFi disconnected" );
+PROG_STR( S_LOGMSG_WIFI_FAIL_CONN_LOST,         "WiFi connection lost" );
+PROG_STR( S_LOGMSG_WIFI_FAIL_CONN_TIMEOUT,      "Unable to connect to WiFi (Timeout)" );
+PROG_STR( S_LOGMSG_WIFI_FAIL_CONN,              "Unable to connect to WiFi" );
+PROG_STR( S_LOGMSG_CON_ADJ_TIME,                "Date/Time was adjusted from the console" );
+PROG_STR( S_LOGMSG_CON_ADJ_TZ,                  "Timezone was changed from the console to \"%S\"" );
+PROG_STR( S_LOGMSG_NTP_FAIL_NO_WIFI,            "NTP sync failed (not connected to WiFi)" );
+PROG_STR( S_LOGMSG_NTP_FAIL_SOCKET_ERR,         "NTP sync failed (socket error)" );
+PROG_STR( S_LOGMSG_NTP_FAIL_CANT_RESOLVE_HOST,  "NTP sync failed (cannot resolve host)" );
+PROG_STR( S_LOGMSG_NTP_FAIL_NO_RESPONSE,        "NTP sync failed (no response from server)" );
+PROG_STR( S_LOGMSG_NTP_FAIL_INVALID_RESPONSE,   "NTP sync failed (invalid response from server)" );
+PROG_STR( S_LOGMSG_NTP_FAIL_SEND_PACKET,        "NTP sync failed (packet send failed!)" );
+PROG_STR( S_LOGMSG_FACTORY_RESET,               "Settings was reset to factory defaults" );
+PROG_STR( S_LOGMSG_CONFIG_RESTORED,             "Restored settings from SD card" );
+PROG_STR( S_LOGMSG_POWER_ON_BATTERY,            "Main power lost, running on battery" );
+PROG_STR( S_LOGMSG_POWER_RESTORED,              "Main power restored" );
 
 
 //--------------------------------------------------------------------------

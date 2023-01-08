@@ -66,6 +66,8 @@ DS3231::DS3231( int8_t pin_irq ) {
     _pin_irq = pin_irq;
     _adjustDelay = -1;
     _delayStart = 0;
+
+    _now.set( 2000, 1, 1, 0, 0, 0 );
 }
 
 
@@ -382,7 +384,7 @@ uint16_t DS3231::getMillis() {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Register a delayed clock adjustment
+ * @brief   Schedule a delayed clock adjustment
  *
  * @param   ndt      DateTime structure containing the new date/time
  * @param   delay    Number of milliseconds to wait before writing the 

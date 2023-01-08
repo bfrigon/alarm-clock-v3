@@ -19,6 +19,7 @@
 #include <drivers/wifi/wifi.h>
 #include <drivers/wifi/wifisocket.h>
 #include <task_errors.h>
+#include <services/logger.h>
 
 #include "telnet_console.h"
 
@@ -211,8 +212,8 @@ void TelnetConsole::stopServer() {
 
     /* Stop currently running console commands */
     this->endTask();
-    
-    /* Close the client socket */
+
+    /* close telnet connection */
     _client.stop();
 
     /* Close the listener socket */
@@ -220,6 +221,11 @@ void TelnetConsole::stopServer() {
 
         g_wifisocket.close( _socket );
         _socket = -1;
+    }
+
+    if( _state == TELNET_STATE_CLIENT_CONNECTED ) {
+
+        g_log.add( EVENT_TELNET_DISCONNECT );
     }
 
     _state = TELNET_STATE_WAIT_WIFI_CONNECTION;
@@ -245,6 +251,13 @@ void TelnetConsole::enableServer( bool enabled ) {
 
     } else {
         stopServer();
+    }
+
+    if( enabled ) {
+        g_log.add( EVENT_TELNET_SERVICE_ENABLED );
+        
+    } else {
+        g_log.add( EVENT_TELNET_SERVICE_DISABLED );
     }
 }
 
@@ -326,6 +339,8 @@ bool TelnetConsole::checkForClients() {
     this->queueTelnetCommand( TELNET_OP_WILL, TELNET_CMD_ECHO );
     this->flushSendBuffer();
 
+    g_log.add( EVENT_TELNET_SESSION_START, _client.remoteIP() );
+
     return true;
 }
 
@@ -385,14 +400,13 @@ bool TelnetConsole::handleNegotiation() {
  * 
  */
 void TelnetConsole::exitConsole( bool timeout = false ) {
-
     if( _state != TELNET_STATE_CLIENT_CONNECTED ) {
         return;
     }
 
     /* Stop currently running console commands */
     this->endTask();
-
+    
     this->println();
     this->println_P( (timeout == true ) ? S_CONSOLE_TIMEOUT : S_CONSOLE_GOODBYE );
     this->println();
@@ -401,6 +415,9 @@ void TelnetConsole::exitConsole( bool timeout = false ) {
 
     /* close telnet connection */
     _client.stop();
+
+
+    g_log.add( EVENT_TELNET_DISCONNECT, timeout );
 
     _state = TELNET_STATE_SERVER_LISTENING;
 }
@@ -517,7 +534,8 @@ void TelnetConsole::runTasks() {
             }
                 
             if( _client.connected() == 0 ) {
-                _client.stop();
+                
+                g_log.add( EVENT_TELNET_DISCONNECT, false );
 
                 /* Client disconnected, go back to listening */
                 _state = TELNET_STATE_SERVER_LISTENING;

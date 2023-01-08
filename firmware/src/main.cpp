@@ -23,6 +23,7 @@
 #include "services/console.h"
 #include "services/telnet_console.h"
 #include "services/ntpclient.h"
+#include "services/logger.h"
 #include "ui/ui.h"
 
 
@@ -43,7 +44,7 @@ TelnetConsole   g_telnetConsole;
 TimeZone        g_timezone;
 NtpClient       g_ntp;
 Screen          g_screen;
-
+Logger          g_log;
 
 bool g_prev_state_wifi = false;
 bool g_prev_state_telnetConsole = false;
@@ -93,6 +94,7 @@ bool checkFactoryReset() {
     g_clock.setTestMode( true );
     g_clock.update();
 
+    /* Reset EEPROM to default values */
     g_config.reset();
     delay( 1000 );
 
@@ -108,6 +110,10 @@ bool checkFactoryReset() {
  *
  */
 void setup() {
+    
+    
+    g_log.add( EVENT_RESET, MCUSR );
+    MCUSR = 0;
 
     /* Setup console */
     g_console.begin( 115200 );
@@ -173,10 +179,10 @@ void setup() {
     /* Display console prompt */
     g_console.resetConsole();
 
-
+    /* Start telnet server if enabled */
     g_telnetConsole.enableServer( g_config.network.telnetEnabled );
 
-    
+    /* Enable automatic ntp sync at random interval */
     g_ntp.setAutoSync( g_config.clock.use_ntp );
 }
 

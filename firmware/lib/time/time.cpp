@@ -218,74 +218,53 @@ bool DateTime::operator>=( const DateTime &right ) const {
 
 /*! ------------------------------------------------------------------------
  *
- * @brief   Adjust the date and time by the 'x' amount of seconds
+ * @brief   Adds 'x' seconds to the DateTime object
  *
- * @param   offset    Number of seconds to adjust forward or backward.
+ * @param   right    Amount of seconds to add.
+ * 
+ * @return  Reference to the left hand DateTime object
  * 
  */
-void DateTime::offset( long offset ) {
+DateTime& DateTime::operator+=( const uint32_t &right ) {
 
-    if( offset == 0 ) {
-        return;
+    if( right == 0 ) {
+        return *this;
     }
 
     int8_t ss = _ss;
     int8_t mm = _mm;
     int8_t hh = _hh;
-    long d = _d;
+    uint32_t d = _d;
     int8_t m = _m;
     int16_t y = _y;
 
-    ss += ( offset % 60L );
+    ss += ( right % 60L );
     if( ss > 59 ) {
         mm++;
         ss %= 60;
     }
-    if( ss < 0 ) {
-        mm--;
-        ss += 60;
-    }
 
-    mm += (( offset % 3600L ) / 60L );
+    mm += (( right % 3600L ) / 60L );
     if( mm > 59 ) {
         hh++;
         mm %= 60;
     }
-    if( mm < 0 ) {
-        hh--;
-        mm += 60;
-    }
 
-    hh +=(( offset % 86400L ) / 3600L );
+    hh +=(( right % 86400L ) / 3600L );
     if ( hh > 23 ) {
         d++;
         hh %= 24;
     }
-    if( hh < 0 ) {
-        d--;
-        hh += 24;
-    }
 
-    d += ( offset / 86400L );
-    while(( d > getMonthNumDays( m, y )) || ( d < 1 )) {
+    d += ( right / 86400L );
+    while( d > getMonthNumDays( m, y )) {
         
-        if( d < 1 ) {
-            m--;
-            if( m < 1 ) {
-                m = 12;
-                y--;
-            }
+        d -= (( uint32_t )getMonthNumDays( m, y ));
+        m++;
 
-            d += (( long )getMonthNumDays( m, y ));
-
-        } else {
-            d -= (( long )getMonthNumDays( m, y ));
-            m++;
-
-            if( m > 12 ) {
-                m = 1;
-                y++;
-            }
+        if( m > 12 ) {
+            m = 1;
+            y++;
         }
     }
 
@@ -295,8 +274,116 @@ void DateTime::offset( long offset ) {
     _d = d;
     _m = m;
     _y = y;
+
+    return *this;
 }
 
+DateTime& DateTime::operator+( const uint32_t &right ) {
+    *this += right;
+    return *this;
+}
+
+DateTime& DateTime::operator-=( const uint32_t &right ) {
+
+    if( right == 0 ) {
+        return *this;
+    }
+
+    int8_t ss = _ss;
+    int8_t mm = _mm;
+    int8_t hh = _hh;
+    long d = _d;
+    int8_t m = _m;
+    int16_t y = _y;
+
+    ss -= ( right % 60L );
+    if( ss < 0 ) {
+        mm--;
+        ss += 60;
+    }
+
+    mm -= (( right % 3600L ) / 60L );
+    if( mm < 0 ) {
+        hh--;
+        mm += 60;
+    }
+
+    hh -=(( right % 86400L ) / 3600L );
+    if( hh < 0 ) {
+        d--;
+        hh += 24;
+    }
+
+    d -= ( right / 86400L );
+    while( d < 1 ) {
+        
+        m--;
+        if( m < 1 ) {
+            m = 12;
+            y--;
+        }
+
+        d += (( long )getMonthNumDays( m, y ));
+    }
+
+    _ss = ss;
+    _mm = mm;
+    _hh = hh;
+    _d = d;
+    _m = m;
+    _y = y;
+
+    return *this;
+}
+
+DateTime& DateTime::operator-( const uint32_t &right ) {
+    *this -= right;
+    return *this;
+}
+
+DateTime& DateTime::operator=( const DateTime &right ) {
+    if( this == &right ) {
+        return *this;
+    }
+
+    this->_d = right._d;
+    this->_m = right._m;
+    this->_y = right._y;
+    this->_hh= right._hh;
+    this->_mm= right._mm;
+    this->_ss= right._ss;
+
+    return *this;
+}
+
+DateTime& DateTime::operator=( const uint32_t &right ) {
+    this->_y = 2000;
+    this->_m = 1;
+    this->_d = 1;
+    this->_hh = 0;
+    this->_mm = 0;
+    this->_ss = 0;
+
+    *this += right;
+    return *this;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Adjust the date and time by the 'x' amount of seconds
+ *
+ * @param   offset    Number of seconds to adjust forward or backward.
+ * 
+ */
+void DateTime::offset( long offset ) {
+    if( offset > 0 ) {
+        *this += (uint32_t)offset;
+        
+    } else if( offset < 0 ) {
+        *this -= (uint32_t)(-offset);
+    }
+}
 
 
 /*! ------------------------------------------------------------------------
@@ -433,7 +520,7 @@ uint8_t getMonthNumDays( uint8_t month, uint16_t year ) {
 
     const uint8_t month_days[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    if( year % 4 == 0 && month == 2 ) {
+    if( LEAP_YEAR( year ) && month == 2 ) {
         return 29;
 
     } else {

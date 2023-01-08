@@ -27,7 +27,7 @@
 #include "drivers/neoclock.h"
 #include "services/ntpclient.h"
 #include "services/telnet_console.h"
-
+#include "services/logger.h"
 
 
 
@@ -186,6 +186,8 @@ void ConfigManager::reset() {
 
         g_alarm.saveProfile( &profile, i );
     }
+
+    g_log.add( EVENT_FACTORY_RESET );
 }
 
 
@@ -384,6 +386,8 @@ void ConfigManager::endRestore( int error ) {
         this->save( EEPROM_SECTION_ALL );
 
         this->apply( EEPROM_SECTION_ALL );
+
+        g_log.add( EVENT_RESTORED_CONFIG );
     }
 }
 

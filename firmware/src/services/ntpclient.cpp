@@ -24,6 +24,7 @@
 #include <timezone.h>
 #include <tzdata.h>
 
+#include "logger.h"
 #include "ntpclient.h"
 
 
@@ -55,6 +56,7 @@ bool NtpClient::sync( ConsoleBase *console ) {
 
     if( g_wifi.connected() == false ) {
         this->setTaskError( ERR_WIFI_NOT_CONNECTED );
+        g_log.add( EVENT_NTP_FAIL_NO_WIFI, 0);
         return false;
     }
 
@@ -121,6 +123,7 @@ bool NtpClient::requestBind() {
     if( _udp.begin( NTPCLIENT_NTP_PORT ) == false ) {
 
         this->endTask( ERR_NTPCLIENT_SOCKET_BIND_FAIL );
+        g_log.add( EVENT_NTP_FAIL_SOCKET_ERR );
         return false;
     }
 
@@ -144,6 +147,7 @@ bool NtpClient::sendNtpPacket() {
     if( _udp.beginPacket( _server_ip, NTPCLIENT_NTP_PORT ) == 0 ) {
 
         this->endTask( ERR_NTPCLIENT_SEND_FAIL );
+        g_log.add( EVENT_NTP_FAIL_SEND_PACKET );
         return false;
     }
 
@@ -179,6 +183,7 @@ bool NtpClient::sendNtpPacket() {
     if( _udp.endPacket() == 0 ) {
 
         this->endTask( ERR_NTPCLIENT_SEND_FAIL );
+        g_log.add( EVENT_NTP_FAIL_SEND_PACKET );
         return false;
     }
 
@@ -204,7 +209,6 @@ bool NtpClient::readNtpResponse() {
         /* Close the socket */
         _udp.stop();
 
-        this->endTask( ERR_NTPCLIENT_INVALID_RESPONSE );
         return false;
     }
 
@@ -333,6 +337,8 @@ void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
         } else {
             this->setTaskError( ERR_WIFI_NOT_CONNECTED );
             _lastSync = g_rtc.now();
+
+            g_log.add( EVENT_NTP_FAIL_NO_WIFI, 0);
         }
 
         _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
@@ -366,6 +372,7 @@ void NtpClient::runTasks() {
         case TASK_NTPCLIENT_RESOLVE_HOST: {
             if( this->getTaskRunningTime() > WIFI_RESOLVE_TIMEOUT ) {
                 this->endTask( ERR_NTPCLIENT_UNKNOWN_HOSTNAME );
+                g_log.add( EVENT_NTP_FAIL_CANT_RESOLVE_HOST );
                 return;
             }
 
@@ -379,6 +386,7 @@ void NtpClient::runTasks() {
                 } else {
 
                     this->endTask( ERR_NTPCLIENT_UNKNOWN_HOSTNAME );
+                    g_log.add( EVENT_NTP_FAIL_CANT_RESOLVE_HOST );
                     return;
                 }
             }
@@ -391,6 +399,8 @@ void NtpClient::runTasks() {
             
             if( this->getTaskRunningTime() > NTPCLIENT_BIND_TIMEOUT ) {
                 this->endTask( ERR_NTPCLIENT_SOCKET_BIND_FAIL );
+                g_log.add( EVENT_NTP_FAIL_SOCKET_ERR );
+
                 return;
             }
 
@@ -408,6 +418,7 @@ void NtpClient::runTasks() {
             if( this->getTaskRunningTime() > NTPCLIENT_REQ_TIMEOUT ) {
 
                 this->endTask( ERR_NTPCLIENT_NO_RESPONSE );
+                g_log.add( EVENT_NTP_FAIL_NO_RESPONSE );
                 return;
             }
 
@@ -419,6 +430,7 @@ void NtpClient::runTasks() {
                 } else {
 
                     this->endTask( ERR_NTPCLIENT_INVALID_RESPONSE );
+                    g_log.add( EVENT_NTP_FAIL_INVALID_RESPONSE );
                     return;
                 }
             }

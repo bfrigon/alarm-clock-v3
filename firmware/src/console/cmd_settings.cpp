@@ -30,7 +30,7 @@
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool ConsoleBase::openCommandConfigBackup() {
+bool ConsoleBase::beginTaskConfigBackup() {
     _taskIndex = 0;
     
 
@@ -45,7 +45,7 @@ bool ConsoleBase::openCommandConfigBackup() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runCommandConfigBackup() {
+void ConsoleBase::runTaskConfigBackup() {
 
     /* Even index display the prompt, odd index process user input */
     if( _taskIndex % 2 ) {
@@ -177,7 +177,7 @@ void ConsoleBase::runCommandConfigBackup() {
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool ConsoleBase::openCommandConfigRestore() {
+bool ConsoleBase::beginTaskConfigRestore() {
     _taskIndex = 0;
 
     this->startTask( TASK_CONSOLE_CONFIG_RESTORE );
@@ -191,7 +191,7 @@ bool ConsoleBase::openCommandConfigRestore() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runCommandConfigRestore() {
+void ConsoleBase::runTaskConfigRestore() {
 
     /* Even index display the prompt, odd index process user input */
     if( _taskIndex % 2 ) {
@@ -306,7 +306,7 @@ void ConsoleBase::runCommandConfigRestore() {
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
  */
-bool ConsoleBase::openCommandFactoryReset() {
+bool ConsoleBase::beginTaskFactoryReset() {
     _taskIndex = 0;
 
     this->println();
@@ -323,7 +323,7 @@ bool ConsoleBase::openCommandFactoryReset() {
  *          responses required before executing the task.
  *           
  */
-void ConsoleBase::runCommandFactoryReset() {
+void ConsoleBase::runTaskFactoryReset() {
     
     /* Even index display the prompt, odd index process user input */
     if( _taskIndex % 2 ) {
