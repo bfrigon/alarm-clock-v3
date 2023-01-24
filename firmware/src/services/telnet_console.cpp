@@ -157,6 +157,18 @@ bool TelnetConsole::clientConnected() {
 
 /*! ------------------------------------------------------------------------
  *
+ * @brief   Return whether or not if the server is currently enabled
+ * 
+ * @return  TRUE if enabled or FALSE otherwise.
+ * 
+ */
+bool TelnetConsole::serverEnabled() {
+    return _serverEnabled;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
  * @brief   Create the server socket 
  * 
  * @return  TRUE if successful or FALSE otherwise.

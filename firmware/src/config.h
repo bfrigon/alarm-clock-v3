@@ -68,7 +68,10 @@
 #define MIN_ALARM_VISUAL_EFFECT_SPEED   1
 #define MAX_ALARM_VISUAL_EFFECT_SPEED   10
 #define MAX_TZ_NAME_LENGTH              40
-
+#define MAX_MQTT_HOST_LENGTH            64
+#define MAX_MQTT_USERNAME_LENGTH        32
+#define MAX_MQTT_PASSWORD_LENGTH        32
+#define MAX_DISCOVERY_PREFIX_LENGTH     32
 
 /* EEPROM addresses */
 #define EEPROM_ADDR_MAGIC               0
@@ -115,6 +118,8 @@ PROG_STR( SETTING_NAME_SECTION_LCD,         "lcd" );
 PROG_STR( SETTING_NAME_SECTION_LAMP,        "lamp" );
 PROG_STR( SETTING_NAME_SECTION_NETWORK,     "network" );
 PROG_STR( SETTING_NAME_SECTION_ALARM,       "alarm" );
+PROG_STR( SETTING_NAME_SECTION_MQTT,        "mqtt-client" );
+PROG_STR( SETTING_NAME_SECTION_HA,          "home-assistant" );
 PROG_STR( SETTING_NAME_24H,                 "24h" );
 PROG_STR( SETTING_NAME_COLOR,               "color" );
 PROG_STR( SETTING_NAME_BRIGHTNESS,          "brightness" );
@@ -148,7 +153,11 @@ PROG_STR( SETTING_NAME_LAMP_COLOR,          "lamp-color" );
 PROG_STR( SETTING_NAME_LAMP_MODE,           "lamp-mode" );
 PROG_STR( SETTING_NAME_LAMP_SPEED,          "lamp-speed" );
 PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
-
+PROG_STR( SETTING_NAME_MQTT_HOST,           "host" );
+PROG_STR( SETTING_NAME_MQTT_USERNAME,       "username" );
+PROG_STR( SETTING_NAME_MQTT_PASSWORD,       "password" );
+PROG_STR( SETTING_NAME_MQTT_PORT,           "port");
+PROG_STR( SETTING_NAME_HA_DISCOVERY_PREFIX, "discovery-prefix");
 
 /* Settings ID's */
 enum {
@@ -182,6 +191,16 @@ enum {
     SETTING_ID_NETWORK_NTPSERVER,
     SETTING_ID_NETWORK_TELNET_ENABLED,
 
+    /* MQTT client section */
+    SETTING_ID_MQTT_ENABLED,
+    SETTING_ID_MQTT_HOST,
+    SETTING_ID_MQTT_PORT,
+    SETTING_ID_MQTT_USERNAME,
+    SETTING_ID_MQTT_PASSWORD,
+
+    /* Home assistant section */
+    SETTING_ID_HA_DISCOVERY_PREFIX,
+
     /* Alarm section */
     SETTING_ID_ALARM_ENABLED,
     SETTING_ID_ALARM_FILENAME,
@@ -213,6 +232,8 @@ enum {
     SECTION_ID_LAMP,
     SECTION_ID_NETWORK,
     SECTION_ID_ALARM,
+    SECTION_ID_MQTT,
+    SECTION_ID_HA,
 };
 
 
@@ -288,6 +309,13 @@ struct NetworkSettings {
     char hostname[ MAX_HOSTNAME_LENGTH + 1 ];
     char ntpserver[ MAX_NTPSERVER_LENGTH + 1];
     bool telnetEnabled = false;
+
+    bool mqtt_enabled = false;
+    char mqtt_host[ MAX_MQTT_HOST_LENGTH + 1];
+    char mqtt_username[ MAX_MQTT_USERNAME_LENGTH + 1];
+    char mqtt_password[ MAX_MQTT_PASSWORD_LENGTH + 1];
+    uint16_t mqtt_port = 1883;
+    char discovery_prefix[ MAX_DISCOVERY_PREFIX_LENGTH ];
 };
 
 

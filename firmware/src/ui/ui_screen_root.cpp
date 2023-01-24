@@ -18,6 +18,7 @@
 
 #include <drivers/wifi/wifi.h>
 #include <services/telnet_console.h>
+#include <services/mqtt.h>
 
 #include "ui.h"
 
@@ -82,7 +83,12 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
 
     g_lcd.setPosition( 0, 0 );
     g_lcd.print( ( g_wifi.connected() == true ) ? CHAR_WIFI_ON : CHAR_SPACE );
-    g_lcd.print( ( g_telnetConsole.clientConnected() == true ) ? CHAR_TELNET_SESSION : CHAR_SPACE );
+
+    if( g_telnetConsole.serverEnabled() == true ) {
+        g_lcd.print( ( g_telnetConsole.clientConnected() == true ) ? CHAR_TELNET_SESSION_ACTIVE : CHAR_TELNET_SESSION_INNACTIVE );
+    } else {
+        g_lcd.print( CHAR_SPACE );
+    }
 
     /* Print status icons */
     g_lcd.setPosition( 0, 14 );

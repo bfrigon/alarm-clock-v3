@@ -55,6 +55,7 @@ typedef enum {
     WIFI_STATUS_CONNECT_FAILED,
     WIFI_STATUS_CONNECT_TIMEOUT,
     WIFI_STATUS_CONNECTION_LOST,
+    WIFI_STATUS_DISCONNECTING,
     WIFI_STATUS_DISCONNECTED,
 } wl_status_t;
 
@@ -64,7 +65,7 @@ typedef enum {
 #define WIFI_RESOLVE_TIMEOUT            5000
 #define WIFI_SOCKET_CLOSE_TIMEOUT       250
 #define WIFI_PING_TIMEOUT               5000
-
+#define WIFI_RSSI_REQ_DELAY             30000
 
 
 void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg );
@@ -111,6 +112,9 @@ class WiFi : public ITask {
 
     bool setSystemTime( DateTime *ndt );
 
+    bool getMacAddress( uint8_t* buffer );
+    int8_t getRSSI();
+
   private:
     int init();
     void getConnectionInfo();
@@ -125,7 +129,11 @@ class WiFi : public ITask {
     uint32_t _dns;
     uint32_t _resolve;
     int32_t _rtt;
+    int8_t _rssi;
+    unsigned long _lastRssiRequest;
+    
     wl_status_t _status;
+    
 
 
     unsigned long _lastConnectAttempt;

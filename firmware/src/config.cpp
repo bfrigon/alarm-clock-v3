@@ -27,6 +27,7 @@
 #include "drivers/neoclock.h"
 #include "services/ntpclient.h"
 #include "services/telnet_console.h"
+#include "services/mqtt.h"
 #include "services/logger.h"
 
 
@@ -39,8 +40,8 @@
  * 
  */
 void ConfigManager::load( uint8_t section ) {
-    uint8_t c;
-    uint8_t byte;
+    uint16_t c;
+    char byte;
 
     /* Checks if EEPROM starts with the magic code 'BEEF'. If not, assumes
        the config is not present or corrupted and restore the default
@@ -55,7 +56,7 @@ void ConfigManager::load( uint8_t section ) {
         for( c = 0; c < sizeof( ClockSettings ); c++ ) {
             byte = EEPROM.read( EEPROM_ADDR_CLOCK_CONFIG + c );
 
-            *( ( ( uint8_t* )&this->clock ) + c ) = byte;
+            *( ( ( char* )&this->clock ) + c ) = byte;
         }
 
         this->clock.lamp.mode = LAMP_MODE_OFF;
@@ -66,7 +67,7 @@ void ConfigManager::load( uint8_t section ) {
         for( c = 0; c < sizeof( NetworkSettings ); c++ ) {
             byte = EEPROM.read( EEPROM_ADDR_NETWORK_CONFIG + c );
 
-            *( ( ( uint8_t* )&this->network ) + c ) = byte;
+            *( ( ( char* )&this->network ) + c ) = byte;
         }
     }
 }
@@ -80,8 +81,8 @@ void ConfigManager::load( uint8_t section ) {
  *
  */
 void ConfigManager::save( uint8_t section ) {
-    uint8_t c;
-    uint8_t byte;
+    uint16_t c;
+    char byte;
 
     /* Save valid config magic number (0xBEEF) */
     EEPROM.update( EEPROM_ADDR_MAGIC + 0, 0xEF );
@@ -90,7 +91,7 @@ void ConfigManager::save( uint8_t section ) {
     if( section & EEPROM_SECTION_CLOCK ) {
 
         for( c = 0; c < sizeof( ClockSettings ); c++ ) {
-            byte = *((( uint8_t* )&this->clock ) + c );
+            byte = *((( char* )&this->clock ) + c );
 
             EEPROM.update( EEPROM_ADDR_CLOCK_CONFIG + c, byte );
         }
@@ -99,7 +100,7 @@ void ConfigManager::save( uint8_t section ) {
     if( section & EEPROM_SECTION_NETWORK ) {
 
         for( c = 0; c < sizeof( NetworkSettings ); c++ ) {
-            byte = *((( uint8_t* )&this->network ) + c );
+            byte = *((( char* )&this->network ) + c );
 
             EEPROM.update( EEPROM_ADDR_NETWORK_CONFIG + c, byte );
         }
@@ -137,6 +138,7 @@ void ConfigManager::apply( uint8_t section ) {
         g_wifi.disconnect();
 
         g_telnetConsole.enableServer( g_config.network.telnetEnabled );
+        g_mqtt.enableClient( g_config.network.mqtt_enabled );
     }
 }
 
@@ -150,6 +152,11 @@ void ConfigManager::reset() {
     this->network.ssid[0] = 0;
     this->network.wkey[0] = 0;
     this->network.telnetEnabled = false;
+    this->network.mqtt_host[0] = 0;
+    this->network.mqtt_username[0] = 0;
+    this->network.mqtt_password[0] = 0;
+    this->network.mqtt_enabled = false;
+    this->network.mqtt_port = 1883;
 
     this->clock.lamp.brightness = 60;
     this->clock.lamp.mode = LAMP_MODE_OFF;
@@ -159,6 +166,7 @@ void ConfigManager::reset() {
     strcpy_P( this->clock.timezone, TZ_ETC_UTC );
     strcpy_P( this->network.hostname, S_DEFAULT_HOSTNAME );
     strcpy_P( this->network.ntpserver, S_DEFAULT_NTPSERVER );
+    strcpy_P( this->network.discovery_prefix, S_DEFAULT_HA_DISCOVERY_PREFIX );
 
 
     /* Store default config */
@@ -442,6 +450,12 @@ bool ConfigManager::readNextLine() {
         } else if( strcmp_P( name, SETTING_NAME_SECTION_NETWORK ) == 0 ) {
             _currentSectionID = SECTION_ID_NETWORK;
 
+        } else if( strcmp_P( name, SETTING_NAME_SECTION_MQTT ) == 0 ) {
+            _currentSectionID = SECTION_ID_MQTT;        
+
+        } else if( strcmp_P( name, SETTING_NAME_SECTION_HA) == 0 ) {
+            _currentSectionID = SECTION_ID_HA;        
+
         } else if( strcmp_P( name, SETTING_NAME_SECTION_ALARM ) == 0 ) {
 
 
@@ -586,6 +600,25 @@ bool ConfigManager::readNextLine() {
     } else if( this->matchSettingName( name, SETTING_NAME_LAMP_BRIGHTNESS, SECTION_ID_ALARM ) == true ) {
         this->parseSettingValue( value, &g_alarm.profile.lamp.brightness, SETTING_TYPE_INTEGER,
                                  MIN_ALARM_LAMP_BRIGHTNESS, MAX_ALARM_LAMP_BRIGHTNESS );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_MQTT_HOST, SECTION_ID_MQTT ) == true ) {
+        this->parseSettingValue( value, &this->network.mqtt_host, SETTING_TYPE_STRING, 0, MAX_MQTT_HOST_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_MQTT_USERNAME, SECTION_ID_MQTT ) == true ) {
+        this->parseSettingValue( value, &this->network.mqtt_username, SETTING_TYPE_STRING, 0, MAX_MQTT_USERNAME_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_MQTT_PASSWORD, SECTION_ID_MQTT ) == true ) {
+        this->parseSettingValue( value, &this->network.mqtt_password, SETTING_TYPE_STRING, 0, MAX_MQTT_PASSWORD_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_ENABLED, SECTION_ID_MQTT ) == true ) {
+        this->parseSettingValue( value, &this->network.mqtt_enabled, SETTING_TYPE_BOOL );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_MQTT_PORT, SECTION_ID_MQTT ) == true ) {
+        this->parseSettingValue( value, &this->network.mqtt_port, SETTING_TYPE_SHORT );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_HA_DISCOVERY_PREFIX, SECTION_ID_HA ) == true ) {
+        this->parseSettingValue( value, &this->network.discovery_prefix, SETTING_TYPE_STRING, 0, MAX_DISCOVERY_PREFIX_LENGTH );
+
     }
 
     return true;
@@ -649,11 +682,11 @@ void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingTyp
             break;
 
         case SETTING_TYPE_INTEGER:
-            *( ( uint8_t* )dest ) = constrain( atoi( src ), min, max );
+            *( ( uint8_t* )dest ) = constrain( atoi( src ), 0, UINT8_MAX );
             break;
 
         case SETTING_TYPE_SHORT:
-            *( ( uint16_t* )dest ) = constrain( atoi( src ), min, max );
+            *( ( uint16_t* )dest ) = constrain( atoi( src ), 0, UINT16_MAX );
             break;
 
         case SETTING_TYPE_STRING:
@@ -991,6 +1024,32 @@ bool ConfigManager::writeNextLine()  {
 
         case SETTING_ID_ALARM_LAMP_BRIGHTNESS:
             this->writeConfigLine( SETTING_NAME_LAMP_BRIGHTNESS, SETTING_TYPE_INTEGER, &g_alarm.profile.lamp.brightness );
+            break;
+
+        case SETTING_ID_MQTT_ENABLED:
+            this->writeConfigLine( SETTING_NAME_SECTION_MQTT, SETTING_TYPE_SECTION, NULL );
+            this->writeConfigLine( SETTING_NAME_ENABLED, SETTING_TYPE_BOOL, &this->network.mqtt_enabled );
+            break;
+
+        case SETTING_ID_MQTT_HOST:
+            this->writeConfigLine( SETTING_NAME_MQTT_HOST, SETTING_TYPE_STRING, &this->network.mqtt_host );
+            break;
+
+        case SETTING_ID_MQTT_PORT:
+            this->writeConfigLine( SETTING_NAME_MQTT_PORT, SETTING_TYPE_SHORT, &this->network.mqtt_port );
+            break;
+
+        case SETTING_ID_MQTT_USERNAME:
+            this->writeConfigLine( SETTING_NAME_MQTT_USERNAME, SETTING_TYPE_STRING, &this->network.mqtt_username );
+            break;
+        
+        case SETTING_ID_MQTT_PASSWORD:
+            this->writeConfigLine( SETTING_NAME_MQTT_PASSWORD, SETTING_TYPE_STRING, &this->network.mqtt_password );
+            break;
+
+        case SETTING_ID_HA_DISCOVERY_PREFIX:
+            this->writeConfigLine( SETTING_NAME_SECTION_HA, SETTING_TYPE_SECTION, NULL );
+            this->writeConfigLine( SETTING_NAME_HA_DISCOVERY_PREFIX, SETTING_TYPE_STRING, &this->network.discovery_prefix );
             break;
     }
 

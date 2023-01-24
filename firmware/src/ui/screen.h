@@ -61,7 +61,8 @@
 #define CHAR_BATTERY_CHARGING           0x06
 #define CHAR_NO_BATTERY                 0x07
 #define CHAR_ALARM                      0x92
-#define CHAR_TELNET_SESSION             0x94
+#define CHAR_TELNET_SESSION_ACTIVE      0x94
+#define CHAR_TELNET_SESSION_INNACTIVE   0xCF
 
 
 

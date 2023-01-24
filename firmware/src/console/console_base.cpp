@@ -550,7 +550,7 @@ void ConsoleBase::parseCommand() {
         g_ntp.printNTPStatus( this );
         this->println();
 
-    /* 'ntp status' command */
+    /* 'service' command */
     } else if( this->matchCommandName( S_COMMAND_SERVICE, true ) == true ) {
         this->runCommandService();
 
@@ -577,8 +577,24 @@ void ConsoleBase::parseCommand() {
 
     /* 'logs' command */
     } else if( this->matchCommandName( S_COMMAND_LOGS, false ) == true ) {
-         this->beginCommandPrintLogs();
+         this->beginTaskPrintLogs();
          started = true;
+
+    /* 'mqtt send' command */
+    } else if( this->matchCommandName( S_COMMAND_MQTT_SEND, true ) == true ) {
+        started = this->beginTaskMqttSend();
+
+    /* 'mqtt enable' command */
+    } else if( this->matchCommandName( S_COMMAND_MQTT_ENABLE, false ) == true ) {
+        started = this->beginTaskMqttEnable();
+
+    /* 'mqtt disable' command */
+    } else if( this->matchCommandName( S_COMMAND_MQTT_DISABLE, false ) == true ) {
+        started = this->beginTaskMqttDisable();
+
+    /* 'mqtt status' command */
+    } else if( this->matchCommandName( S_COMMAND_MQTT_STATUS, false ) == true ) {
+        this->runCommandMqttStatus();
 
     /* No command entered, display the prompt again */
     } else if( strlen( _inputBuffer ) == 0 ) {
@@ -694,7 +710,19 @@ void ConsoleBase::runTasks() {
                 break;
 
             case TASK_CONSOLE_PRINT_LOGS:
-                this->runCommandPrintLogs();
+                this->runTaskPrintLogs();
+                break;
+
+            case TASK_CONSOLE_MQTT_ENABLE:
+                this->runTaskMqttEnable();
+                break;
+
+            case TASK_CONSOLE_MQTT_DISABLE:
+                this->runTaskMqttDisable();
+                break;
+
+            case TASK_CONSOLE_MQTT_SEND:
+                this->runTaskMqttSend();
                 break;
         }
 
@@ -844,6 +872,46 @@ void ConsoleBase::printErrorMessage( int8_t error ) {
 
         case ERR_NTPCLIENT_NO_RESPONSE:
             this->println_P( S_CONSOLE_NTP_NO_RESP );
+            break;
+
+        case ERR_MQTTBROKER_UNKNOWN_HOSTNAME:
+            this->println_P( S_CONSOLE_MQTT_UNKNOWN_HOST );
+            break;
+
+        case ERR_MQTTBROKER_CANT_CONNECT:
+            this->println_P( S_CONSOLE_MQTT_CANT_CONNECT );
+            break;
+
+        case ERR_MQTTBROKER_NO_RESPONSE:
+            this->println_P( S_CONSOLE_MQTT_NO_RESPONSE );
+            break;
+
+        case ERR_MQTTCLIENT_CANT_ALLOCATE:
+            this->println_P( S_CONSOLE_MQTT_CANT_ALLOCATE );
+            break;
+
+        case ERR_MQTTCLIENT_WRITE_FAIL:
+            this->println_P( S_CONSOLE_MQTT_WRITE_FAIL );
+            break;
+
+        case ERR_MQTTCLIENT_READ_FAIL:
+            this->println_P( S_CONSOLE_MQTT_READ_FAIL );
+            break;
+
+        case ERR_MQTT_MALFORMED_PACKET:
+            this->println_P( S_CONSOLE_MQTT_MALFORMED_PKT );
+            break;
+
+        case ERR_MQTTBROKER_UNEXPECTED_RESPONSE:
+            this->println_P( S_CONSOLE_MQTT_UNEXPECT_RESP );
+            break;
+
+        case ERR_MQTTBROKER_REFUSED_CONNECT:
+            this->println_P( S_CONSOLE_MQTT_REFUSED_CONN );
+            break;
+
+        case ERR_MQTTBROKER_DISCONNECTED:
+            this->println_P( S_LOGMSG_MQTT_DISCONNECTED );
             break;
 
         default:

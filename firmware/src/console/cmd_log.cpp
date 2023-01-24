@@ -1,7 +1,7 @@
 //******************************************************************************
 //
 // Project : Alarm Clock V3
-// File    : src/console/cmd_ntp.cpp
+// File    : src/console/cmd_log.cpp
 // Author  : Benoit Frigon <www.bfrigon.com>
 //
 // -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@
 #include <timezone.h>
 #include <tzdata.h>
 
-void ConsoleBase::beginCommandPrintLogs() {
+void ConsoleBase::beginTaskPrintLogs() {
 
     _taskIndex = g_log.getFirstIndex();
 
@@ -32,7 +32,7 @@ void ConsoleBase::beginCommandPrintLogs() {
 }
 
 
-void ConsoleBase::runCommandPrintLogs() {
+void ConsoleBase::runTaskPrintLogs() {
 
     if( g_log.printLogEntry( this, _taskIndex ) == false ) {
         this->endTask( TASK_SUCCESS );

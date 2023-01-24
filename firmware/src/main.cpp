@@ -23,6 +23,8 @@
 #include "services/console.h"
 #include "services/telnet_console.h"
 #include "services/ntpclient.h"
+#include "services/mqtt.h"
+#include "services/homeassistant.h"
 #include "services/logger.h"
 #include "ui/ui.h"
 
@@ -45,6 +47,8 @@ TimeZone        g_timezone;
 NtpClient       g_ntp;
 Screen          g_screen;
 Logger          g_log;
+MqttClient      g_mqtt;
+HomeAssistant   g_homeassistant;
 
 bool g_prev_state_wifi = false;
 bool g_prev_state_telnetConsole = false;
@@ -182,6 +186,12 @@ void setup() {
     /* Start telnet server if enabled */
     g_telnetConsole.enableServer( g_config.network.telnetEnabled );
 
+    /* Connect to the mqtt broker if enabled */
+    g_mqtt.begin();
+
+    /* Enable home assistant client via MQTT */
+    g_homeassistant.begin();
+
     /* Enable automatic ntp sync at random interval */
     g_ntp.setAutoSync( g_config.clock.use_ntp );
 }
@@ -237,6 +247,11 @@ void loop() {
     /* Process telnet server events */
     g_telnetConsole.runTasks();
 
+    /* Process MQTT client events */
+    g_mqtt.runTasks();
+
+    /* Push events to Home Assistant via MQTT */
+    g_homeassistant.runTasks();
 
     /* Update status icons on main display */
     if( g_telnetConsole.clientConnected() != g_prev_state_telnetConsole ) {

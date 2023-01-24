@@ -22,7 +22,7 @@
 #include <alarm.h>
 #include <services/telnet_console.h>
 #include <services/logger.h>
-
+#include <services/mqtt.h>
 #include "power.h"
 
 
@@ -272,6 +272,7 @@ void Power::cpuReset() {
  */
 void Power::reboot() {
 
+    g_mqtt.end();
     g_telnetConsole.stopServer();
     g_alarm.end();
     g_wifi.end();

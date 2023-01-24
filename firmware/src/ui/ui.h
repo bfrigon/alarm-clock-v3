@@ -122,6 +122,7 @@ enum {
     /* --- Services menu --- */
     ID_SERVICE_TELNET,
     ID_SERVICE_NTP_AUTOSYNC,
+    ID_SERVICE_MQTT,
 
     /* --- YES/NO dialog screen --- */
     ID_DIALOG_YES,
@@ -778,6 +779,7 @@ PROGMEM const ScreenData screen_menu_settings {
 PROGMEM const struct ScreenItemBase ITEMS_MENU_SERVICES[] = {
     ITEM_TOGGLE( ID_SERVICE_TELNET, 0, 0, S_MENU_SERVICE_TELNET, &g_config.network.telnetEnabled, ITEM_COMPACT ),
     ITEM_TOGGLE( ID_SERVICE_NTP_AUTOSYNC, 1, 0, S_MENU_SERVICE_TIME_AUTOSYNC, &g_config.clock.use_ntp, ITEM_COMPACT ),
+    ITEM_TOGGLE( ID_SERVICE_MQTT, 2, 0, S_MENU_SERVICE_MQTT, &g_config.network.mqtt_enabled, ITEM_COMPACT ),
     ITEM_END()
 };
 

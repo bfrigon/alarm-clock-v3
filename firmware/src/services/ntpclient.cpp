@@ -148,6 +148,8 @@ bool NtpClient::sendNtpPacket() {
 
         this->endTask( ERR_NTPCLIENT_SEND_FAIL );
         g_log.add( EVENT_NTP_FAIL_SEND_PACKET );
+
+        _udp.stop();
         return false;
     }
 
@@ -184,6 +186,8 @@ bool NtpClient::sendNtpPacket() {
 
         this->endTask( ERR_NTPCLIENT_SEND_FAIL );
         g_log.add( EVENT_NTP_FAIL_SEND_PACKET );
+
+        _udp.stop();
         return false;
     }
 
@@ -400,6 +404,8 @@ void NtpClient::runTasks() {
             if( this->getTaskRunningTime() > NTPCLIENT_BIND_TIMEOUT ) {
                 this->endTask( ERR_NTPCLIENT_SOCKET_BIND_FAIL );
                 g_log.add( EVENT_NTP_FAIL_SOCKET_ERR );
+
+                _udp.stop();
 
                 return;
             }

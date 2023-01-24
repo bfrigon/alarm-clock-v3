@@ -18,6 +18,7 @@
 
 #include "logger.h"
 #include "drivers/wifi/wifi.h"
+#include "services/mqtt.h"
 #include "drivers/rtc.h"
 #include <time.h>
 #include <timezone.h>
@@ -262,6 +263,66 @@ void Logger::printLogEntryMessage( IPrint *output, uint8_t type, uint32_t flags 
     } else if( type == EVENT_TELNET_SERVICE_DISABLED ) {
 
         output->print_P(S_LOGMSG_TELNET_SERVICE_DISABLED );
+
+    /* MQTT: Cannot connect to broker (no wifi) */
+    } else if( type == EVENT_MQTT_FAIL_NO_WIFI ) {
+
+        output->print_P( S_LOGMSG_MQTT_FAIL_NO_WIFI );
+
+    /* MQTT: Cannot resolve broker hostname */
+    } else if( type == EVENT_MQTT_CANT_RESOLVE_HOST ) {
+
+        output->print_P( S_LOGMSG_MQTT_CANT_RESOLVE_HOST );
+
+    /* MQTT: No response from broker */
+    } else if( type == EVENT_MQTT_BROKER_NO_RESPONSE ) {
+
+        output->print_P( S_LOGMSG_MQTT_NO_RESPONSE );
+
+    /* MQTT: Connection refused */
+    } else if( type == EVENT_MQTT_CONNECT_REFUSED && flags != MQTT_CONNACK_NOT_AUTHORIZED ) {
+
+        output->printf_P( S_LOGMSG_MQTT_CONNECT_REFUSED, flags );
+
+    /* MQTT: Connection refused (unauthorized) */
+    } else if( type == EVENT_MQTT_CONNECT_REFUSED && flags == MQTT_CONNACK_NOT_AUTHORIZED ) {
+
+        output->printf_P( S_LOGMSG_MQTT_CONNECT_UNAUTHORIZED, flags );
+
+    /* MQTT: client enabled */
+    } else if( type == EVENT_MQTT_ENABLED ) {
+
+        output->print_P( S_LOGMSG_MQTT_CLIENT_ENABLED );
+
+    /* MQTT: client disabled */
+    } else if( type == EVENT_MQTT_DISABLED ) {
+
+        output->print_P( S_LOGMSG_MQTT_CLIENT_DISABLED );
+
+    /* MQTT: Attempt reconnect */
+    } else if( type == EVENT_MQTT_ATTEMPT_RECONNECT ) {
+
+        output->print_P( S_LOGMSG_MQTT_ATTEMPT_RECONNECT );
+
+    /* MQTT: Connected */
+    } else if( type == EVENT_MQTT_CONNECTED ) {
+
+        output->print_P( S_LOGMSG_MQTT_CONNECTED );
+
+    /* MQTT: Disconnected */
+    } else if( type == EVENT_MQTT_DISCONNECTED ) {
+
+        output->print_P( S_LOGMSG_MQTT_DISCONNECTED );
+
+    /* MQTT: Unexpected response */
+    } else if( type == EVENT_MQTT_UNEXPECTED_RESPONSE ) {
+
+        output->print_P( S_LOGMSG_MQTT_UNEXPECTED_RESPONSE );
+
+    /* MQTT: Socket error */
+    } else if( type == EVENT_MQTT_SOCKET_ERROR ) {
+
+        output->print_P( S_LOGMSG_MQTT_SOCKET_ERROR );
 
     /* Unknown log entry */
     } else {

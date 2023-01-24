@@ -17,6 +17,9 @@
 //******************************************************************************
 
 #include <services/ntpclient.h>
+#include <services/mqtt.h>
+#include <services/telnet_console.h>
+#include <services/homeassistant.h>
 #include <time.h>
 
 #include "ui.h"
@@ -313,6 +316,8 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
         case ID_ALARM_ON_1:
         case ID_ALARM_ON_2:
             g_clock.requestClockUpdate();
+            g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM );
+            g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM_AVAILABLE );
             break;
 
         case ID_ALARM_EDIT_1:
@@ -474,10 +479,23 @@ bool onExitScreen( Screen* screen  ) {
             break;
 
         case SCREEN_ID_NETWORK:
-        case SCREEN_ID_SERVICES:
             if( save == true ) {
                 g_config.save( EEPROM_SECTION_ALL );
                 g_config.apply( EEPROM_SECTION_ALL );
+
+            } else {
+                g_config.load( EEPROM_SECTION_ALL );
+            }
+
+            break;
+
+        case SCREEN_ID_SERVICES:
+            if( save == true ) {
+                g_config.save( EEPROM_SECTION_ALL );
+
+                g_ntp.setAutoSync( g_config.clock.use_ntp );
+                g_telnetConsole.enableServer( g_config.network.telnetEnabled );
+                g_mqtt.enableClient( g_config.network.mqtt_enabled );
 
             } else {
                 g_config.load( EEPROM_SECTION_ALL );
@@ -501,6 +519,8 @@ bool onExitScreen( Screen* screen  ) {
         case SCREEN_ID_EDIT_ALARM_VISUAL:
             if( save == true ) {
                 g_alarm.saveProfile( &g_alarm.profile, selectedProfile );
+                g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM );
+                g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM_AVAILABLE );
             }
 
             break;
@@ -508,6 +528,9 @@ bool onExitScreen( Screen* screen  ) {
         case SCREEN_ID_SET_ALARMS:
             if( save == true ) {
                 g_config.save( EEPROM_SECTION_CLOCK );
+                g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM );
+                g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM_AVAILABLE );
+
             } else {
                 g_config.load( EEPROM_SECTION_CLOCK );
             }

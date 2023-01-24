@@ -48,6 +48,9 @@ enum {
     TASK_CONSOLE_SET_DATE,
     TASK_CONSOLE_NTP_SYNC,
     TASK_CONSOLE_PRINT_LOGS,
+    TASK_CONSOLE_MQTT_SEND,
+    TASK_CONSOLE_MQTT_ENABLE,
+    TASK_CONSOLE_MQTT_DISABLE,
 };
 
 
@@ -81,6 +84,10 @@ PROG_STR( S_COMMAND_SETTING_BACKUP,   "config backup" );
 PROG_STR( S_COMMAND_SETTING_RESTORE,  "config restore" );
 PROG_STR( S_COMMAND_FACTORY_RESET,    "factory reset" );
 PROG_STR( S_COMMAND_BATT_STATUS,      "batt status");
+PROG_STR( S_COMMAND_MQTT_ENABLE,      "mqtt enable");
+PROG_STR( S_COMMAND_MQTT_DISABLE,     "mqtt disable");
+PROG_STR( S_COMMAND_MQTT_STATUS,      "mqtt status");
+PROG_STR( S_COMMAND_MQTT_SEND,        "mqtt send");
 
 
 // ----------------------------------------
@@ -104,6 +111,10 @@ PROG_STR( S_HELP_SETTING_BACKUP,      "Save settings to a file on the SD card." 
 PROG_STR( S_HELP_SETTING_RESTORE,     "Restore settings from a file on the SD card." );
 PROG_STR( S_HELP_FACTORY_RESET,       "Restore settings to their default values." );
 PROG_STR( S_HELP_BATT_STATUS,         "Get the battery health status" );
+PROG_STR( S_HELP_MQTT_ENABLE,         "Enable the MQTT client" );
+PROG_STR( S_HELP_MQTT_DISABLE,        "Disable the MQTT client" );
+PROG_STR( S_HELP_MQTT_STATUS,         "Display the client connection status" );
+PROG_STR( S_HELP_MQTT_SEND_TOPIC,     "Send a message" );
 
 
 // ----------------------------------------
@@ -112,12 +123,13 @@ PROG_STR( S_HELP_BATT_STATUS,         "Get the battery health status" );
 PROG_STR( S_USAGE_NSLOOKUP,           "nslookup [hostname]" );
 PROG_STR( S_USAGE_PING,               "ping [host]" );
 PROG_STR( S_USAGE_SERVICE,            "service [name] (enable|disable|status)" );
+PROG_STR( S_USAGE_MQTT_SEND,          "mqtt send [topic] [payload]" );
 
 
 // ----------------------------------------
 // Commands listed on the help menu
 // ----------------------------------------
-#define CONSOLE_HELP_MENU_ITEMS       18
+#define CONSOLE_HELP_MENU_ITEMS       22
 const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_HELP,
     S_COMMAND_DATE,
@@ -137,6 +149,10 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_FACTORY_RESET,
     S_COMMAND_BATT_STATUS,
     S_COMMAND_REBOOT,
+    S_COMMAND_MQTT_ENABLE,
+    S_COMMAND_MQTT_DISABLE,
+    S_COMMAND_MQTT_STATUS,
+    S_COMMAND_MQTT_SEND,
 };
 const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_HELP,
@@ -157,6 +173,10 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_FACTORY_RESET,
     S_HELP_BATT_STATUS,
     S_HELP_REBOOT,
+    S_HELP_MQTT_ENABLE,
+    S_HELP_MQTT_DISABLE,
+    S_HELP_MQTT_STATUS,
+    S_HELP_MQTT_SEND_TOPIC,
 };
 
 enum { 
@@ -294,8 +314,23 @@ class ConsoleBase : public IPrint, protected ITask {
     void printBattStatus();
 
     /* 'logs' command */
-    void beginCommandPrintLogs(); 
-    void runCommandPrintLogs();
+    void beginTaskPrintLogs(); 
+    void runTaskPrintLogs();
+
+    /* mqtt enable */
+    bool beginTaskMqttEnable();
+    void runTaskMqttEnable();
+
+    /* mqtt disable */
+    bool beginTaskMqttDisable();
+    void runTaskMqttDisable();
+
+    /* mqtt send */
+    bool beginTaskMqttSend();
+    void runTaskMqttSend();
+
+    /* mqtt status */
+    void runCommandMqttStatus();
 };
 
 

@@ -46,6 +46,9 @@ WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
     gi8Winc1501IntnPin = pin_irq;
     gi8Winc1501ResetPin = pin_rst;
     gi8Winc1501ChipEnPin = pin_en;
+
+    _lastRssiRequest = millis();
+    _rssi = -120;
 }
 
 
@@ -139,8 +142,6 @@ int WiFi::init() {
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA | 
                                          SSL_CIPHER_RSA_WITH_AES_256_CBC_SHA256 );
     }
-
-    Serial.println(ret);
 
     return ret;
 }
@@ -260,6 +261,8 @@ void WiFi::disconnect() {
         g_wifisocket.close( i );
     }
 
+    _status = WIFI_STATUS_DISCONNECTING;
+
     this->startTask( TASK_WIFI_DISCONNECT_CLOSE_SOCKET );  
 }
 
@@ -287,6 +290,34 @@ bool WiFi::connected() {
  */
 wl_status_t WiFi::status() {
     return _status;
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Gets the current working MAC address of the device
+ *
+ * @param   buffer      6 byte array where the MAC address will be copied.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
+bool WiFi::getMacAddress( uint8_t* buffer ) {
+
+    return ( m2m_wifi_get_mac_address( buffer ) == M2M_SUCCESS );
+}
+
+
+/*! ------------------------------------------------------------------------
+ *
+ * @brief   Gets the current RSSI for the conected AP. 
+ *
+ * @return  RSSI value
+ * 
+ */
+int8_t WiFi::getRSSI() {
+
+    return _rssi;
 }
 
 
@@ -399,7 +430,12 @@ void WiFi::handleEvent(uint8_t u8MsgType, void *pvMsg)
             _dns = pstrIPCfg->u32DNS;
             
             _status = WIFI_STATUS_CONNECTED;
+        }
+        break;
 
+        case M2M_WIFI_RESP_CURRENT_RSSI: {
+
+            _rssi = *(( int8_t* )pvMsg );
             
         }
         break;
@@ -699,6 +735,12 @@ void WiFi::runTasks() {
         return;
     }
 
+    if( millis() - _lastRssiRequest > WIFI_RSSI_REQ_DELAY ) {
+        _lastRssiRequest = millis();
+
+        m2m_wifi_req_curr_rssi();
+    }
+
     /* Handle WIFI module events */
     m2m_wifi_handle_events(NULL);
 
@@ -728,6 +770,9 @@ void WiFi::runTasks() {
                     
                     g_log.add( EVENT_WIFI_CONNECTED, 0 );
                     this->endTask( WIFI_STATUS_CONNECTED );
+
+                    m2m_wifi_req_curr_rssi();
+                    _lastRssiRequest = millis();
                     return;
 
                 /* WIFI_STATUS_IDLE */

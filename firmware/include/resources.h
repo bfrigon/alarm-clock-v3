@@ -19,6 +19,7 @@
 #define RESOURCES_H
 
 #include <avr/pgmspace.h>
+#include <version.h>
 
 
 //--------------------------------------------------------------------------
@@ -72,6 +73,7 @@ const unsigned char CUSTOM_CHARACTERS_ROOT[] PROGMEM = {
 PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 PROG_STR( S_DEFAULT_NTPSERVER,          "pool.ntp.org" );
+PROG_STR( S_DEFAULT_HA_DISCOVERY_PREFIX,"homeassistant");
 
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
@@ -105,6 +107,8 @@ PROG_STR( S_MAIN_MENU_SETTINGS,         "Settings" );
 /* Service menu */
 PROG_STR( S_MENU_SERVICE_TIME_AUTOSYNC, "NTP Sync" );
 PROG_STR( S_MENU_SERVICE_TELNET,        "Telnet  " );
+PROG_STR( S_MENU_SERVICE_MQTT,          "MQTT-HA " );
+
 
 /* Network menu srings */
 PROG_STR( S_MENU_NETWORK_STATUS,        "Network status" );
@@ -199,7 +203,7 @@ PROG_STR( S_SSID,                       "SSID" );
 
 PROG_STR( S_CONSOLE_CONNECT_REFUSE,     "Another telnet session is active.\r\n" );
 
-PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw date: " __DATE__ ")\r\n" 
+PROG_STR( S_CONSOLE_WELCOME,            "Alarm clock V3 console (fw " FIRMWARE_VERSION ")\r\n" 
                                         "https://github.com/bfrigon/alarm-clock-v3\r\n"
                                         "\r\n"
                                         "Type 'help' for a list of commands" );
@@ -336,6 +340,27 @@ PROG_STR( S_CONSOLE_BATT_STATE_MISSING, "No battery detected!" );
 PROG_STR( S_LOG_REPEAT,                 " <- Occured %d times" );
 PROG_STR( S_LOG_REPEAT_LIMIT,           " <- Occured more than 250 times!" );
 
+PROG_STR( S_CONSOLE_MQTT_PUB_ACK,       "Publish topic acknowledged");
+PROG_STR( S_CONSOLE_MQTT_UNKNOWN_HOST,  "Unknown broker hostname");
+PROG_STR( S_CONSOLE_MQTT_CANT_CONNECT,  "Cannot connect to broker");
+PROG_STR( S_CONSOLE_MQTT_NO_RESPONSE,   "No response received from broker");
+PROG_STR( S_CONSOLE_MQTT_CANT_ALLOCATE, "Cannot allocate memory for packet buffer!");
+PROG_STR( S_CONSOLE_MQTT_WRITE_FAIL,    "Error while writing to packet buffer!");
+PROG_STR( S_CONSOLE_MQTT_READ_FAIL,     "Error while reading from packet buffer!");
+PROG_STR( S_CONSOLE_MQTT_MALFORMED_PKT, "Malformed packet!");
+PROG_STR( S_CONSOLE_MQTT_UNEXPECT_RESP, "Unexpected response from broker");
+PROG_STR( S_CONSOLE_MQTT_REFUSED_CONN,  "Connection refused");
+PROG_STR( S_CONSOLE_MQTT_IS_ENABLED,    "MQTT client is already enabled");
+PROG_STR( S_CONSOLE_MQTT_IS_DISABLED,   "MQTT client is already disabled");
+PROG_STR( S_CONSOLE_MQTT_CONNECTED,     "Connected to MQTT broker (%s:%hu)");
+PROG_STR( S_CONSOLE_MQTT_DISCONNECTED,  "Disconnected from MQTT broker");
+PROG_STR( S_CONSOLE_MQTT_CLIENT_STATE,  "Client    : %S");
+PROG_STR( S_CONSOLE_MQTT_CONN_STATE,    "Connected : %S");
+PROG_STR( S_CONSOLE_MQTT_BROKER_HOST,   "Hostname  : %s");
+PROG_STR( S_CONSOLE_MQTT_BROKER_PORT,   "Port      : %hu");
+PROG_STR( S_CONSOLE_MQTT_ENABLED,       "MQTT client enabled");
+PROG_STR( S_CONSOLE_MQTT_DISABLED,      "MQTT client disabled");
+
 
 PROG_STR( S_LOGMSG_UNKNOWN,                     "**Unknown log entry type!** (type: %d, flags: %ld)" );
 PROG_STR( S_LOGMSG_RESET,                       "System reset (MCUSR: 0x%02X)" );
@@ -343,7 +368,7 @@ PROG_STR( S_LOGMSG_TELNET_SERVICE_ENABLED,      "Telnet server enabled" );
 PROG_STR( S_LOGMSG_TELNET_SERVICE_DISABLED,     "Telnet server disabled" );
 PROG_STR( S_LOGMSG_TELNET_SESSION_END,          "Telnet session ended" );
 PROG_STR( S_LOGMSG_TELNET_SESSION_TIMEOUT,      "Telnet session timed out" );
-PROG_STR( S_LOGMSG_TELNET_SESSION_START,        "Client started a telnet session from %d.%d.%d.%d" );
+PROG_STR( S_LOGMSG_TELNET_SESSION_START,        "Telnet session started from %d.%d.%d.%d" );
 PROG_STR( S_LOGMSG_WIFI_CONNECTED,              "WiFi connected" );
 PROG_STR( S_LOGMSG_WIFI_DISCONNECTED,           "WiFi disconnected" );
 PROG_STR( S_LOGMSG_WIFI_FAIL_CONN_LOST,         "WiFi connection lost" );
@@ -361,6 +386,19 @@ PROG_STR( S_LOGMSG_FACTORY_RESET,               "Settings was reset to factory d
 PROG_STR( S_LOGMSG_CONFIG_RESTORED,             "Restored settings from SD card" );
 PROG_STR( S_LOGMSG_POWER_ON_BATTERY,            "Main power lost, running on battery" );
 PROG_STR( S_LOGMSG_POWER_RESTORED,              "Main power restored" );
+PROG_STR( S_LOGMSG_MQTT_FAIL_NO_WIFI,           "Cannot connect to MQTT broker (No wifi)" );
+PROG_STR( S_LOGMSG_MQTT_CANT_RESOLVE_HOST,      "Cannot resolve MQTT broker hostname" );
+PROG_STR( S_LOGMSG_MQTT_NO_RESPONSE,            "No response from MQTT broker" );
+PROG_STR( S_LOGMSG_MQTT_CONNECT_REFUSED,        "MQTT broker refused connection (code : %d)" );
+PROG_STR( S_LOGMSG_MQTT_CONNECT_UNAUTHORIZED,   "MQTT broker refused connection (Unauthorized)" );
+PROG_STR( S_LOGMSG_MQTT_CLIENT_ENABLED,         "MQTT client enabled" );
+PROG_STR( S_LOGMSG_MQTT_CLIENT_DISABLED,        "MQTT client disabled" );
+PROG_STR( S_LOGMSG_MQTT_ATTEMPT_RECONNECT,      "Connection to MQTT broker lost, attempt to reconnect" );
+PROG_STR( S_LOGMSG_MQTT_CONNECTED,              "Connected to MQTT broker" );
+PROG_STR( S_LOGMSG_MQTT_DISCONNECTED,           "Disconnected from MQTT broker" );
+PROG_STR( S_LOGMSG_MQTT_UNEXPECTED_RESPONSE,    "Unexpected response from MQTT broker" );
+PROG_STR( S_LOGMSG_MQTT_SOCKET_ERROR,           "Socket error while connecting to MQTT broker" );
+
 
 
 //--------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 #include "alarm.h"
 #include "ui/screen.h"
 #include "ui/ui.h"
+#include "services/homeassistant.h"
 
 
 uint8_t vs1053_buffer[VS1053_DATA_BLOCK_SIZE];
@@ -913,6 +914,10 @@ void Alarm::processEvents() {
         if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
             g_screen.requestScreenUpdate( false );
         }
+
+        g_homeassistant.updateSensor( SENSOR_ID_ALARM_SWITCH );
+        g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM );
+        g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM_AVAILABLE );
     }
 
     /* If time has changed, checks for alarms */
@@ -1102,6 +1107,8 @@ bool Alarm::checkForAlarms( DateTime* now ) {
     if( offset != 0 ) {
         return false;
     }
+
+    g_homeassistant.updateSensor( SENSOR_ID_NEXT_ALARM );
 
     this->loadProfile( alarm_id );
     this->play( ALARM_MODE_NORMAL );

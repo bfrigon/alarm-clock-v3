@@ -19,6 +19,7 @@
 #include <resources.h>
 #include <services/ntpclient.h>
 #include <services/telnet_console.h>
+#include <services/mqtt.h>
 
 #include "console_base.h"
 
@@ -28,11 +29,13 @@ PROG_STR( S_ACTION_DISABLE, "disable" );
 PROG_STR( S_ACTION_STATUS, "status" );
 PROG_STR( S_SERVICE_TELNET, "telnet" );
 PROG_STR( S_SERVICE_NTP, "ntp" );
+PROG_STR( S_SERVICE_MQTT, "mqtt" );
 
 /* Service IDs */
 enum {
     SERVICE_TELNET = 1,
-    SERVICE_NTP
+    SERVICE_NTP,
+    SERVICE_MQTT
 };
 
 /* Actions */
@@ -182,6 +185,47 @@ void ConsoleBase::runCommandService() {
 
         this->println();
         
+    /* MQTT client */
+    } else if( strcasecmp_P( param_name, S_SERVICE_MQTT ) == 0 ) {
+
+        switch( action ) {
+
+            /* Action : Enable */
+            case SERVICE_ACTION_ENABLE:
+                if( g_config.network.mqtt_enabled == false ) {    
+
+                    g_config.network.mqtt_enabled = true;
+                    g_config.save( EEPROM_ADDR_NETWORK_CONFIG );
+
+                    g_mqtt.enableClient( true );
+                } 
+
+                this->println_P( S_CONSOLE_MQTT_ENABLED );
+                break;
+
+            /* Action : Disable */
+            case SERVICE_ACTION_DISABLE:
+                if( g_config.network.mqtt_enabled == true ) {    
+
+                    g_config.network.mqtt_enabled = false;
+                    g_config.save( EEPROM_ADDR_NETWORK_CONFIG );
+
+                    g_mqtt.enableClient( false );
+                } 
+
+                this->println_P( S_CONSOLE_MQTT_DISABLED );
+                break;
+
+            /* Action : Status */
+            case SERVICE_ACTION_STATUS:
+                this->runCommandMqttStatus();
+                break;
+
+        }
+
+        this->println();
+
+
     /* Unknown service */
     } else {
         this->println_P( S_CONSOLE_SERV_UNKNOWN );
