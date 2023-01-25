@@ -19,13 +19,13 @@
 #include <config.h>
 #include <task_errors.h>
 #include <drivers/power.h>
-
 #include "console_base.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
- * @brief   Starts the 'config backup' command task
+ * @brief   Starts the 'config backup' command task.
  *
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
@@ -39,7 +39,7 @@ bool ConsoleBase::beginTaskConfigBackup() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Monitor the 'config backup' command task. Display prompts and validate 
  *          responses required before executing the task.
@@ -63,7 +63,7 @@ void ConsoleBase::runTaskConfigBackup() {
         if( filename != 0 ) {
             memmove( _inputBuffer, filename, strlen( filename ) + 1);
 
-            /* Skip filename prompt if a filename is provided in the command parameter */
+            /* Skip filename prompt if a filename is provided in the command parameter. */
             _taskIndex = 1;
         }
     }
@@ -80,7 +80,7 @@ void ConsoleBase::runTaskConfigBackup() {
         /* Validate filename prompt */
         case 1:
 
-            /* If filename is empty, use the default one */
+            /* If filename is empty, use the default one. */
             if( strlen( _inputBuffer ) == 0 ) {
                 strcpy( _inputBuffer, CONFIG_BACKUP_FILENAME );
             }
@@ -90,10 +90,10 @@ void ConsoleBase::runTaskConfigBackup() {
 
                 if( g_config.getTaskError() == ERR_CONFIG_FILE_EXISTS ) {
 
-                    /* Move filename to an unused area of the input buffer */
+                    /* Move filename to an unused area of the input buffer. */
                     memmove( _inputBuffer + 4, _inputBuffer, strlen( _inputBuffer ) + 1 );
 
-                    /* Continue on step 2, display overwrite prompt */
+                    /* Continue on step 2, display overwrite prompt. */
                     _taskIndex = 2;
                     
                 } else {
@@ -104,7 +104,7 @@ void ConsoleBase::runTaskConfigBackup() {
 
             } else {
 
-                /* Backup started, skip overwrite prompt */
+                /* Backup started, skip overwrite prompt. */
                 _taskIndex = 4;
 
                 this->println();
@@ -114,14 +114,14 @@ void ConsoleBase::runTaskConfigBackup() {
             break;
 
 
-        /* Display overwrite prompt if file exists */
+        /* Display overwrite prompt if file exists. */
         case 2:
             _inputBufferLimit = 1;
 
             this->printf_P( S_CONSOLE_CFG_FILE_EXISTS, _inputBuffer + 4 );
             break;
 
-        /* Validate overwrite file prompt */
+        /* Validate overwrite file prompt. */
         case 3:
             if( tolower( _inputBuffer[ 0 ] ) == 'y' ) {
                 
@@ -150,7 +150,7 @@ void ConsoleBase::runTaskConfigBackup() {
         default:
             _taskIndex = 4;
 
-            /* Check if settings backup task is done */
+            /* Check if settings backup task is done. */
             if( g_config.getCurrentTask() == TASK_NONE ) {
 
                 if( g_config.getTaskError() == TASK_SUCCESS) {
@@ -170,9 +170,9 @@ void ConsoleBase::runTaskConfigBackup() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Starts the 'config restore' command task
+ * @brief   Starts the 'config restore' command task.
  *
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
@@ -185,7 +185,7 @@ bool ConsoleBase::beginTaskConfigRestore() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Monitor the 'config restore' command task. Display prompts and validate 
  *          responses required before executing the task.
@@ -299,9 +299,9 @@ void ConsoleBase::runTaskConfigRestore() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Starts the 'factory reset' command task
+ * @brief   Starts the 'factory reset' command task.
  *
  * @return  TRUE if successful, FALSE if another task is already running.
  *           
@@ -317,7 +317,7 @@ bool ConsoleBase::beginTaskFactoryReset() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Monitor the 'factory reset' command task. Display prompts and validate 
  *          responses required before executing the task.

@@ -21,19 +21,17 @@
 #include <services/telnet_console.h>
 #include <services/homeassistant.h>
 #include <time.h>
-
 #include "ui.h"
 
 
 uint8_t selectedProfile = 0;
 uint8_t selectedAlarm = 0;
-
-
 struct Time adjTime;
 struct Date adjDate;
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Event raised when a key press occurs
  *
@@ -49,7 +47,7 @@ bool onKeypress( Screen* screen, uint8_t key ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when drawing an item.
  *
@@ -125,7 +123,7 @@ bool onDrawItem( Screen* screen, ScreenItem* item, uint16_t index, bool isSelect
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when the cursor on the currently selected 
  *          item has changed position or when another item is selected.
@@ -232,7 +230,7 @@ void onSelectionChange( Screen* screen, ScreenItem* item, uint8_t fieldPos, bool
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Raised when a screen item value changes.
  *
@@ -380,7 +378,7 @@ void onValueChange( Screen* screen, ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when entering the screen
  *
@@ -418,9 +416,9 @@ void onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Event raised when leaving the screen
+ * @brief   Event raised when leaving the screen.
  *
  * @param   screen    Current screen.
  *
@@ -460,7 +458,7 @@ bool onExitScreen( Screen* screen  ) {
                 DateTime nDate( (uint16_t)adjDate.year + 2000, adjDate.month, adjDate.day,
                                 adjTime.hour, adjTime.minute, 0 );
 
-                /* Disable ntp auto-sync when setting the time manually */
+                /* Disable ntp auto-sync when setting the time manually. */
                 g_config.clock.use_ntp = false;
                 g_ntp.setAutoSync( false );
                 g_config.save( EEPROM_SECTION_CLOCK );

@@ -15,12 +15,13 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "qt1070.h"
 #include "power.h"
 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -65,7 +66,7 @@ QT1070::QT1070( uint8_t pin_irq ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Initialize the touch IC.
  * 
@@ -86,7 +87,7 @@ void QT1070::begin() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Enable key change interrupt.
  * 
@@ -98,7 +99,7 @@ void QT1070::enableInterrupt() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Disable key change interrupt.
  * 
@@ -109,7 +110,7 @@ void QT1070::disableInterrupt() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the two status bytes from the touch IC.
  *
@@ -126,7 +127,7 @@ bool QT1070::readStatus() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Write configuration block to the touch IC.
  *
@@ -143,7 +144,7 @@ bool QT1070::writeConfig() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Process the touche events to detect which key was pressed.
  *
@@ -194,7 +195,7 @@ uint8_t QT1070::processEvents() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Process key event using the standard mode meaning that holding 
  *          the key down will be considered a SHIFT+KEY press.
@@ -249,7 +250,7 @@ uint8_t QT1070::processKeyStandardMode( uint8_t key, uint16_t lastEventDelay ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Process key event using the repeat mode.
  *
@@ -274,10 +275,10 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
         }
     }
 
-    /* Key down, moved to a different key */
+    /* Key down, moved to a different key. */
     if( key != 0 && key != this->firstKeyState ) {
 
-        /* Ignore the key until the user move back to the current key or release the key */
+        /* Ignore the key until the user move back to the current key or release the key. */
         return KEY_NONE;
     }
 
@@ -294,12 +295,12 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 
 
 
-    /* Key down, first repeat : Check if the minimum repeat delay elapsed */
+    /* Key down, first repeat : Check if the minimum repeat delay elapsed. */
     if( this->repeatCount == 1 && lastEventDelay < this->repeatDelay ) {
         return KEY_NONE;
     }
 
-    /* Key down, subsequent repeats : Check if the rate delay elapsed */
+    /* Key down, subsequent repeats : Check if the rate delay elapsed. */
     if( this->repeatCount > 1 && lastEventDelay < this->repeatRate ) {
         return KEY_NONE;
     }
@@ -311,7 +312,7 @@ uint8_t QT1070::processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Transmit data to the touch IC.
  *
@@ -342,7 +343,7 @@ uint8_t QT1070::write( uint8_t reg, void *data, uint8_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Read data from the touch IC.
  *
@@ -372,7 +373,7 @@ uint8_t QT1070::read( uint8_t reg, void *data, uint8_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Interrupt service routine for the key change event.
  *

@@ -24,12 +24,27 @@
 #include <timezone.h>
 #include <tzdata.h>
 
+
+
+/*******************************************************************************
+ *
+ * @brief   Class initializer
+ *
+ */
 Logger::Logger() {
     memset( &_entries, 0, sizeof( LogEntry ) * MAX_LOG_ENTRIES);
     _ptrHead = 0;
     _ptrTail = 0;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Get current timestamp.
+ * 
+ * @return  Number of seconds since January 1st 2000.
+ *
+ */
 uint32_t Logger::getTimestamp() {
     DateTime now = g_rtc.now();
 
@@ -59,7 +74,15 @@ uint32_t Logger::getTimestamp() {
 }
 
 
-
+/*******************************************************************************
+ *
+ * @brief   Add an event entry to the system log.
+ *
+ * @param   eventType   Event type ID
+ * @param   flags       Additional event information to include 
+ *                      with the event entry.
+ * 
+ */
 void Logger::add( uint8_t eventType, uint32_t flags ) {
 
     /* Invalid event type */
@@ -68,7 +91,7 @@ void Logger::add( uint8_t eventType, uint32_t flags ) {
     }
 
     /* If the previous log entry is a duplicate, don't create another entry, 
-       increments the repeat counter instead */
+       increments the repeat counter instead. */
     if( _entries[ _ptrTail ].type == eventType && _entries[ _ptrTail ].flags == flags ) {
         
         _entries[ _ptrTail ].repeat++;
@@ -104,17 +127,40 @@ void Logger::add( uint8_t eventType, uint32_t flags ) {
 }
 
 
-
+/*******************************************************************************
+ *
+ * @brief   Gets the pointer to the most recent entry im the event log table.
+ * 
+ * @return  Index of the most recent event in the log table.
+ * 
+ */
 uint8_t Logger::getFirstIndex() {
     return _ptrHead;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Gets the pointer to the oldest entry im the event log table.
+ * 
+ * @return  Index of the oldest event in the log table.
+ * 
+ */
 uint8_t Logger::getLastIndex() {
     return _ptrTail;
 }
 
 
-
+/*******************************************************************************
+ *
+ * @brief   Prints a event entry from the system log table.
+ * 
+ * @param   console     Console object to print to.
+ * @param   index       Entry ID in the system log table.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
 bool Logger::printLogEntry( ConsoleBase *console, uint8_t index ) {
 
     if( index > MAX_LOG_ENTRIES - 1 ) {
@@ -126,11 +172,11 @@ bool Logger::printLogEntry( ConsoleBase *console, uint8_t index ) {
     }
 
     
-    /* Convert log entry timestamp to DateTime object */
+    /* Convert log entry timestamp to DateTime object. */
     DateTime evTime = DateTime(2000, 1, 1, 0, 0, 0 );
     evTime += _entries[ index ].timestamp;
 
-    /* Convert to local time */
+    /* Convert to local time. */
     g_timezone.toLocal( &evTime );
 
     console->printf_P( PSTR( "[ %d-%02d-%02d %02d:%02d:%02d ] " ), 
@@ -144,7 +190,7 @@ bool Logger::printLogEntry( ConsoleBase *console, uint8_t index ) {
 
     this->printLogEntryMessage( console, _entries[ index ].type, _entries[ index ].flags );
 
-    /* Print how many times the log entry occured if more than 1 */
+    /* Print how many times the log entry occured if more than 1. */
     if( _entries[ index ].repeat >= 250 ) {
         console->print_P( S_LOG_REPEAT_LIMIT );
 
@@ -157,6 +203,16 @@ bool Logger::printLogEntry( ConsoleBase *console, uint8_t index ) {
     return true;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Print the message associated with an event type.
+ * 
+ * @param   output  Console object to print to.
+ * @param   type    Event type
+ * @param   flags   Additional event information
+ * 
+ */
 void Logger::printLogEntryMessage( IPrint *output, uint8_t type, uint32_t flags ) {
     /* MCU Reset */
     if( type == EVENT_RESET ) {
@@ -328,5 +384,4 @@ void Logger::printLogEntryMessage( IPrint *output, uint8_t type, uint32_t flags 
     } else {
         output->printf_P( S_LOGMSG_UNKNOWN, type, flags );
     }
-
 }

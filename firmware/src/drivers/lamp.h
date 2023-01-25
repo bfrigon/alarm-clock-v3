@@ -18,9 +18,9 @@
 #ifndef LAMP_H
 #define LAMP_H
 
+
 #include <Arduino.h>
 #include <config.h>
-
 #include "neopixel.h"
 
 
@@ -32,20 +32,19 @@
 #define LAMP_MODE_RAINBOW     4
 #define LAMP_MODE_NIGHTLIGHT  5
 
-
-
-
-
 #define LAMP_MIMIMUM_FADING_BRIGHTNESS  20
 
 
+   
+/*******************************************************************************
+ *
+ * @brief   Lamp driver class
+ * 
+ *******************************************************************************/
 class Lamp : public NeoPixel {
+
   public:
-
-    /* Constructor */
     Lamp( int8_t pin_leds );
-
-
     void setBrightness( uint8_t brightness, bool force = false );
     void setColorFromTable( uint8_t id, bool force = false );
     void setColorRGB( uint8_t r, uint8_t g, uint8_t b, bool force = false );
@@ -58,24 +57,23 @@ class Lamp : public NeoPixel {
     bool isActive();
     void setAmbientDimming( uint8_t dimming ) { _ambientDimming = 0; }; /* Not implemented */
 
+
   private:
+    void updateVisualStepDelay();
+
+
     uint8_t _delay_off = 0;
     uint8_t _mode = LAMP_MODE_OFF;
-
     uint32_t _timerStart = 0;
-
     uint16_t _visualStepDelay = 0;
     uint8_t _visualStepValue = 0;
     uint8_t _visualStepSpeed = 5;
     bool _visualStepReverse = false;
-
     struct NightLampSettings *_settings;
-    
-
-    void updateVisualStepDelay();
-    
 };
 
+
+/* Lamp driver*/
 extern Lamp g_lamp;
 
 #endif /* LAMP_H */

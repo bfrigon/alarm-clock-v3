@@ -23,12 +23,12 @@
 #include <console/console_base.h>
 #include <timezone.h>
 #include <tzdata.h>
-
 #include "logger.h"
 #include "ntpclient.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Initialize class
  *
@@ -39,7 +39,7 @@ NtpClient::NtpClient() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Begin the synchronization request
  *
@@ -77,12 +77,12 @@ bool NtpClient::sync( ConsoleBase *console ) {
 
     _lastSync = g_rtc.now();
 
-    /* If configured ntp server address is an ip address, skip the hostname resolve */
+    /* If configured ntp server address is an ip address, skip the hostname resolve. */
     if( _server_ip.fromString( g_config.network.ntpserver ) == true ) {
 
         this->requestBind();
 
-    /* Resolve the ntp server hostname */
+    /* Resolve the ntp server hostname. */
     } else {
 
         if( console != NULL ) {
@@ -99,7 +99,7 @@ bool NtpClient::sync( ConsoleBase *console ) {
     
         if( g_wifi.startHostnameResolve( g_config.network.ntpserver ) == false ) {
 
-            /* Hostname resolve failed */
+            /* Hostname resolve failed. */
             this->endTask( g_wifi.getTaskError() );
             return false;
         }
@@ -109,9 +109,9 @@ bool NtpClient::sync( ConsoleBase *console ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Request a socket bind to the NTP port 123
+ * @brief   Request a socket bind to the NTP port 123.
  *
  * @return  TRUE if the request was successful or FALSE otherwise. 
  * 
@@ -128,14 +128,14 @@ bool NtpClient::requestBind() {
     }
 
     /* Successfully requested socket bind, monitor status change 
-       in runTask() */
+       in runTask(). */
     return true;
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Format the NTP request packet and sent it
+ * @brief   Format the NTP request packet and sent it.
  *
  * @return  TRUE if the request was successful or FALSE otherwise. 
  * 
@@ -164,7 +164,7 @@ bool NtpClient::sendNtpPacket() {
     g_rtc.readTime( &now );
 
 
-    /* Set the transmit timestamp */    
+    /* Set the transmit timestamp. */    
     uint32_t t1_sec = now.getEpoch() + EPOCH_NTP_OFFSET;
     _packet.ts_transmit.sec = _htonl( t1_sec );
 
@@ -192,12 +192,12 @@ bool NtpClient::sendNtpPacket() {
     }
 
     /* Successfully sent packet, monitor response
-       in runTask() */
+       in runTask(). */
     return true;
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if a response was received. If so, decode the NTP response 
  *          packet and update the clock accordingly
@@ -250,17 +250,17 @@ bool NtpClient::readNtpResponse() {
     sec_offset /= 2;
 
     
-    /* Add the millisecond offset to the current time */
+    /* Add the millisecond offset to the current time. */
     int16_t now_ms = g_rtc.getMillis() + ms_offset;
 
-    /* If the millisecond offset overflow, adjust the seconds offset */
+    /* If the millisecond offset overflow, adjust the seconds offset. */
     if( now_ms > 1000 ) {
         now.offset( now_ms / 1000 );
         now_ms %= 1000;
     }
 
     /* Since the RTC cannot store milliseconds, we need to synchronise the
-       RTC at the next second. Calculate the needed delay */
+       RTC at the next second. Calculate the needed delay. */
     int16_t wait = 1000 - now_ms;
     now.offset( sec_offset + 1 );
 
@@ -275,7 +275,7 @@ bool NtpClient::readNtpResponse() {
     // g_console.println();
 
 
-    /* Schedule the next synchronization */
+    /* Schedule the next synchronization. */
     if( _nextSyncDelay != 0 ) {
 
         randomSeed( analogRead( PIN_A0 ));
@@ -309,9 +309,9 @@ bool NtpClient::readNtpResponse() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Enable/disable the automatic time synchronization
+ * @brief   Enable/disable the automatic time synchronization.
  *
  * @param   enabled    Enable the auto-sync feature
  * @param   verbose    Display messages on the console 
@@ -332,12 +332,12 @@ void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
             console->println_P( S_ENABLED );
         }
 
-        /* If WiFi is connected, immediately synchronize */
+        /* If WiFi is connected, immediately synchronize. */
         if( g_wifi.connected() == true ) {
             
             this->sync( console );
 
-        /* Or schedule the next retry */
+        /* Or schedule the next retry. */
         } else {
             this->setTaskError( ERR_WIFI_NOT_CONNECTED );
             _lastSync = g_rtc.now();
@@ -350,7 +350,7 @@ void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Monitor the different stages of the request.
  * 
@@ -372,7 +372,7 @@ void NtpClient::runTasks() {
 
     switch( this->getCurrentTask() ) {
 
-        /* Resolving NTP server hostname */
+        /* Resolving NTP server hostname. */
         case TASK_NTPCLIENT_RESOLVE_HOST: {
             if( this->getTaskRunningTime() > WIFI_RESOLVE_TIMEOUT ) {
                 this->endTask( ERR_NTPCLIENT_UNKNOWN_HOSTNAME );
@@ -384,7 +384,7 @@ void NtpClient::runTasks() {
 
                 if( _server_ip != 0 ) {
 
-                    /* Request a socket bound to port 123 */
+                    /* Request a socket bound to port 123. */
                     this->requestBind();
                     
                 } else {
@@ -398,7 +398,7 @@ void NtpClient::runTasks() {
         break;
 
 
-        /* Monitor bind socket status */
+        /* Monitor bind socket status. */
         case TASK_NTPCLIENT_SOCKET_BIND: {
             
             if( this->getTaskRunningTime() > NTPCLIENT_BIND_TIMEOUT ) {
@@ -412,14 +412,14 @@ void NtpClient::runTasks() {
 
             if( _udp.bound() ) {
 
-                /* Now that socket is bound, send the NTP request packet */
+                /* Now that socket is bound, send the NTP request packet. */
                 this->sendNtpPacket();
             }
         }
         break;
 
 
-        /* Monitor NTP response packet */
+        /* Monitor NTP response packet. */
         case TASK_NTPCLIENT_SEND_PACKET: {
             if( this->getTaskRunningTime() > NTPCLIENT_REQ_TIMEOUT ) {
 
@@ -446,11 +446,11 @@ void NtpClient::runTasks() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints NTP client status on the console.
  * 
- * @param   console    ConsoleBase object to print results to
+ * @param   console    ConsoleBase object to print results to.
  * 
  */
 void NtpClient::printNTPStatus( ConsoleBase *console ) {
@@ -464,12 +464,12 @@ void NtpClient::printNTPStatus( ConsoleBase *console ) {
 
     console->println();
 
-    /* Print the last synchronization date/time */
+    /* Print the last synchronization date/time. */
     console->print_P( S_CONSOLE_NTP_LAST_SYNC );
     console->printDateTime( &_lastSync, TZ_UTC );
     console->println();
 
-    /* Print delay before next synchronization */
+    /* Print delay before next synchronization. */
     if( _nextSyncDelay > 0 ) {
         unsigned long remaining;
         remaining = ( _lastSync.getEpoch() + _nextSyncDelay ) - g_rtc.now()->getEpoch();
@@ -483,7 +483,7 @@ void NtpClient::printNTPStatus( ConsoleBase *console ) {
 
     console->println();
 
-    /* Print the previous attempt error */
+    /* Print the previous attempt error. */
     console->print_P( S_CONSOLE_NTP_LAST_ERROR );
 
     if( this->getTaskError() == TASK_SUCCESS ) {

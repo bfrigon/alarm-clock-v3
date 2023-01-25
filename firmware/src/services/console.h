@@ -22,22 +22,30 @@
 
 
 
+/*******************************************************************************
+ *
+ * @brief   Provides access to the console through the serial port
+ * 
+ *******************************************************************************/
 class Console : public ConsoleBase {
+
   public:
     void runTasks();
     void begin( unsigned long baud);
     void resetConsole();
+
 
   private:
     size_t _print( char c );
     int _read();
     int _peek();
     int _available();
-
     void exitConsole( bool timeout );
-    
+   
 };
 
+
+/* Serial port console */
 extern Console g_console;
 
 

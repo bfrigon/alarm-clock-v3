@@ -19,7 +19,6 @@
 #include <hardware.h>
 #include <config.h>
 #include <freemem.h>
-
 #include "services/console.h"
 #include "services/telnet_console.h"
 #include "services/ntpclient.h"
@@ -27,6 +26,7 @@
 #include "services/homeassistant.h"
 #include "services/logger.h"
 #include "ui/ui.h"
+
 
 
 Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
@@ -55,7 +55,7 @@ bool g_prev_state_telnetConsole = false;
 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Checks if the check button is held after reset or if EEPROM 
  *          contains an invalid magic code. In that case, all settings are 
@@ -108,7 +108,7 @@ bool checkFactoryReset() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Initialize drivers
  *
@@ -197,7 +197,7 @@ void setup() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Main loop
  *

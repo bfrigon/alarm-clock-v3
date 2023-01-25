@@ -58,6 +58,12 @@
 #define VS1053_BLOCKS_PER_RUN       16
 
 
+
+/*******************************************************************************
+ *
+ * @brief   Load/save alarm profiles and play alarm sound on set time.
+ * 
+ *******************************************************************************/
 class Alarm : private VS1053 {
 
   public:
@@ -68,19 +74,16 @@ class Alarm : private VS1053 {
     void begin();
     void end();
     void onPowerStateChange( uint8_t state );
-
     bool loadProfile( struct AlarmProfile *profile, uint8_t id );
     bool loadProfile( uint8_t id );
     void saveProfile( struct AlarmProfile *profile, uint8_t id );
     void saveProfile( uint8_t id );
     bool readProfileAlarmTime( uint8_t id, Time *time, uint8_t *dow );
-
     bool detectSDCard();
     bool isSDCardPresent();
     bool openNextFile();
     bool openFile( char *name );
     bool fileExists( char* filename );
-
     void setVolume( uint8_t vol );
     void play( uint8_t mode );
     void play( uint8_t mode, uint16_t delay );
@@ -88,24 +91,21 @@ class Alarm : private VS1053 {
     void snooze();
     uint16_t getSnoozeTimeRemaining();
     void resume();
-
     bool isAlarmSwitchOn();
     bool detectAlarmSwitchState();
-
     void processEvents();
     bool checkForAlarms( DateTime *now );
     int8_t getNextAlarmID( DateTime *currentTime, bool matchNow );
     int16_t getNextAlarmOffset( int8_t profile_id, DateTime *currentTime, bool matchNow );
-
     bool isSnoozing();
     bool isPlaying();
     uint8_t getPlayMode();
     bool isAlarmEnabled();
     struct AlarmProfile profile;
     FatFile currentFile;
-    
-  private:
 
+
+  private:
     void feedBuffer();
     void visualStart();
     void visualStep();
@@ -119,10 +119,7 @@ class Alarm : private VS1053 {
     uint8_t _pin_sd_cs;
     uint8_t _pin_alarm_sw;
     bool _init = false;
-
     int8_t _rtcmin = -1;
-
-
     unsigned long _timerStart = 0;
     unsigned long _alarmStart = 0;
     unsigned long _snoozeStart = 0;
@@ -130,14 +127,11 @@ class Alarm : private VS1053 {
     uint16_t _visualStepDelay = 0;
     uint8_t _visualStepValue = 0;
     bool _visualStepReverse = false;
-
     bool _sd_present = false;
     bool _alarm_sw_on = false;
     uint8_t _playMode = ALARM_MODE_OFF;
     uint8_t _volume = 0;
-
     uint16_t _pgm_audio_ptr = 0;
-
     SdFat _sd;
     TPA2016 _amplifier;
 };

@@ -58,39 +58,29 @@ enum {
 
 
 
+/*******************************************************************************
+ *
+ * @brief   Provides access to the console through telnet.
+ * 
+ *******************************************************************************/
 class TelnetConsole : public ConsoleBase {
+
   public:
-
     TelnetConsole();
-
     void runTasks();
-
     bool startServer();
     void stopServer();
     bool clientConnected();
     bool serverEnabled();
-
     void enableServer( bool enabled );
     void printConsoleStatus( ConsoleBase *console );
 
 
   private:
-    SOCKET _socket;
-    TCPClient _client;
-    uint8_t _state;
-    unsigned long _lastActivity;
-    bool _serverEnabled;
-
-    char _sendBuffer[ TELNET_SEND_BUFFER_SIZE + 1 ];
-    size_t _sendBufSize;
-
-
-    size_t _print( char c );
     int _read();
     int _peek();
     int _available();
     void flushSendBuffer();
-
     void exitConsole( bool timeout );
     void resetConsole();
     bool requestListen();
@@ -99,8 +89,19 @@ class TelnetConsole : public ConsoleBase {
     void queueTelnetCommand( uint8_t op, uint8_t cmd );
     void processIncommingTelnetCommands( uint8_t op, uint8_t cmd );
 
+    SOCKET _socket;
+    TCPClient _client;
+    uint8_t _state;
+    unsigned long _lastActivity;
+    bool _serverEnabled;
+    char _sendBuffer[ TELNET_SEND_BUFFER_SIZE + 1 ];
+    size_t _sendBufSize;
+    size_t _print( char c );
+
 };
 
+
+/* Telnet console */
 extern TelnetConsole g_telnetConsole;
 
 

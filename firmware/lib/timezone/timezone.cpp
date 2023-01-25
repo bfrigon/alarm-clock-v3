@@ -15,13 +15,15 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "timezone.h"
 #include <tzdata.h>
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
- * @brief   Initialize class with UTC as the default timezone
+ * @brief   Initialize class with UTC as the default timezone.
  *
  */
 TimeZone::TimeZone() {
@@ -31,11 +33,11 @@ TimeZone::TimeZone() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Sets the current timezone ID
+ * @brief   Sets the current timezone ID.
  *
- * @param   zone_id    Timezone index in the timezone table
+ * @param   zone_id    Timezone index in the timezone table.
  * 
  */
 bool TimeZone::setTimezoneByID( uint16_t id ) {
@@ -52,13 +54,13 @@ bool TimeZone::setTimezoneByID( uint16_t id ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Sets the current timezone by name
+ * @brief   Sets the current timezone by name.
  *
  * @param   name    Name of the timezone.
  *
- * @return  TRUE if timezone is found, FALSE otherwise
+ * @return  TRUE if timezone is found, FALSE otherwise.
  * 
  */
 bool TimeZone::setTimezoneByName( char *name ) {
@@ -75,9 +77,9 @@ bool TimeZone::setTimezoneByName( char *name ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the current timezone name
+ * @brief   Get the current timezone name.
  *
  * @return  Pointer to the array of character in program memory containing
  *          the name of the timezone.
@@ -88,7 +90,7 @@ const char* TimeZone::getName() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the current timezone abbreviation whether it is currently 
  *          on standard time or daylight saving time.
@@ -109,10 +111,10 @@ const char* TimeZone::getAbbreviation( DateTime *local ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Convert a DateTime object from UTC to local time for the 
- *          current timezone
+ *          current timezone.
  *
  * @param   utc    Pointer to a DateTime object containing UTC time.
  * 
@@ -122,7 +124,7 @@ void TimeZone::toLocal( DateTime *utc ) {
     DateTime local;
     
 
-    /* Convert time to local using standard time */
+    /* Convert time to local using standard time. */
     local = *utc;
     local.offset( _tz.std_offset * 60L );
 
@@ -130,12 +132,12 @@ void TimeZone::toLocal( DateTime *utc ) {
     if( this->isDST( &local )) {
 
         /* If local time is inside the daylight period, 
-           convert utc to local using daylight time instead */    
+           convert utc to local using daylight time instead. */
         local = *utc;
         local.offset( _tz.dst_offset * 60L );
 
         /* If convertion occurs during a transition from DST to STD,
-           re-convert utc to local using standard time */
+           re-convert utc to local using standard time. */
         if( this->isDST( &local ) == false ) {
             local = *utc;
             local.offset( _tz.std_offset * 60L );
@@ -146,10 +148,10 @@ void TimeZone::toLocal( DateTime *utc ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Convert a DateTime object from local time to UTC for the 
- *          current timezone
+ *          current timezone.
  *
  * @param   utc    Pointer to a DateTime object containing local time time.
  * 
@@ -161,13 +163,13 @@ void TimeZone::toUTC( DateTime *local ) {
     if( this->isDST( local )) {
 
         /* If local time is inside the daylight period, 
-           convert local to UTC using daylight time instead */    
+           convert local to UTC using daylight time instead. */
         
         utc.offset( -( _tz.dst_offset * 60L ));
 
     } else {
 
-        /* Convert time to UTC using standard time */
+        /* Convert time to UTC using standard time. */
         utc.offset( -( _tz.std_offset * 60L ));
     }
 
@@ -175,14 +177,14 @@ void TimeZone::toUTC( DateTime *local ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Determine whether or not the local time is currently 
- *          in a daylight saving period
+ *          in a daylight saving period.
  *
  * @param   local    Pointer to a DateTime object containing local time.
  *
- * @return  TRUE if local time is on daylight saving time, FALSE otherwise
+ * @return  TRUE if local time is on daylight saving time, FALSE otherwise.
  * 
  */
 bool TimeZone::isDST( DateTime *local ) {
@@ -208,7 +210,7 @@ bool TimeZone::isDST( DateTime *local ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the specified DateTime object to the daylight saving transition
  *          for this timezone.
@@ -263,9 +265,9 @@ void TimeZone::getTransition( int16_t year, bool stdToDst, DateTime *dt ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the standard time offset from UTC
+ * @brief   Get the standard time offset from UTC.
  *
  * @return  Offset in minutes
  * 
@@ -275,9 +277,9 @@ int16_t TimeZone::getStdUtcOffset() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the daylight saving time offset from UTC
+ * @brief   Get the daylight saving time offset from UTC.
  *
  * @return  Offset in minutes
  * 
@@ -287,12 +289,11 @@ int16_t TimeZone::getDstUtcOffset() {
 }
 
 
-/*! ------------------------------------------------------------------------
- *
+/*******************************************************************************
  * @brief   Find a timezone index in the table from it's name.
  *
  * @param   name   Pointer to an array of character containg the name 
- *                 to search for
+ *                 to search for.
  *
  * @return  The timezone index in the table
  * 
@@ -313,9 +314,9 @@ int16_t findTimezoneByName( char* name ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Gets a region starting index in the timezone table
+ * @brief   Gets a region starting index in the timezone table.
  *
  * @param   region    Region ID
  *
@@ -345,9 +346,9 @@ int16_t getTzRegionStartIndex( uint8_t region ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Gets a region block size in the timezone table
+ * @brief   Gets a region block size in the timezone table.
  *
  * @param   region    Region ID
  *
@@ -377,9 +378,9 @@ uint16_t getTzRegionSize( uint8_t region ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Gets a region ending index in the timezone table
+ * @brief   Gets a region ending index in the timezone table.
  *
  * @param   region    Region ID
  *

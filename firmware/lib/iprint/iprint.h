@@ -18,9 +18,12 @@
 #ifndef I_PRINT_H
 #define I_PRINT_H
 
+
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <time.h>
+
+
 
 #define TEXT_ALIGN_LEFT     0
 #define TEXT_ALIGN_CENTER   1
@@ -53,11 +56,14 @@ const char S_DATETIME_SEPARATOR_SPACE[] PROGMEM = { " " };
 
 
 
-
+/*******************************************************************************
+ *
+ * @brief   Task manager interface
+ * 
+ *******************************************************************************/
 class IPrint {
 
   public: 
-
     size_t print( char c );
     size_t print( const char *str );
     size_t print( const char *str, uint8_t length, uint8_t align );
@@ -66,28 +72,26 @@ class IPrint {
     size_t println( const char *str, uint8_t length, uint8_t align );
     size_t printf( const char *format, ... );
     size_t printfln( const char *format, ... );
-
     size_t print_P( const char *str );
     size_t print_P( const char *str, uint8_t length, uint8_t align );
     size_t println_P( const char *str );
     size_t println_P( const char *str, uint8_t length, uint8_t align );
     size_t printf_P( const char *format, ... );
     size_t printfln_P( const char *format, ... );
-
     size_t printTimeInterval( unsigned long seconds, const char *separator = S_DATETIME_SEPARATOR_SPACE, bool compact = false );
-    
+
+
   private:
     FILE _stream = {0};
     static int _cb_putchar( char ch, FILE *stream );
-
     virtual size_t _print( char c ) = 0;
     size_t _print( const char *str, bool ptr_pgm_space = false );
     size_t _print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space = false );
+
 
   protected:
     void _initPrint();
     
 };
-
 
 #endif /* I_PRINT_H */

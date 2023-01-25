@@ -71,25 +71,30 @@
 #define VS1053_DATA_SPI_SETTING         SPISettings( 8000000, MSBFIRST, SPI_MODE0 )
 
 
+/*******************************************************************************
+ *
+ * @brief   Audio codec (VS1053) driver class
+ * 
+ *******************************************************************************/
 class VS1053 {
+
   public:
-
     VS1053( int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_rst );
-
     int8_t begin();
     void end();
-
     bool readyForData();
     void playData( uint8_t *buffer, size_t buffsiz );
     void setVolume( uint8_t left, uint8_t right );
     void softReset();
     void reset();
 
+
   protected:
     uint16_t sciRead( uint8_t addr );
     void sciWrite( uint8_t addr, uint16_t data );
     inline void spiwrite( uint8_t c );
     void spiwrite( uint8_t *buffer, size_t num );
+
 
   private:
     bool _init = false;

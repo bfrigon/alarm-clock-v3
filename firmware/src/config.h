@@ -80,12 +80,10 @@
 #define EEPROM_ADDR_NETWORK_CONFIG      EEPROM_ADDR_CLOCK_CONFIG + ( sizeof( ClockSettings ) )
 #define EEPROM_ADDR_PROFILES            EEPROM_ADDR_NETWORK_CONFIG + ( sizeof( NetworkSettings ) )
 
-
 /* EEPROM settings sections */
 #define EEPROM_SECTION_CLOCK            0x01
 #define EEPROM_SECTION_NETWORK          0x02
 #define EEPROM_SECTION_ALL              EEPROM_SECTION_CLOCK | EEPROM_SECTION_NETWORK
-
 
 /* Settings type */
 enum {
@@ -102,7 +100,6 @@ enum {
     SETTING_TYPE_TIMEZONE,
 };
 
-
 #define SETTING_VALUE_FALSE                 "off"
 #define SETTING_VALUE_TRUE                  "on"
 
@@ -111,7 +108,7 @@ PROG_STR( COMMENT_FILE_HEADER,              "; -----------------------\r\n"
                                             "; Alarm clock V3 settings\r\n"
                                             "; -----------------------\r\n" );
 
-/* Settings labels */
+/* Config file settings labels */
 PROG_STR( SETTING_NAME_SECTION_CLOCK,       "clock" );
 PROG_STR( SETTING_NAME_SECTION_ALS,         "als" );
 PROG_STR( SETTING_NAME_SECTION_LCD,         "lcd" );
@@ -236,7 +233,6 @@ enum {
     SECTION_ID_HA,
 };
 
-
 /* Settings parser token types */
 enum {
     TOKEN_NAME = 0,
@@ -246,13 +242,11 @@ enum {
     TOKEN_LIST,
 };
 
-
 /* Tasks ID's */
 enum {
     TASK_CONFIG_BACKUP = 1,
     TASK_CONFIG_RESTORE
 };
-
 
 /* Night lamp settings */
 struct NightLampSettings {
@@ -262,7 +256,6 @@ struct NightLampSettings {
     uint8_t speed;
     uint8_t mode;
 };
-
 
 /* Alarm profile settings */
 struct AlarmProfile {
@@ -277,7 +270,6 @@ struct AlarmProfile {
     uint8_t dow = 0x7F;
     struct NightLampSettings lamp;
 };
-
 
 /* Clock settings */
 struct ClockSettings {
@@ -294,7 +286,6 @@ struct ClockSettings {
 
     struct NightLampSettings lamp;
 };
-
 
 /* Network settings */
 struct NetworkSettings {
@@ -319,14 +310,14 @@ struct NetworkSettings {
 };
 
 
-//**************************************************************************
-//
-// Configuration manager
-//
-//**************************************************************************
+/*******************************************************************************
+ *
+ * @brief   Configuration manager
+ * 
+ *******************************************************************************/
 class ConfigManager : public ITask {
-  public:
 
+  public:
     void reset();
     void load( uint8_t section = EEPROM_SECTION_ALL );
     void save( uint8_t section = EEPROM_SECTION_ALL );
@@ -339,11 +330,11 @@ class ConfigManager : public ITask {
     void endRestore( int error = TASK_SUCCESS );
     void runTasks();
 
-    ClockSettings clock;
-    NetworkSettings network;
+    ClockSettings clock;        /* Clock settings */
+    NetworkSettings network;    /* Network settings */
+
 
   private:
-
     bool writeNextLine();
     void writeConfigLine( const char* name, uint8_t type, void* value );
     bool readNextLine();
@@ -351,12 +342,10 @@ class ConfigManager : public ITask {
     void parseSettingValue( char* src, void* dest, uint8_t type, uint8_t min = 0, uint8_t max = 255 );
     bool matchSettingName( char* testName, const char* name, uint8_t section );
 
-
-    uint8_t _currentSettingID = 0;
-    uint8_t _currentSectionID = 0;
-    int8_t _currentAlarmID = -1;
-
-    FatFile _sd_file;
+    uint8_t _currentSettingID = 0;      /* Current settings ID read or written to config file */
+    uint8_t _currentSectionID = 0;      /* Current section ID read or written to config file */
+    int8_t _currentAlarmID = -1;        /* Current alarm profile read or written to config file */
+    FatFile _sd_file;                   /* SD file manager instance */
 };
 
 extern ConfigManager g_config;

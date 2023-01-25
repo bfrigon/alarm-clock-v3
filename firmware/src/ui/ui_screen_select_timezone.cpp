@@ -18,15 +18,17 @@
 
 #include <timezone.h>
 #include <tzdata.h>
-
 #include "ui.h"
+
 
 
 uint16_t g_selectedTimezone;
 
-/*! ------------------------------------------------------------------------
+
+
+/*******************************************************************************
  *
- * @brief   Event raised when entering the screen
+ * @brief   Event raised when entering the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -37,7 +39,7 @@ void selectTimezone_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when the cursor on the currently selected 
  *          item has changed position or when another item is selected.
@@ -56,9 +58,9 @@ void selectTimezone_onSelectionChange( Screen* screen, ScreenItem* item, uint8_t
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Event raised when leaving the screen
+ * @brief   Event raised when leaving the screen.
  *
  * @param   screen    Current screen.
  *
@@ -86,7 +88,7 @@ bool selectTimezone_onExitScreen( Screen* screen  ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when drawing an item.
  *
@@ -114,13 +116,13 @@ bool selectTimezone_onDrawItem( Screen* screen, ScreenItem* item, uint16_t index
     char buffer[40];
     strcpy_P( buffer, tz.getName() );
 
-    /* Convert underscore character to spaces */
+    /* Convert underscore character to spaces. */
     char* ptr;
     while(( ptr = strchr( buffer, '_' )) != NULL )  {
         *ptr = '\x20';
     }
 
-    /* Get only the last segment of the timezone name */
+    /* Get only the last segment of the timezone name. */
     char* caption = strrchr( buffer, '/' );
     if( caption == NULL ) {
         return true;

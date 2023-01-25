@@ -22,12 +22,16 @@
 #include <avr/pgmspace.h>
 
 
+
+/*******************************************************************************
+ *
+ * @brief   NeoPixel driver class
+ * 
+ *******************************************************************************/
 class NeoPixel {
+  
   public:
-
-    /* Constructor */
     NeoPixel( int8_t pin_leds, int8_t pin_shdn );
-
     void begin();
     void end();
     void onPowerStateChange( uint8_t state );
@@ -35,15 +39,13 @@ class NeoPixel {
     void setColorFromTable( uint8_t id );
     void setBrightness( uint8_t brightness );
     void setAmbientDimming( uint8_t dimming );
-
     virtual void update() = 0;
 
-  protected:
 
+  protected:
     void show( uint8_t *pixmap, uint8_t num_leds );
     void setPixel( uint8_t *pixmap, uint8_t id, bool state );
     inline uint8_t getColorBrigthness( uint8_t color );
-
 
     int8_t _pin_leds;
     int8_t _pin_shdn;
@@ -53,7 +55,6 @@ class NeoPixel {
     uint8_t _r = 0xFF;
     uint8_t _ambientDimming = 0;
     bool _init = false;
-
 };
 
 #endif /* NEOPIXEL_H */

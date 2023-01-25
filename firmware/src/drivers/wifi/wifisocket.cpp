@@ -24,11 +24,13 @@
 #include "wifisocket.h"
 
 
+
 extern uint8 hif_receive_blocked;
 WiFiSocket g_wifisocket;
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor
  * 
@@ -48,13 +50,13 @@ WiFiSocket::WiFiSocket() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Handle socket events
+ * @brief   Handle socket events.
  *
  * @param   socket    Socket ID
  * @param   u8Msg     Event ID
- * @param   pvMsg     Pointer to additional event data
+ * @param   pvMsg     Pointer to additional event data.
  * 
  */
 void WiFiSocket::handleEvent( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
@@ -176,7 +178,7 @@ void WiFiSocket::handleEvent( SOCKET sock, uint8 u8Msg, void *pvMsg ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Create a socket
  * 
@@ -205,7 +207,7 @@ SOCKET WiFiSocket::create( uint16 u16Domain, uint8 u8Type, uint8 u8Flags ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Associates the provided address and local port to the socket
  * 
@@ -234,13 +236,13 @@ bool WiFiSocket::requestBind( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8Ad
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if the given socket is bound. 
  * 
  * @param   sock    Socket ID
  * 
- * @return  1 if connected, 0 otherwise
+ * @return  1 if connected, 0 otherwise.
  * 
  */
 uint8_t WiFiSocket::bound( SOCKET sock ) {
@@ -255,7 +257,7 @@ uint8_t WiFiSocket::bound( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   After successful socket binding to an IP address and port on the 
  *          system, start listening on a passive socket for incoming connections.
@@ -283,13 +285,13 @@ bool WiFiSocket::requestListen( SOCKET sock, uint8 backlog ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if the given socket is listening. 
  * 
  * @param   sock    Socket ID
  * 
- * @return  1 if connected, 0 otherwise
+ * @return  1 if connected, 0 otherwise.
  * 
  */
 uint8_t WiFiSocket::listening( SOCKET sock ) {
@@ -304,7 +306,7 @@ uint8_t WiFiSocket::listening( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Establishes a TCP connection with a remote server.
  * 
@@ -335,13 +337,13 @@ bool WiFiSocket::requestConnect( SOCKET sock, struct sockaddr *pstrAddr, uint8 u
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if the given socket is connected to a remote server.
  * 
  * @param   sock    Socket ID
  * 
- * @return  1 if connected, 0 otherwise
+ * @return  1 if connected, 0 otherwise.
  * 
  */
 uint8_t WiFiSocket::connected( SOCKET sock ) {
@@ -356,7 +358,7 @@ uint8_t WiFiSocket::connected( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the socket option.
  * 
@@ -367,7 +369,7 @@ uint8_t WiFiSocket::connected( SOCKET sock ) {
  * @param   u16OptionLen    length of the option value in bytes
  * 
  * @return  SOCK_ERR_NO_ERROR if successful or a negative number indicating
- * 	        an error
+ * 	        an error.
  * 
  */
 sint8 WiFiSocket::setopt( SOCKET socket, uint8 u8Level, uint8 option_name, const void *option_value, uint16 u16OptionLen ) {
@@ -376,13 +378,13 @@ sint8 WiFiSocket::setopt( SOCKET socket, uint8 u8Level, uint8 option_name, const
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the number of received bytes in the buffer
+ * @brief   Get the number of received bytes in the buffer.
  * 
  * @param   sock    Socket ID
  * 
- * @return  Number of bytes available
+ * @return  Number of bytes available.
  * 
  */
 int WiFiSocket::available( SOCKET sock ) {
@@ -397,13 +399,13 @@ int WiFiSocket::available( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the buffer without discarding it.
  * 
  * @param   sock    Socket ID
  * 
- * @return  Character read or -1 if no character is available
+ * @return  Character read or -1 if no character is available.
  * 
  */
 int WiFiSocket::peek( SOCKET sock ) {
@@ -428,10 +430,10 @@ int WiFiSocket::peek( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads from the packet buffer and copy the data to
- *          the specified buffer
+ *          the specified buffer.
  * 
  * @param   sock    Socket ID
  * @param   buf     Pointer to a buffer to hold incoming packets
@@ -498,13 +500,13 @@ int WiFiSocket::read( SOCKET sock, uint8_t* buf, size_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the server IP address the given socket is connected to.
  * 
  * @param   sock    Socket ID
  * 
- * @return  IPAddress structure containing the ip address.
+ * @return  IPAddress structure containing the ip address of the remote host.
  * 
  */
 IPAddress WiFiSocket::remoteIP( SOCKET sock )
@@ -513,13 +515,13 @@ IPAddress WiFiSocket::remoteIP( SOCKET sock )
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the server port number the given socket is connected to.
  * 
  * @param   sock    Socket ID
  * 
- * @return  The port number
+ * @return  The port number of the remote host.
  * 
  */
 uint16_t WiFiSocket::remotePort( SOCKET sock )
@@ -528,7 +530,7 @@ uint16_t WiFiSocket::remotePort( SOCKET sock )
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Transmit the data contained in the given buffer to the connected
  *          remote host.
@@ -569,7 +571,7 @@ size_t WiFiSocket::write( SOCKET sock, const uint8_t *buf, size_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Transmit the data contained in the given buffer to the connected
  *          remote host.
@@ -582,7 +584,7 @@ size_t WiFiSocket::write( SOCKET sock, const uint8_t *buf, size_t size ) {
  * @param   u8AddrLen        Destination address length in bytes.
  * 
  * @return  SOCK_ERR_NO_ERROR if successful or negative number inticating an
- * 	        error
+ * 	        error.
  * 
  */
 sint16 WiFiSocket::sendto( SOCKET sock, void *pvSendBuffer, uint16 u16SendLength, uint16 flags, struct sockaddr *pstrDestAddr, uint8 u8AddrLen ) {
@@ -603,14 +605,14 @@ sint16 WiFiSocket::sendto( SOCKET sock, void *pvSendBuffer, uint16 u16SendLength
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Close the socket
  * 
  * @param   sock    Socket ID
  * 
  * @return  SOCK_ERR_NO_ERROR if successful or negative number inticating an
- *          error
+ *          error.
  * 
  */
 sint8 WiFiSocket::close( SOCKET sock ) {
@@ -644,14 +646,14 @@ sint8 WiFiSocket::close( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Checks if a given socket belongs to the parent socket.
  * 
  * @param   sock     Parent socket ID
  * @param   child    Child socket ID
  * 
- * @return  1 if successful, 0 if an error occured
+ * @return  1 if successful, 0 if an error occured.
  * 
  */
 int WiFiSocket::hasParent( SOCKET sock, SOCKET child ) {
@@ -664,7 +666,7 @@ int WiFiSocket::hasParent( SOCKET sock, SOCKET child ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Find the next child socket that belong to the given parent 
  *          socket who have accepted a connection from a client.
@@ -693,7 +695,7 @@ SOCKET WiFiSocket::accepted( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Fill the packet buffer with the received data.
  * 

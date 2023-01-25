@@ -28,6 +28,7 @@
 #include "console_base.h"
 
 
+
 static char* param_tz_name;
 static DateTime cmd_time_adj;
 bool cmd_time_use_ntp;
@@ -56,13 +57,11 @@ enum {
     STEP_DISPLAY_APPLY_SETTINGS_PROMPT,
     STEP_VALIDATE_APPLY_SETTINGS_PROMPT,
     STEP_MONITOR_NTP_SYNC_COMPLETION,
-    
-
 };
 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Starts the 'set date' task
  *
@@ -86,7 +85,7 @@ bool ConsoleBase::beginTaskSetDate() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Run the 'set date' task. Display prompts and validate 
  *          responses required before executing the task.
@@ -287,9 +286,9 @@ void ConsoleBase::runTaskSetDate() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Print the current date and time to the console
+ * @brief   Print the current date and time to the console.
  *           
  */
 void ConsoleBase::runCommandPrintCurrentTime() {
@@ -316,11 +315,11 @@ void ConsoleBase::runCommandPrintCurrentTime() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Starts the 'set timezone' task
+ * @brief   Starts the 'set timezone' task.
  *
- * @return  TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise.
  *           
  */
 bool ConsoleBase::beginTaskSetTimeZone() {
@@ -342,7 +341,7 @@ bool ConsoleBase::beginTaskSetTimeZone() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Run the 'set timezone' task. Display prompts and validate 
  *          responses required before executing the task.
@@ -543,7 +542,7 @@ void ConsoleBase::runTaskSetTimeZone() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Print current timezone information to the console.
  *           
@@ -563,7 +562,7 @@ void ConsoleBase::showTimezoneInfo() {
     dst_offset = g_timezone.getDstUtcOffset();
     current_offset = ( isDst == true ) ? dst_offset : std_offset;
 
-    /* Calculate the difference between daylight saving time and standard time */
+    /* Calculate the difference between daylight saving time and standard time. */
     int16_t dst_diff = abs( dst_offset - std_offset );
 
     DateTime std, dst;
@@ -572,7 +571,7 @@ void ConsoleBase::showTimezoneInfo() {
 
 
 
-    /* Print whether the local time is equal, ahead or behind UTC */
+    /* Print whether the local time is equal, ahead or behind UTC. */
     if( current_offset == 0 ) {
         this->println_P( S_CONSOLE_TZ_EQUAL_UTC );
     } else if( current_offset > 0 ) {
@@ -600,7 +599,7 @@ void ConsoleBase::showTimezoneInfo() {
 
         for( uint8_t i = 0; i < 2; i++ ) {
 
-            /* Print standard time to daylight saving time transition date */
+            /* Print standard time to daylight saving time transition date. */
             if( show_dst_first == true ) {
                 this->println();
                 this->printf_P( S_CONSOLE_TZ_DST_TRANS, 
@@ -618,7 +617,7 @@ void ConsoleBase::showTimezoneInfo() {
                 continue;
             }
 
-            /* Print daylight saving time to standard time transition date */
+            /* Print daylight saving time to standard time transition date. */
             if( show_dst_first == false ) {
 
                 this->println();

@@ -63,21 +63,20 @@
 
 
 
-
+/*******************************************************************************
+ *
+ * @brief   Audio amplifier (TPA2016) driver class
+ * 
+ *******************************************************************************/
 class TPA2016 {
 
   public:
-
     TPA2016();
-
     void begin();
     void end();
-
     void setPins( int8_t pin_shutdown );
-
     bool enableOutputs();
     bool disableOutputs();
-
     bool setFixedGain( int8_t db );
     bool setAttackTime( int8_t time );
     bool setReleaseTime( int8_t time );
@@ -85,11 +84,10 @@ class TPA2016 {
     bool setMaxGain( int8_t db );
     bool setLimiter( bool disabled, int8_t level );
     bool setCompression( uint8_t compression );
-
     void dumpRegs();
 
-  private:
 
+  private:
     bool write( uint8_t reg, uint8_t data );
 
     bool _init = false;
@@ -104,7 +102,6 @@ class TPA2016 {
     int8_t _outputLimiterLevel;
     int8_t _maxGain;
     uint8_t _compression;
-
 };
 
 #endif /* _TPA2016_H */

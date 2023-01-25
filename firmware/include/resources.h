@@ -324,7 +324,6 @@ PROG_STR( S_CONSOLE_TELNET_DISABLED,    "Telnet console is disabled" );
 PROG_STR( S_CONSOLE_TELNET_SESS_ACTIVE, "Session active from %d.%d.%d.%d on port %hu" );
 PROG_STR( S_CONSOLE_TELNET_NO_SESS,     "No active session" );
 
-
 PROG_STR( S_CONSOLE_BATT_STATE,         "State    : " );
 PROG_STR( S_CONSOLE_BATT_VOLTAGE,       "Voltage  : %d.%03d V" );
 PROG_STR( S_CONSOLE_BATT_CHARGE,        "Charge   : %d%%" );
@@ -336,9 +335,6 @@ PROG_STR( S_CONSOLE_BATT_STATE_DISCHG,  "Discharging" );
 PROG_STR( S_CONSOLE_BATT_STATE_IDLE,    "Idle" );
 PROG_STR( S_CONSOLE_BATT_STATE_UNKNOWN, "Unknown" );
 PROG_STR( S_CONSOLE_BATT_STATE_MISSING, "No battery detected!" );
-
-PROG_STR( S_LOG_REPEAT,                 " <- Occured %d times" );
-PROG_STR( S_LOG_REPEAT_LIMIT,           " <- Occured more than 250 times!" );
 
 PROG_STR( S_CONSOLE_MQTT_PUB_ACK,       "Publish topic acknowledged");
 PROG_STR( S_CONSOLE_MQTT_UNKNOWN_HOST,  "Unknown broker hostname");
@@ -361,7 +357,9 @@ PROG_STR( S_CONSOLE_MQTT_BROKER_PORT,   "Port      : %hu");
 PROG_STR( S_CONSOLE_MQTT_ENABLED,       "MQTT client enabled");
 PROG_STR( S_CONSOLE_MQTT_DISABLED,      "MQTT client disabled");
 
-
+/* Log item descriptions */
+PROG_STR( S_LOG_REPEAT,                         " <- Occured %d times" );
+PROG_STR( S_LOG_REPEAT_LIMIT,                   " <- Occured more than 250 times!" );
 PROG_STR( S_LOGMSG_UNKNOWN,                     "**Unknown log entry type!** (type: %d, flags: %ld)" );
 PROG_STR( S_LOGMSG_RESET,                       "System reset (MCUSR: 0x%02X)" );
 PROG_STR( S_LOGMSG_TELNET_SERVICE_ENABLED,      "Telnet server enabled" );
@@ -400,14 +398,11 @@ PROG_STR( S_LOGMSG_MQTT_UNEXPECTED_RESPONSE,    "Unexpected response from MQTT b
 PROG_STR( S_LOGMSG_MQTT_SOCKET_ERROR,           "Socket error while connecting to MQTT broker" );
 
 
-
 //--------------------------------------------------------------------------
 //
 // Strings arrays
 //
 //--------------------------------------------------------------------------
-
-
 
 #define MAX_ALS_PRESETS_NAMES   4
 #define ALS_PRESET_NAME_LENGTH  8
@@ -439,7 +434,6 @@ const char _ALARM_VISUAL[ MAX_ALARM_VISUALS ][ ALARM_VISUAL_NAME_LENGTH + 1 ] PR
     "White flash",
     "Red flash"
 };
-
 
 #define MAX_ALARM_LAMP_MODES            5
 #define ALARM_LAMP_MODES_NAME_LENGTH    8
@@ -589,6 +583,5 @@ const uint8_t PROGMEM _DEFAULT_ALARMSOUND_DATA[] = {
     0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
     0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA
 };
-
 
 #endif /* RESOURCES_H */

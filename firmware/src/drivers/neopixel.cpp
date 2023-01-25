@@ -17,12 +17,12 @@
 //******************************************************************************
 
 #include <resources.h>
-
 #include "neopixel.h"
 #include "power.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -38,7 +38,7 @@ NeoPixel::NeoPixel( int8_t pin_leds, int8_t pin_shdn ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Initialize pins for the LED string.
  * 
@@ -60,7 +60,7 @@ void NeoPixel::begin() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Disable power for the LED string.
  * 
@@ -78,10 +78,10 @@ void NeoPixel::end() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Disable/enable power for the leds based on the current system 
- *          power state
+ *          power state.
  *
  * @param   state    Current power state
  * 
@@ -100,7 +100,7 @@ void NeoPixel::onPowerStateChange( uint8_t state ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Calculate the pixel brightness and apply gamma correction for an 
  *          individual color channel.
@@ -117,14 +117,14 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
     /* Apply ambiant light dimming percentage */
     brightness = brightness * ( 100 - _ambientDimming ) / 100;
 
-    /* Keep the ambient dimming from turning the pixel off completely */
+    /* Keep the ambient dimming from turning the pixel off completely. */
     if( _brightness > 0 && brightness < 1 ) {
         brightness = 1;
     }
 
     if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
 
-        /* limit brightness in low power mode */
+        /* limit brightness in low power mode. */
         if( brightness > 25 ) {
             brightness = 25;
         }
@@ -136,7 +136,7 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Send the data to each pixels.
  *
@@ -256,7 +256,7 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set/clear pixel within the pixel map.
  *
@@ -278,7 +278,7 @@ void NeoPixel::setPixel( uint8_t *pixmap, uint8_t pos, bool state ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets the brightness of the pixel string.
  *
@@ -294,9 +294,9 @@ void NeoPixel::setBrightness( uint8_t brightness ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Sets the ambient dimming percentage
+ * @brief   Sets the ambient dimming percentage.
  *
  * @param   dimming    Ambient dimming percentage ( 0-100 )
  * 
@@ -315,7 +315,7 @@ void NeoPixel::setAmbientDimming( uint8_t dimming ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets the pixel string color using an RGB value.
  *
@@ -331,7 +331,7 @@ void NeoPixel::setColorRGB( uint8_t r, uint8_t g, uint8_t b ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets the pixel string color using the RGB table color ID.
  *

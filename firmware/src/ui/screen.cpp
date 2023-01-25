@@ -18,13 +18,13 @@
 
 #include <config.h>
 #include <resources.h>
-
 #include "screen.h"
 #include "screen_item.h"
 #include "ui.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor for Screen class.
  * 
@@ -45,14 +45,14 @@ Screen::Screen() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Run task for this screen
+ * @brief   Run task for this screen.
  *
  */
 void Screen::processEvents() {
 
-    /* Process Keypad event if available */
+    /* Process Keypad event if available. */
     uint8_t key;
     key = g_keypad.processEvents();
 
@@ -74,7 +74,7 @@ void Screen::processEvents() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Update the screen contents on the LCD.
  * 
@@ -92,7 +92,7 @@ void Screen::update() {
     _updateRequested = false;
     _clearScreenRequested = false;
 
-    /* Disable blinking cursor */
+    /* Disable blinking cursor. */
     g_lcd.setCursor( false, false );
 
     if( _isShowConfirmDialog == true ) {
@@ -110,7 +110,7 @@ void Screen::update() {
     }
 
 
-    /* Allow the callback to override the default screen drawing */
+    /* Allow the callback to override the default screen drawing. */
     if( _currentScreen.eventDrawScreen != NULL ) {
 
         g_lcd.setPosition( 0, 0 );
@@ -126,7 +126,7 @@ void Screen::update() {
 
     ScreenItem item;
 
-    /* If the current selected item is full screen, only draw this item */
+    /* If the current selected item is full screen, only draw this item. */
     if( _itemFullscreen == true ) {
 
         item.loadFromProgmem( &_currentScreen.items[ _selected ] );
@@ -135,7 +135,7 @@ void Screen::update() {
 
     } else {
 
-        /* Draw all visible items on the screen */
+        /* Draw all visible items on the screen. */
         for( uint8_t i = 0; true; i++ ) {
 
             item.loadFromProgmem( &_currentScreen.items[ i ] );
@@ -144,7 +144,7 @@ void Screen::update() {
             uint8_t row = item.getPositionRow() - _scroll;
             uint8_t col = item.getPositionCol();
 
-            /* No more items to draw */
+            /* No more items to draw. */
             if( item.getType() == ITEM_TYPE_NULL ) {
                 break;
             }
@@ -180,9 +180,9 @@ void Screen::update() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Exit item fullscreen edit mode 
+ * @brief   Exit item fullscreen edit mode.
  * 
  */
 void Screen::exitFullScreen() {
@@ -209,7 +209,7 @@ void Screen::exitFullScreen() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Process key press events.
  *
@@ -218,7 +218,7 @@ void Screen::exitFullScreen() {
  */
 void Screen::processKeypadEvent( uint8_t key ) {
 
-    /* Allow the callback to override the keypress event */
+    /* Allow the callback to override the keypress event. */
     if( _currentScreen.eventKeypress != NULL ) {
 
         if( _currentScreen.eventKeypress( this, key ) == false ) {
@@ -228,7 +228,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
     switch( key ) {
 
-        /* Exit current menu */
+        /* Exit current menu. */
         case KEY_MENU:
 
             if( _isShowConfirmDialog == true ) {
@@ -262,7 +262,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
             break;
 
-        /* Increment/select current item.*/
+        /* Increment/select current item. */
         case KEY_SET:
 
             if( _isShowConfirmDialog == true ) {
@@ -293,7 +293,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
                 return;
             }
 
-            /* Or increment the value of the item */
+            /* Or increment the value of the item. */
             this->incrementItemValue( &_currentItem, false );
 
             break;
@@ -302,7 +302,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
             this->clearItemValue( &_currentItem );
             break;
 
-        /* Go to next item or next digit position.*/
+        /* Go to next item or next digit position. */
         case KEY_NEXT:
 
             if( _isShowConfirmDialog == true ) {
@@ -327,7 +327,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 
 
             /* increment cursor position within the current item, if
-            it reaches the item length, skip to the next item */
+            it reaches the item length, skip to the next item. */
             if( _fieldPos >= this->calcFieldLength( &_currentItem ) ) {
 
                 _fieldPos = 0;
@@ -352,7 +352,7 @@ void Screen::processKeypadEvent( uint8_t key ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reset the timeout timer.
  * 
@@ -367,7 +367,7 @@ void Screen::resetTimeout( int16_t timeout ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Returns whether or not the timeout delay has elapsed.
  *
@@ -384,7 +384,7 @@ bool Screen::hasScreenTimedOut() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Exits the current screen and returns to the parent screen.
  * 
@@ -394,7 +394,7 @@ void Screen::exitScreen() {
         return;
     }
 
-    /* If items changed, show the confirm changes dialog */
+    /* If items changed, show the confirm changes dialog. */
     if( _confirmChanges && _itemChanged ) {
 
         this->updateKeypadRepeatMode();
@@ -407,14 +407,14 @@ void Screen::exitScreen() {
         return;
     }
 
-    /* Goto back to parent screen */
+    /* Goto back to parent screen. */
     this->activate( NULL, false );
 
     return;
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Leave the current screen and activate this one.
  *
@@ -429,17 +429,17 @@ bool Screen::activate( const ScreenData* screen, bool selectFirstItem ) {
 
     uint8_t prevScreenID = this->getId();
 
-    /* Trigger exit screen event. If callback return false, cancel screen change */
+    /* Trigger exit screen event. If callback return false, cancel screen change. */
     if( _currentScreen.eventExitScreen != NULL ) {
         if( _currentScreen.eventExitScreen( this ) == false ) {
             return false;
         }
     }
 
-    /* Return to previous screen */
+    /* Return to the previous screen. */
     if( screen == NULL ) {
 
-        /* Already at the root screen */
+        /* Already at the root screen. */
         if( _breadCrumbIndex == 0 ) {
             return false;
         }
@@ -450,7 +450,7 @@ bool Screen::activate( const ScreenData* screen, bool selectFirstItem ) {
 
     } else {
 
-        /* Maximum screen depth reached */
+        /* Maximum screen depth reached. */
         if( _breadCrumbIndex == SCREEN_MAX_BREADCRUMB_ITEMS - 1 ) {
             return false;
         }
@@ -464,7 +464,7 @@ bool Screen::activate( const ScreenData* screen, bool selectFirstItem ) {
         _breadCrumbScreen[ _breadCrumbIndex ] = screen;
     }
 
-    /* Load the screen data from the program memory */
+    /* Load the screen data from the program memory. */
     memcpy_P( &_currentScreen, screen, sizeof( ScreenData ) );
     
     _timeout = 0;
@@ -475,7 +475,7 @@ bool Screen::activate( const ScreenData* screen, bool selectFirstItem ) {
     _itemChanged = false;
     _uppercase = false;
 
-    /* Restore previous selection */
+    /* Restore the previous selection. */
     if( selectFirstItem ) {
         this->selectFirstItem();
     } else {
@@ -484,7 +484,7 @@ bool Screen::activate( const ScreenData* screen, bool selectFirstItem ) {
 
     _enterScreenTime = millis();
 
-    /* Trigger enter screen event on new screen */
+    /* Trigger enter screen event on new screen. */
     if( _currentScreen.eventEnterScreen != NULL ) {
         _currentScreen.eventEnterScreen( this, prevScreenID );
     }
@@ -503,11 +503,11 @@ bool Screen::activate( const ScreenData* screen, bool selectFirstItem ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Request screen refresh
  *
- * @param   clear    Clear the screen before updating
+ * @param   clear    Clear the screen before updating.
  *
  */
 void Screen::requestScreenUpdate( bool clear ) {
@@ -517,15 +517,15 @@ void Screen::requestScreenUpdate( bool clear ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Print a list item value from the selected index
+ * @brief   Print a list item value from the selected index.
  *
- * @param   item          Pointer to the list object to draw
+ * @param   item          Pointer to the list object to draw.
  * @param   index         Selected index within the list to print.
- * @param   isSelected    Idicate whether or not the list is currently selected
- * @param   row           Zero-based Y position where to draw the caption on the screen
- * @param   col           Zero-based X position where to draw the caption on the screen
+ * @param   isSelected    Idicate whether or not the list is currently selected.
+ * @param   row           Zero-based Y position where to draw the caption on the screen.
+ * @param   col           Zero-based X position where to draw the caption on the screen.
  *
  */
 void Screen::printListItemValue( ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col ) {
@@ -563,9 +563,9 @@ void Screen::printListItemValue( ScreenItem* item, uint16_t index, bool isSelect
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Update a screen item display on the LCD
+ * @brief   Update a screen item display on the LCD.
  *
  * @param   item          Pointer to a screen item.
  * @param   isSelected    TRUE if item is currently selectedor False otherwise.
@@ -598,7 +598,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 
         } else {
 
-            /* Only print the item caption */
+            /* Only print the item caption. */
             g_lcd.print( isSelected ? CHAR_SELECT : CHAR_SPACE );
 
             this->printItemCaption( item );
@@ -863,7 +863,7 @@ void Screen::drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t c
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Returns whether or not a given item can be viewed full screen.
  *
@@ -887,7 +887,7 @@ bool Screen::isItemFullScreenEditable( ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a given item's caption on the LCD.
  *
@@ -919,7 +919,7 @@ uint8_t Screen::printItemCaption( ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Selects the first item on the screen.
  * 
@@ -933,7 +933,7 @@ void Screen::selectFirstItem() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Resets the screen item selection.
  * 
@@ -955,7 +955,7 @@ void Screen::clearSelection() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Selects a given item from it's index position.
  *
@@ -1067,7 +1067,7 @@ void Screen::selectItem( uint8_t index ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets which keys on the keypad are repeatable when held down 
  *          based on the current screen state and selected item.
@@ -1114,7 +1114,7 @@ void Screen::updateKeypadRepeatMode() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Returns a given item's maximum value length.
  *
@@ -1131,7 +1131,7 @@ uint8_t Screen::calcFieldLength( ScreenItem* item ) {
     }
 
 
-    /* Determine item length */
+    /* Determine the item length. */
     switch( item->getType() ) {
         case ITEM_TYPE_IP:
             length = 12;
@@ -1170,7 +1170,7 @@ uint8_t Screen::calcFieldLength( ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Update the cursor position on the LCD.
  * 
@@ -1188,7 +1188,7 @@ void Screen::updateCursorPosition() {
     if( this->isItemFullScreenEditable( &_currentItem ) ) {
 
         if( _itemFullscreen == false ) {
-            /* No blinking cursor if not currently full screen */
+            /* No blinking cursor if not currently full screen. */
             return;
 
         } else {
@@ -1273,7 +1273,7 @@ void Screen::updateCursorPosition() {
             break;
 
 
-        /* No blinking cursor for other items */
+        /* No blinking cursor for the other items. */
         default:
             return;
 
@@ -1284,7 +1284,7 @@ void Screen::updateCursorPosition() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Revert an item to it's default value.
  *
@@ -1346,14 +1346,14 @@ void Screen::clearItemValue( ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Converts the item's value to the number of bars to be displayed 
  *          for ITEM_TYPE_BAR items.
  *
  * @param   item    Pointer to a screen item.
  *
- * @return  The number of bars to display
+ * @return  The number of bars to display.
  * 
  */
 uint8_t Screen::itemValueToBars( ScreenItem* item ) {
@@ -1377,9 +1377,9 @@ uint8_t Screen::itemValueToBars( ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Increment a given item's value
+ * @brief   Increment a given item's value.
  *
  * @param   item     Pointer to a screen item.
  * @param   shift    TRUE to use an alternate increment valueor False to 
@@ -1629,11 +1629,11 @@ void Screen::incrementItemValue( ScreenItem* item, bool shift ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the next valid character when incrementing a text box item
+ * @brief   Get the next valid character when incrementing a text box item.
  *
- * @param   current    Current character to start from
+ * @param   current    Current character to start from.
  *
  * @return  The next valid character.
  * 
@@ -1678,7 +1678,7 @@ inline char Screen::nextValidCharacter( char current ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Increments an item's value while keeping it in the valid range.
  *
@@ -1719,7 +1719,7 @@ void Screen::incDigit( uint8_t* value, uint8_t pos, uint8_t max, uint8_t min ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Returns the number of digits in a given number.
  *

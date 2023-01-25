@@ -18,11 +18,13 @@
 #ifndef TIME_H
 #define TIME_H
 
+
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 
-#define EPOCH_NTP_OFFSET            2208988800
 
+
+#define EPOCH_NTP_OFFSET            2208988800
 
 enum {
     DATETIME_FORMAT_DDMMYYYY,
@@ -95,16 +97,19 @@ const char _DAYS[ 7 ][ 10 ] PROGMEM = {
 
 
 
+/*******************************************************************************
+ *
+ * @brief   Date/time storage class
+ * 
+ *******************************************************************************/
 class DateTime {
+
   public:
     DateTime();
     DateTime( DateTime *src );
     DateTime( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec );
-        
     void set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec );
     void offset( long offset );
-    
-
     bool operator==( const DateTime &right ) const;
     bool operator!=( const DateTime &right ) const;
     bool operator<( const DateTime &right ) const;
@@ -117,7 +122,6 @@ class DateTime {
     DateTime& operator+( const uint32_t &right );
     DateTime& operator=( const DateTime &right );
     DateTime& operator=( const uint32_t &right );
-
     uint8_t second()    { return _ss; }
     uint8_t minute()    { return _mm; }
     uint8_t hour()      { return _hh; }
@@ -125,18 +129,16 @@ class DateTime {
     uint8_t month()     { return _m; }
     uint16_t year()     { return _y; }
     uint8_t dow();
-
     unsigned long getEpoch();
 
-  protected:
-    
 
-    uint16_t _y;
-    uint8_t _m;
-    uint8_t _d;
-    uint8_t _hh;
-    uint8_t _mm;
-    uint8_t _ss;
+  protected:
+    uint16_t _y;        /* Year */
+    uint8_t _m;         /* Month */
+    uint8_t _d;         /* Day */
+    uint8_t _hh;        /* Hour */
+    uint8_t _mm;        /* Minute */
+    uint8_t _ss;        /* Seconds */
 };
 
 
@@ -144,14 +146,11 @@ const char* getMonthName( uint8_t month, bool shortName );
 const char* getDayName( uint8_t day, bool shortName );
 uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day );
 uint8_t getMonthNumDays( uint8_t month, uint16_t year );
-
-
 uint8_t dateToBuf( char* buffer, uint8_t format, DateTime* date );
 uint8_t timeToBuf( char* buffer, bool fmt_24h, DateTime* date );
 uint8_t timeToBuf( char* buffer, bool fmt_24h, Time* time );
 const char* strptime( const char *buf, const char *fmt, DateTime* dest );
 const char* parse_int( const char *buf, int *dest, int min, int max, uint8_t digits );
-
 
 
 #endif /* TIME_H */

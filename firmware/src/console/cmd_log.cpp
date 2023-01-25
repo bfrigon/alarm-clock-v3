@@ -17,12 +17,20 @@
 //******************************************************************************
 
 #include "console_base.h"
-
 #include "services/logger.h"
 #include <time.h>
 #include <timezone.h>
 #include <tzdata.h>
 
+
+
+/*******************************************************************************
+ * 
+ * @brief   Starts the print logs command task.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
 void ConsoleBase::beginTaskPrintLogs() {
 
     _taskIndex = g_log.getFirstIndex();
@@ -32,6 +40,11 @@ void ConsoleBase::beginTaskPrintLogs() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Print the next line of the log to the console
+ * 
+ */
 void ConsoleBase::runTaskPrintLogs() {
 
     if( g_log.printLogEntry( this, _taskIndex ) == false ) {

@@ -21,16 +21,14 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <time.h>
-
 #include "neopixel.h"
-
 
 
 
 #define SEG_MINUS  0x0A
 #define SEG_SPACE  0x0B
 
-
+/* Character map */
 static const uint8_t PROGMEM _charmap[ 12 ] = {
     0b00111111,  /* Digit 0 */
     0b00000110,  /* Digit 1 */
@@ -48,43 +46,40 @@ static const uint8_t PROGMEM _charmap[ 12 ] = {
 
 
 
-
-
+/*******************************************************************************
+ *
+ * @brief   NeoPixel clock driver class
+ * 
+ *******************************************************************************/
 class NeoClock : public NeoPixel {
+
   public:
-
-    uint8_t hour = 0xFF;
-    uint8_t minute = 0xFF;
-    uint8_t flashRate = 20;
-    bool status_set = false;
-
-    bool hourFlashing = false;
-    bool minutesFlashing = false;
-
-
-
-    /* Constructor */
     NeoClock( int8_t pin_leds, int8_t pin_shdn );
-
     void update();
     void setTestMode( bool testMode );
     void restoreClockDisplay();
     bool requestClockUpdate( bool force = false );
     void processEvents();
-    
 
+    uint8_t hour = 0xFF;
+    uint8_t minute = 0xFF;
+    uint8_t flashRate = 20;
+    bool status_set = false;
+    bool hourFlashing = false;
+    bool minutesFlashing = false;
 
   private:
+    void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
+
     uint32_t _flashTimerStart = 0;
     bool _flashState = false;
     bool _testMode = false;
     DateTime _prevDate;
     bool _updateRequested = false;
-
-    void setDigitPixels( uint8_t *pixmap, uint8_t pos, uint8_t value );
-
 };
 
+
+/* Neopixel clock driver */
 extern NeoClock g_clock;
 
 #endif /* NEOCLOCK_H */

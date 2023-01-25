@@ -144,9 +144,6 @@
 
 
 
-
-
-
 typedef struct {
     bool blink = false;
     bool cursor = false;
@@ -159,18 +156,17 @@ typedef struct {
 
 
 
-
-
-
+/*******************************************************************************
+ *
+ * @brief   US2066 LCD driver class
+ * 
+ *******************************************************************************/
 class US2066 : public IPrint {
 
   public:
-
     US2066( uint8_t address, uint8_t pin_reset );
-
     void begin();
     void end();
-
     void clear();
     void setPosition( uint8_t row, uint8_t col );
     void setContrast( uint8_t contrast );
@@ -179,6 +175,7 @@ class US2066 : public IPrint {
     void setDisplay( bool on, bool reverse );
     uint8_t setCustomCharacters( const unsigned char *pchrmap );
     void fill( char c, uint8_t num );
+
 
   private:
     void selectInstructions( uint8_t iset );
@@ -192,12 +189,13 @@ class US2066 : public IPrint {
     uint8_t _pin_reset;
     uint8_t _ambientDimming;
     uint8_t _contrast;
-
     uint8_t _current_iset = US2066_ISET_STANDARD;
     FILE _lcdout = {0};
     US2066_STATE _state;
 };
 
+
+/* LCD driver */
 extern US2066 g_lcd ;
 
 #endif /* US2066_H */

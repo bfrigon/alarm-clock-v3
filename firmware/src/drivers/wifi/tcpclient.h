@@ -18,6 +18,7 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
 
+
 #include <Arduino.h>
 #include <Client.h>
 #include <IPAddress.h>
@@ -26,12 +27,18 @@ extern "C" {
     #include "socket/include/socket.h"
 }
 
+
+
+/*******************************************************************************
+ *
+ * @brief   TCP client class
+ * 
+ *******************************************************************************/
 class TCPClient : public Client {
 
-public:
+  public:
     TCPClient();
     TCPClient( SOCKET sock );
-
     int connectSSL( IPAddress ip, uint16_t port );
     int connectSSL( const char* host, uint16_t port );
     virtual int connect( IPAddress ip, uint16_t port );
@@ -45,22 +52,19 @@ public:
     virtual void flush();
     virtual void stop();
     virtual uint8_t connected();
+    virtual IPAddress remoteIP();
+    virtual uint16_t remotePort();
     virtual operator bool();
     bool operator==( const TCPClient &other ) const;
     bool operator!=( const TCPClient &other ) const;
-
     using Print::write;
 
-    virtual IPAddress remoteIP();
-    virtual uint16_t remotePort();
 
-private:
-    SOCKET _socket;
-
+  private:
     int connect(const char* host, uint16_t port, uint8_t opt);
     int connect(IPAddress ip, uint16_t port, uint8_t opt, const uint8_t *hostname);
+
+    SOCKET _socket;
 };
-
-
 
 #endif /* TCPCLIENT_H */

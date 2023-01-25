@@ -18,7 +18,6 @@
 
 #include <config.h>
 #include <drivers/bq27441.h>
-
 #include "ui.h"
 
 
@@ -26,7 +25,8 @@
 uint8_t g_battStatusPage = 0;
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Event raised when updating the screen.
  *
@@ -150,9 +150,9 @@ bool battStatus_onDrawScreen( Screen* screen ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs.
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.
@@ -178,7 +178,7 @@ bool battStatus_onKeypress( Screen* screen, uint8_t key ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when the exit screen timeout delay has elapsed.
  *
@@ -191,9 +191,9 @@ void battStatus_onTimeout( Screen* screen ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * Event raised when entering the screen
+ * Event raised when entering the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  * 

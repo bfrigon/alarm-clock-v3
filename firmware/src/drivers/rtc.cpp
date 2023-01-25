@@ -17,19 +17,17 @@
 //******************************************************************************
 
 #include <time.h>
-
 #include "rtc.h"
 #include "power.h"
 #include "neoclock.h"
 #include "wifi/wifi.h"
 
 
-
-
 volatile bool rtc_event = false;
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Convert a binary coded decimal to an 8-bit integer.
  *
@@ -42,7 +40,7 @@ uint8_t bcd2bin( uint8_t val ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Convert a 8-bit integer to a binary coded decimal.
  *
@@ -55,7 +53,7 @@ uint8_t bin2bcd( uint8_t val ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -71,7 +69,7 @@ DS3231::DS3231( int8_t pin_irq ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Initialize the RTC IC.
  * 
@@ -97,7 +95,7 @@ void DS3231::begin() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Enable the alarm interrupt.
  * 
@@ -113,7 +111,7 @@ void DS3231::enableInterrupt() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Disable the alarm interrupt.
  * 
@@ -123,7 +121,7 @@ void DS3231::disableInterrupt() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Clear the alarm flag.
  * 
@@ -136,7 +134,7 @@ void DS3231::clearAlarmFlag() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the frequency at which the alarm interrupt is raised.
  *
@@ -178,7 +176,7 @@ void DS3231::setAlarmFrequency( uint8_t freq ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if an alarm event occured. If so, it will reset the 
  *          alarm flag and rearm the interrupt.
@@ -214,9 +212,9 @@ bool DS3231::processEvents() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   For debugging purposes. Prints the contents of all registers
+ * @brief   For debugging purposes. Prints the contents of all registers.
  * 
  */
 void DS3231::dumpRegs() {
@@ -238,7 +236,7 @@ void DS3231::dumpRegs() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the current date and time.
  *
@@ -273,7 +271,7 @@ void DS3231::readTime( DateTime *dt ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the current unix time. 
  * 
@@ -289,7 +287,7 @@ unsigned long DS3231::getEpoch() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets the date and time on the RTC IC.
  *
@@ -316,7 +314,7 @@ void DS3231::writeTime( DateTime *new_dt ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Read data from the RTC IC.
  *
@@ -337,7 +335,7 @@ uint8_t DS3231::read( uint8_t reg ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Write data to the RTC IC.
  *
@@ -357,9 +355,9 @@ void DS3231::write( uint8_t reg, uint8_t value ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Reset the milliseconds counter
+ * @brief   Reset the milliseconds counter.
  * 
  */
 void DS3231::resetMillis() {
@@ -367,11 +365,12 @@ void DS3231::resetMillis() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the number of milliseconds since the beginning of the current second
+ * @brief   Get the number of milliseconds since the beginning of the 
+ *          current second.
  *
- * @return  Number of milliseconds elapsed
+ * @return  Number of milliseconds elapsed.
  * 
  */
 uint16_t DS3231::getMillis() {
@@ -382,13 +381,13 @@ uint16_t DS3231::getMillis() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Schedule a delayed clock adjustment
+ * @brief   Schedule a delayed clock adjustment.
  *
  * @param   ndt      DateTime structure containing the new date/time
  * @param   delay    Number of milliseconds to wait before writing the 
- *                   new date/time
+ *                   new date/time.
  * 
  */
 void DS3231::adjustClock( DateTime *ndt, int16_t delay ) {
@@ -398,7 +397,7 @@ void DS3231::adjustClock( DateTime *ndt, int16_t delay ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Interrupt service routine for the alarm event.
  * 

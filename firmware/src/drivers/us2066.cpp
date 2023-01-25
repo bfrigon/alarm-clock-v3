@@ -19,7 +19,8 @@
 #include "us2066.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -37,7 +38,7 @@ US2066::US2066( uint8_t address, uint8_t pin_reset ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Perform proper power-up sequence and initialize the LCD module.
  * 
@@ -111,7 +112,7 @@ void US2066::begin() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Shutdown the LCD module.
  * 
@@ -130,7 +131,7 @@ void US2066::end() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Selects the display instruction set.
  *
@@ -181,7 +182,7 @@ void US2066::selectInstructions( uint8_t iset ) {
         /* US2066_ISET_SPECIAL : RE=0, SD=0, IS=1 */
         default:
 
-            /* If current set is oled, go back to extended set first */
+            /* If current set is oled, go back to extended set first. */
             if( _current_iset == US2066_ISET_OLED ) {
                 this->sendCommand( US2066_CMD_OLED_CHAR );
             }
@@ -195,7 +196,7 @@ void US2066::selectInstructions( uint8_t iset ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sends a single byte command to the LCD module.
  *
@@ -222,9 +223,9 @@ uint8_t US2066::sendCommand( uint8_t cmd ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Send a two bytes command to the LCD module (cmd + data)
+ * @brief   Send a two bytes command to the LCD module (cmd + data).
  *
  * @param   cmd     Command to send
  * @param   data    Data (single byte)
@@ -244,7 +245,7 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
     Wire.write( US2066_MODE_CMD | US2066_MODE_CONTINUE );
     Wire.write( cmd );
 
-    /* Data following commands in extended mode require D/C#=1 */
+    /* Data following commands in extended mode require D/C#=1. */
     Wire.write( _current_iset == US2066_ISET_EXTENDED ? US2066_MODE_DATA : US2066_MODE_CMD );
     Wire.write( data );
 
@@ -252,7 +253,7 @@ uint8_t US2066::sendCommand( uint8_t cmd, uint8_t data ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Write custom characters to the LCD CGRAM.
  *
@@ -304,7 +305,7 @@ uint8_t US2066::setCustomCharacters( const unsigned char *pchrmap ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the DDRAM address corresponding to the specified 
  *          row and column.
@@ -323,7 +324,7 @@ void US2066::setPosition( uint8_t row, uint8_t col ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Clear the display
  * 
@@ -337,7 +338,7 @@ void US2066::clear() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the display contrast
  * 
@@ -354,7 +355,7 @@ void US2066::setContrast( uint8_t contrast ) {
 
     _contrast = contrast;
 
-    /* Apply ambiant light dimming percentage */
+    /* Apply ambiant light dimming percentage. */
     contrast = contrast * ( 100 - _ambientDimming ) / 100;
 
     /* Select OLED instruction set */
@@ -367,9 +368,9 @@ void US2066::setContrast( uint8_t contrast ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Sets the ambient dimming percentage
+ * @brief   Sets the ambient dimming percentage.
  *
  * @param   dimming    Dimming percentage ( 0-100 )
  * 
@@ -388,7 +389,7 @@ void US2066::setAmbientDimming( uint8_t dimming ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets the cursor state of the LCD module.
  *
@@ -407,7 +408,7 @@ void US2066::setCursor( bool underline, bool blinking ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Turn the display ON or OFF.
  *
@@ -427,7 +428,7 @@ void US2066::setDisplay( bool on, bool reverse ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Update the display control register on the LCD. 
  *          (display ON/OFF, cursor)
@@ -442,19 +443,19 @@ void US2066::updateDisplayState() {
 
 
     /* Select extended instruction set, reverse display is set while
-       selecting instruction set */
+       selecting instruction set. */
     this->selectInstructions( US2066_ISET_EXTENDED ); /* RE=1, SD=0 */
 
 
-    /* Return to standard instruction set */
+    /* Return to standard instruction set. */
     this->selectInstructions( US2066_ISET_STANDARD ); /* RE=0, SD=0, SI=0 */
 
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Fills the LCD with the specified number of characters
+ * @brief   Fills the LCD with the specified number of characters.
  *
  * @param   c       Character to print
  * @param   num     Number of times to print the character
@@ -483,7 +484,7 @@ void US2066::fill( char c, uint8_t num ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   IPrint interface callback for printing a single character. 
  *          Sends the output to the LCD module at the current coordinates.

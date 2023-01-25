@@ -18,14 +18,16 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+
 #include <Arduino.h>
 #include "console/console_base.h"
 
 
 
+/* Maximum number of log entries */
 #define MAX_LOG_ENTRIES 50
 
-
+/* Event ID's */
 enum {
     EVENT_EMPTY = 0,
     EVENT_RESET,
@@ -59,13 +61,7 @@ enum {
     EVENT_MQTT_DISCONNECTED,
     EVENT_MQTT_UNEXPECTED_RESPONSE,
     EVENT_MQTT_SOCKET_ERROR,
-
-
 };
-
-
-
-
 
 struct LogEntry {
     uint8_t type;
@@ -74,31 +70,35 @@ struct LogEntry {
     uint8_t repeat;
 };
 
+
+
+/*******************************************************************************
+ *
+ * @brief   System event logger class
+ * 
+ *******************************************************************************/
 class Logger {
+
   public:
-
     Logger();
-
     void add( uint8_t eventID, uint32_t flags = 0 );
     uint8_t getLastIndex();
     uint8_t getFirstIndex();
-
     bool printLogEntry( ConsoleBase *console, uint8_t index );
-
-    
 
   
   private:
-    LogEntry _entries[ MAX_LOG_ENTRIES ];
-    uint8_t _ptrHead = 0;
-    uint8_t _ptrTail = 0;
-
     uint32_t getTimestamp();
     void printLogEntryMessage( IPrint *objPrint, uint8_t type, uint32_t flags );
 
-    
+    LogEntry _entries[ MAX_LOG_ENTRIES ];   /* System log table */
+    uint8_t _ptrHead = 0;                   /* Pointer to the most recent event */
+    uint8_t _ptrTail = 0;                   /* Pointer to the oldest event */
 };
 
+
+/* System event logger */
 extern Logger g_log;
+
 
 #endif /* LOGGER_H */

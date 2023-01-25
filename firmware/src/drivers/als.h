@@ -22,6 +22,9 @@
 #include <Wire.h>
 #include <itask.h>
 
+
+
+/* TSL2591 I2C bus address */
 #define TSL2591_I2C_ADDR        0x29
 
 /* TSL2591 registers */
@@ -44,7 +47,10 @@
 #define TSL2591_REG_C1DATAL     0x16
 #define TSL2591_REG_C1DATAH     0x17
 
+/* TSL2591 flags */
 #define TSL2591_COMMAND_SELECT      0x80
+
+/* TSL2591 Transaction types */
 #define TSL2591_TRANSACTION_NORMAL  0x20
 #define TSL2591_TRANSACTION_SPECIAL 0x60
 
@@ -71,7 +77,7 @@
 #define TSL2591_ENABLE_NPIEN        0x80
 #define TSL2591_ENABLE_OFF          0x00
 
-
+/* Limits */
 #define ALS_MINIMUM_STABLE_DELAY    2000
 #define ALS_STABLE_RANGE            5
 #define ALS_FADE_STEPS_MS           8
@@ -86,37 +92,38 @@ enum {
 };
 
 
+/*******************************************************************************
+ *
+ * @brief   Ambiant light sensor (TSL2591) driver class
+ * 
+ *******************************************************************************/
 class ALS {
 
   public:
     ALS();
-
     void onPowerStateChange( uint8_t state );
     void suspend();
     void resume();
     void processEvents();
-
     void begin();
 
 
   private:
-
     bool configure( uint8_t gain, uint8_t integration );
     bool writeByte( uint8_t command, uint8_t value );
     uint8_t readByte( uint8_t address );
     uint16_t readWord( uint8_t address );
-
-    bool _init = false;
-    uint32_t _lastIntegrationStart;
-    uint32_t _lastValueChange;
-    uint8_t _currentAmbientDimming;
-    uint8_t _targetAmbientDimming;
-
     uint8_t calculateAmbientDimming();
 
+    bool _init = false;               /* Class initialized */
+    uint32_t _lastIntegrationStart;   /* Timestamp of the last integration start */
+    uint32_t _lastValueChange;        /* Timestamp of the previous diming ammount change */
+    uint8_t _currentAmbientDimming;   /* Current dimming amount */
+    uint8_t _targetAmbientDimming;    /* Target dimming amount */
 };
 
-extern ALS g_als;
 
+/* Ambiant light sensor */
+extern ALS g_als;
 
 #endif  /* _TSL2591_H */

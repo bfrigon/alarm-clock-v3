@@ -18,6 +18,8 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+
+
 #define FIRMWARE_VERSION        "2023.1.1"
 
 #endif /* VERSION_H */

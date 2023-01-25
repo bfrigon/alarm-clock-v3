@@ -18,21 +18,20 @@
 #ifndef CONSOLE_BASE_H
 #define CONSOLE_BASE_H
 
+
 #include <Arduino.h>
 #include <resources.h>
 #include <itask.h>
 #include <iprint.h>
 
 
+
+/* Limits */
 #define INPUT_BUFFER_LENGTH         80
 #define CMD_HISTORY_BUFFER_LENGTH   256
 
-
-
-// ----------------------------------------
-// Console tasks ID's
-// ----------------------------------------
-enum {
+/* Console tasks ID's */ 
+enum consoleTaskIds {
     TASK_CONSOLE_PRINT_HELP = 1,
     TASK_CONSOLE_NET_RESTART,
     TASK_CONSOLE_NET_STATUS,
@@ -53,10 +52,7 @@ enum {
     TASK_CONSOLE_MQTT_DISABLE,
 };
 
-
-// ----------------------------------------
-// Command names
-// ----------------------------------------
+/* Accepted commands */ 
 PROG_STR( S_COMMAND_HELP,             "help" );
 PROG_STR( S_COMMAND_EXIT,             "exit" );
 PROG_STR( S_COMMAND_CLEAR,            "clear" );
@@ -89,10 +85,7 @@ PROG_STR( S_COMMAND_MQTT_DISABLE,     "mqtt disable");
 PROG_STR( S_COMMAND_MQTT_STATUS,      "mqtt status");
 PROG_STR( S_COMMAND_MQTT_SEND,        "mqtt send");
 
-
-// ----------------------------------------
-// Command help strings
-// ----------------------------------------
+/* Command descriptions */ 
 PROG_STR( S_HELP_HELP,                "Display this message." );
 PROG_STR( S_HELP_REBOOT,              "Restart the firmware." );
 PROG_STR( S_HELP_SET_TIMEZONE,        "Set the time zone." );
@@ -116,19 +109,13 @@ PROG_STR( S_HELP_MQTT_DISABLE,        "Disable the MQTT client" );
 PROG_STR( S_HELP_MQTT_STATUS,         "Display the client connection status" );
 PROG_STR( S_HELP_MQTT_SEND_TOPIC,     "Send a message" );
 
-
-// ----------------------------------------
-// Command usage help
-// ----------------------------------------
+/* Commands usage */ 
 PROG_STR( S_USAGE_NSLOOKUP,           "nslookup [hostname]" );
 PROG_STR( S_USAGE_PING,               "ping [host]" );
 PROG_STR( S_USAGE_SERVICE,            "service [name] (enable|disable|status)" );
 PROG_STR( S_USAGE_MQTT_SEND,          "mqtt send [topic] [payload]" );
 
-
-// ----------------------------------------
-// Commands listed on the help menu
-// ----------------------------------------
+/* Commands listed on the help menu */
 #define CONSOLE_HELP_MENU_ITEMS       22
 const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_HELP,
@@ -179,46 +166,43 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_MQTT_SEND_TOPIC,
 };
 
-enum { 
+enum ctrlSequences { 
     CTRL_SEQ_CLEAR_SCREEN,
     CTRL_SEQ_CLEAR_SCROLLBACK,
     CTRL_SEQ_CURSOR_POSITION,
     CTRL_SEQ_ERASE_LINE,
     CTRL_SEQ_CURSOR_COLUMN,
     CTRL_SEQ_CURSOR_LEFT,
-
 };
 
 
 
-
-
+/*******************************************************************************
+ *
+ * @brief   Console base class
+ * 
+ *******************************************************************************/
 class ConsoleBase : public IPrint, protected ITask {
 
   public:
     ConsoleBase();
-
     virtual void runTasks() = 0;
-
     void printDateTime( DateTime *dt, const char *timezone, int16_t ms = -1 );
     void printErrorMessage( int8_t error );
     void clearScreen();
 
+
   protected:
-    
-    
     void resetInput();
     void displayPrompt();
-
     virtual int _read() = 0;
     virtual int _peek() = 0;
     virtual int _available() = 0;
-
     virtual void exitConsole( bool timeout = false ) = 0;
     virtual void resetConsole() = 0;
 
-  private:
 
+  private:
     char _inputBuffer[ INPUT_BUFFER_LENGTH + 1 ];
     char _historyBuffer[ CMD_HISTORY_BUFFER_LENGTH + 1];
     char* _inputParameter;
@@ -231,17 +215,13 @@ class ConsoleBase : public IPrint, protected ITask {
     
     bool processInput();
     void trimInput();
-    
     void parseCommand();
     bool matchCommandName( const char *command, bool hasParameter = false ); 
     char* getInputParameter();
     void readHistoryBuffer( bool forward );
     void writeHistoryBuffer();
-    
     void sendControlSequence( uint8_t sequence, uint8_t row = 1, uint8_t col = 1 );
     void processControlSequence( char ch );
-
-    
 
     // ----------------------------------------
     // Commands
@@ -332,7 +312,5 @@ class ConsoleBase : public IPrint, protected ITask {
     /* mqtt status */
     void runCommandMqttStatus();
 };
-
-
 
 #endif  /* CONSOLE_H */

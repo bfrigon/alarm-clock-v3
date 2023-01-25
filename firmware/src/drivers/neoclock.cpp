@@ -21,15 +21,13 @@
 #include <ui/screen.h>
 #include <ui/ui.h>
 #include <config.h>
-
 #include "neoclock.h"
 #include "rtc.h"
 #include "power.h"
 
 
 
-
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -43,7 +41,7 @@ NeoClock::NeoClock( int8_t pin_leds, int8_t pin_shdn ) : NeoPixel( pin_leds, pin
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the clock display back to it's default state.
  *
@@ -66,7 +64,7 @@ void NeoClock::restoreClockDisplay() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Refresh the lamp NeoPixel data.
  * 
@@ -149,7 +147,7 @@ void NeoClock::update() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if the pixels needs to be updated.
  * 
@@ -159,7 +157,7 @@ void NeoClock::processEvents() {
     DateTime now = g_rtc.now();
     
 
-    /* If time has changed, update the clock display */
+    /* If time has changed, update the clock display. */
     if( now != _prevDate ) {
         _prevDate = now;
 
@@ -170,7 +168,7 @@ void NeoClock::processEvents() {
         this->requestClockUpdate();
     }
 
-    /* Update the clock display when blinking state changes */
+    /* Update the clock display when blinking state changes. */
     if( millis() - _flashTimerStart > ( this->flashRate * 10 ) ) {
         _flashTimerStart = millis();
         _flashState = !( _flashState );
@@ -180,7 +178,7 @@ void NeoClock::processEvents() {
         }
     }
 
-    /* Update the clock display if requested */
+    /* Update the clock display if requested. */
     if( _updateRequested == true ) {
 
         g_clock.update();
@@ -189,7 +187,7 @@ void NeoClock::processEvents() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets pixel for a given segment digit position. Each digits 
  *          contains 7 pixels.
@@ -209,24 +207,24 @@ void NeoClock::setDigitPixels( uint8_t* pixmap, uint8_t pos, uint8_t value ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Turn on all the leds on the display.
  *
- * @param   testMode    True to enable pixel test mdoe.
+ * @param   testMode    True to enable pixel test mode.
  */
 void NeoClock::setTestMode( bool testMode ) {
     _testMode = testMode;
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Request a clock display update. It only accepts the request 
  *          when the current screen is neither the clock set screen or the 
- *          alarm display screen
+ *          alarm display screen.
  *
- * @return  TRUE if the request is accepted, FALSE otherwise
+ * @return  TRUE if the request is accepted, FALSE otherwise.
  * 
  */
 bool NeoClock::requestClockUpdate( bool force ) {
@@ -242,7 +240,7 @@ bool NeoClock::requestClockUpdate( bool force ) {
                 return true;
             }
         
-            /* Don't update clock display on these screens */
+            /* Don't update clock display on these screens. */
             break;
 
         case SCREEN_ID_ROOT:

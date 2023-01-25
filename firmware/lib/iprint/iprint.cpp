@@ -15,18 +15,20 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include <iprint.h>
 #include <time.h>
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   User stream callback for sending a character.
  *
  * @param   c         Character to send
  * @param   stream    Stream object from which the call originate from.
  *
- * @return  Number of bytes written
+ * @return  Number of bytes written.
  * 
  */
 int IPrint::_cb_putchar( char c, FILE *stream ) {
@@ -39,9 +41,9 @@ int IPrint::_cb_putchar( char c, FILE *stream ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Initialize the IPrint interface
+ * @brief   Initialize the IPrint interface.
  * 
  */
 void IPrint::_initPrint() {
@@ -53,15 +55,15 @@ void IPrint::_initPrint() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Prints a character array
+ * @brief   Prints a character array.
  *
  * @param   str              Pointer to the string to print.
  * @param   ptr_pgm_space    TRUE if 'str' points to a program memory 
- *                           location, FALSE otherwize
+ *                           location, FALSE otherwise.
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::_print( const char *str, bool ptr_pgm_space ) {
@@ -93,20 +95,20 @@ size_t IPrint::_print( const char *str, bool ptr_pgm_space ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array within a fixed length. Adds padding before 
- *          or after the character array if it is less than the fixed length
+ *          or after the character array if it is less than the fixed length.
  *
  * @param   str              Pointer to the string to print.
  * @param   length           Maximum number of characters to print, including 
- *                           padding
+ *                           padding.
  * @param   align            Text alignment ( TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 
  *                           TEXT_ALIGN_RIGHT )
  * @param   ptr_pgm_space    True if 'str' points to a program memory location, 
  *                           FALSE otherwize
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::_print( const char *str, uint8_t length, uint8_t align, bool ptr_pgm_space ) {
@@ -191,9 +193,9 @@ size_t IPrint::_print( const char *str, uint8_t length, uint8_t align, bool ptr_
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Prints a single character
+ * @brief   Prints a single character.
  *
  * @param   c    Character to print
  *
@@ -202,14 +204,14 @@ size_t IPrint::_print( const char *str, uint8_t length, uint8_t align, bool ptr_
  */
 size_t IPrint::print( char c ) {
 
-    /* Call the print function implemented in the parent class */
+    /* Call the print function implemented in the parent class. */
     return this->_print( c );
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Prints a character array contained in SRAM
+ * @brief   Prints a character array contained in SRAM.
  *
  * @param   str    Pointer to the string to print.
  *
@@ -220,7 +222,7 @@ size_t IPrint::print( const char *str ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array contained in SRAM within a fixed length. 
  * 
@@ -232,7 +234,7 @@ size_t IPrint::print( const char *str ) {
  * @param   align     Text alignment ( TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 
  *                    TEXT_ALIGN_RIGHT )
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::print( const char *str, uint8_t length, uint8_t align ) {
@@ -240,11 +242,11 @@ size_t IPrint::print( const char *str, uint8_t length, uint8_t align ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Sends a carriage return character
+ * @brief   Sends a carriage return character.
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::println() {
@@ -252,14 +254,14 @@ size_t IPrint::println() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array contained in SRAM and sends a 
- *          carriage return character
+ *          carriage return character.
  *
  * @param   str    Pointer to the string to print.
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::println( const char *str ) {
@@ -272,7 +274,7 @@ size_t IPrint::println( const char *str ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array contained in SRAM within a fixed length 
  *          and sends a carriage return. 
@@ -285,7 +287,7 @@ size_t IPrint::println( const char *str ) {
  * @param   align     Text alignment ( TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 
  *                    TEXT_ALIGN_RIGHT )
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::println( const char *str, uint8_t length, uint8_t align ) {
@@ -298,7 +300,7 @@ size_t IPrint::println( const char *str, uint8_t length, uint8_t align ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a formated string using a format string contained in SRAM.
  *
@@ -321,7 +323,7 @@ size_t IPrint::printf( const char *format, ... ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a formated string using a format string contained in SRAM
  *          and sends a carriage return.
@@ -347,13 +349,13 @@ size_t IPrint::printfln( const char *format, ... ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Prints a character array contained in program memory
+ * @brief   Prints a character array contained in program memory.
  *
  * @param   str    Pointer to the string to print.
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::print_P( const char *str ) {
@@ -361,7 +363,7 @@ size_t IPrint::print_P( const char *str ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array contained in program memory within 
  *          a fixed length. 
@@ -374,7 +376,7 @@ size_t IPrint::print_P( const char *str ) {
  * @param   align     Text alignment ( TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 
  *                    TEXT_ALIGN_RIGHT )
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::print_P( const char *str, uint8_t length, uint8_t align ) {
@@ -382,14 +384,14 @@ size_t IPrint::print_P( const char *str, uint8_t length, uint8_t align ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array contained in program memory and sends 
- *          a carriage return character
+ *          a carriage return character.
  *
  * @param   str    Pointer to the string to print.
  *
- * @return  Number of characters written
+ * @return  Number of characters written.
  * 
  */
 size_t IPrint::println_P( const char *str ) {
@@ -402,7 +404,7 @@ size_t IPrint::println_P( const char *str ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a character array contained in program memory within a 
  *          fixed length and sends a carriage return. 
@@ -428,7 +430,7 @@ size_t IPrint::println_P( const char *str, uint8_t length, uint8_t align ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a formated string using a format string contained in 
  *          program memory.
@@ -452,7 +454,7 @@ size_t IPrint::printf_P( const char *format, ... ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints a formated string using a format string contained in 
  *          program memory and sends a carriage return.
@@ -478,14 +480,14 @@ size_t IPrint::printfln_P( const char *format, ... ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Prints a formated time interval
+ * @brief   Prints a formated time interval.
  *
  * @param   time         Number of seconds
  * @param   separator    String in program memory to use to separate components
  * @param   compact      TRUE prints a compact representation of the inteval, 
- *                       FALSE otherwise
+ *                       FALSE otherwise.
  *
  * @return  Number of characters printed.
  * 

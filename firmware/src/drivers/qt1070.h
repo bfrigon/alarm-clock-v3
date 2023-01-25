@@ -23,6 +23,7 @@
 #include <Wire.h>
 
 
+
 /* --- I2C address --- */
 #define I2C_ADDR_AT42QT1070     0x1B
 
@@ -54,10 +55,7 @@
 #define KEY_NEXT                KEY_RIGHT
 
 
-
-
-/* --- Status block --- */
-
+/* Status block */
 typedef struct {
     /* Address 2 */
     bool touch: 1;          /* Key detected flag */
@@ -98,15 +96,15 @@ struct configBlock {
 
 
 
-
+/*******************************************************************************
+ *
+ * @brief   Capacitive touch controller class
+ * 
+ *******************************************************************************/
 class QT1070 {
 
   public:
-    statusBlock status;
-    configBlock config;
-
     QT1070( uint8_t pin_irq );
-
     void begin();
     void enableInterrupt();
     void disableInterrupt();
@@ -114,7 +112,8 @@ class QT1070 {
     bool writeConfig();
     uint8_t processEvents();
 
-
+    statusBlock status;
+    configBlock config;
     uint16_t longKeyDelay = 1200;
     uint16_t repeatDelay = 750;
     uint16_t repeatRate = 125;
@@ -125,7 +124,6 @@ class QT1070 {
   private:
     uint8_t write( uint8_t reg, void *data, uint8_t size );
     uint8_t read( uint8_t reg, void *data, uint8_t size );
-
     uint8_t processKeyStandardMode( uint8_t key, uint16_t lastEventDelay );
     uint8_t processKeyRepeatMode( uint8_t key, uint16_t lastEventDelay );
 
@@ -134,12 +132,12 @@ class QT1070 {
     uint8_t firstKeyState = 0;
     uint8_t lastKeyState = 0;
     unsigned long lastEventStart = 0;
-
-
 };
 
 void isr_qt1070();
 
+
+/* Keypad driver */
 extern QT1070 g_keypad;
 
 #endif /* QT1070_H */

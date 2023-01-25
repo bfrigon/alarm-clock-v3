@@ -81,10 +81,14 @@
 #define RTC_ALARM_EVERY_HOUR    2
 
 
+/*******************************************************************************
+ *
+ * @brief   Real time clock driver (DS3231) class
+ * 
+ *******************************************************************************/
 class DS3231 {
 
   public:
-
     DS3231( int8_t pin_irq );
     void begin();
     void setAlarmFrequency( uint8_t freq );
@@ -98,10 +102,9 @@ class DS3231 {
     void dumpRegs();
     uint16_t getMillis();
     void resetMillis();
-
     void adjustClock( DateTime *ndt, int16_t delay );
-
     DateTime* now()     { return &_now; }
+
 
   private:
     uint8_t read( uint8_t reg );
@@ -109,7 +112,6 @@ class DS3231 {
 
     bool _init = false;
     int8_t _pin_irq;
-
     unsigned long _secStart;
     unsigned long _delayStart;
     DateTime _now;
@@ -119,6 +121,8 @@ class DS3231 {
 
 void isr_ds3231();
 
+
+/* Real time clock*/
 extern DS3231 g_rtc;
 
 #endif /* RTC_H */

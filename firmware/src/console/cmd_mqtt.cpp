@@ -20,6 +20,14 @@
 #include "services/mqtt.h"
 
 
+
+/*******************************************************************************
+ * 
+ * @brief   Starts the 'mqtt send' command task.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
 bool ConsoleBase::beginTaskMqttSend() {
 
     /* Check if parameters are provided */
@@ -36,7 +44,7 @@ bool ConsoleBase::beginTaskMqttSend() {
     }
 
     /* Split parameters. first one is the message topic, second one is 
-    the payload */
+    the payload. */
     char *param_topic, *param_payload, *ptr;
     param_topic = strtok_rP( param, PSTR( "\x20" ), &ptr );
     param_payload = ptr;
@@ -59,6 +67,11 @@ bool ConsoleBase::beginTaskMqttSend() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Monitor the 'mqtt send' task completion.
+ * 
+ */
 void ConsoleBase::runTaskMqttSend() {
 
     /* Task still running */
@@ -74,6 +87,13 @@ void ConsoleBase::runTaskMqttSend() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Starts the 'mqtt enable' command task.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
 bool ConsoleBase::beginTaskMqttEnable() {
 
     if( g_config.network.mqtt_enabled == true ) {
@@ -97,6 +117,11 @@ bool ConsoleBase::beginTaskMqttEnable() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Monitor the 'mqtt enable' task completion.
+ * 
+ */
 void ConsoleBase::runTaskMqttEnable() {
 
     /* Task still running */
@@ -112,6 +137,13 @@ void ConsoleBase::runTaskMqttEnable() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Starts the 'mqtt disable' command task.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
 bool ConsoleBase::beginTaskMqttDisable() {
 
     if( g_config.network.mqtt_enabled == false ) {
@@ -135,6 +167,11 @@ bool ConsoleBase::beginTaskMqttDisable() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Monitor the 'mqtt disable' task completion.
+ * 
+ */
 void ConsoleBase::runTaskMqttDisable() {
     /* Task still running */
     if( g_mqtt.isBusy() == true ) {
@@ -150,6 +187,11 @@ void ConsoleBase::runTaskMqttDisable() {
 }
 
 
+/*******************************************************************************
+ * 
+ * @brief   Prints the status of the MQTT client to the console.
+ * 
+ */
 void ConsoleBase::runCommandMqttStatus() {
 
     this->println();
@@ -158,5 +200,4 @@ void ConsoleBase::runCommandMqttStatus() {
     this->printfln_P( S_CONSOLE_MQTT_BROKER_HOST, g_config.network.mqtt_host );
     this->printfln_P( S_CONSOLE_MQTT_BROKER_PORT, g_config.network.mqtt_port );
     this->println();
-
 }

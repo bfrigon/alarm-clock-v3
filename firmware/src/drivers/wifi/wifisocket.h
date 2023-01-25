@@ -46,7 +46,6 @@ struct SocketInfo {
     struct sockaddr _lastSendtoAddr;
 };
 
-
 /* Socket states */
 enum {
   SOCKET_STATE_INVALID,
@@ -61,15 +60,16 @@ enum {
 };
 
 
-//**************************************************************************
-//
-// WiFi socket
-//
-//**************************************************************************
+
+/*******************************************************************************
+ *
+ * @brief   WiFi socket class
+ * 
+ *******************************************************************************/
 class WiFiSocket {
+  
   public:
     WiFiSocket();
-
     SOCKET create( uint16 u16Domain, uint8 u8Type, uint8 u8Flags );
     bool requestBind( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8AddrLen );
     uint8_t bound( SOCKET sock );
@@ -77,13 +77,10 @@ class WiFiSocket {
     uint8_t listening( SOCKET sock );
     bool requestConnect( SOCKET sock, struct sockaddr *pstrAddr, uint8 u8AddrLen );
     uint8_t connected( SOCKET sock );
-        
     sint8 setopt( SOCKET socket, uint8 u8Level, uint8 option_name, const void *option_value, uint16 u16OptionLen );
-        
     int available( SOCKET sock );
     int peek( SOCKET sock );
     int read( SOCKET sock, uint8_t* buf, size_t size );
-    
     size_t write( SOCKET sock, const uint8_t *buf, size_t size );
     sint16 sendto( SOCKET sock, void *pvSendBuffer, uint16 u16SendLength, uint16 flags, struct sockaddr *pstrDestAddr, uint8 u8AddrLen );
     IPAddress remoteIP( SOCKET sock );
@@ -91,7 +88,6 @@ class WiFiSocket {
     sint8 close( SOCKET sock );
     SOCKET accepted( SOCKET sock );
     int hasParent( SOCKET sock, SOCKET child );
-
     void handleEvent( SOCKET sock, uint8 u8Msg, void *pvMsg );
 
 

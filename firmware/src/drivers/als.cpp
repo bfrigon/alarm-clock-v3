@@ -25,7 +25,7 @@
 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Class constructor
  * 
@@ -39,9 +39,9 @@ ALS::ALS() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Initialize the TSL2591 IC
+ * @brief   Initialize the TSL2591 IC.
  * 
  */
 void ALS::begin() {
@@ -49,9 +49,9 @@ void ALS::begin() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Power down the TSL2591 IC
+ * @brief   Power down the TSL2591 IC.
  * 
  */
 void ALS::suspend() {
@@ -66,9 +66,9 @@ void ALS::suspend() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Re-initialize the TSL2591 IC
+ * @brief   Re-initialize the TSL2591 IC.
  * 
  */
 void ALS::resume() {
@@ -93,9 +93,9 @@ void ALS::resume() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Sets the sensor gain and integration time
+ * @brief   Sets the sensor gain and integration time.
  * 
  * @param   gain           ADC gain
  * @param   integration    Integration time
@@ -117,9 +117,9 @@ bool ALS::configure( uint8_t gain, uint8_t integration ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Called when system power state changes 
+ * @brief   Called when system power state changes.
  * 
  * @param   state   New power state
  * 
@@ -135,7 +135,7 @@ void ALS::onPowerStateChange( uint8_t state ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Monitor ambient lighting for changes and set the display 
  *          brightness accordingly.
@@ -153,7 +153,7 @@ void ALS::processEvents() {
         /* Calculate required dimming */
         uint8_t dimming = this->calculateAmbientDimming();
 
-        /* Check if the dimming value is outside stable range */
+        /* Check if the dimming value is outside stable range. */
         if( _targetAmbientDimming < ( dimming < ALS_STABLE_RANGE ? 0 : dimming - ALS_STABLE_RANGE ) || 
             _targetAmbientDimming > min( dimming + ALS_STABLE_RANGE, 100 )) {
 
@@ -163,10 +163,10 @@ void ALS::processEvents() {
     }
 
     /* Only change the brightness when the target dimming value has 
-       been stable for the required amount of time */
+       been stable for the required amount of time. */
     if( millis() - _lastValueChange > ALS_MINIMUM_STABLE_DELAY && ( millis() - _lastValueChange ) % ALS_FADE_STEPS_MS == 0 ) {
 
-        /* gradually bring the current dimming value to the target value  */ 
+        /* gradually bring the current dimming value to the target value. */ 
         if( _targetAmbientDimming > _currentAmbientDimming ) {
             _currentAmbientDimming++;
 
@@ -176,7 +176,7 @@ void ALS::processEvents() {
 
         if( _currentAmbientDimming != _targetAmbientDimming ) {
 
-            /* Update clock and lcd ambient dimming values */
+            /* Update clock and lcd ambient dimming values. */
             g_clock.setAmbientDimming( _currentAmbientDimming );
             g_lcd.setAmbientDimming( _currentAmbientDimming );
         }
@@ -184,7 +184,7 @@ void ALS::processEvents() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Calculate the required dimming percentage relative to the 
  *          perceived ambient light. 
@@ -193,7 +193,7 @@ void ALS::processEvents() {
  *          preset. The preset also determine the threshold at which it 
  *          begins dimming. 
  *
- * @return  Percentage of dimming required (0 - preset maximum)
+ * @return  Percentage of dimming required (0 - preset maximum).
  * 
  */
 uint8_t ALS::calculateAmbientDimming() {
@@ -202,21 +202,21 @@ uint8_t ALS::calculateAmbientDimming() {
         return 0;
     }
 
-    /* Read the count from both channels (visible+ir and ir ) */
+    /* Read the count from both channels (visible+ir and ir ). */
     uint16_t vis_ir = this->readWord( TSL2591_REG_C0DATAL );
     uint16_t ir = this->readWord( TSL2591_REG_C1DATAL );
 
-    /* If either one of the channel overflow, no dimming required */
+    /* If either one of the channel overflow, no dimming required. */
     if(( vis_ir == 0xFFFF ) | ( ir == 0xFFFF )) {
         return 0;
     }
 
-    /* Estimate perceived room brightness */
+    /* Estimate perceived room brightness. */
     uint16_t perceived;
     perceived = ( vis_ir > ir ) ? vis_ir - ir : 0;
 
     /* Set the dark threshold and maximum dimming value
-       from the selected preset */
+       from the selected preset. */
     uint16_t dark_threshold;
     uint8_t max_dimming;
     uint8_t min_perceived;
@@ -252,7 +252,7 @@ uint8_t ALS::calculateAmbientDimming() {
     }
 
     /* Calculate the dimming value relative to the perceived brightness bellow the
-       defined dark threshold */
+       defined dark threshold. */
     if( perceived < dark_threshold ) {
         return map( perceived, min_perceived, dark_threshold, max_dimming, 0 );
     } else {
@@ -261,9 +261,9 @@ uint8_t ALS::calculateAmbientDimming() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Write a single byte at the specified address
+ * @brief   Write a single byte at the specified address.
  * 
  * @param   address    Address to write to
  * @param   value      The value to write
@@ -281,13 +281,13 @@ bool ALS::writeByte( uint8_t address, uint8_t value ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Read a single byte from given address
+ * @brief   Read a single byte from given address.
  * 
  * @param   address    Register address to read from
  * 
- * @return  Value at the specified address
+ * @return  Value at the specified address.
  * 
  */
 uint8_t ALS::readByte( uint8_t address ) {
@@ -302,9 +302,9 @@ uint8_t ALS::readByte( uint8_t address ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Read a 16 bits(word) value starting at the given address
+ * @brief   Read a 16 bits(word) value starting at the given address.
  * 
  * @param   address    Register address to read from
  * 

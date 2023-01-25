@@ -20,10 +20,11 @@
 #include <services/ntpclient.h>
 #include <services/telnet_console.h>
 #include <services/mqtt.h>
-
 #include "console_base.h"
 
 
+
+/* Commands syntax */
 PROG_STR( S_ACTION_ENABLE, "enable" );
 PROG_STR( S_ACTION_DISABLE, "disable" );
 PROG_STR( S_ACTION_STATUS, "status" );
@@ -46,9 +47,10 @@ enum {
 };
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
- * @brief   Run the 'service' command
+ * @brief   Run the 'service' command.
  *           
  */
 void ConsoleBase::runCommandService() {
@@ -67,7 +69,7 @@ void ConsoleBase::runCommandService() {
     }
 
     /* Split parameters. first one is the service name, second one is 
-       the action to take */
+       the action to take. */
     char *param_name, *param_action, *ptr;
     param_name = strtok_rP( param, PSTR( "\x20" ), &ptr );
     param_action = strtok_rP( NULL, PSTR( "\x20" ), &ptr );

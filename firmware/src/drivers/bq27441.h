@@ -135,13 +135,16 @@
 
 
 
+/*******************************************************************************
+ *
+ * @brief   Battery monitor (BQ27441) driver class
+ * 
+ *******************************************************************************/
 class BQ27441 {
 
   public:
     BQ27441();
-
     bool begin( uint16_t capacity );
-
     bool isReady();
     bool isBatteryPresent();
     bool isCharging();
@@ -149,12 +152,12 @@ class BQ27441 {
     uint8_t getBatteryState();
     int16_t getAvgPower();
     int16_t getAvgCurrent();
-
     int8_t getStateOfHealth();
     uint8_t getStateOfCharge( bool filtered = true );
     uint16_t getRemainingCapacity( bool filtered = true );
     uint16_t getFullCapacity( bool filtered = true );
     uint16_t getVoltage();
+
 
   private:
     uint8_t read( uint8_t reg, void* data, uint8_t size );
@@ -163,7 +166,6 @@ class BQ27441 {
     bool writeDataBlock( uint8_t classID, uint8_t blockID, void* data, uint8_t length );
     bool readDataBlock( uint8_t classID, uint8_t blockID, void* data, uint8_t length );
     uint8_t calcBlockChecksum();
-    
     uint16_t readWord( uint8_t reg );
     uint16_t readControlData( uint16_t function );
     bool executeControlCommand( uint16_t function );
@@ -172,11 +174,11 @@ class BQ27441 {
     bool seal();
     bool unseal();
 
-    bool _init = false;
+    bool _init = false;     /* Class initialized */
 };
 
 
+/* Battery monitor */
 extern BQ27441 g_battery ;
-
 
 #endif /* BQ27441_H */

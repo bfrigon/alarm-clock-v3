@@ -20,11 +20,11 @@
 #include <task_errors.h>
 #include <services/ntpclient.h>
 #include <freemem.h>
-
 #include "console_base.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -50,9 +50,9 @@ ConsoleBase::ConsoleBase() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Send control sequences to clear the remote terminal screen
+ * @brief   Send control sequences to clear the remote terminal screen.
  * 
  */
 void ConsoleBase::clearScreen() {
@@ -64,7 +64,7 @@ void ConsoleBase::clearScreen() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sends a control sequence to the remote terminal.
  * 
@@ -104,9 +104,9 @@ void ConsoleBase::sendControlSequence( uint8_t sequence, uint8_t param1, uint8_t
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Decode incomming control sequence characters
+ * @brief   Decode incomming control sequence characters.
  * 
  * @param   ch    Next character in the sequence to process
  * 
@@ -143,9 +143,9 @@ void ConsoleBase::processControlSequence( char ch ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Discard the user input
+ * @brief   Discard the user input.
  * 
  */
 void ConsoleBase::resetInput() {
@@ -157,9 +157,9 @@ void ConsoleBase::resetInput() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Check if the input buffer contains the specified command
+ * @brief   Check if the input buffer contains the specified command.
  *
  * @param   command         Command name to find
  * @param   hasParameter    TRUE if the command expects a parameter, 
@@ -201,9 +201,9 @@ bool ConsoleBase::matchCommandName( const char *command, bool hasParameter ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Returns the pointer to the start of the parameter in the input buffer
+ * @brief   Returns the pointer to the start of the parameter in the input buffer.
  *
  * @return  Pointer to the parameter start, 0 if none is found.
  * 
@@ -223,9 +223,9 @@ char* ConsoleBase::getInputParameter() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Remove leading and trailing white spaces from the input buffer
+ * @brief   Remove leading and trailing white spaces from the input buffer.
  * 
  */
 void ConsoleBase::trimInput() {
@@ -253,11 +253,11 @@ void ConsoleBase::trimInput() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Process incomming character and echo the input back accordingly.
  *
- * @return  TRUE if end of line is detected, FALSE otherwise
+ * @return  TRUE if end of line is detected, FALSE otherwise.
  * 
  */
 bool ConsoleBase::processInput() {
@@ -325,7 +325,7 @@ bool ConsoleBase::processInput() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Display an input prompt
  * 
@@ -336,10 +336,10 @@ void ConsoleBase::displayPrompt() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Move the history buffer cursor forward or back and copy the
- *          stored command to the input buffer
+ *          stored command to the input buffer.
  * 
  * @param   forward    TRUE to move forward in the history buffer, FALSE
  *                     otherwise.
@@ -414,10 +414,10 @@ void ConsoleBase::readHistoryBuffer( bool forward ) {
 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Store the current command in the input buffer to the start of 
- *          the history buffer
+ *          the history buffer.
  * 
  */
 void ConsoleBase::writeHistoryBuffer() {
@@ -432,32 +432,32 @@ void ConsoleBase::writeHistoryBuffer() {
     }
 
     /* Don't add if the new item is a duplicate of the 
-       first one in the history buffer */
+       first one in the history buffer. */
     if( strcmp( _inputBuffer, _historyBuffer ) == 0 ) {
         return;
     }
 
     /* Make space for the new item by shifting the content of the history 
-       buffer to the right */
+       buffer to the right. */
     memmove( _historyBuffer + strlen( _inputBuffer ) + 1, _historyBuffer, 
              CMD_HISTORY_BUFFER_LENGTH - strlen( _inputBuffer ));
 
     /* Remove the last command in the history buffer if it does not 
-       fit entierly*/
+       fit entierly. */
     char *ptr = _historyBuffer + CMD_HISTORY_BUFFER_LENGTH ;
     while( *ptr != '\0' && ptr >= _historyBuffer ) {
         *ptr-- = '\0';
     }
 
-    /* Insert the new command in the buffer */
+    /* Insert the new command in the buffer. */
     strcpy( _historyBuffer, _inputBuffer );
 
-    /* Reset the history buffer pointer to the first item */
+    /* Reset the history buffer pointer to the first item. */
     _cmdHistoryPtr = NULL;
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Scan the input buffer for known commands and run them accordingly.
  * 
@@ -596,7 +596,7 @@ void ConsoleBase::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_MQTT_STATUS, false ) == true ) {
         this->runCommandMqttStatus();
 
-    /* No command entered, display the prompt again */
+    /* No command entered, display the prompt again. */
     } else if( strlen( _inputBuffer ) == 0 ) {
 
     /* Unknown command */
@@ -606,7 +606,7 @@ void ConsoleBase::parseCommand() {
     }
 
     /* If command was not executed, display the prompt on a new line
-       and wait for another command  */
+       and wait for another command. */
     if( started == false ) {
 
         if( this->getTaskError() != TASK_SUCCESS ) {
@@ -619,31 +619,29 @@ void ConsoleBase::parseCommand() {
         this->displayPrompt();
     }
 
-    /* Reset the input buffer for the next command */    
+    /* Reset the input buffer for the next command. */    
     this->resetInput();
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Run current tasks
+ * @brief   Run the current tasks.
  * 
  */
 void ConsoleBase::runTasks() {
 
     if( this->getCurrentTask() == TASK_NONE ) {
 
-        /* Reset input buffer limit to it's maximum */
+        /* Reset input buffer limit to it's maximum. */
         _inputBufferLimit = INPUT_BUFFER_LENGTH;
         _inputHidden = false;
 
         /* Enable history buffer */
         _cmdHistoryEnabled = true;
 
-        /* If no task is running, process the input buffer */
+        /* If no task is running, process the input buffer. */
         if( this->processInput() == true ) {
-
-            
 
             /* Store the command in the history buffer */
             this->writeHistoryBuffer();
@@ -657,7 +655,7 @@ void ConsoleBase::runTasks() {
 
     } else {
 
-        /* Task is currently running, call the task runner */
+        /* Task is currently running, call the task runner. */
         switch( this->getCurrentTask() ) {
 
             case TASK_CONSOLE_PRINT_HELP:
@@ -744,14 +742,14 @@ void ConsoleBase::runTasks() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   prints the date and time on the console.
  * 
- * @param   dt          dateTime object holding the date/time to print
+ * @param   dt          dateTime object holding the date/time to print.
  * @param   timezone    Timezone abbreviation
  * @param   ms          Milliseconds to display. Set to -1 to not display 
- *                      the milliseconds
+ *                      the milliseconds.
  * 
  */
 void ConsoleBase::printDateTime( DateTime *dt, const char *timezone, int16_t ms ) {
@@ -782,7 +780,7 @@ void ConsoleBase::printDateTime( DateTime *dt, const char *timezone, int16_t ms 
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Print the error message of a given error ID.
  * 

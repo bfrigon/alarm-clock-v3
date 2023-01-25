@@ -18,6 +18,7 @@
 #ifndef TIMEZONE_H
 #define TIMEZONE_H
 
+
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <time.h>
@@ -90,23 +91,26 @@ int16_t getTzRegionEndIndex( uint8_t region );
 uint16_t getTzRegionSize( uint8_t region );
 
 
+/*******************************************************************************
+ *
+ * @brief   Timezone manager class
+ * 
+ *******************************************************************************/
 class TimeZone {
+
   public: 
     TimeZone();
-
     bool setTimezoneByID( uint16_t id );
     bool setTimezoneByName( char *name );
-    
     const char* getName();
     const char* getAbbreviation( DateTime *local );
-
     void toLocal( DateTime *utc );
     void toUTC( DateTime *local );
     int16_t getStdUtcOffset();
     int16_t getDstUtcOffset();
-
     bool isDST( DateTime *local );
     void getTransition( int16_t year, bool stdToDst, DateTime *dt );
+
 
   private:
     uint16_t _id = 0;

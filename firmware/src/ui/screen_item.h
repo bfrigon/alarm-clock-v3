@@ -23,22 +23,20 @@
 
 
 /* Item attributes */
-#define ITEM_NORMAL                     0x00
-#define ITEM_NOCURSOR                   0x08
-#define ITEM_BREAK                      0x10
-#define ITEM_EDIT_FULLSCREEN            0x20
-#define ITEM_COMPACT                    0x40
-#define ITEM_READONLY                   0x80
-
-#define ITEM_LIST_SRAM_POINTER          0x01
-#define ITEM_LIST_PROGMEM_POINTER       0x00
-#define ITEM_LIST_VALUE_INT8            0x00
-#define ITEM_LIST_VALUE_INT16           0x02
-#define ITEM_CAPTION_SRAM_POINTER       0x04
-#define ITEM_CAPTION_PROGMEM_POINTER    0x00
-#define ITEM_NUMBER_INC_DIGITS          0x00
-#define ITEM_NUMBER_INC_WHOLE           0x02
-
+#define ITEM_NORMAL                     0x00    /* No attributes */
+#define ITEM_NOCURSOR                   0x08    /* Non-selectable item */
+#define ITEM_BREAK                      0x10    /* Scroll the item to the top of the screen when selected */
+#define ITEM_EDIT_FULLSCREEN            0x20    /* Edit item value full screen */
+#define ITEM_COMPACT                    0x40    /* Display edit field only, no caption */
+#define ITEM_READONLY                   0x80    /* Non-editable value */
+#define ITEM_LIST_SRAM_POINTER          0x01    /* List items names are stored in SRAM */
+#define ITEM_LIST_PROGMEM_POINTER       0x00    /* List items names are stored in program memory */
+#define ITEM_LIST_VALUE_INT8            0x00    /* Selected list item represented by an 8-bit integer */
+#define ITEM_LIST_VALUE_INT16           0x02    /* Selected list item represented by an 16-bit integer */
+#define ITEM_CAPTION_SRAM_POINTER       0x04    /* Item caption stored in SRAM */
+#define ITEM_CAPTION_PROGMEM_POINTER    0x00    /* Item caption stored in program memory */
+#define ITEM_NUMBER_INC_DIGITS          0x00    /* Increment value individual digits */
+#define ITEM_NUMBER_INC_WHOLE           0x02    /* Increment value as a whole */
 
 /* Item types */
 enum {
@@ -65,11 +63,6 @@ enum {
 };
 
 
-//**************************************************************************
-//
-// Screen item definition macros
-//
-//**************************************************************************
 #define ITEM_END() \
     { ITEM_TYPE_NULL, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, NULL }
 
@@ -110,12 +103,7 @@ enum {
     { ITEM_TYPE_DOW, id, row, col, caption, value, 0, 0, 0, options, NULL }
 
 
-//**************************************************************************
-//
-// Screen items class
-//
-//**************************************************************************
-
+/* Screen item */
 struct ScreenItemBase {
     uint8_t _type;
     uint8_t _id;
@@ -130,10 +118,16 @@ struct ScreenItemBase {
     const void* _list;
 };
 
+
+
+/*******************************************************************************
+ *
+ * @brief   UI screen item class
+ * 
+ *******************************************************************************/
 class ScreenItem : protected ScreenItemBase {
 
   public:
-
     ScreenItem();
     void loadFromProgmem( const struct ScreenItemBase* item );
     void unload();

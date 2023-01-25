@@ -19,15 +19,16 @@
 #include <task_errors.h>
 #include <drivers/power.h>
 #include <alarm.h>
-
 #include "ui.h"
+
 
 
 uint8_t menuSettings_selectedItem = 0;
 bool confirm_action = false;
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Event raised when an item on the screen change it's value
  *
@@ -40,7 +41,7 @@ void settingsMenu_onValueChange( Screen* screen, ScreenItem* item ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when entering the screen
  *
@@ -62,7 +63,7 @@ void settingsManager_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when updating the screen.
  *
@@ -139,9 +140,9 @@ bool settingsManager_onDrawScreen( Screen* screen ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs.
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.

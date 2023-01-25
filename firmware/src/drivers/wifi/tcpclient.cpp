@@ -26,7 +26,8 @@
 #include "wifisocket.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Default class constructor
  * 
@@ -36,7 +37,7 @@ TCPClient::TCPClient() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Create a class instance and assign a specific socket ID.
  * 
@@ -49,14 +50,14 @@ TCPClient::TCPClient( SOCKET sock ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Establish a secure connection to the given host name and port
+ * @brief   Establish a secure connection to the given host name and port.
  * 
  * @param   host    Hostname to connect to
  * @param   port    Port number to connect to 
  * 
- * @return  1 if successful, 0 otherwise
+ * @return  1 if successful, 0 otherwise.
  * 
  */
 int TCPClient::connectSSL( const char* host, uint16_t port ) {
@@ -65,15 +66,15 @@ int TCPClient::connectSSL( const char* host, uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Establish a secure connection to the given host IP address 
- *          and port
+ *          and port.
  * 
- * @param   ip      IP address of the remote host
- * @param   port    Port number to connect to 
+ * @param   ip      IP address of the remote host.
+ * @param   port    Port number to connect to.
  * 
- * @return  1 if successful, 0 otherwise
+ * @return  1 if successful, 0 otherwise.
  * 
  */
 int TCPClient::connectSSL( IPAddress ip, uint16_t port ) {
@@ -81,14 +82,14 @@ int TCPClient::connectSSL( IPAddress ip, uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Establish a connection to the given host name and port
+ * @brief   Establish a connection to the given host name and port.
  * 
- * @param   host    Hostname to connect to
- * @param   port    Port number to connect to 
+ * @param   host    Hostname to connect to.
+ * @param   port    Port number to connect to .
  * 
- * @return  1 if successful, 0 otherwise
+ * @return  1 if successful, 0 otherwise.
  * 
  */
 int TCPClient::connect( const char* host, uint16_t port ) {
@@ -96,14 +97,14 @@ int TCPClient::connect( const char* host, uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Establish a connection to the given host IP address and port
+ * @brief   Establish a connection to the given host IP address and port.
  * 
- * @param   ip      IP address of the remote host
- * @param   port    Port number to connect to 
+ * @param   ip      IP address of the remote host.
+ * @param   port    Port number to connect to.
  * 
- * @return  1 if successful, 0 otherwise
+ * @return  1 if successful, 0 otherwise.
  * 
  */
 int TCPClient::connect( IPAddress ip, uint16_t port ) {
@@ -111,16 +112,16 @@ int TCPClient::connect( IPAddress ip, uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Establish a connection to the given host name and port and set
  *          socket options.
  * 
- * @param   host    Hostname to connect to
- * @param   port    Port number to connect to 
- * @param   opt     Socket options
+ * @param   host    Hostname to connect to.
+ * @param   port    Port number to connect to.
+ * @param   opt     Socket options.
  * 
- * @return  1 if successful, 0 otherwise
+ * @return  1 if successful, 0 otherwise.
  * 
  */
 int TCPClient::connect( const char* host, uint16_t port, uint8_t opt ) {
@@ -141,24 +142,24 @@ int TCPClient::connect( const char* host, uint16_t port, uint8_t opt ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Establish a connection to the given host name and port and set
  *          socket options.
  * 
- * @param   ip          IP address of the remote host
- * @param   port        Port number to connect to
- * @param   opt         Socket options
- * @param   hostname    Server name indicator, used by SSL socket
+ * @param   ip          IP address of the remote host.
+ * @param   port        Port number to connect to.
+ * @param   opt         Socket options.
+ * @param   hostname    Server name indicator, used by SSL socket.
  * 
- * @return  1 if successful, 0 otherwise
+ * @return  1 if successful, 0 otherwise.
  * 
  */
 int TCPClient::connect( IPAddress ip, uint16_t port, uint8_t opt, const uint8_t *hostname ) {
 
     struct sockaddr_in addr;
 
-    // Initialize socket address structure:
+    /* Initialize socket address structure */
     addr.sin_family = AF_INET;
     addr.sin_port = _htons(port);
     addr.sin_addr.s_addr = ip;
@@ -167,7 +168,7 @@ int TCPClient::connect( IPAddress ip, uint16_t port, uint8_t opt, const uint8_t 
         this->stop();
     }
 
-    // Create TCP socket:
+    /* Create TCP socket */
     if(( _socket = g_wifisocket.create( AF_INET, SOCK_STREAM, opt )) < 0 ) {
         return 0;
     }
@@ -176,7 +177,7 @@ int TCPClient::connect( IPAddress ip, uint16_t port, uint8_t opt, const uint8_t 
         g_wifisocket.setopt( _socket, SOL_SSL_SOCKET, SO_SSL_SNI, hostname, m2m_strlen( (uint8_t *)hostname ));
     }
 
-    // Connect to remote host:
+    /* Connect to remote host */
     if( g_wifisocket.requestConnect( _socket, (struct sockaddr *)&addr, sizeof( struct sockaddr_in )) == false ) {
 
         g_wifisocket.close( _socket );
@@ -188,13 +189,13 @@ int TCPClient::connect( IPAddress ip, uint16_t port, uint8_t opt, const uint8_t 
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Write a single byte into the packet buffer
+ * @brief   Write a single byte into the packet buffer.
  * 
- * @param   byte    Byte to write
+ * @param   byte    Byte to write.
  * 
- * @return  Number of bytes written
+ * @return  Number of bytes written.
  * 
  */
 size_t TCPClient::write( uint8_t byte ) {
@@ -202,14 +203,14 @@ size_t TCPClient::write( uint8_t byte ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Copy from the given buffer into the packet buffer
+ * @brief   Copy from the given buffer into the packet buffer.
  * 
- * @param   buffer    Pointer to the buffer containing the data to write
- * @param   size      Size of the buffer
+ * @param   buffer    Pointer to the buffer containing the data to write.
+ * @param   size      Size of the buffer.
  * 
- * @return  Number of bytes written
+ * @return  Number of bytes written.
  * 
  */
 size_t TCPClient::write( const uint8_t *buffer, size_t size ) {
@@ -231,12 +232,12 @@ size_t TCPClient::write( const uint8_t *buffer, size_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the number of bytes (characters) available for reading from 
  *          the buffer.
  * 
- * @return  Number of bytes available
+ * @return  Number of bytes available.
  * 
  */
 int TCPClient::available() {
@@ -249,7 +250,7 @@ int TCPClient::available() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character from the packet buffer.
  * 
@@ -268,21 +269,21 @@ int TCPClient::read() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads from the packet buffer and copy the data to
- *          the specified buffer
+ *          the specified buffer.
  * 
- * @param   buf     Pointer to a buffer to hold incoming packets
- * @param   size    Maximum size of the buffer
+ * @param   buf     Pointer to a buffer to hold incoming packets.
+ * @param   size    Maximum size of the buffer.
  * 
  * @return  The number of bytes read.
  * 
  */
 int TCPClient::read( uint8_t* buf, size_t size ) {
 
-    // sizeof(size_t) is architecture dependent
-    // but we need a 16 bit data type here
+    /* sizeof(size_t) is architecture dependent
+       but we need a 16 bit data type here. */
     uint16_t size_tmp = available();
     
     if( size_tmp == 0 ) {
@@ -299,11 +300,11 @@ int TCPClient::read( uint8_t* buf, size_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the buffer without discarding it.
  * 
- * @return  Character read or -1 if no character is available
+ * @return  Character read or -1 if no character is available.
  * 
  */
 int TCPClient::peek() {
@@ -316,17 +317,17 @@ int TCPClient::peek() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Unimplemented method of the Print class
+ * @brief   Unimplemented method of the Print class.
  * 
  */
 void TCPClient::flush() {}
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Close the socket 
+ * @brief   Closes the socket. 
  * 
  */
 void TCPClient::stop() {
@@ -341,11 +342,11 @@ void TCPClient::stop() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if the socket is connected. 
  * 
- * @return  1 if connected, 0 otherwise
+ * @return  1 if connected, 0 otherwise.
  * 
  */
 uint8_t TCPClient::connected() {
@@ -357,12 +358,12 @@ uint8_t TCPClient::connected() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Returns whether or not the class has a valid socket ID assigned
- *          to it
+ *          to it.
  * 
- * @return  TRUE if the socket ID is valid or FALSE otherwise
+ * @return  TRUE if the socket ID is valid or FALSE otherwise.
  * 
  */
 TCPClient::operator bool()
@@ -371,14 +372,14 @@ TCPClient::operator bool()
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Compare the socket ID of this instance with another class instance
+ * @brief   Compare the socket ID of this instance with another class instance.
  * 
- * @param   other    Pointer to the other class instance to test
+ * @param   other    Pointer to the other class instance to test.
  * 
  * @return  TRUE if the socket ID is the same that the other 
- *          class or FALSE otherwise
+ *          class or FALSE otherwise.
  * 
  */
 bool TCPClient::operator==( const TCPClient &other ) const {
@@ -387,14 +388,14 @@ bool TCPClient::operator==( const TCPClient &other ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Compare the socket ID of this instance with another class instance
+ * @brief   Compare the socket ID of this instance with another class instance.
  * 
- * @param   other    Pointer to the other class instance to test
+ * @param   other    Pointer to the other class instance to test.
  * 
  * @return  TRUE if the socket ID is NOT the same that the other 
- *          class or FALSE otherwise
+ *          class or FALSE otherwise.
  * 
  */
 bool TCPClient::operator!=( const TCPClient &other ) const {
@@ -403,7 +404,7 @@ bool TCPClient::operator!=( const TCPClient &other ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the server IP address the given socket is connected to.
  * 
@@ -422,13 +423,13 @@ IPAddress TCPClient::remoteIP() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the server port number the given socket is connected to.
  * 
  * @param   sock    Socket ID
  * 
- * @return  The port number
+ * @return  The port number.
  * 
  */
 uint16_t TCPClient::remotePort() {

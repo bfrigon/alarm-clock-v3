@@ -31,6 +31,12 @@
 #define POWER_MODE_SUSPEND          2
 
 
+
+/*******************************************************************************
+ *
+ * @brief   Power management class
+ * 
+ *******************************************************************************/
 class Power {
 
   public:
@@ -51,18 +57,19 @@ class Power {
 
 
   private:
+    void enterSleep();
+
     int8_t _pin_onbatt;
     int8_t _pin_sysoff;
     int8_t _pin_cfgrst;
     uint8_t _mode = POWER_MODE_NORMAL;
     bool _init = false;
     bool _wdt = false;
-
     uint32_t _lpwrTimerStart;
-
-    void enterSleep();
 };
 
+
+/* Power manager */
 extern Power g_power;
 
 #endif /* POWER_H */

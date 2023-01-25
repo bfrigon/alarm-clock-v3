@@ -110,17 +110,15 @@ struct ScreenData {
 };
 
 
-//**************************************************************************
-//
-// Screen class
-//
-//**************************************************************************
+/*******************************************************************************
+ *
+ * @brief   UI screen class
+ * 
+ *******************************************************************************/
 class Screen {
 
   public:
-
     Screen();
-
     void update();
     void selectFirstItem();
     void clearSelection();
@@ -177,29 +175,6 @@ class Screen {
 
 
   private:
-    unsigned long _enterScreenTime;
-    bool _isShowConfirmDialog;
-    bool _itemFullscreen;
-    bool _itemChanged;
-    bool _confirmChanges;
-    uint8_t _selected;
-    uint8_t _returnValue;
-    uint8_t _fieldPos;
-    uint8_t _scroll;
-    uint16_t _timeout;
-    uint16_t _listPrevValue;
-    const ScreenData* _breadCrumbScreen[ SCREEN_MAX_BREADCRUMB_ITEMS ];
-    uint8_t _breadCrumbSelection[ SCREEN_MAX_BREADCRUMB_ITEMS ];
-    uint8_t _breadCrumbIndex;
-    
-    bool _uppercase = false;
-    ScreenItem _currentItem;
-    ScreenData _currentScreen;
-    bool _updateRequested;
-    bool _clearScreenRequested;
-
-    
-
     void drawItem( ScreenItem* item, bool isSelected, uint8_t row, uint8_t col );
     void printListItemValue( ScreenItem* item, uint16_t index, bool isSelected, uint8_t row, uint8_t col );
     uint8_t printItemCaption( ScreenItem* item );
@@ -214,9 +189,29 @@ class Screen {
     char nextValidCharacter( char current );
     uint8_t itemValueToBars( ScreenItem* item );
     void exitFullScreen();
-
     inline uint8_t getNumDigits( uint8_t number );
+
+    unsigned long _enterScreenTime;
+    bool _isShowConfirmDialog;
+    bool _itemFullscreen;
+    bool _itemChanged;
+    bool _confirmChanges;
+    uint8_t _selected;
+    uint8_t _returnValue;
+    uint8_t _fieldPos;
+    uint8_t _scroll;
+    uint16_t _timeout;
+    uint16_t _listPrevValue;
+    const ScreenData* _breadCrumbScreen[ SCREEN_MAX_BREADCRUMB_ITEMS ];
+    uint8_t _breadCrumbSelection[ SCREEN_MAX_BREADCRUMB_ITEMS ];
+    uint8_t _breadCrumbIndex;
+    bool _uppercase = false;
+    ScreenItem _currentItem;
+    ScreenData _currentScreen;
+    bool _updateRequested;
+    bool _clearScreenRequested;
 };
+
 
 extern Screen g_screen;
 

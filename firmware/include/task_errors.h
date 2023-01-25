@@ -18,7 +18,10 @@
 #ifndef TASK_ERRORS_H
 #define TASK_ERRORS_H
 
+
 #include <Arduino.h>
+
+
 
 //extern const char* getErrorMessage( int8_t error );
 
@@ -66,8 +69,4 @@ enum {
 
 };
 
-
-
-
 #endif /* TASK_ERRORS_H */
-

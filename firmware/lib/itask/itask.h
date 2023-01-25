@@ -20,18 +20,22 @@
 
 #include <Arduino.h>
 
-#define TASK_NONE       0
 
 
+#define TASK_NONE         0
 #define TASK_SUCCESS      0
 #define ERR_TASK_FAIL     (-1)
 #define ERR_TASK_TIMEOUT  (-2)
 
 
+/*******************************************************************************
+ *
+ * @brief   Task manager interface
+ * 
+ *******************************************************************************/
 class ITask {
 
   public:
-
     bool isBusy();
     virtual void runTasks();
     uint8_t getCurrentTask();
@@ -41,9 +45,10 @@ class ITask {
 
 
   private:
-    uint8_t _currentTask = TASK_NONE;
-    unsigned long _timerTaskStart = 0;
-    int _taskError = 0;
+    uint8_t _currentTask = TASK_NONE;   /* Current running task ID */
+    unsigned long _timerTaskStart = 0;  /* Timestamp when current task started */
+    int _taskError = 0;                 /* Last running task error */
+
 
   protected:
     uint8_t startTask( uint8_t task, bool force = true );
@@ -52,5 +57,3 @@ class ITask {
 };
 
 #endif /* I_TASK_H */
-
-

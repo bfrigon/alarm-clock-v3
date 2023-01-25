@@ -20,7 +20,6 @@
 #include <tzdata.h>
 #include <config.h>
 #include <task_errors.h>
-
 #include "alarm.h"
 #include "ui/screen.h"
 #include "drivers/lamp.h"
@@ -32,11 +31,11 @@
 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Load settings from EEPROM
+ * @brief   Load settings from EEPROM.
  *
- * @param   section    Which block of the EEPROM configuration to load
+ * @param   section    Which block of the EEPROM configuration to load.
  * 
  */
 void ConfigManager::load( uint8_t section ) {
@@ -45,7 +44,7 @@ void ConfigManager::load( uint8_t section ) {
 
     /* Checks if EEPROM starts with the magic code 'BEEF'. If not, assumes
        the config is not present or corrupted and restore the default
-       settings */
+       settings. */
     if( this->isEepromValid() == false ) {
         this->reset();
         return;
@@ -73,11 +72,11 @@ void ConfigManager::load( uint8_t section ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Save settings to EEPROM
+ * @brief   Save settings to EEPROM.
  * 
- * @param   section    Which block of the EEPROM configuration to load
+ * @param   section    Which block of the EEPROM configuration to load.
  *
  */
 void ConfigManager::save( uint8_t section ) {
@@ -108,11 +107,11 @@ void ConfigManager::save( uint8_t section ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Apply the settings to the different modules.
  * 
- * @param   section    Which block of the EEPROM configuration to load
+ * @param   section    Which block of the EEPROM configuration to load.
  *
  */
 void ConfigManager::apply( uint8_t section ) {
@@ -143,7 +142,7 @@ void ConfigManager::apply( uint8_t section ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Restore default settings or initialize EEPROM contents.
  *
@@ -169,11 +168,11 @@ void ConfigManager::reset() {
     strcpy_P( this->network.discovery_prefix, S_DEFAULT_HA_DISCOVERY_PREFIX );
 
 
-    /* Store default config */
+    /* Store default config. */
     this->save();
 
 
-    /* Save default alarm profiles */
+    /* Save default alarm profiles. */
     struct AlarmProfile profile;
     profile.snoozeDelay = 10;
     profile.volume = 30;
@@ -199,10 +198,10 @@ void ConfigManager::reset() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Look for the magic code at the start of EEPROM to determine if 
- *          the config is present
+ *          the config is present.
  *
  * @return  TRUE if config found, FALSE otherwise.
  * 
@@ -220,7 +219,7 @@ bool ConfigManager::isEepromValid() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Set the config erase flag in the EEPROM configuration block.
  * 
@@ -236,9 +235,9 @@ void ConfigManager::formatEeprom() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Run tasks for the configuration manager
+ * @brief   Run tasks for the configuration manager.
  * 
  */
 void ConfigManager::runTasks() {
@@ -268,7 +267,7 @@ void ConfigManager::runTasks() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Starts the configuration backup task.
  *
@@ -326,7 +325,7 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Stops the configuration backup task.
  *
@@ -343,7 +342,7 @@ void ConfigManager::endBackup( int error ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Starts the configuration restore task.
  *
@@ -373,7 +372,7 @@ bool ConfigManager::startRestore( const char *filename) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Stops the configuration restore task.
  *
@@ -400,12 +399,12 @@ void ConfigManager::endRestore( int error ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next line in the backup file and set the corresponding 
  *          setting value.
  *
- * @return  TRUE if successful, FALSE otherwise
+ * @return  TRUE if successful, FALSE otherwise.
  * 
  */
 bool ConfigManager::readNextLine() {
@@ -427,12 +426,12 @@ bool ConfigManager::readNextLine() {
         return false;
     }
 
-    /* Ignore line if empty */
+    /* Ignore the line if empty. */
     if( strnlen( name, 1 ) == 0 ) {
         return true;
     }
 
-    /* If setting is a section header, find out the section ID from the name */
+    /* If setting is a section header, find out the section ID from the name. */
     if( type == SETTING_TYPE_SECTION ) {
 
         if( strcmp_P( name, SETTING_NAME_SECTION_CLOCK ) == 0 ) {
@@ -625,7 +624,7 @@ bool ConfigManager::readNextLine() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Checks if the settings name on the current line in the config 
  *          file matches the provided name. 
@@ -646,7 +645,7 @@ inline bool ConfigManager::matchSettingName( char* currentName, const char* name
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Converts the user readable format from the backup file and copy 
  *          it to the specified memory location.
@@ -762,7 +761,7 @@ void ConfigManager::parseSettingValue( char* src, void* dest, uint8_t settingTyp
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Parse the current line in the backup file.
  *
@@ -780,7 +779,7 @@ uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
     bool insideQuote = false;
     uint8_t token = TOKEN_NAME;
 
-    /* Reset the name and value buffer */
+    /* Reset the name and value buffer. */
     name[0] = 0;
     value[0] = 0;
 
@@ -863,7 +862,7 @@ uint8_t ConfigManager::parseConfigLine( char* name, char* value ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Write the next setting line to the backup file.
  *
@@ -1078,7 +1077,7 @@ bool ConfigManager::writeNextLine()  {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Converts the setting value from memory to an user readable format.
  *

@@ -19,7 +19,8 @@
 #include "console.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   IPrint interface callback for printing a single character. Sends the 
  *          output to the serial port.
@@ -33,7 +34,7 @@ size_t Console::_print( char c ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the receive buffer.
  * 
@@ -45,7 +46,7 @@ int Console::_read() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the receive buffer without 
  *          discarding it.
@@ -58,7 +59,7 @@ int Console::_peek() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the number of bytes (characters) available for reading from 
  *          the buffer.
@@ -71,7 +72,7 @@ int Console::_available() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Initialize the serial console.
  *
@@ -87,11 +88,11 @@ void Console::begin( unsigned long baud ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Terminate the console session
+ * @brief   Terminate the console session.
  *
- * @param   timeout    TRUE when the session has timed out
+ * @param   timeout    TRUE when the session has timed out.
  * 
  */
 void Console::exitConsole( bool timeout ) {
@@ -101,14 +102,14 @@ void Console::exitConsole( bool timeout ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Clear the screen and display the welcome message
+ * @brief   Clear the screen and display the welcome message.
  * 
  */
 void Console::resetConsole() {
 
-    /* Stop currently running console commands */
+    /* Stop currently running console commands. */
     this->endTask();    
 
     this->clearScreen();
@@ -121,7 +122,7 @@ void Console::resetConsole() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Run console tasks
  * 

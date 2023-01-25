@@ -19,9 +19,10 @@
 #include "ui.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
- * @brief   Event raised when entering the screen
+ * @brief   Event raised when entering the screen.
  *
  * @param   screen    Pointer to the screen where the event occured.
  *
@@ -52,9 +53,9 @@ void showAlarmScreen_onEnterScreen( Screen* screen, uint8_t prevScreenID ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Event raised when leaving the screen
+ * @brief   Event raised when leaving the screen.
  *
  * @param   screen    Current screen.
  *
@@ -70,9 +71,9 @@ bool showAlarmScreen_onExitScreen( Screen* screen  ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Event raised when a key press occurs
+ * @brief   Event raised when a key press occurs.
  *
  * @param   screen    Pointer to the screen where the event occured.
  * @param   key       Detected key press.
@@ -87,7 +88,7 @@ bool showAlarmScreen_onKeypress( Screen *screen, uint8_t key ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Event raised when updating the screen.
  *
@@ -112,7 +113,7 @@ bool showAlarmScreen_onDrawScreen( Screen *screen ) {
         return false;
     }
 
-    /* Get alarm next trigger time */
+    /* Get alarm next trigger time. */
     int16_t alarm_time = g_alarm.getNextAlarmOffset( alarm_id, &local, false );
 
     g_lcd.printf_P( S_ALARM_IN, alarm_id + 1 );

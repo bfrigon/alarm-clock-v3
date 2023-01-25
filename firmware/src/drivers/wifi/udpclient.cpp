@@ -26,7 +26,8 @@
 #include "wifisocket.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor
  * 
@@ -39,11 +40,11 @@ UDPClient::UDPClient() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Starts listening on specified port
+ * @brief   Starts listening on specified port.
  * 
- * @return  1 if successful, 0 if there are no socket available
+ * @return  1 if successful, 0 if there are no socket available.
  * 
  */
 uint8_t UDPClient::begin( uint16_t port ) {
@@ -83,11 +84,11 @@ uint8_t UDPClient::begin( uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Starts listening on specified multicast IP address and port
+ * @brief   Starts listening on specified multicast IP address and port.
  * 
- * @return  1 if successful, 0 if there are no socket available
+ * @return  1 if successful, 0 if there are no socket available.
  * 
  */
 uint8_t UDPClient::beginMulticast( IPAddress ip, uint16_t port ) {
@@ -104,11 +105,11 @@ uint8_t UDPClient::beginMulticast( IPAddress ip, uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check if the socket is bound. 
  * 
- * @return  1 if bound, 0 otherwise
+ * @return  1 if bound, 0 otherwise.
  * 
  */
 uint8_t UDPClient::bound() {
@@ -120,12 +121,12 @@ uint8_t UDPClient::bound() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the number of bytes (characters) available for reading from 
  *          the buffer.
  * 
- * @return  Number of bytes available
+ * @return  Number of bytes available.
  * 
  */
 int UDPClient::available() {
@@ -142,9 +143,9 @@ int UDPClient::available() {
  }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Close the socket 
+ * @brief   Close the socket.
  * 
  */
  void UDPClient::stop() {
@@ -158,13 +159,13 @@ int UDPClient::available() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief  	Start building up a packet to send to the remote host specific 
  *          in ip and port.
  * 
- * @param   ip      IP address of the remote host
- * @param   port    The port of the remote host 
+ * @param   ip      IP address of the remote host.
+ * @param   port    The port of the remote host.
  * 
  * @return  1 if successful, 0 if there was an error.
  */
@@ -178,15 +179,15 @@ int UDPClient::beginPacket( IPAddress ip, uint16_t port )
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Start building up a packet to send to the remote host specific 
- *          in host and port
+ *          in host and port.
  * 
  * @param   host    The address of the remote host.
  * @param   port    The port of the remote host. 
  * 
- * @return  1 if successful, 0 if there was an error
+ * @return  1 if successful, 0 if there was an error.
  * 
  */
 int UDPClient::beginPacket( const char *host, uint16_t port ) {
@@ -210,11 +211,11 @@ int UDPClient::beginPacket( const char *host, uint16_t port ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Finish off this packet and send it
+ * @brief   Finish off this packet and send it.
  * 
- * @return  1 if the packet was sent successfully, 0 if there was an error
+ * @return  1 if the packet was sent successfully, 0 if there was an error.
  * 
  */
 int UDPClient::endPacket() {
@@ -231,13 +232,13 @@ int UDPClient::endPacket() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Write a single byte into the packet buffer
+ * @brief   Write a single byte into the packet buffer.
  * 
  * @param   byte    Byte to write
  * 
- * @return  Number of bytes written
+ * @return  Number of bytes written.
  * 
  */
 size_t UDPClient::write( uint8_t byte ) {
@@ -246,14 +247,14 @@ size_t UDPClient::write( uint8_t byte ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Copy from the given buffer into the packet buffer
+ * @brief   Copy from the given buffer into the packet buffer.
  * 
- * @param   buffer    Pointer to the buffer containing the data to write
- * @param   size      Size of the buffer
+ * @param   buffer    Pointer to the buffer containing the data to write.
+ * @param   size      Size of the buffer.
  * 
- * @return  Number of bytes written
+ * @return  Number of bytes written.
  * 
  */
 size_t UDPClient::write( const uint8_t *buffer, size_t size )
@@ -270,7 +271,7 @@ size_t UDPClient::write( const uint8_t *buffer, size_t size )
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Starts processing the next available incoming packet, checks for 
  *          the presence of a UDP packet, and reports the size.
@@ -298,7 +299,7 @@ int UDPClient::parsePacket() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character from the packet buffer.
  * 
@@ -316,21 +317,21 @@ int UDPClient::read() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads from the packet buffer and copy the data to
- *          the specified buffer
+ *          the specified buffer.
  * 
- * @param   buf     Pointer to a buffer to hold incoming packets
- * @param   size    Maximum size of the buffer
+ * @param   buf     Pointer to a buffer to hold incoming packets.
+ * @param   size    Maximum size of the buffer.
  * 
  * @return  The number of bytes read.
  * 
  */
 int UDPClient::read( unsigned char* buf, size_t size ) {
 
-    // sizeof(size_t) is architecture dependent
-    // but we need a 16 bit data type here
+    /* sizeof(size_t) is architecture dependent
+       but we need a 16 bit data type here */
     uint16_t size_tmp = available();
 
     if( size_tmp == 0 ) {
@@ -351,11 +352,11 @@ int UDPClient::read( unsigned char* buf, size_t size ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the buffer without discarding it.
  * 
- * @return  Character read or -1 if no character is available
+ * @return  Character read or -1 if no character is available.
  * 
  */
 int UDPClient::peek() {
@@ -368,15 +369,15 @@ int UDPClient::peek() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Unimplemented method of the Print class
+ * @brief   Unimplemented method of the Print class.
  * 
  */
 void UDPClient::flush() {}
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the server IP address the given socket is connected to.
  * 
@@ -395,13 +396,13 @@ IPAddress UDPClient::remoteIP() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the server port number the given socket is connected to.
  * 
  * @param   sock    Socket ID
  * 
- * @return  The port number
+ * @return  The port number.
  * 
  */
 uint16_t UDPClient::remotePort() {

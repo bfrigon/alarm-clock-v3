@@ -15,10 +15,12 @@
 // PO Box 1866, Mountain View, CA 94042, USA.
 //
 //******************************************************************************
+
 #include "time.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Initialize the DateTime class with default date and time.
  *
@@ -28,12 +30,12 @@ DateTime::DateTime() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Initialize the DateTime class with date and time from another 
  *          DateTime class.
  *
- * @param   src    source  DateTime object
+ * @param   src    source DateTime object
  * 
  */
 DateTime::DateTime( DateTime *src ) {
@@ -46,9 +48,9 @@ DateTime::DateTime( DateTime *src ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Initialize the DateTime class with specific date/time values
+ * @brief   Initialize the DateTime class with specific date/time values.
  *
  * @param   year     Year
  * @param   month    Month (1-12)
@@ -64,9 +66,9 @@ DateTime::DateTime( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Set the date and time 
+ * @brief   Set the date and time.
  *
  * @param   year     Year
  * @param   month    Month (1-12)
@@ -116,13 +118,13 @@ void DateTime::set( uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Test if two DateTime objects are equal
+ * @brief   Test if two DateTime objects are equal.
  *
  * @param   right    DateTime object to compare this instance to.
  * 
- * @return  TRUE if equal, FALSE otherwise
+ * @return  TRUE if equal, FALSE otherwise.
  * 
  */
 bool DateTime::operator==(const DateTime &right) const {
@@ -136,13 +138,13 @@ bool DateTime::operator==(const DateTime &right) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Test if two DateTime objects are not equal
+ * @brief   Test if two DateTime objects are not equal.
  *
  * @param   right    DateTime object to compare this instance to.
  * 
- * @return  TRUE if NOT equal, FALSE otherwise
+ * @return  TRUE if NOT equal, FALSE otherwise.
  * 
  */
 bool DateTime::operator!=( const DateTime &right ) const { 
@@ -150,13 +152,13 @@ bool DateTime::operator!=( const DateTime &right ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Test if one DateTime is less than the other
+ * @brief   Test if one DateTime is less than the other.
  *
  * @param   right    DateTime object to compare this instance to.
  * 
- * @return  TRUE if less, FALSE otherwise
+ * @return  TRUE if less, FALSE otherwise.
  * 
  */
 bool DateTime::operator<( const DateTime &right ) const {
@@ -174,13 +176,13 @@ bool DateTime::operator<( const DateTime &right ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Test if one DateTime is more than the other
+ * @brief   Test if one DateTime is more than the other.
  *
  * @param   right    DateTime object to compare this instance to.
  * 
- * @return  TRUE if more, FALSE otherwise
+ * @return  TRUE if more, FALSE otherwise.
  * 
  */
 bool DateTime::operator>( const DateTime &right ) const { 
@@ -188,13 +190,13 @@ bool DateTime::operator>( const DateTime &right ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Test if one DateTime is less or equal than the other
+ * @brief   Test if one DateTime is less or equal than the other.
  *
  * @param   right    DateTime object to compare this instance to.
  * 
- * @return  TRUE if less or equal, FALSE otherwise
+ * @return  TRUE if less or equal, FALSE otherwise.
  * 
  */
 bool DateTime::operator<=( const DateTime &right ) const {
@@ -202,13 +204,13 @@ bool DateTime::operator<=( const DateTime &right ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Test if one DateTime is more or equal than the other
+ * @brief   Test if one DateTime is more or equal than the other.
  *
  * @param   right    DateTime object to compare this instance to.
  * 
- * @return  TRUE if more or equal, FALSE otherwise
+ * @return  TRUE if more or equal, FALSE otherwise.
  * 
  */
 bool DateTime::operator>=( const DateTime &right ) const { 
@@ -216,13 +218,13 @@ bool DateTime::operator>=( const DateTime &right ) const {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Adds 'x' seconds to the DateTime object
+ * @brief   Adds 'x' seconds to the DateTime object.
  *
  * @param   right    Amount of seconds to add.
  * 
- * @return  Reference to the left hand DateTime object
+ * @return  Reference to the left hand DateTime object.
  * 
  */
 DateTime& DateTime::operator+=( const uint32_t &right ) {
@@ -278,11 +280,31 @@ DateTime& DateTime::operator+=( const uint32_t &right ) {
     return *this;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Adds 'x' seconds to the DateTime object.
+ *
+ * @param   right    Amount of seconds to add.
+ * 
+ * @return  Reference to the left hand DateTime object.
+ * 
+ */
 DateTime& DateTime::operator+( const uint32_t &right ) {
     *this += right;
     return *this;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Subtract 'x' seconds to the DateTime object.
+ *
+ * @param   right    Amount of seconds to subtract.
+ * 
+ * @return  Reference to the left hand DateTime object.
+ * 
+ */
 DateTime& DateTime::operator-=( const uint32_t &right ) {
 
     if( right == 0 ) {
@@ -336,11 +358,31 @@ DateTime& DateTime::operator-=( const uint32_t &right ) {
     return *this;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Subtract 'x' seconds to the DateTime object.
+ *
+ * @param   right    Amount of seconds to subtract.
+ * 
+ * @return  Reference to the left hand DateTime object.
+ * 
+ */
 DateTime& DateTime::operator-( const uint32_t &right ) {
     *this -= right;
     return *this;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Copy the right hand DateTime object to the left hand DateTime object.
+ *
+ * @param   right    DateTime object to copy
+ * 
+ * @return  Reference to the left hand DateTime object.
+ * 
+ */
 DateTime& DateTime::operator=( const DateTime &right ) {
     if( this == &right ) {
         return *this;
@@ -356,6 +398,17 @@ DateTime& DateTime::operator=( const DateTime &right ) {
     return *this;
 }
 
+
+/*******************************************************************************
+ *
+ * @brief   Sets a DateTime object from a 32-bit integer representing
+ *          the number of seconds since january 1st 2000.
+ *
+ * @param   right    Number of seconds since january 1st 2000.
+ * 
+ * @return  Reference to the left hand DateTime object.
+ * 
+ */
 DateTime& DateTime::operator=( const uint32_t &right ) {
     this->_y = 2000;
     this->_m = 1;
@@ -369,7 +422,7 @@ DateTime& DateTime::operator=( const uint32_t &right ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Adjust the date and time by the 'x' amount of seconds
  *
@@ -386,7 +439,7 @@ void DateTime::offset( long offset ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Gets the day of week from the current date.
  *
@@ -398,7 +451,7 @@ uint8_t DateTime::dow() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Calculate the unix epoch
  * 
@@ -434,7 +487,7 @@ unsigned long DateTime::getEpoch() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the pointer to the string stored in program memory which 
  *          represents the given month.
@@ -468,7 +521,7 @@ const char* getMonthName( uint8_t month, bool shortName ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the pointer to the string stored in program memory which 
  *          represents the given day of week.
@@ -498,14 +551,14 @@ const char* getDayName( uint8_t day, bool shortName ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Get the number of day in a given month
+ * @brief   Get the number of day in a given month.
  *
  * @param   month    Month (1-12) 
  * @param   year     year 
  *
- * @return  The number of days
+ * @return  The number of days.
  * 
  */
 uint8_t getMonthNumDays( uint8_t month, uint16_t year ) {
@@ -529,7 +582,7 @@ uint8_t getMonthNumDays( uint8_t month, uint16_t year ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the day of week from a given date. 
  *
@@ -600,7 +653,7 @@ uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints the time from a given date/time structure into a string.
  *
@@ -608,7 +661,7 @@ uint8_t getDayOfWeek( uint16_t year, uint8_t month, uint8_t day ) {
  * @param   fmt_24h    TRUE for 24H time format or False for am/pm.
  * @param   date       Structure containing the date and time to print.
  *
- * @return  The number of characters written
+ * @return  The number of characters written.
  * 
  */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
@@ -621,7 +674,7 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints the given time into a string.
  *
@@ -629,7 +682,7 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, DateTime *date ) {
  * @param   fmt_24h    TRUE for 24H time format or False for am/pm.
  * @param   time       Structure containing the time to print.
  *
- * @return  The number of characters written
+ * @return  The number of characters written.
  * 
  */
 uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
@@ -653,16 +706,16 @@ uint8_t timeToBuf( char *buffer, bool fmt_24h, Time *time ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints the date from a given date/time structure into a string 
  *          unsign a specific format.
  *
  * @param   buffer     Pointer to the string to write to.
  * @param   format     Date format to use.
- * @param   date       Structure containing the date to print
+ * @param   date       Structure containing the date to print.
  *
- * @return  The number of characters written
+ * @return  The number of characters written.
  * 
  */
 uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
@@ -734,7 +787,7 @@ uint8_t dateToBuf( char *buffer, uint8_t format, DateTime *date ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Parse an integer value from a given array of character
  *
@@ -777,15 +830,15 @@ const char* parse_int( const char *buf, int *dest, int min, int max, uint8_t dig
 } 
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   convert a character array representation of time to a DateTime 
- *          structure
+ *          structure.
  *
  * @param   buf     Pointer to the character array to convert.
  * @param   fmt     Pointer to a character array containing the format used to 
- *                  parse the date/time string
- * @param   dest    DateTime object to store the results to
+ *                  parse the date/time string.
+ * @param   dest    DateTime object to store the results to.
  *
  * @return  Pointer to the first character not processed by this function 
  *          or NULL if it fails to match all of the format string.
@@ -799,8 +852,6 @@ const char* strptime( const char *buf, const char *fmt, DateTime* dest ) {
     uint8_t min = dest->minute();
     uint8_t sec = dest->second();
     int res;
-
-    
     
     while(( *fmt != '\0' ) && ( buf != NULL )) {
 

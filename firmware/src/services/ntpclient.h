@@ -19,7 +19,6 @@
 #define NTPCLIENT_H
 
 #include <Arduino.h>
-
 #include <itask.h>
 #include <drivers/wifi/wifi.h>
 #include <console/console_base.h>
@@ -44,7 +43,7 @@ enum {
     TASK_NTPCLIENT_SEND_PACKET
 };
 
-
+/* NTP packet data */
 typedef struct
 {
     uint8_t flags;            // Flags
@@ -83,16 +82,16 @@ typedef struct
 } ntp_packet_t;
 
 
-//**************************************************************************
-//
-// NTP client
-//
-//**************************************************************************
+
+/*******************************************************************************
+ *
+ * @brief   Network time protocol client
+ * 
+ *******************************************************************************/
 class NtpClient : public ITask {
+
   public:
-
     NtpClient();
-
     bool sync( ConsoleBase *console = NULL );
     void runTasks();
     void getPreviousSync( DateTime &dt );
@@ -102,20 +101,20 @@ class NtpClient : public ITask {
 
 
   private:
+    bool requestBind();
+    bool sendNtpPacket();
+    bool readNtpResponse();
+
     IPAddress _server_ip;
     UDPClient _udp;
     ntp_packet_t _packet;
     DateTime _lastSync;
     unsigned long _nextSyncDelay;
     ConsoleBase *_console;
-
-    bool requestBind();
-    bool sendNtpPacket();
-    bool readNtpResponse();
 };
 
+
+/* NTP client */
 extern NtpClient g_ntp;
-
-
 
 #endif /* NTPCLIENT_H */

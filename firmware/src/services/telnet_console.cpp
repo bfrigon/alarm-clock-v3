@@ -20,11 +20,11 @@
 #include <drivers/wifi/wifisocket.h>
 #include <task_errors.h>
 #include <services/logger.h>
-
 #include "telnet_console.h"
 
 
-/*! ------------------------------------------------------------------------
+
+/*******************************************************************************
  *
  * @brief   Class constructor
  *
@@ -38,7 +38,7 @@ TelnetConsole::TelnetConsole() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   IPrint interface callback for printing a single character. 
  *          write the character to the send buffer and send the packet once
@@ -46,7 +46,7 @@ TelnetConsole::TelnetConsole() {
  * 
  * @param   c   character to print
  *
- * @return  Number of bytes written
+ * @return  Number of bytes written.
  */
 size_t TelnetConsole::_print( char c ) {
     _sendBuffer[ _sendBufSize++ ] = c;
@@ -63,7 +63,7 @@ size_t TelnetConsole::_print( char c ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Send the content of the transmit buffer. 
  * 
@@ -79,7 +79,7 @@ void TelnetConsole::flushSendBuffer() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the receive buffer.
  * 
@@ -88,19 +88,19 @@ void TelnetConsole::flushSendBuffer() {
  */
 int TelnetConsole::_read() {
 
-    /* Reset the session inactivity timer */
+    /* Reset the session inactivity timer. */
     _lastActivity = millis();
 
     return _client.read();
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Reads the next character in the receive buffer without 
  *          discarding it.
  * 
- * @return  Character read or -1 if no character is available
+ * @return  Character read or -1 if no character is available.
  * 
  */
 int TelnetConsole::_peek() {
@@ -108,12 +108,12 @@ int TelnetConsole::_peek() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Get the number of bytes (characters) available for reading from 
  *          the buffer.
  * 
- * @return  Number of bytes available
+ * @return  Number of bytes available.
  * 
  */
 int TelnetConsole::_available() {
@@ -121,7 +121,7 @@ int TelnetConsole::_available() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Write telnet command sequence to the transmit buffer.
  * 
@@ -132,7 +132,7 @@ int TelnetConsole::_available() {
 void TelnetConsole::queueTelnetCommand( uint8_t op, uint8_t cmd ) {
 
     /* Check if there is enough space for the command sequence, if
-       not, flush the buffer */
+       not, flush the buffer. */
     if( _sendBufSize + 3 >= TELNET_SEND_BUFFER_SIZE ) {
         this->flushSendBuffer();
     }
@@ -143,9 +143,9 @@ void TelnetConsole::queueTelnetCommand( uint8_t op, uint8_t cmd ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Return whether or not if a client is currently connected
+ * @brief   Return whether or not if a client is currently connected.
  * 
  * @return  TRUE if connected or FALSE otherwise.
  * 
@@ -155,9 +155,9 @@ bool TelnetConsole::clientConnected() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Return whether or not if the server is currently enabled
+ * @brief   Return whether or not if the server is currently enabled.
  * 
  * @return  TRUE if enabled or FALSE otherwise.
  * 
@@ -167,9 +167,9 @@ bool TelnetConsole::serverEnabled() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Create the server socket 
+ * @brief   Create the server socket.
  * 
  * @return  TRUE if successful or FALSE otherwise.
  * 
@@ -213,7 +213,7 @@ bool TelnetConsole::startServer() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Disconnect the client and stop accepting connections.
  * 
@@ -222,7 +222,7 @@ bool TelnetConsole::startServer() {
  */
 void TelnetConsole::stopServer() {
 
-    /* Stop currently running console commands */
+    /* Stop currently running console commands. */
     this->endTask();
 
     /* close telnet connection */
@@ -244,11 +244,11 @@ void TelnetConsole::stopServer() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Sets whether or not the server is enabled.
  * 
- * @param   enabled    TRUE to accept connections, FALSE otherwise
+ * @param   enabled    TRUE to accept connections, FALSE otherwise.
  * 
  */
 void TelnetConsole::enableServer( bool enabled ) {
@@ -274,11 +274,11 @@ void TelnetConsole::enableServer( bool enabled ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Prints console status on the console.
  * 
- * @param   console    ConsoleBase object to print results to
+ * @param   console    ConsoleBase object to print results to.
  * 
  */
 void TelnetConsole::printConsoleStatus( ConsoleBase *console ) {
@@ -308,7 +308,7 @@ void TelnetConsole::printConsoleStatus( ConsoleBase *console ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
  * @brief   Check for accepted socket connection. Refuses the connection if
  *          a session is already active.
@@ -331,7 +331,7 @@ bool TelnetConsole::checkForClients() {
         return false;
     }
 
-    /* Client already connected, refuse subsequent connections */
+    /* Client already connected, refuse subsequent connections. */
     if( _client.connected() ) {
 
         char buffer[ sizeof( S_CONSOLE_CONNECT_REFUSE ) ];
@@ -357,11 +357,11 @@ bool TelnetConsole::checkForClients() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Handle telnet negotiation exchange
+ * @brief   Handle telnet negotiation exchange.
  * 
- * @return  TRUE if negotiation is done or FALSE otherwise
+ * @return  TRUE if negotiation is done or FALSE otherwise.
  * 
  */
 bool TelnetConsole::handleNegotiation() {
@@ -404,11 +404,11 @@ bool TelnetConsole::handleNegotiation() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Terminate the console session
+ * @brief   Terminate the console session.
  *
- * @param   timeout    TRUE when the session has timed out
+ * @param   timeout    TRUE when the session has timed out.
  * 
  */
 void TelnetConsole::exitConsole( bool timeout = false ) {
@@ -416,7 +416,7 @@ void TelnetConsole::exitConsole( bool timeout = false ) {
         return;
     }
 
-    /* Stop currently running console commands */
+    /* Stop currently running console commands. */
     this->endTask();
     
     this->println();
@@ -425,7 +425,7 @@ void TelnetConsole::exitConsole( bool timeout = false ) {
 
     this->flushSendBuffer();
 
-    /* close telnet connection */
+    /* closes the telnet connection. */
     _client.stop();
 
 
@@ -435,9 +435,9 @@ void TelnetConsole::exitConsole( bool timeout = false ) {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Clear the screen and display the welcome message
+ * @brief   Clear the screen and display the welcome message.
  * 
  */
 void TelnetConsole::resetConsole() {
@@ -457,9 +457,9 @@ void TelnetConsole::resetConsole() {
 }
 
 
-/*! ------------------------------------------------------------------------
+/*******************************************************************************
  *
- * @brief   Run server tasks
+ * @brief   Run server tasks.
  * 
  */
 void TelnetConsole::runTasks() {
@@ -468,7 +468,7 @@ void TelnetConsole::runTasks() {
         return;
     }
 
-    /* Stop server if WiFi connection is lost */
+    /* Stop server if WiFi connection is lost. */
     if( g_wifi.connected() == false && _state != TELNET_STATE_WAIT_WIFI_CONNECTION ) {
         
         this->stopServer();
@@ -478,7 +478,7 @@ void TelnetConsole::runTasks() {
 
     switch( _state ) {
 
-        /* Waiting for WiFi to be connected before starting the server */
+        /* Waiting for WiFi to be connected before starting the server. */
         case TELNET_STATE_WAIT_WIFI_CONNECTION:
 
             if( g_wifi.connected() == true ) {
@@ -488,7 +488,7 @@ void TelnetConsole::runTasks() {
             break;
 
 
-        /* Wait for a confirmation that the server socket is bound */
+        /* Wait for a confirmation that the server socket is bound. */
         case TELNET_STATE_SOCKET_REQ_BIND:
 
             if( _socket < 0 || g_wifisocket.bound( _socket ) == 0 ) {
@@ -506,7 +506,7 @@ void TelnetConsole::runTasks() {
             break;
 
 
-        /* Wait for a confirmation that the server socket is listening */
+        /* Wait for a confirmation that the server socket is listening. */
         case TELNET_STATE_SOCKET_REQ_LISTEN:
 
             if( g_wifisocket.listening( _socket )) {
@@ -523,13 +523,13 @@ void TelnetConsole::runTasks() {
             break;
 
 
-        /* Wait for telnet negotiation to complete */
+        /* Wait for telnet negotiation to complete. */
         case TELNET_STATE_CLIENT_NEGOTIATING:
         
             if( this->handleNegotiation() == true ) {
                 _state = TELNET_STATE_CLIENT_CONNECTED;
 
-                /* Display the welcome message and prompt */
+                /* Display the welcome message and prompt. */
                 this->resetConsole();
             }
             break;
@@ -538,7 +538,7 @@ void TelnetConsole::runTasks() {
         /* Serve connected client */
         case TELNET_STATE_CLIENT_CONNECTED:
 
-            /* Disconnect client if session timeout timer elapse */
+            /* Disconnect client if session timeout timer elapse. */
             if( _client.connected() && millis() > _lastActivity + ( TELNET_SESSION_TIMEOUT * 1000UL )) {
 
                 this->exitConsole( true );
@@ -549,17 +549,17 @@ void TelnetConsole::runTasks() {
                 
                 g_log.add( EVENT_TELNET_DISCONNECT, false );
 
-                /* Client disconnected, go back to listening */
+                /* Client disconnected, go back to listening. */
                 _state = TELNET_STATE_SERVER_LISTENING;
                 return;
             }
 
 
             /* Check if other clients are trying to connect, 
-            if so, refuse connection */
+            if so, refuse the connection. */
             this->checkForClients();
 
-            /* Process user input and run commands */
+            /* Process user input and run commands. */
             ConsoleBase::runTasks();
 
             this->flushSendBuffer();
