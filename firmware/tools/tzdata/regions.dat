@@ -160,6 +160,7 @@ PACIFIC_OCEAN    Pacific/Tarawa
 PACIFIC_OCEAN    Pacific/Tongatapu
 PACIFIC_OCEAN    Pacific/Wake
 PACIFIC_OCEAN    Pacific/Wallis
+PACIFIC_OCEAN    Pacific/Kanton
 ATLANTIC_OCEAN    Atlantic/Azores
 ATLANTIC_OCEAN    Atlantic/Bermuda
 ATLANTIC_OCEAN    Atlantic/Canary
@@ -188,6 +189,7 @@ CENTRAL_AMERICA    America/Tijuana
 CENTRAL_AMERICA    America/Panama
 CENTRAL_AMERICA    America/Managua
 CENTRAL_AMERICA    America/Tegucigalpa
+CENTRAL_AMERICA    America/Ciudad_Juarez
 CARIBBEAN    America/Anguilla
 CARIBBEAN    America/Antigua
 CARIBBEAN    America/Aruba
@@ -290,6 +292,7 @@ EUROPE    Europe/Istanbul
 EUROPE    Europe/Jersey
 EUROPE    Europe/Kaliningrad
 EUROPE    Europe/Kiev
+EUROPE    Europe/Kyiv
 EUROPE    Europe/Kirov
 EUROPE    Europe/Lisbon
 EUROPE    Europe/Ljubljana

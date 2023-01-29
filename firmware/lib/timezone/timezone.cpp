@@ -230,19 +230,32 @@ void TimeZone::getTransition( int16_t year, bool stdToDst, DateTime *dt ) {
     uint8_t trans_min = (stdToDst ? _tz.dst_min : _tz.std_min );
 
 
-    /* If DOW is defined, transition occurs on the day-of-week following the 
-       specified date. */
+    /* If a day-of-week is specified in the transition rule, transition occurs on that day-of-week 
+       following or preceding the specified date in the rule. */
     if( trans_dow != D_NONE ) {
-        
-        if( trans_day > getMonthNumDays( trans_month, year )) {
-            trans_day = getMonthNumDays( trans_month, year );
-        }
 
-        uint8_t start_dow = getDayOfWeek( year, trans_month, trans_day );
-        trans_day += ( start_dow > trans_dow ) ? 7 + trans_dow - start_dow : trans_dow - start_dow;
+        /* Check if the 'match before' flag is set in the transition rule (<=) */
+        if( trans_day & DOW_BEFORE ) {
 
-        if( trans_day > getMonthNumDays( trans_month, year )) {
-            trans_day -= 7;
+            trans_day -= DOW_BEFORE;
+
+            /* Adjust the transition date to the day-of-week preceding the specified date (eg. Sat<=30). */
+            uint8_t findBeforeDow = getDayOfWeek( year, trans_month, trans_day );
+            trans_day -= ( findBeforeDow > trans_dow ? ( findBeforeDow - trans_dow ) : ( findBeforeDow - trans_dow + 7 ));
+
+            if (trans_day < 1 ) {
+                trans_day += 7;
+            }
+
+        } else {
+
+            /* Adjust the transition date to the day-of-week following the specified date (eg. Sun>=1) */
+            uint8_t findAfterDow = getDayOfWeek( year, trans_month, trans_day );
+            trans_day += ( findAfterDow > trans_dow ? ( 7 + trans_dow - findAfterDow ) : ( trans_dow - findAfterDow ));
+
+            if( trans_day > getMonthNumDays( trans_month, year )) {
+                trans_day -= 7;
+            }
         }
     }
 
@@ -328,7 +341,6 @@ int16_t getTzRegionStartIndex( uint8_t region ) {
     switch( region ) {
         case TZ_REGION_AFRICA:          return TZ_REGION_AFRICA_INDEX;
         case TZ_REGION_ANTARCTICA:      return TZ_REGION_ANTARCTICA_INDEX;
-        case TZ_REGION_ARCTIC_OCEAN:    return TZ_REGION_ARCTIC_OCEAN_INDEX;
         case TZ_REGION_ASIA:            return TZ_REGION_ASIA_INDEX;
         case TZ_REGION_ATLANTIC_OCEAN:  return TZ_REGION_ATLANTIC_OCEAN_INDEX;
         case TZ_REGION_AUSTRALIA:       return TZ_REGION_AUSTRALIA_INDEX;
@@ -360,7 +372,6 @@ uint16_t getTzRegionSize( uint8_t region ) {
     switch( region ) {
         case TZ_REGION_AFRICA:          return TZ_REGION_AFRICA_SIZE;
         case TZ_REGION_ANTARCTICA:      return TZ_REGION_ANTARCTICA_SIZE;
-        case TZ_REGION_ARCTIC_OCEAN:    return TZ_REGION_ARCTIC_OCEAN_SIZE;
         case TZ_REGION_ASIA:            return TZ_REGION_ASIA_SIZE;
         case TZ_REGION_ATLANTIC_OCEAN:  return TZ_REGION_ATLANTIC_OCEAN_SIZE;
         case TZ_REGION_AUSTRALIA:       return TZ_REGION_AUSTRALIA_SIZE;

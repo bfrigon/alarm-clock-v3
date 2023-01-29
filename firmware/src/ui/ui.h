@@ -23,8 +23,8 @@
 #include <config.h>
 #include <alarm.h>
 #include <resources.h>
-
 #include "screen.h"
+
 
 
 // ----------------------------------------
@@ -281,9 +281,6 @@ PROGMEM const struct ScreenItemBase ITEMS_SELECT_TIMEZONE[] = {
                DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),
     ITEM_LIST( ID_TZ_REGION_ANTARCTICA, 1, 0, _TZ_REGION_NAMES[ TZ_REGION_ANTARCTICA ], &g_selectedTimezone, NULL,
                TZ_REGION_ANTARCTICA_INDEX, TZ_REGION_ANTARCTICA_INDEX + TZ_REGION_ANTARCTICA_SIZE - 1, 
-               DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
-    ITEM_LIST( ID_TZ_REGION_ARCTIC_OCEAN, 2, 0, _TZ_REGION_NAMES[ TZ_REGION_ARCTIC_OCEAN ], &g_selectedTimezone, NULL,
-               TZ_REGION_ARCTIC_OCEAN_INDEX, TZ_REGION_ARCTIC_OCEAN_INDEX + TZ_REGION_ARCTIC_OCEAN_SIZE - 1, 
                DISPLAY_WIDTH - 2, ITEM_EDIT_FULLSCREEN | ITEM_LIST_VALUE_INT16 ),               
     ITEM_LIST( ID_TZ_REGION_ASIA, 3, 0, _TZ_REGION_NAMES[ TZ_REGION_ASIA ], &g_selectedTimezone, NULL,
                TZ_REGION_ASIA_INDEX, TZ_REGION_ASIA_INDEX + TZ_REGION_ASIA_SIZE - 1, 

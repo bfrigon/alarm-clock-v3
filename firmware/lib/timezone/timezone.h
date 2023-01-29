@@ -24,11 +24,14 @@
 #include <time.h>
 
 
+/* Match the previous day-of-week starting from a specified date. default behaviour 
+   is to match forward from the specified date*/
+#define DOW_BEFORE      0x20
+
 
 enum {
     TZ_REGION_AFRICA,
     TZ_REGION_ANTARCTICA,
-    TZ_REGION_ARCTIC_OCEAN,
     TZ_REGION_ASIA,
     TZ_REGION_ATLANTIC_OCEAN,
     TZ_REGION_AUSTRALIA,
@@ -44,12 +47,11 @@ enum {
     TZ_REGION_UNKNOWN,
 };
 
-#define MAX_TZ_REGION_NAMES        15
+#define MAX_TZ_REGION_NAMES        14
 #define TZ_REGION_NAME_LENGTH      14
 const char _TZ_REGION_NAMES[ MAX_TZ_REGION_NAMES ][ TZ_REGION_NAME_LENGTH + 1 ] PROGMEM = {
   "Africa",
   "Antarctica",
-  "Arctic ocean",
   "Asia",
   "Atlantic ocean",
   "Australia",

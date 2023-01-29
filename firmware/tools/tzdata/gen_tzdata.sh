@@ -415,6 +415,9 @@ for zone_name in "${!zone[@]}"; do
     elif [[ "${std_day:3:2}" == ">=" ]]; then 
         std_dow="D_${std_day:0:3}"
         std_day="${std_day:5}"
+    elif [[ "${std_day:3:2}" == "<=" ]]; then 
+        std_dow="D_${std_day:0:3}"
+        std_day="DOW_BEFORE | ${std_day:5}"
     else
         std_dow="D_NONE"
     fi
@@ -426,6 +429,9 @@ for zone_name in "${!zone[@]}"; do
     elif [[ "${dst_day:3:2}" == ">=" ]]; then 
         dst_dow="D_${dst_day:0:3}"
         dst_day="${dst_day:5}"
+    elif [[ "${dst_day:3:2}" == "<=" ]]; then 
+        dst_dow="D_${dst_day:0:3}"
+        dst_day="DOW_BEFORE | ${dst_day:5}"
     else
         dst_dow="D_NONE"
     fi
@@ -450,7 +456,7 @@ for zone_name in "${!zone[@]}"; do
         fi
     fi
 
-    echo "${var_zone_region}|${zone_name##*'/'}|    { $var_zone_name, $std_def, $dst_def }," >> $filename_tz_table
+    echo "${var_zone_region}~${zone_name##*'/'}~    { $var_zone_name, $std_def, $dst_def }," >> $filename_tz_table
 
 
     if [[ "$var_zone_region" == "UNKNOWN" ]]; then
@@ -469,7 +475,7 @@ done
 
 echo "const char TZ_UTC[] PROGMEM = { \"UTC\" };" >> $filename_abbrev_list
 echo "const char TZ_ETC_UTC[] PROGMEM = { \"Etc/UTC\" };" >> $filename_tz_names
-echo "ETCETERA|UTC|    { TZ_ETC_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC }," >> $filename_tz_table
+echo "ETCETERA~UTC~    { TZ_ETC_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC, 0, 0, 0, 0, 0, 0, TZ_UTC }," >> $filename_tz_table
 
 echo "Sorting table entries..."
 sort -o $filename_tz_names $filename_tz_names
@@ -483,7 +489,7 @@ sort -o $filename_tz_table $filename_tz_table
 ##--------------------------------------------------------------
 index=0
 current_region=""
-while IFS='|' read -ra line; do
+while IFS='~' read -ra line; do
     region="${line[0]}"
 
     if [[ "$region" != "$current_region" ]]; then
@@ -568,7 +574,7 @@ echo >> $output
 
 echo "/* Timezone rules table */" >> $output
 echo "const TimeZoneRules TimeZonesTable[] PROGMEM = {" >> $output
-cut -d'|' -f3  $filename_tz_table >> $output
+cut -d'~' -f3  $filename_tz_table >> $output
 echo "};" >> $output
 
 echo >> $output

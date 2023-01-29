@@ -24,7 +24,6 @@
 #include <Wire.h>
 #include <avr/wdt.h>
 #include <avr/pgmspace.h>
-
 #include "drivers/tpa2016.h"
 #include "drivers/vs1053.h"
 #include "drivers/rtc.h"
