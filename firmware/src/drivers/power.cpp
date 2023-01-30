@@ -131,17 +131,6 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
 
 /*******************************************************************************
  *
- * @brief   Run power management tasks.
- *
- */
-void Power::processEvents() {
-
-    g_power.detectPowerState();
-}
-
-
-/*******************************************************************************
- *
  * @brief   Detect the state of the 'on battery' pin and set power mode 
  *          accordingly.
  *
@@ -153,9 +142,9 @@ uint8_t Power::detectPowerState() {
     if( this->isOnBatteryPower() == true ) {
 
         if( _mode == POWER_MODE_NORMAL ) {
-            return this->setPowerMode( POWER_MODE_LOW_POWER );
+            return this->setPowerMode( POWER_MODE_ON_BATTERY );
 
-        } else if( _mode == POWER_MODE_LOW_POWER && ( millis() - _lpwrTimerStart >= DELAY_BEFORE_SUSPEND ) ) {
+        } else if( _mode == POWER_MODE_ON_BATTERY && ( millis() - _lpwrTimerStart >= DELAY_BEFORE_SUSPEND ) ) {
             return this->setPowerMode( POWER_MODE_SUSPEND );
 
         } else if( _mode == POWER_MODE_SUSPEND ) {

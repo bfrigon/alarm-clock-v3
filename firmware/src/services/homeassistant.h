@@ -35,6 +35,15 @@
 #define MAX_PAYLOAD_SWITCH_STATE_LENGTH     3   /* Switch state (on/off) */
 #define MAX_PAYLOAD_TIMESTAMP_STATE_LENGTH  25  /* Timestamp (YYYY-MM-DDThh:mm:00+00:00) */
 #define MAX_PAYLOAD_RSSI_STATE_LENGTH       4   /* RSSI value (max 3 digits inc. sign) */
+#define MAX_PAYLOAD_BATTERY_CHARGE_LENGTH   3   /* Battery charge value (max 3 digits) */
+#define MAX_PAYLOAD_BATTERY_STATUS_LENGTH   11  /* Battery status */
+#define MAX_PAYLOAD_BATTERY_VOLTAGE_LENGTH  5   /* Battery voltage (0.000) */
+
+/* Sensor maximum update rate */
+#define MAX_UPDATE_RATE_CONN_RSSI           30000   
+#define MAX_UPDATE_RATE_BATTERY_CHARGE      60000
+#define MAX_UPDATE_RATE_BATTERY_STATUS      1000
+#define MAX_UPDATE_RATE_BATTERY_VOLTAGE     60000
 
 /* Topic name maxmimum length */
 #define MAX_WILL_TOPIC_LENGTH               15 + MAX_HA_DEVICE_ID_LENGTH + MAX_DISCOVERY_PREFIX_LENGTH
@@ -49,6 +58,9 @@ enum HASensorsIDs {
     SENSOR_ID_NEXT_ALARM_AVAILABLE,
     SENSOR_ID_ALARM_SWITCH,
     SENSOR_ID_CONN_RSSI,
+    SENSOR_ID_BATTERY_CHARGE,
+    SENSOR_ID_BATTERY_STATUS,
+    SENSOR_ID_BATTERY_VOLT,
     SENSOR_ID_AVAILABILITY
 };
 
@@ -65,20 +77,33 @@ PROG_STR( S_PAYLOAD_AVAIL_OFFLINE,      "offline" );
 PROG_STR( S_PAYLOAD_SWITCH_ON,          "ON" );
 PROG_STR( S_PAYLOAD_SWITCH_OFF,         "OFF" );
 PROG_STR( S_PAYLOAD_INTEGER,            "%d" );
+PROG_STR( S_PAYLOAD_VOLTAGE,            "%1d.%03d" );
 PROG_STR( S_PAYLOAD_TIMESTAMP,          "%4d-%02d-%02dT%02d:%02d:00+00:00" );
+PROG_STR( S_PAYLOAD_BATT_CHARGING,      "charging" );
+PROG_STR( S_PAYLOAD_BATT_DISCHARGING,   "discharging" );
+PROG_STR( S_PAYLOAD_BATT_FULL,          "full" );
+PROG_STR( S_PAYLOAD_BATT_NOT_PRESENT,   "missing" );
+PROG_STR( S_PAYLOAD_BATT_UNKNOWN,       "unknown" );
+
 
 /* node ID format */
 #define MAX_HA_DEVICE_ID_LENGTH         12
 PROG_STR( S_HA_ID_FORMAT,               "%02x%02x%02x%02x%02x%02x" );
 
 /* Sendor topic names */
-PROG_STR( S_TOPIC_ALARM_SWITCH_CONFIG,  "%s/binary_sensor/%s/clock_alarm_switch/config" );
-PROG_STR( S_TOPIC_ALARM_SWITCH_STATE,   "%s/binary_sensor/%s/clock_alarm_switch/state" );
-PROG_STR( S_TOPIC_NEXT_ALARM_CONFIG,    "%s/sensor/%s/clock_next_alarm/config" );
-PROG_STR( S_TOPIC_NEXT_ALARM_STATE,     "%s/sensor/%s/clock_next_alarm/state" );
-PROG_STR( S_TOPIC_NEXT_ALARM_AVAIL,     "%s/sensor/%s/clock_next_alarm/available" );
-PROG_STR( S_TOPIC_CONN_RSSI_CONFIG,     "%s/sensor/%s/clock_rssi/config" );
-PROG_STR( S_TOPIC_CONN_RSSI_STATE,      "%s/sensor/%s/clock_rssi/state" );
+PROG_STR( S_TOPIC_CONFIG_ALARM_SWITCH,  "%s/binary_sensor/%s/clock_alarm_switch/config" );
+PROG_STR( S_TOPIC_STATE_ALARM_SWITCH,   "%s/binary_sensor/%s/clock_alarm_switch/state" );
+PROG_STR( S_TOPIC_CONFIG_NEXT_ALARM,    "%s/sensor/%s/clock_next_alarm/config" );
+PROG_STR( S_TOPIC_STATE_NEXT_ALARM,     "%s/sensor/%s/clock_next_alarm/state" );
+PROG_STR( S_TOPIC_AVAIL_NEXT_ALARM,     "%s/sensor/%s/clock_next_alarm/available" );
+PROG_STR( S_TOPIC_CONFIG_CONN_RSSI,     "%s/sensor/%s/clock_rssi/config" );
+PROG_STR( S_TOPIC_STATE_CONN_RSSI,      "%s/sensor/%s/clock_rssi/state" );
+PROG_STR( S_TOPIC_CONFIG_BATTERY_CHARGE,"%s/sensor/%s/clock_battery_charge/config" );
+PROG_STR( S_TOPIC_STATE_BATTERY_CHARGE, "%s/sensor/%s/clock_battery_charge/state" );
+PROG_STR( S_TOPIC_CONFIG_BATTERY_STATUS,"%s/sensor/%s/clock_battery_status/config" );
+PROG_STR( S_TOPIC_STATE_BATTERY_STATUS, "%s/sensor/%s/clock_battery_status/state" );
+PROG_STR( S_TOPIC_CONFIG_BATTERY_VOLT,  "%s/sensor/%s/clock_battery_voltage/config" );
+PROG_STR( S_TOPIC_STATE_BATTERY_VOLT,   "%s/sensor/%s/clock_battery_voltage/state" );
 PROG_STR( S_TOPIC_AVAILABILITY,         "%s/sensor/%s/status" );
 
 /* Sendor configuration topics payload */
@@ -120,6 +145,40 @@ PROG_STR( S_JSON_CONFIG_CONN_RSSI,      "{\"name\":\"Alarm clock Signal strength
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
+PROG_STR( S_JSON_CONFIG_BATTERY_CHARGE, "{\"name\":\"Alarm clock Battery charge\"," \
+                                        "\"uniq_id\":\"clock_%s_battery\"," \
+                                        "\"dev_cla\":\"battery\"," \
+                                        "\"unit_of_meas\":\"%%\"," \
+                                        "\"ent_cat\":\"diagnostic\", " \
+                                        "\"stat_t\":\"%s/sensor/%s/clock_battery_charge/state\"," \
+                                        "\"avty_t\": \"%s/sensor/%s/status\"," \
+                                        "\"ic\":\"mdi:battery\"," \
+                                        "\"dev\":{" \
+                                        "\"ids\":[\"%s\"]" \
+                                        "}}" );
+
+PROG_STR( S_JSON_CONFIG_BATTERY_STATUS, "{\"name\":\"Alarm clock Battery status\"," \
+                                        "\"uniq_id\":\"clock_%s_battery_status\"," \
+                                        "\"dev_cla\":\"enum\"," \
+                                        "\"ent_cat\":\"diagnostic\", " \
+                                        "\"stat_t\":\"%s/sensor/%s/clock_battery_status/state\"," \
+                                        "\"avty_t\": \"%s/sensor/%s/status\"," \
+                                        "\"ic\":\"mdi:battery-charging-outline\"," \
+                                        "\"dev\":{" \
+                                        "\"ids\":[\"%s\"]" \
+                                        "}}" );
+
+PROG_STR( S_JSON_CONFIG_BATTERY_VOLT,   "{\"name\":\"Alarm clock Battery voltage\"," \
+                                        "\"uniq_id\":\"clock_%s_battery_voltage\"," \
+                                        "\"dev_cla\":\"voltage\"," \
+                                        "\"ent_cat\":\"diagnostic\", " \
+                                        "\"unit_of_meas\":\"V\"," \
+                                        "\"stat_t\":\"%s/sensor/%s/clock_battery_voltage/state\"," \
+                                        "\"avty_t\": \"%s/sensor/%s/status\"," \
+                                        "\"ic\":\"mdi:sine-wave\"," \
+                                        "\"dev\":{" \
+                                        "\"ids\":[\"%s\"]" \
+                                        "}}" );
 
 
 /*******************************************************************************
@@ -137,8 +196,8 @@ class HomeAssistant : public ITask {
 
     void begin();    
     void runTasks();
-    void updateSensor( uint8_t sensorID );
-    void updateAllSensors();
+    bool updateSensor( uint8_t sensorID, bool force = false );
+    bool updateAllSensors( bool force = false );
 
   private:
 
@@ -152,7 +211,11 @@ class HomeAssistant : public ITask {
     char _will_payload[ MAX_PAYLOAD_AVAILABILITY_LENGTH + 1 ];  /* WILL message payload buffer */
     char _ha_device_id[ MAX_HA_DEVICE_ID_LENGTH + 1 ];          /* Home assistant device ID */
     bool _sensorNeedUpdate[ MAX_SENSORS_ID ];                   /* Sensors need update flag */
-    int8_t _prevRssi;                                           /* Previously sent WiFi RSSI value */
+    unsigned long _prevTimestampConnRssi;                       /* RSSI sensor Last update timestamp */
+    unsigned long _prevTimestampBatteryCharge;                  /* Battery charge last update timestamp */
+    unsigned long _prevTimestampBatteryStatus;                  /* Battery status last update timestamp */
+    unsigned long _prevTimestampBatteryVoltage;                 /* Battery voltage last update timestamp */
+    uint8_t _prevBatteryStatus;                                 /* Previous battery status sent */
 };
 
 extern HomeAssistant g_homeassistant;

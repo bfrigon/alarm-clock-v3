@@ -170,9 +170,6 @@ void setup() {
     /* Initialize audio system */
     g_alarm.begin();
 
-    /* Enable watchdog timer */
-    g_power.enableWatchdog();
-
     /* Initialize WIFI driver */
     g_wifi.begin();
     g_wifi.setSystemTime( g_rtc.now() );
@@ -194,6 +191,9 @@ void setup() {
 
     /* Enable automatic ntp sync at random interval */
     g_ntp.setAutoSync( g_config.clock.use_ntp );
+
+    /* Enable watchdog timer */
+    g_power.enableWatchdog();
 }
 
 
@@ -209,7 +209,7 @@ void loop() {
     g_power.resetWatchdog();
 
     /* Run power management tasks */
-    g_power.processEvents();
+    g_power.detectPowerState();
 
     /* If an RTC interrupt occured, read the current time */
     g_rtc.processEvents();

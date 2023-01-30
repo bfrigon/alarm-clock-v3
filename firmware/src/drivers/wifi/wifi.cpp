@@ -256,6 +256,11 @@ void WiFi::disconnect() {
         return;
     }
 
+    /* Already disconnected */
+    if( _status != WIFI_STATUS_CONNECTED ) {
+        return;
+    }
+
     /* Close sockets to clean state */
     for( int i = 0; i < MAX_SOCKET; i++ ) {
         g_wifisocket.close( i );
@@ -553,10 +558,10 @@ void WiFi::onPowerStateChange( uint8_t state ) {
         init();
     }
 
-    if( state == POWER_MODE_NORMAL ) {
-        this->connect();
-    } else {
+    if( state == POWER_MODE_SUSPEND ) {
         this->disconnect();
+    } else {
+        this->connect();
     }
 }
 

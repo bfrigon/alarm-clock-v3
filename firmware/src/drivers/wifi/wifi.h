@@ -49,7 +49,6 @@ enum {
 /* WiFi module status */
 typedef enum {
     WIFI_STATUS_IDLE = 0,
-    WIFI_STATUS_SCAN_COMPLETED,
     WIFI_STATUS_CONNECTED,
     WIFI_STATUS_CONNECT_FAILED,
     WIFI_STATUS_CONNECT_TIMEOUT,
@@ -64,7 +63,7 @@ typedef enum {
 #define WIFI_RESOLVE_TIMEOUT            5000
 #define WIFI_SOCKET_CLOSE_TIMEOUT       250
 #define WIFI_PING_TIMEOUT               5000
-#define WIFI_RSSI_REQ_DELAY             30000
+#define WIFI_RSSI_REQ_DELAY             5000
 
 void wifimanager_wifi_cb( uint8_t u8MsgType, void *pvMsg );
 void wifimanager_resolve_cb( uint8 *hostName, uint32 hostIp );

@@ -24,10 +24,10 @@
 #include <avr/wdt.h>
 
 
-#define DELAY_BEFORE_SUSPEND        5000
+#define DELAY_BEFORE_SUSPEND        30000
 
 #define POWER_MODE_NORMAL           0
-#define POWER_MODE_LOW_POWER        1
+#define POWER_MODE_ON_BATTERY       1
 #define POWER_MODE_SUSPEND          2
 
 
@@ -53,7 +53,6 @@ class Power {
     void cpuReset();
     void reboot();
     bool detectConfigResetButton();
-    void processEvents();
 
 
   private:

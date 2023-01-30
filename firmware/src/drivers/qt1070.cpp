@@ -174,7 +174,7 @@ uint8_t QT1070::processEvents() {
         }
         
         
-        if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
+        if( g_power.getPowerMode() == POWER_MODE_ON_BATTERY ) {
 
             g_power.resetSuspendDelay();
         }

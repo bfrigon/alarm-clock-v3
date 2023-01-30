@@ -122,7 +122,7 @@ inline uint8_t NeoPixel::getColorBrigthness( uint8_t color ) {
         brightness = 1;
     }
 
-    if( g_power.getPowerMode() == POWER_MODE_LOW_POWER ) {
+    if( g_power.getPowerMode() == POWER_MODE_ON_BATTERY ) {
 
         /* limit brightness in low power mode. */
         if( brightness > 25 ) {
@@ -162,9 +162,9 @@ void NeoPixel::show( uint8_t *pixmap, uint8_t num_pixels ) {
 
     /* Build gamma corrected color table in GRB order */
     volatile uint8_t colorTable[3] = {
-        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 0 : _g ),
-        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 255 : _r ),
-        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_LOW_POWER ? 0 : _b ),
+        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_ON_BATTERY ? 0 : _g ),
+        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_ON_BATTERY ? 255 : _r ),
+        this->getColorBrigthness( g_power.getPowerMode() == POWER_MODE_ON_BATTERY ? 0 : _b ),
     };
 
 

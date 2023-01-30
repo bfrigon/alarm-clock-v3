@@ -1193,8 +1193,8 @@ void MqttClient::runTasks() {
                 /* Attempt to reconnect if connection was lost */
                 if(( millis() - _lastConnectAttempt > MQTT_RECONNECT_ATTEMPT_DELAY ) || _firstConnectAttempt == true ) {
                     
-                    /* Do not reconnect if clock is running on battery */
-                    if( g_power.getPowerMode() != POWER_MODE_NORMAL ) {
+                    /* Do not reconnect if power mode is suspended */
+                    if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
                         return;
                     }
 

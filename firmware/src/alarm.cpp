@@ -571,7 +571,7 @@ void Alarm::audioStart() {
     }
 
     if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-        g_power.setPowerMode( POWER_MODE_LOW_POWER );
+        g_power.setPowerMode( POWER_MODE_ON_BATTERY );
     }
 
     if( this->profile.gradual == true && ( ( _playMode & ALARM_MODE_TEST ) == 0 ) ) {

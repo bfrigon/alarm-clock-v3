@@ -32,7 +32,7 @@
  */
 bool suspendScreen_onKeypress( Screen* screen, uint8_t key ) {
 
-    g_power.setPowerMode( POWER_MODE_LOW_POWER );
+    g_power.setPowerMode( POWER_MODE_ON_BATTERY );
     return false;
 }
 

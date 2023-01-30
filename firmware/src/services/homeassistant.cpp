@@ -32,8 +32,6 @@ HomeAssistant::HomeAssistant() {
     _will_topic[0] = 0;
     _will_payload[0] = 0;
     _taskCurrentSensorID = SENSOR_ID_NONE;
-    _prevRssi = -120;
-
 }
 
 
@@ -61,35 +59,103 @@ void HomeAssistant::begin() {
 
 /*******************************************************************************
  *
- * @brief   Schedule all sensors to send update to home assistant
- *
+ * @brief   Schedule all sensors to send update to home assistant.
+ * 
+ * @param   force   Schedule an update regardless of the last update time.
+ * 
+ * @return  TRUE if sensors updates were scheduled, FALSE otherwise.
+ * 
  */
-void HomeAssistant::updateAllSensors() {
+bool HomeAssistant::updateAllSensors( bool force ) {
     uint8_t i;
-    for( i = 0; i < MAX_SENSORS_ID; i++ ) {
+    bool scheduled = false;
+    for( i = 1; i <= MAX_SENSORS_ID; i++ ) {
 
-        _sensorNeedUpdate[ i ] = true;
+        if( this->updateSensor( i, force ) == true ) {
+            scheduled = true;
+        }
     }
+
+    return scheduled;
 }
 
 
 /*******************************************************************************
  *
- * @brief   Schedule a specific sensor to send update to home assistant
+ * @brief   Schedule a specific sensor to send update to home assistant.
+ * 
+ * @param   sensorID    ID of the sensor to update
+ * @param   force       Schedule an update regardless of the last update time.
  *
+ * @return  TRUE if update scheduled, FALSE if ignored.
  */
-void HomeAssistant::updateSensor( uint8_t sensorID ) {
+bool HomeAssistant::updateSensor( uint8_t sensorID, bool force ) {
     if( sensorID > MAX_SENSORS_ID || sensorID == 0 ) {
-        return;
+        return false;
+    }
+
+    if( force == false ) {
+        switch( sensorID ) {
+
+            /* WiFi measured RSSI sensor */
+            case SENSOR_ID_CONN_RSSI: {
+
+                if( millis() - _prevTimestampConnRssi < MAX_UPDATE_RATE_CONN_RSSI ) {
+                    return false;
+                }
+            }
+            break;
+
+            /* Battery charge sensor */
+            case SENSOR_ID_BATTERY_CHARGE: {
+
+                if( millis() - _prevTimestampBatteryCharge < MAX_UPDATE_RATE_BATTERY_CHARGE ) {
+                    return false;
+                }
+            }
+            break;
+
+            /* Battery charge sensor */
+            case SENSOR_ID_BATTERY_VOLT: {
+
+                if( millis() - _prevTimestampBatteryVoltage < MAX_UPDATE_RATE_BATTERY_VOLTAGE ) {
+                    return false;
+                }
+            }
+            break;            
+
+            /* Battery status sensor */
+            case SENSOR_ID_BATTERY_STATUS: {
+                
+                if( millis() - _prevTimestampBatteryStatus < MAX_UPDATE_RATE_BATTERY_STATUS ) {
+                    return false;
+                }
+
+                /* Skip update if battery status didn't change */
+                uint8_t battState;
+                battState = g_battery.getBatteryState();
+                if( _prevBatteryStatus == battState ) {
+                    return false;
+                }
+
+                /* Force update battery charge and voltage sensor when battery state changes */
+                this->updateSensor( SENSOR_ID_BATTERY_CHARGE, true );
+                this->updateSensor( SENSOR_ID_BATTERY_VOLT, true );
+
+                _prevBatteryStatus = battState;
+            }
+            break;
+        }
     }
 
     _sensorNeedUpdate[ sensorID - 1 ] = true;
+    return true;
 }
 
 
 /*******************************************************************************
  *
- * @brief   Begin sending each sensors config payload
+ * @brief   Begin sending each sensors config payload.
  *
  */
 void HomeAssistant::beginSendSensorConfig() {
@@ -106,7 +172,7 @@ void HomeAssistant::beginSendSensorConfig() {
 
 /*******************************************************************************
  *
- * @brief   Begin sending sensors state which are flagged for update
+ * @brief   Begin sending sensors state which are flagged for update.
  *
  */
 void HomeAssistant::beginSendSensorStates() {
@@ -144,18 +210,33 @@ void HomeAssistant::sendNextSensorConfig() {
             return;
 
         case SENSOR_ID_ALARM_SWITCH:
-            topic_len = strlen_P( S_TOPIC_ALARM_SWITCH_CONFIG ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_CONFIG_ALARM_SWITCH ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_ALARM_SWITCH ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
 
         case SENSOR_ID_NEXT_ALARM:
-            topic_len = strlen_P( S_TOPIC_NEXT_ALARM_CONFIG ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_CONFIG_NEXT_ALARM ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_NEXT_ALARM ) + ( strlen( g_config.network.discovery_prefix ) * 3 ) + ( MAX_HA_DEVICE_ID_LENGTH * 5 ) + 1;
             break;
 
         case SENSOR_ID_CONN_RSSI:
-            topic_len = strlen_P( S_TOPIC_CONN_RSSI_CONFIG ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_CONFIG_CONN_RSSI ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_CONN_RSSI ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
+            break;
+
+        case SENSOR_ID_BATTERY_CHARGE:
+            topic_len = strlen_P( S_TOPIC_CONFIG_BATTERY_CHARGE ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = strlen_P( S_JSON_CONFIG_BATTERY_CHARGE ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
+            break;
+
+        case SENSOR_ID_BATTERY_STATUS:
+            topic_len = strlen_P( S_TOPIC_CONFIG_BATTERY_STATUS ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = strlen_P( S_JSON_CONFIG_BATTERY_STATUS ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
+            break;
+
+        case SENSOR_ID_BATTERY_VOLT:
+            topic_len = strlen_P( S_TOPIC_CONFIG_BATTERY_VOLT ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = strlen_P( S_JSON_CONFIG_BATTERY_VOLT ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
     }
 
@@ -172,7 +253,7 @@ void HomeAssistant::sendNextSensorConfig() {
         /* Alarm switch sensor config */
         case SENSOR_ID_ALARM_SWITCH: {
 
-            snprintf_P( topic, topic_len, S_TOPIC_ALARM_SWITCH_CONFIG, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_ALARM_SWITCH, g_config.network.discovery_prefix, _ha_device_id );
             snprintf_P( payload, payload_len, S_JSON_CONFIG_ALARM_SWITCH, 
                 _ha_device_id,
                 g_config.network.discovery_prefix, _ha_device_id, 
@@ -184,7 +265,7 @@ void HomeAssistant::sendNextSensorConfig() {
         /* Next alarm timestamp sensor config */
         case SENSOR_ID_NEXT_ALARM: {
 
-            snprintf_P( topic, topic_len, S_TOPIC_NEXT_ALARM_CONFIG, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_NEXT_ALARM, g_config.network.discovery_prefix, _ha_device_id );
             snprintf_P( payload, payload_len, S_JSON_CONFIG_NEXT_ALARM, 
                 _ha_device_id,
                 g_config.network.discovery_prefix, _ha_device_id, 
@@ -197,7 +278,7 @@ void HomeAssistant::sendNextSensorConfig() {
         /* Signal strength sensor config */
         case SENSOR_ID_CONN_RSSI: {
 
-            snprintf_P( topic, topic_len, S_TOPIC_CONN_RSSI_CONFIG, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_CONN_RSSI, g_config.network.discovery_prefix, _ha_device_id );
             snprintf_P( payload, payload_len, S_JSON_CONFIG_CONN_RSSI, 
                 _ha_device_id,
                 g_config.network.discovery_prefix, _ha_device_id, 
@@ -205,6 +286,43 @@ void HomeAssistant::sendNextSensorConfig() {
                 _ha_device_id );
         }
         break;
+
+        /* Battery charge sensor config */
+        case SENSOR_ID_BATTERY_CHARGE: {
+
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_BATTERY_CHARGE, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( payload, payload_len, S_JSON_CONFIG_BATTERY_CHARGE, 
+                _ha_device_id,
+                g_config.network.discovery_prefix, _ha_device_id, 
+                g_config.network.discovery_prefix, _ha_device_id, 
+                _ha_device_id );
+        }
+        break;
+
+        /* Battery status sensor config */
+        case SENSOR_ID_BATTERY_STATUS: {
+
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_BATTERY_STATUS, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( payload, payload_len, S_JSON_CONFIG_BATTERY_STATUS, 
+                _ha_device_id,
+                g_config.network.discovery_prefix, _ha_device_id, 
+                g_config.network.discovery_prefix, _ha_device_id, 
+                _ha_device_id );
+        }
+        break;
+
+        /* Battery voltage sensor config */
+        case SENSOR_ID_BATTERY_VOLT: {
+
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_BATTERY_VOLT, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( payload, payload_len, S_JSON_CONFIG_BATTERY_VOLT, 
+                _ha_device_id,
+                g_config.network.discovery_prefix, _ha_device_id, 
+                g_config.network.discovery_prefix, _ha_device_id, 
+                _ha_device_id );
+        }
+        break;
+
     }
 
     /* Publish configuration topic */
@@ -243,24 +361,39 @@ void HomeAssistant::sendNextSensorState() {
             break;
 
         case SENSOR_ID_NEXT_ALARM_AVAILABLE:
-            topic_len = strlen_P( S_TOPIC_NEXT_ALARM_AVAIL ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_AVAIL_NEXT_ALARM ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = MAX_PAYLOAD_SWITCH_STATE_LENGTH + 1;
             break;
 
         case SENSOR_ID_ALARM_SWITCH:
-            topic_len = strlen_P( S_TOPIC_ALARM_SWITCH_STATE ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_STATE_ALARM_SWITCH ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = MAX_PAYLOAD_SWITCH_STATE_LENGTH + 1;
             break;
 
         case SENSOR_ID_NEXT_ALARM:
-            topic_len = strlen_P( S_TOPIC_NEXT_ALARM_STATE ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_STATE_NEXT_ALARM ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = MAX_PAYLOAD_TIMESTAMP_STATE_LENGTH + 1;
             break;
 
         case SENSOR_ID_CONN_RSSI:
-            topic_len = strlen_P( S_TOPIC_CONN_RSSI_STATE ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            topic_len = strlen_P( S_TOPIC_STATE_CONN_RSSI ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = MAX_PAYLOAD_RSSI_STATE_LENGTH + 1;
             break;
+
+        case SENSOR_ID_BATTERY_CHARGE:
+            topic_len = strlen_P( S_TOPIC_STATE_BATTERY_CHARGE ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = MAX_PAYLOAD_BATTERY_CHARGE_LENGTH + 1;
+            break;
+
+        case SENSOR_ID_BATTERY_STATUS:
+            topic_len = strlen_P( S_TOPIC_STATE_BATTERY_STATUS ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = MAX_PAYLOAD_BATTERY_STATUS_LENGTH + 1;
+            break;
+
+       case SENSOR_ID_BATTERY_VOLT:
+            topic_len = strlen_P( S_TOPIC_STATE_BATTERY_VOLT ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = MAX_PAYLOAD_BATTERY_VOLTAGE_LENGTH + 1;
+            break;            
     }
 
     topic = ( char* )malloc( topic_len );
@@ -283,7 +416,7 @@ void HomeAssistant::sendNextSensorState() {
         /* Alarm switch sensor state */
         case SENSOR_ID_ALARM_SWITCH: {
 
-            snprintf_P( topic, topic_len, S_TOPIC_ALARM_SWITCH_STATE, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_STATE_ALARM_SWITCH, g_config.network.discovery_prefix, _ha_device_id );
             strncpy_P( payload, ( g_alarm.isAlarmSwitchOn() ? S_PAYLOAD_SWITCH_ON : S_PAYLOAD_SWITCH_OFF ), payload_len );
         }
         break;
@@ -291,7 +424,7 @@ void HomeAssistant::sendNextSensorState() {
         /* Next alarm timestamp */
         case SENSOR_ID_NEXT_ALARM: {
 
-            snprintf_P( topic, topic_len, S_TOPIC_NEXT_ALARM_STATE, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_STATE_NEXT_ALARM, g_config.network.discovery_prefix, _ha_device_id );
 
             DateTime local;
             local = g_rtc.now();
@@ -328,7 +461,7 @@ void HomeAssistant::sendNextSensorState() {
 
         /* Next alarm available sensor */
         case SENSOR_ID_NEXT_ALARM_AVAILABLE: {
-            snprintf_P( topic, topic_len, S_TOPIC_NEXT_ALARM_AVAIL, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_AVAIL_NEXT_ALARM, g_config.network.discovery_prefix, _ha_device_id );
             strncpy_P( payload, (( g_alarm.isAlarmEnabled() == true ) ? S_PAYLOAD_SWITCH_ON : S_PAYLOAD_SWITCH_OFF ), payload_len );
         }
         break;
@@ -336,8 +469,68 @@ void HomeAssistant::sendNextSensorState() {
         /* WiFi signal strength sensor */
         case SENSOR_ID_CONN_RSSI: {
             
-            snprintf_P( topic, topic_len, S_TOPIC_CONN_RSSI_STATE, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( topic, topic_len, S_TOPIC_STATE_CONN_RSSI, g_config.network.discovery_prefix, _ha_device_id );
             snprintf_P( payload, payload_len, S_PAYLOAD_INTEGER, g_wifi.getRSSI() );
+
+            _prevTimestampConnRssi = millis();
+        }
+        break;
+
+        /* Battery charge sensor */
+        case SENSOR_ID_BATTERY_CHARGE: {
+            
+            snprintf_P( topic, topic_len, S_TOPIC_STATE_BATTERY_CHARGE, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( payload, payload_len, S_PAYLOAD_INTEGER, g_battery.getStateOfCharge( false ));
+
+            _prevTimestampBatteryCharge = millis();
+        }
+        break;
+
+        /* Battery voltage sensor */
+        case SENSOR_ID_BATTERY_VOLT: {
+            
+            snprintf_P( topic, topic_len, S_TOPIC_STATE_BATTERY_VOLT, g_config.network.discovery_prefix, _ha_device_id );
+
+            uint16_t batt_v;
+            batt_v = g_battery.getVoltage();
+
+            snprintf_P( payload, payload_len, S_PAYLOAD_VOLTAGE, batt_v / 1000, batt_v % 1000 );
+
+            _prevTimestampBatteryVoltage = millis();
+        }
+        break;
+
+        /* Battery status sensor */
+        case SENSOR_ID_BATTERY_STATUS: {
+            
+            snprintf_P( topic, topic_len, S_TOPIC_STATE_BATTERY_STATUS, g_config.network.discovery_prefix, _ha_device_id );
+
+            switch( g_battery.getBatteryState() ) {
+
+                case BATTERY_STATE_CHARGING:
+                    strncpy_P( payload, S_PAYLOAD_BATT_CHARGING, payload_len );
+                    break;
+
+                case BATTERY_STATE_DISCHARGE_FULL:
+                case BATTERY_STATE_DISCHARGE_HALF:
+                case BATTERY_STATE_DISCHARGE_LOW:
+                    strncpy_P( payload, S_PAYLOAD_BATT_DISCHARGING, payload_len );
+                    break;
+
+                case BATTERY_STATE_READY:
+                    strncpy_P( payload, S_PAYLOAD_BATT_FULL, payload_len );
+                    break;
+
+                case BATTERY_STATE_NOT_PRESENT:
+                    strncpy_P( payload, S_PAYLOAD_BATT_NOT_PRESENT, payload_len );
+                    break;
+
+                default:
+                    strncpy_P( payload, S_PAYLOAD_BATT_UNKNOWN, payload_len );
+                    break;
+            }
+
+            _prevTimestampBatteryStatus = millis();
         }
         break;
     }
@@ -357,10 +550,13 @@ void HomeAssistant::sendNextSensorState() {
  */
 void HomeAssistant::runTasks() {
 
-    if( g_wifi.getRSSI() != _prevRssi ) {
-        _prevRssi = g_wifi.getRSSI();
-
+    /* update sensors */
+    if( g_mqtt.connected() == true ) {
+        
         this->updateSensor( SENSOR_ID_CONN_RSSI );
+        this->updateSensor( SENSOR_ID_BATTERY_CHARGE );
+        this->updateSensor( SENSOR_ID_BATTERY_STATUS );
+        this->updateSensor( SENSOR_ID_BATTERY_VOLT );
     }
 
     /* If connection to broker is lost, start wait connect task */
@@ -401,7 +597,7 @@ void HomeAssistant::runTasks() {
                 this->endTask( TASK_SUCCESS );
 
                 /* Force publish all sensors states */
-                this->updateAllSensors();
+                this->updateAllSensors( true );
                 return;
             }
 
