@@ -112,6 +112,8 @@ bool ConsoleBase::beginTaskMqttEnable() {
         return false;
     }
 
+    this->println_P( S_CONSOLE_MQTT_CONNECTING );
+
     this->startTask( TASK_CONSOLE_MQTT_ENABLE );
     return true;
 }
@@ -158,7 +160,7 @@ bool ConsoleBase::beginTaskMqttDisable() {
 
     g_mqtt.enableClient( false );
 
-    if( g_wifi.connected() == false ) {
+    if( g_wifi.connected() == false || g_mqtt.connected() == false ) {
         return false;
     }
 

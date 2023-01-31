@@ -346,7 +346,7 @@ void MqttClient::enableClient( bool enabled ) {
     } else {
         g_log.add( EVENT_MQTT_DISABLED );
 
-        if( _tcp.connected() == 1 && g_wifi.connected() == true ) {
+        if( _connected == true && g_wifi.connected() == true ) {
             this->disconnect();
         }
     }
@@ -491,13 +491,9 @@ bool MqttClient::connect() {
  */
 void MqttClient::disconnect( bool immediate ) {
 
-    if( _connected == false ) {
-        return;
-    }
-
     /* If tcp connection was dropped unexpectedly, 
        reset the connection flags */
-    if( _tcp.connected() == 0 || immediate == true) {
+    if( _tcp.connected() == 0 || immediate == true ) {
         _connected = false;
         _lastPub = false;
         _firstConnectAttempt = true;
@@ -505,13 +501,18 @@ void MqttClient::disconnect( bool immediate ) {
 
         this->freeBuffer();
 
-        if( _tcp.connected() == 1 ) {
-            _tcp.stop();
-        }
+        _tcp.stop();
         
         g_log.add( EVENT_MQTT_DISCONNECTED );
-        this->endTask( ERR_MQTTBROKER_DISCONNECTED );
 
+        if( this->getCurrentTask() != TASK_NONE ) {
+            this->endTask( ERR_MQTTBROKER_DISCONNECTED );
+        }
+
+        return;
+    }
+
+    if( _connected == false ) {
         return;
     }
 
@@ -1008,7 +1009,8 @@ void MqttClient::runTasks() {
                     g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
                 }
 
-                this->disconnect( true );
+                _tcp.stop();
+
                 return;
             }
 
@@ -1017,7 +1019,11 @@ void MqttClient::runTasks() {
                 if( this->sendConnectPacket() == false ) {
 
                     this->endTask( ERR_MQTTBROKER_REFUSED_CONNECT );
-                    this->disconnect( true );
+                    g_log.add( EVENT_MQTT_CONNECT_REFUSED );
+                    
+                    _tcp.stop();
+                    this->freeBuffer();
+
                     return;
                 }
             }
@@ -1036,13 +1042,12 @@ void MqttClient::runTasks() {
                 this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
                 g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
 
+                _tcp.stop();
+                this->freeBuffer();
+
                 return;
             }
 
-            if( _tcp.connected() == 0 ) {
-                this->disconnect( true );
-                return;
-            }
 
             /* Check if response has been received */
             if( _rxState != MQTT_RX_STATE_COMPLETE ) {
@@ -1056,7 +1061,9 @@ void MqttClient::runTasks() {
                 g_log.add( EVENT_MQTT_UNEXPECTED_RESPONSE );
 
                 /* Must receive CONNACK after connect request, droping connection */
-                this->disconnect( true );
+                _tcp.stop();
+                this->freeBuffer();
+
                 return;
             }
 
@@ -1068,7 +1075,8 @@ void MqttClient::runTasks() {
                 this->endTask( ERR_MQTTBROKER_REFUSED_CONNECT );
                 g_log.add( EVENT_MQTT_CONNECT_REFUSED, reason );
 
-                this->disconnect( true );
+                _tcp.stop();
+                this->freeBuffer();
                 
                 return;    
             }
@@ -1141,7 +1149,6 @@ void MqttClient::runTasks() {
 
             /* Expects a PUBACK packet type */
             if( _rxPacketType != MQTT_PACKET_PUBACK ) {
-                g_log.add( 250, _rxPacketType );
                 return;
             }
 
@@ -1149,7 +1156,6 @@ void MqttClient::runTasks() {
             this->readInt16( &packetID );
             
             if( _currentPacketID != packetID ) {
-                g_log.add( 251, packetID );
                 return;
             }
 

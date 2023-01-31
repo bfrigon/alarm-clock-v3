@@ -356,6 +356,7 @@ PROG_STR( S_CONSOLE_MQTT_BROKER_HOST,   "Hostname  : %s");
 PROG_STR( S_CONSOLE_MQTT_BROKER_PORT,   "Port      : %hu");
 PROG_STR( S_CONSOLE_MQTT_ENABLED,       "MQTT client enabled");
 PROG_STR( S_CONSOLE_MQTT_DISABLED,      "MQTT client disabled");
+PROG_STR( S_CONSOLE_MQTT_CONNECTING,    "Connecting..." );
 
 /* Log item descriptions */
 PROG_STR( S_LOG_REPEAT,                         " <- Occured %d times" );
@@ -396,6 +397,7 @@ PROG_STR( S_LOGMSG_MQTT_CONNECTED,              "Connected to MQTT broker" );
 PROG_STR( S_LOGMSG_MQTT_DISCONNECTED,           "Disconnected from MQTT broker" );
 PROG_STR( S_LOGMSG_MQTT_UNEXPECTED_RESPONSE,    "Unexpected response from MQTT broker" );
 PROG_STR( S_LOGMSG_MQTT_SOCKET_ERROR,           "Socket error while connecting to MQTT broker" );
+
 
 
 //--------------------------------------------------------------------------
