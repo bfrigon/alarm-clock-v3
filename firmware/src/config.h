@@ -298,15 +298,15 @@ struct NetworkSettings {
     char ssid[ MAX_SSID_LENGTH + 1 ];
     char wkey[ MAX_WKEY_LENGTH + 1 ];
     char hostname[ MAX_HOSTNAME_LENGTH + 1 ];
-    char ntpserver[ MAX_NTPSERVER_LENGTH + 1];
+    char ntpserver[ MAX_NTPSERVER_LENGTH + 1 ];
     bool telnetEnabled = false;
 
     bool mqtt_enabled = false;
-    char mqtt_host[ MAX_MQTT_HOST_LENGTH + 1];
-    char mqtt_username[ MAX_MQTT_USERNAME_LENGTH + 1];
-    char mqtt_password[ MAX_MQTT_PASSWORD_LENGTH + 1];
+    char mqtt_host[ MAX_MQTT_HOST_LENGTH + 1 ];
+    char mqtt_username[ MAX_MQTT_USERNAME_LENGTH + 1 ];
+    char mqtt_password[ MAX_MQTT_PASSWORD_LENGTH + 1 ];
     uint16_t mqtt_port = 1883;
-    char discovery_prefix[ MAX_DISCOVERY_PREFIX_LENGTH ];
+    char discovery_prefix[ MAX_DISCOVERY_PREFIX_LENGTH + 1 ];
 };
 
 

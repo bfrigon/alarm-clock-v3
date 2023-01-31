@@ -296,8 +296,9 @@ bool Power::detectConfigResetButton() {
  * 
  */
 void Power::enableWatchdog() {
+    
     /* Enable watchdog timer, 8 seconds timeout */
-    // wdt_enable( WDTO_8S );
+    wdt_enable( WDTO_8S );
 
     _wdt = true;
 }
@@ -320,6 +321,5 @@ void Power::disableWatchdog() {
  * 
  */
 void Power::resetWatchdog() {
-    // wtd_reset();
-
+    wdt_reset();
 }

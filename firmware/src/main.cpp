@@ -79,6 +79,8 @@ bool checkFactoryReset() {
         while( g_power.detectConfigResetButton() == true ) {
 
             if( ( millis() - start ) >= 1000 ) {
+
+                wdt_reset();
                 break;
             }
         }
@@ -115,9 +117,11 @@ bool checkFactoryReset() {
  */
 void setup() {
     
-    
     g_log.add( EVENT_RESET, MCUSR );
     MCUSR = 0;
+
+    /* Enable watchdog timer */
+    g_power.enableWatchdog();
 
     /* Setup console */
     g_console.begin( 115200 );
@@ -191,9 +195,6 @@ void setup() {
 
     /* Enable automatic ntp sync at random interval */
     g_ntp.setAutoSync( g_config.clock.use_ntp );
-
-    /* Enable watchdog timer */
-    g_power.enableWatchdog();
 }
 
 

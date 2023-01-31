@@ -132,8 +132,6 @@ void Alarm::onPowerStateChange( uint8_t state ) {
         
         delay( 50 );
 
-        _amplifier.dumpRegs();
-
     } else {
         _amplifier.end();
         delay( 50 );
