@@ -315,6 +315,7 @@ PROG_STR( S_CONSOLE_NTP_ADJUST,         "Adjusted clock %c%ld.%03ld seconds" );
 PROG_STR( S_CONSOLE_NTP_SERVER,         "NTP server : %s" );
 PROG_STR( S_CONSOLE_NTP_AUTOSYNC,       "Automatic clock synchronization : " );
 PROG_STR( S_CONSOLE_NTP_LAST_ERROR,     "Previous sync error : " );
+PROG_STR( S_CONSOLE_NTP_WAITING_WIFI,   "Waiting for WiFi to connect" );
 
 PROG_STR( S_CONSOLE_SERV_UNKNOWN,       "Unknown service name" );
 PROG_STR( S_CONSOLE_SERV_INVALID_OPT,   "Invalid option" );
@@ -381,6 +382,7 @@ PROG_STR( S_LOGMSG_NTP_FAIL_CANT_RESOLVE_HOST,  "NTP sync failed (cannot resolve
 PROG_STR( S_LOGMSG_NTP_FAIL_NO_RESPONSE,        "NTP sync failed (no response from server)" );
 PROG_STR( S_LOGMSG_NTP_FAIL_INVALID_RESPONSE,   "NTP sync failed (invalid response from server)" );
 PROG_STR( S_LOGMSG_NTP_FAIL_SEND_PACKET,        "NTP sync failed (packet send failed!)" );
+PROG_STR( S_LOGMSG_NTP_ADJUST_OFFSET,           "NTP client adjusted clock (%c%ld seconds) ");
 PROG_STR( S_LOGMSG_FACTORY_RESET,               "Settings was reset to factory defaults" );
 PROG_STR( S_LOGMSG_CONFIG_RESTORED,             "Restored settings from SD card" );
 PROG_STR( S_LOGMSG_POWER_ON_BATTERY,            "Main power lost, running on battery" );

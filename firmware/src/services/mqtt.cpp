@@ -1196,6 +1196,11 @@ void MqttClient::runTasks() {
             
             if( _tcp.connected() == 0 ) {
 
+                /* Don't attempt to reconnect while wifi is busy */
+                if( g_wifi.isBusy() == true ) {
+                    return;
+                }
+
                 /* Attempt to reconnect if connection was lost */
                 if(( millis() - _lastConnectAttempt > MQTT_RECONNECT_ATTEMPT_DELAY ) || _firstConnectAttempt == true ) {
                     

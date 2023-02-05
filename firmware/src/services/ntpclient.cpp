@@ -282,21 +282,23 @@ bool NtpClient::readNtpResponse() {
         _nextSyncDelay = random( NTPCLIENT_SYNC_SCHD_MIN, NTPCLIENT_SYNC_SCHD_MAX );
     }
 
+    if( sec_offset > 0 && ms_offset < 0 ) {
+        ms_offset += 1000;
+        sec_offset--;
+    }
 
+    /* If ntp sync was called from console, print adjustment offset. */
     if( _console != NULL ) {
-
-
-        if( sec_offset > 0 && ms_offset < 0 ) {
-            ms_offset += 1000;
-            sec_offset--;
-        }
-        
         _console->println();
         _console->printf_P( S_CONSOLE_NTP_ADJUST, 
                             ( sec_offset < 0 || ms_offset < 0 ) ? '-' : '+',
                             ( 1 - ((( sec_offset >> 31 ) & 0x1 ) << 1 )) * sec_offset, 
                             ( 1 - ((( ms_offset >> 31 ) & 0x1 ) << 1 )) * ms_offset );
         _console->println();
+    }
+
+    if( sec_offset > 10 || sec_offset < -10 ) {
+        g_log.add( EVENT_NTP_ADJUST_CLOCK, sec_offset );
     }
 
 
@@ -340,12 +342,10 @@ void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
         /* Or schedule the next retry. */
         } else {
             this->setTaskError( ERR_WIFI_NOT_CONNECTED );
+
             _lastSync = g_rtc.now();
-
-            g_log.add( EVENT_NTP_FAIL_NO_WIFI, 0);
+            _nextSyncDelay = 1;
         }
-
-        _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
     }
 }
 
@@ -356,19 +356,6 @@ void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
  * 
  */
 void NtpClient::runTasks() {
-
-    
-    if( this->isBusy() == false && _nextSyncDelay > 0 ) {
-        
-        DateTime now;
-        now = g_rtc.now();
-
-        if( now.getEpoch() > _lastSync.getEpoch() + _nextSyncDelay ) {
-            this->sync( NULL );
-
-            _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
-        }
-    }
 
     switch( this->getCurrentTask() ) {
 
@@ -425,6 +412,7 @@ void NtpClient::runTasks() {
 
                 this->endTask( ERR_NTPCLIENT_NO_RESPONSE );
                 g_log.add( EVENT_NTP_FAIL_NO_RESPONSE );
+                
                 return;
             }
 
@@ -437,7 +425,32 @@ void NtpClient::runTasks() {
 
                     this->endTask( ERR_NTPCLIENT_INVALID_RESPONSE );
                     g_log.add( EVENT_NTP_FAIL_INVALID_RESPONSE );
+
                     return;
+                }
+            }
+        }
+        break;
+
+        /* No Task running */
+        default: {
+            if( g_wifi.connected() == true && _nextSyncDelay > 0 ) {
+        
+                DateTime now;
+                now = g_rtc.now();
+
+                if( now.getEpoch() > _lastSync.getEpoch() + _nextSyncDelay ) {
+                
+                    if( this->sync( NULL ) == false ) {
+                        _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
+
+                        return;
+                    }
+
+                    if( this->getTaskError() != TASK_SUCCESS ) {
+
+                        _nextSyncDelay = NTPCLIENT_RETRY_DELAY;
+                    }
                 }
             }
         }
@@ -470,7 +483,12 @@ void NtpClient::printNTPStatus( ConsoleBase *console ) {
     console->println();
 
     /* Print delay before next synchronization. */
-    if( _nextSyncDelay > 0 ) {
+    if( _nextSyncDelay == 1 && g_wifi.connected() == false ) {
+        
+        console->print_P( S_CONSOLE_NTP_NEXT_SYNC );
+        console->println_P( S_CONSOLE_NTP_WAITING_WIFI );
+
+    } else if( _nextSyncDelay > 0 ) {
         unsigned long remaining;
         remaining = ( _lastSync.getEpoch() + _nextSyncDelay ) - g_rtc.now()->getEpoch();
 

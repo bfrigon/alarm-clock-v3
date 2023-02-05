@@ -310,6 +310,16 @@ void Logger::printLogEntryMessage( IPrint *output, uint8_t type, uint32_t flags 
         
         output->print_P(S_LOGMSG_NTP_FAIL_SEND_PACKET);
 
+    /* NTP: Adjusted clock (Only shown if greater that +/-10 seconds ) */
+    } else if( type == EVENT_NTP_ADJUST_CLOCK ) {
+
+        int32_t offset;
+        offset = (int32_t)flags;
+
+        output->printf_P( S_LOGMSG_NTP_ADJUST_OFFSET,
+                    ( offset < 0 ) ? '-' : '+',
+                    ( 1 - ((( offset >> 31 ) & 0x1 ) << 1 )) * offset);
+
     /* Telnet service enabled */
     } else if( type == EVENT_TELNET_SERVICE_ENABLED ) {
 
