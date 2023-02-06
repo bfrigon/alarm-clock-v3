@@ -932,8 +932,13 @@ bool MqttClient::publish( char* topic, char* payload, bool retain ) {
     /* Add fixed header */
     this->writeFixedHeader( MQTT_PACKET_PUBLISH, flags, remainingLength );
 
+    _currentPacketID++;
+    if( _currentPacketID == 0 ) {
+        _currentPacketID++;
+    }
+
     this->writeString( topic );
-    this->writeInt16( ++_currentPacketID );
+    this->writeInt16( _currentPacketID ); 
 
     if( payload != nullptr ) {
         this->writeString( payload, false );
