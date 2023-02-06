@@ -339,7 +339,7 @@ void MqttClient::enableClient( bool enabled ) {
     if( enabled ) {
         g_log.add( EVENT_MQTT_ENABLED );
 
-        if( g_wifi.connected() == true ) {
+        if( g_wifi.connected() == true && g_wifi.isBusy() == false ) {
             this->connect();
         }
         
