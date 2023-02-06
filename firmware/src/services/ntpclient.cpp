@@ -335,13 +335,16 @@ void NtpClient::setAutoSync( bool enabled, ConsoleBase *console ) {
         }
 
         /* If WiFi is connected, immediately synchronize. */
-        if( g_wifi.connected() == true ) {
+        if( g_wifi.connected() == true && g_wifi.isBusy() == false ) {
             
             this->sync( console );
 
         /* Or schedule the next retry. */
         } else {
-            this->setTaskError( ERR_WIFI_NOT_CONNECTED );
+
+            if( g_wifi.connected() == false ) {
+                this->setTaskError( ERR_WIFI_NOT_CONNECTED );
+            }
 
             _lastSync = g_rtc.now();
             _nextSyncDelay = 1;
@@ -487,6 +490,11 @@ void NtpClient::printNTPStatus( ConsoleBase *console ) {
         
         console->print_P( S_CONSOLE_NTP_NEXT_SYNC );
         console->println_P( S_CONSOLE_NTP_WAITING_WIFI );
+
+    } else if( _nextSyncDelay == 1 && g_wifi.isBusy() == true ) {
+        
+        console->print_P( S_CONSOLE_NTP_NEXT_SYNC );
+        console->println_P( S_CONSOLE_NTP_WIFI_BUSY );
 
     } else if( _nextSyncDelay > 0 ) {
         unsigned long remaining;

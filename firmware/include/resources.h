@@ -316,6 +316,7 @@ PROG_STR( S_CONSOLE_NTP_SERVER,         "NTP server : %s" );
 PROG_STR( S_CONSOLE_NTP_AUTOSYNC,       "Automatic clock synchronization : " );
 PROG_STR( S_CONSOLE_NTP_LAST_ERROR,     "Previous sync error : " );
 PROG_STR( S_CONSOLE_NTP_WAITING_WIFI,   "Waiting for WiFi to connect" );
+PROG_STR( S_CONSOLE_NTP_WIFI_BUSY,      "WiFi is used by another service" );
 
 PROG_STR( S_CONSOLE_SERV_UNKNOWN,       "Unknown service name" );
 PROG_STR( S_CONSOLE_SERV_INVALID_OPT,   "Invalid option" );
