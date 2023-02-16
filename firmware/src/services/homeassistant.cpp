@@ -20,6 +20,8 @@
 #include "mqtt.h"
 #include "logger.h"
 #include "timezone.h"
+#include "ui/ui.h"
+#include "drivers/us2066.h"
 
 
 
@@ -32,6 +34,8 @@ HomeAssistant::HomeAssistant() {
     _will_topic[0] = 0;
     _will_payload[0] = 0;
     _taskCurrentSensorID = SENSOR_ID_NONE;
+
+    memset( this->lcd_message, 0, MAX_PAYLOAD_LCD_MESSAGE_LENGTH + 1 );
 }
 
 
@@ -48,12 +52,14 @@ void HomeAssistant::begin() {
     snprintf_P( _ha_device_id, MAX_HA_DEVICE_ID_LENGTH + 1, S_HA_ID_FORMAT, mac[ 0 ], mac[ 1 ], mac[ 2 ], mac[ 3 ], mac[ 4 ], mac[ 5 ] );
     snprintf_P( _will_topic, MAX_WILL_TOPIC_LENGTH + 1, S_TOPIC_AVAILABILITY, g_config.network.discovery_prefix, _ha_device_id );
     strncpy_P( _will_payload, S_PAYLOAD_AVAIL_OFFLINE , MAX_PAYLOAD_AVAILABILITY_LENGTH + 1 );
+    memset( this->lcd_message, 0, MAX_PAYLOAD_LCD_MESSAGE_LENGTH + 1 );
 
     g_mqtt.setWillMessage( _will_topic, _will_payload, true, true );
 
     /* Start task waiting for the MQTT client to conenct to the broker */
     this->startTask( TASK_HOMEASSISTANT_WAIT_MQTT_CONNECT );
    
+    
 }
 
 
@@ -164,7 +170,7 @@ void HomeAssistant::beginSendSensorConfig() {
         return;
     }
 
-    this->startTask( TASK_HOMEASSISTANT_SEND_SENSOR_CONFIG );
+    this->startTask( TASK_HOMEASSISTANT_SEND_SENSOR_CONFIG, true );
 
     _taskCurrentSensorID = SENSOR_ID_NONE;
 }
@@ -199,53 +205,80 @@ void HomeAssistant::sendNextSensorConfig() {
     }
 
 
-    char *topic, *payload;
+    char *topic = nullptr;
+    char *payload = nullptr;
     size_t topic_len, payload_len;
+    bool isSubscribeTopic;    
 
     switch( _taskCurrentSensorID ) {
 
-        /* These sensors don't need config topic, skip */
-        case SENSOR_ID_AVAILABILITY:
-        case SENSOR_ID_NEXT_ALARM_AVAILABLE:
-            return;
-
         case SENSOR_ID_ALARM_SWITCH:
+            isSubscribeTopic = false;
             topic_len = strlen_P( S_TOPIC_CONFIG_ALARM_SWITCH ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_ALARM_SWITCH ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
 
         case SENSOR_ID_NEXT_ALARM:
+            isSubscribeTopic = false;
             topic_len = strlen_P( S_TOPIC_CONFIG_NEXT_ALARM ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_NEXT_ALARM ) + ( strlen( g_config.network.discovery_prefix ) * 3 ) + ( MAX_HA_DEVICE_ID_LENGTH * 5 ) + 1;
             break;
 
         case SENSOR_ID_CONN_RSSI:
+            isSubscribeTopic = false;
             topic_len = strlen_P( S_TOPIC_CONFIG_CONN_RSSI ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_CONN_RSSI ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
 
         case SENSOR_ID_BATTERY_CHARGE:
+            isSubscribeTopic = false;
             topic_len = strlen_P( S_TOPIC_CONFIG_BATTERY_CHARGE ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_BATTERY_CHARGE ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
 
         case SENSOR_ID_BATTERY_STATUS:
+            isSubscribeTopic = false;
             topic_len = strlen_P( S_TOPIC_CONFIG_BATTERY_STATUS ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_BATTERY_STATUS ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
 
         case SENSOR_ID_BATTERY_VOLT:
+            isSubscribeTopic = false;
             topic_len = strlen_P( S_TOPIC_CONFIG_BATTERY_VOLT ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = strlen_P( S_JSON_CONFIG_BATTERY_VOLT ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
             break;
+
+        case SENSOR_ID_LCD_MESSAGE:
+            isSubscribeTopic = false;
+            topic_len = strlen_P( S_TOPIC_CONFIG_LCD_MSG ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            payload_len = strlen_P( S_JSON_CONFIG_LCD_MSG ) + ( strlen( g_config.network.discovery_prefix ) * 2 ) + ( MAX_HA_DEVICE_ID_LENGTH * 4 ) + 1;
+            break;
+
+        case SENSOR_ID_LCD_MESSAGE_SET:
+            isSubscribeTopic = true;
+            topic_len = strlen_P( S_TOPIC_CMD_LCD_MSG ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
+            break;
+
+        /* Sendor does not need to send a configuration topic */
+        default:
+            return;
     }
 
-
+    /* Allocate buffer for topic */
     topic = ( char* )malloc( topic_len );
-    payload = ( char* )malloc( payload_len );
-
-    if( topic == nullptr || payload == nullptr ) {
+    if( topic == nullptr ) {
         return;
+    }
+
+    /* Allocate buffer for the sensor state to publish if it is not a
+       topic to subscribe to. */
+    if( isSubscribeTopic == false ) {
+    
+        payload = ( char* )malloc( payload_len );
+
+        if( payload == nullptr ) {
+            return;
+        }
     }
 
     switch( _taskCurrentSensorID ) {
@@ -323,13 +356,41 @@ void HomeAssistant::sendNextSensorConfig() {
         }
         break;
 
+        /* LCD message sensor config */
+        case SENSOR_ID_LCD_MESSAGE: {
+
+            snprintf_P( topic, topic_len, S_TOPIC_CONFIG_LCD_MSG, g_config.network.discovery_prefix, _ha_device_id );
+            snprintf_P( payload, payload_len, S_JSON_CONFIG_LCD_MSG,
+                _ha_device_id,
+                g_config.network.discovery_prefix, _ha_device_id, 
+                g_config.network.discovery_prefix, _ha_device_id, 
+                _ha_device_id );
+        }
+        break;
+
+        /* LCD message sensor set topic */
+        case SENSOR_ID_LCD_MESSAGE_SET: {
+            snprintf_P( topic, topic_len, S_TOPIC_CMD_LCD_MSG, g_config.network.discovery_prefix, _ha_device_id );
+            
+        }
+        break;
+    }
+    
+    if( isSubscribeTopic == true ) {
+
+        /* Send topic subscription request */
+        g_mqtt.subscribe( topic );
+    } else {
+
+        /* Publish configuration topic */
+        g_mqtt.publish( topic, payload, true );
     }
 
-    /* Publish configuration topic */
-    g_mqtt.publish( topic, payload, true );
-
     free( topic );
-    free( payload );
+
+    if( payload != nullptr ) {
+        free( payload );
+    }
 }
 
 
@@ -393,11 +454,17 @@ void HomeAssistant::sendNextSensorState() {
        case SENSOR_ID_BATTERY_VOLT:
             topic_len = strlen_P( S_TOPIC_STATE_BATTERY_VOLT ) + strlen( g_config.network.discovery_prefix ) + MAX_HA_DEVICE_ID_LENGTH + 1;
             payload_len = MAX_PAYLOAD_BATTERY_VOLTAGE_LENGTH + 1;
-            break;            
+            break;
+
+        /* Sensor does not have a state to send */
+        default:
+            return;
     }
 
     topic = ( char* )malloc( topic_len );
+
     payload = ( char* )malloc( payload_len );
+    memset( payload, 0, payload_len );
 
     if( topic == nullptr || payload == nullptr ) {
         return;
@@ -641,4 +708,34 @@ void HomeAssistant::runTasks() {
         }
         break;
     }
+}
+
+
+void handleHassTopicCallback( char* topic, size_t topicLength, char* payload, size_t payloadLength, bool retain ) {
+
+    char* topic_cmp;
+
+    /* Allocate memory for the topic compare. */
+    topic_cmp = ( char* )malloc( topicLength + 1 );
+    if( topic_cmp == nullptr ) {
+        return;
+    }
+
+    /* Check if received topic is for sensor ID CMD_LCD_MSG */
+    snprintf_P( topic_cmp, topicLength + 1, S_TOPIC_CMD_LCD_MSG, g_config.network.discovery_prefix, g_homeassistant.getDeviceID() );
+    if( memcmp( topic, topic_cmp, topicLength ) == 0 ) {
+
+        utf8ToLcdCharset( payload, payloadLength );
+
+        /* Update LCD message */
+        memset( g_homeassistant.lcd_message, 0, MAX_PAYLOAD_LCD_MESSAGE_LENGTH + 1 );
+        strncpy( g_homeassistant.lcd_message, payload, payloadLength );
+
+        if( g_screen.getId() == SCREEN_ID_ROOT ) {
+            g_screen.requestScreenUpdate( false );
+        }
+    }
+
+    free( topic_cmp );
+
 }

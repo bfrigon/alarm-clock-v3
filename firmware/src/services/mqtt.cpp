@@ -41,6 +41,7 @@ MqttClient::MqttClient() {
     _will_payload = nullptr;
     _will_retain = false;
     _lastPub = false;
+    _pubReceiveCallback = nullptr;
     
 }
 
@@ -85,6 +86,36 @@ void MqttClient::end() {
 
     this->disconnect( true );
     _init = false;
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Sets the pointer to the function to be called when a publish 
+ *          message is received from the server.
+ * 
+ */
+void MqttClient::setPublishReceiveCallback( mqttPubRxFunc func ) {
+
+    _pubReceiveCallback = func;
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Increment the packet ID counter
+ *
+ * @returns The next packet ID
+ */
+uint16_t MqttClient::getNewPacketID() {
+
+    _currentPacketID++;
+
+    if( _currentPacketID == 0 ) {
+        _currentPacketID++;
+    }
+
+    return _currentPacketID;
 }
 
 
@@ -148,27 +179,6 @@ void MqttClient::resetRxState() {
     _rxPacketType = 0;
     _rxPacketFlags = 0;
 }
-
-
-#ifdef MQTT_DEBUG_PACKET
-/*******************************************************************************
- *
- * @brief   Prints the content of the RX/TX buffer to the serial console
- * 
- */
-void MqttClient::dumpBuffer() {
-
-    if( _buffer == nullptr ) {
-        return;
-    }
-
-    size_t i;
-    for( i = 0; i < _bufferSize; i++ ) {
-        g_console.printf( "%02X ", (( uint8_t* )_buffer )[ i ] );
-    }
-    g_console.println();
-}
-#endif
 
     
 /*******************************************************************************
@@ -381,6 +391,80 @@ void MqttClient::setWillMessage( char* topic, char *payload, bool retain, bool p
 
 /*******************************************************************************
  *
+ * @brief   Process publish message packet received from broker.
+ * 
+ */
+void MqttClient::onReceivePublishMessage() {
+
+    /* No callback function was set, discard message */
+    if( _pubReceiveCallback == nullptr ) {
+        return;
+    }
+
+    uint8_t qos = ( _rxPacketFlags & 0x06 ) >> 1;
+    bool retain = _rxPacketFlags & 0x01;
+    
+    
+    uint16_t topicLen;
+    this->readInt16( &topicLen );
+
+    char *topic, *payload;
+    topic = (char*)_buffer + _bufferPos;
+
+    _bufferPos += topicLen;
+
+    /* Read packet identifier if QOS > 0 */
+    uint16_t packetID = 0;
+    if( qos >= MQTT_QOS_1 ) {
+        this->readInt16( &packetID );
+    }
+
+    payload = ( char* )_buffer + _bufferPos;
+
+    uint16_t payloadLen;
+    payloadLen = _bufferSize - _bufferPos;
+    
+    /* Invoke user callback */
+    this->_pubReceiveCallback( topic, topicLen, payload, payloadLen, retain );
+
+    /* Send an acknowledge response */
+    if( qos == MQTT_QOS_1 ) {
+        this->sendPublishAck( packetID );
+    }
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Send an acknowledge packet after receiving a subscribed topic 
+ *          publish from the broker.
+ * 
+ * @param   PacketID    Packet identifier of the PUBLISH packet to acknowledge.
+ * 
+ * @return  TRUE if succesful or FALSE otherwise.
+ * 
+ */
+bool MqttClient::sendPublishAck( uint16_t packetID ) {
+    if( _tcp.connected() == 0 ) {
+        return false;
+    }
+
+    this->resetRxState();
+    
+    /* Prepare the PUBACK packet */
+    this->allocBuffer( MQTT_MAX_FIXED_HEADER_LENGTH );
+    this->writeFixedHeader( MQTT_PACKET_PUBACK, 0, 2 );
+    
+    /* Write the variable header */
+    this->writeInt16( packetID );
+
+    /* Send the PUBACK packet */
+    return this->sendPacket();
+}
+
+
+/*******************************************************************************
+ *
  * @brief   Return whether or not the client is currently connected to
  *          the broker
  * 
@@ -499,7 +583,7 @@ void MqttClient::disconnect( bool immediate ) {
         _firstConnectAttempt = true;
         _lastConnectAttempt = 0;
 
-        this->freeBuffer();
+        this->resetRxState();
 
         _tcp.stop();
         
@@ -554,13 +638,6 @@ bool MqttClient::sendPacket() {
 
     _lastPacketSent = millis();
 
-    #ifdef MQTT_DEBUG_PACKET
-        g_console.println();
-        g_console.printfln( "MQTT TX (type=%d,length=%d) :", ((( uint8_t* )_buffer )[ 0 ] & 0xF0 ) >> 4, _bufferPos );
-
-        this->dumpBuffer();
-    #endif
-
     this->freeBuffer();
 
     if( res == false ) {
@@ -593,7 +670,7 @@ void MqttClient::poll() {
 
         if( rxByte < 0 ) {
             this->endTask( ERR_MQTTCLIENT_READ_FAIL );
-            _rxState = MQTT_RX_STATE_IDLE;
+            this->disconnect( true );
 
             return;
         }
@@ -610,14 +687,14 @@ void MqttClient::poll() {
 
                 if( _rxPacketType == 0 ) {
                     this->endTask( ERR_MQTT_MALFORMED_PACKET );
-                    _rxState = MQTT_RX_STATE_IDLE;
+                    this->disconnect( true );
                 }
 
                 /* allocate buffer for the remaining length field (1-4 bytes)*/
                 if( this->allocBuffer( 4 ) == nullptr ) {
 
                     this->endTask( ERR_MQTTCLIENT_CANT_ALLOCATE );
-                    _rxState = MQTT_RX_STATE_IDLE;
+                    this->disconnect( true );
 
                     return;
                 }
@@ -635,7 +712,7 @@ void MqttClient::poll() {
                 if(( rxByte & 0x80 ) != 0  && _bufferPos > 2 ) {
 
                     this->endTask( ERR_MQTT_MALFORMED_PACKET );
-                    _rxState = MQTT_RX_STATE_IDLE;
+                    this->disconnect( true );
 
                     return;
                 }
@@ -657,25 +734,29 @@ void MqttClient::poll() {
                         _rxState = MQTT_RX_STATE_COMPLETE;
                         _bufferPos = 0;
 
-                        #ifdef MQTT_DEBUG_PACKET
+                        /* Received a publish packet from broker for a subscribed topic */
+                        if( _rxPacketType == MQTT_PACKET_PUBLISH ) {
 
-                            g_console.println();
-                            g_console.printfln( "MQTT RX (type=%d, flags=0x%02X, length=0)", 
-                                                _rxPacketType, _rxPacketFlags );
-                        #endif
+                            if( _pubReceiveCallback != nullptr) {
+                                this->onReceivePublishMessage();
+                            }
+
+                            /* Discard packet after callback has been called */
+                            this->resetRxState();
+
+                            return;
+                        }
 
                         return;
                     }
-
 
                     if( this->allocBuffer( packetLength ) == nullptr ) {
 
                         this->endTask( ERR_MQTTCLIENT_CANT_ALLOCATE );
-                        _rxState = MQTT_RX_STATE_IDLE;
+                        this->disconnect( true );
+
                         return;
                     }
-
-                    
 
                     _rxState = MQTT_RX_STATE_READ_DATA;
                 }
@@ -687,18 +768,25 @@ void MqttClient::poll() {
 
                 (( uint8_t* )_buffer )[ _bufferPos++ ] = ( uint8_t )rxByte;
 
+                /* Done reading packet */
                 if( _bufferPos == _bufferSize ) {
                     _rxState = MQTT_RX_STATE_COMPLETE;
                     _bufferPos = 0;
 
-                    #ifdef MQTT_DEBUG_PACKET
+                    /* Received a publish packet from broker for a subscribed topic */
+                    if( _rxPacketType == MQTT_PACKET_PUBLISH ) {
 
-                        g_console.println();
-                        g_console.printfln( "MQTT RX (type=%d, flags=0x%02X, length=%d) :", 
-                                            _rxPacketType, _rxPacketFlags, _bufferSize );
-                        
-                        this->dumpBuffer();
-                    #endif
+                        if( _pubReceiveCallback != nullptr) {
+                            this->onReceivePublishMessage();
+                        }
+
+                        /* Discard packet after callback has been called */
+                        this->resetRxState();
+
+                        return;
+                    }
+
+                    return;
                 }
             }
             break;
@@ -819,6 +907,73 @@ bool MqttClient::sendConnectPacket() {
 
 /*******************************************************************************
  *
+ * @brief   Check if the receive buffer contains a CONACK (Connection acknowledge)
+ *          Packet.
+ * 
+ * @return  Returns TRUE if a valid CONACK packet was received, FALSE otherwise.
+ * 
+ */
+bool MqttClient::checkForConnectAck() {
+
+    /* Check for incomming packet */
+    this->poll();
+    
+    if( this->getTaskRunningTime() > MQTT_BROKER_CONNECT_TIMEOUT ) {
+
+        this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
+        g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
+
+        this->disconnect( true );
+
+        return false;
+    }
+
+
+    /* Check if response has been received */
+    if( _rxState != MQTT_RX_STATE_COMPLETE ) {
+        return false;
+    }
+
+    /* Expects a CONNACK packet type */
+    if( _rxPacketType != MQTT_PACKET_CONNACK ) {
+
+        this->endTask( ERR_MQTTBROKER_UNEXPECTED_RESPONSE );
+        g_log.add( EVENT_MQTT_UNEXPECTED_RESPONSE );
+
+        /* Must receive CONNACK after connect request, droping connection */
+        this->disconnect( true );
+
+        return false;
+    }
+
+    uint8_t reason = (( uint8_t *)_buffer )[ 1 ];
+
+    /* Reset RX buffer */
+    this->resetRxState();
+
+
+    if( reason != MQTT_CONNACK_ACCEPTED ) {
+
+        this->endTask( ERR_MQTTBROKER_REFUSED_CONNECT );
+        g_log.add( EVENT_MQTT_CONNECT_REFUSED, reason );
+
+        _tcp.stop();
+        this->freeBuffer();
+        
+        return false;
+    }
+
+    g_log.add( EVENT_MQTT_CONNECTED );
+    _connected = true;
+    _lastPub = false;
+
+    this->endTask( TASK_SUCCESS );
+    return true;
+}
+
+
+/*******************************************************************************
+ *
  * @brief   Send a DISCONNECT request packet to the broker
  * 
  * @details This function returns immediately. The completion can be monitored
@@ -847,10 +1002,10 @@ bool MqttClient::sendDisconnectPacket() {
 
 /*******************************************************************************
  *
- * @brief   Send a PING packet to the broker
+ * @brief   Send a PING packet to the broker.
  * 
  * @details This function returns immediately. The completion can be monitored
- *          by calling isBusy() and check the error with getTaskError()
+ *          by calling isBusy() and check the error with getTaskError().
  * 
  * @return  TRUE if successful, FALSE otherwise.
  * 
@@ -884,13 +1039,59 @@ bool MqttClient::ping() {
 
 /*******************************************************************************
  *
- * @brief   Send a PUBLISH packet to the broker
+ * @brief   Check if the receive buffer contains a PINGRESP (Ping response)
+ *          Packet.
+ * 
+ * @return  Returns TRUE if a valid PINGRESP packet was received, FALSE otherwise.
+ * 
+ */
+bool MqttClient::checkForPingResponse() {
+
+    /* Check for incomming packet */
+    this->poll();
+
+    if( this->getTaskRunningTime() > MQTT_BROKER_PING_TIMEOUT ) {
+
+        this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
+        g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
+
+        return false;
+    }
+
+    if( _tcp.connected() == 0 ) {
+        this->disconnect( true );
+        return false;
+    }
+    
+    /* Check if response has been received */
+    if( _rxState != MQTT_RX_STATE_COMPLETE ) {
+        return false;
+    }
+
+    /* Expects a PINGRESP packet type */
+    if( _rxPacketType != MQTT_PACKET_PINGRESP ) {
+        return false;
+    }
+    
+    /* Reset RX buffer */
+    this->resetRxState();
+
+    /* Ping successful */
+    this->endTask( TASK_SUCCESS );
+
+    return true;
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Send a PUBLISH packet to the broker.
  * 
  * @details This function returns immediately. The completion can be monitored
- *          by calling isBusy() and check the error with getTaskError()
+ *          by calling isBusy() and check the error with getTaskError().
  * 
- * @param   topic   Pointer to a character array containing the topic
- * @param   payload Pointer to a character array containing the message payload
+ * @param   topic   Pointer to a character array containing the topic.
+ * @param   payload Pointer to a character array containing the message payload.
  * @param   retain  Sets the retain flag
  * 
  * @return  TRUE if successful, FALSE otherwise.
@@ -932,20 +1133,184 @@ bool MqttClient::publish( char* topic, char* payload, bool retain ) {
     /* Add fixed header */
     this->writeFixedHeader( MQTT_PACKET_PUBLISH, flags, remainingLength );
 
-    _currentPacketID++;
-    if( _currentPacketID == 0 ) {
-        _currentPacketID++;
-    }
+    /* Add variable header */
+    this->writeString( topic, true );
+    this->writeInt16( this->getNewPacketID() ); 
 
-    this->writeString( topic );
-    this->writeInt16( _currentPacketID ); 
-
+    /* Add packet payload */
     if( payload != nullptr ) {
         this->writeString( payload, false );
     }
 
     /* Send the packet */
     return this->sendPacket();
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Check if the receive buffer contains a PUBACK (Publish acknowledge).
+ *          Packet.
+ * 
+ * @return  Returns TRUE if a valid PUBACK packet was received, FALSE otherwise.
+ * 
+ */
+bool MqttClient::checkForPublishAck() {
+
+    /* Check for incomming packet */
+    this->poll();
+
+    if( this->getTaskRunningTime() > MQTT_BROKER_PUBLISH_TIMEOUT ) {
+
+        this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
+        g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
+
+        return false;
+    }
+
+    if( _tcp.connected() == 0 ) {
+        this->disconnect( true );
+        return false;
+    }
+    
+    /* Check if response has been received */
+    if( _rxState != MQTT_RX_STATE_COMPLETE ) {
+        return false;
+    }
+
+    /* Expects a PUBACK packet type */
+    if( _rxPacketType != MQTT_PACKET_PUBACK ) {
+        return false;
+    }
+
+    /* Read the packet ID from the RX buffer */
+    uint16_t packetID;
+    this->readInt16( &packetID );
+
+    /* Reset RX buffer */
+    this->resetRxState();
+    
+    if( _currentPacketID != packetID ) {
+        return false;
+    }
+
+    /* Send disconnect packet if it was the final publish 
+        before disconnect request */
+    if( _lastPub == true ) {
+
+        this->sendDisconnectPacket();
+        return true;
+    }
+
+    this->endTask( TASK_SUCCESS );
+    return true;
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Send a SUBSCRIBE request packet to the broker.
+ * 
+ * @details This function returns immediately. The completion can be monitored
+ *          by calling isBusy() and check the error with getTaskError().
+ * 
+ * @param   topic   Pointer to a character array containing the topic to
+ *                  subscribe to.
+ * 
+ * @return  TRUE if successful, FALSE otherwise.
+ * 
+ */
+bool MqttClient::subscribe( char* topic ) {
+
+    if( _init == false ) {
+        return false;
+    }
+
+    if( _tcp.connected() == 0 ) {
+        return false;
+    }
+
+    this->startTask( TASK_MQTT_SEND_SUBSCRIBE_PACKET, true );
+    this->resetRxState();
+    
+    /* determine remaining packet length */
+    size_t remainingLength;
+    remainingLength = 2;                        /* Packet ID length */
+    remainingLength += strlen( topic ) + 2 ;    /* Topic name length */
+    remainingLength += 1;                       /* Request QOS field */
+
+    /* Allocate TX buffer */
+    if( this->allocBuffer( MQTT_MAX_FIXED_HEADER_LENGTH + remainingLength ) == nullptr ) {
+        this->endTask( ERR_MQTTCLIENT_CANT_ALLOCATE );
+
+        return false;
+    }
+
+    /* Add fixed header */
+    this->writeFixedHeader( MQTT_PACKET_SUBSCRIBE, MQTT_SUB_FLAGS, remainingLength );
+
+    /* Add variable header */
+    this->writeInt16( this->getNewPacketID() ); 
+
+    /* Write packet payload */
+    this->writeString( topic, true );
+    this->writeInt( MQTT_QOS_1 );
+
+    /* Send the packet */
+    return this->sendPacket();
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Check if the receive buffer contains a SUBACK (Subscribe acknowledge)
+ *          Packet.
+ * 
+ * @return  Returns TRUE if a valid SUBACK packet was received, FALSE otherwise.
+ * 
+ */
+bool MqttClient::checkForSubscribeAck() {
+
+    /* check for incomming packets */
+    this->poll();
+
+    if( this->getTaskRunningTime() > MQTT_BROKER_SUBSCRIBE_TIMEOUT ) {
+
+        this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
+        g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
+
+        return false;
+    }
+
+    if( _tcp.connected() == 0 ) {
+        this->disconnect( true );
+        return false;
+    }
+    
+    /* Check if response has been received */
+    if( _rxState != MQTT_RX_STATE_COMPLETE ) {
+        return false;
+    }
+
+    /* Expects a SUBACK packet type */
+    if( _rxPacketType != MQTT_PACKET_SUBACK ) {
+        return false;
+    }
+
+    /* Read the packet ID from the RX buffer */
+    uint16_t packetID;
+    this->readInt16( &packetID );
+
+    /* Reset RX buffer */
+    this->resetRxState();
+    
+    if( _currentPacketID != packetID ) {
+        return false;
+    }
+
+    this->endTask( TASK_SUCCESS );
+    
+    return true;
 }
 
 
@@ -1026,8 +1391,7 @@ void MqttClient::runTasks() {
                     this->endTask( ERR_MQTTBROKER_REFUSED_CONNECT );
                     g_log.add( EVENT_MQTT_CONNECT_REFUSED );
                     
-                    _tcp.stop();
-                    this->freeBuffer();
+                    this->disconnect( true );
 
                     return;
                 }
@@ -1039,141 +1403,30 @@ void MqttClient::runTasks() {
         /* Sending connect request packet */
         case TASK_MQTT_SEND_CONNECT_PACKET: {
 
-            /* Check for incomming packet */
-            this->poll();
-            
-            if( this->getTaskRunningTime() > MQTT_BROKER_CONNECT_TIMEOUT ) {
-
-                this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
-                g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
-
-                _tcp.stop();
-                this->freeBuffer();
-
-                return;
-            }
-
-
-            /* Check if response has been received */
-            if( _rxState != MQTT_RX_STATE_COMPLETE ) {
-                return;
-            }
-
-            /* Expects a CONNACK packet type */
-            if( _rxPacketType != MQTT_PACKET_CONNACK ) {
-
-                this->endTask( ERR_MQTTBROKER_UNEXPECTED_RESPONSE );
-                g_log.add( EVENT_MQTT_UNEXPECTED_RESPONSE );
-
-                /* Must receive CONNACK after connect request, droping connection */
-                _tcp.stop();
-                this->freeBuffer();
-
-                return;
-            }
-
-            uint8_t reason = (( uint8_t *)_buffer )[ 1 ];
-
-
-            if( reason != MQTT_CONNACK_ACCEPTED ) {
-
-                this->endTask( ERR_MQTTBROKER_REFUSED_CONNECT );
-                g_log.add( EVENT_MQTT_CONNECT_REFUSED, reason );
-
-                _tcp.stop();
-                this->freeBuffer();
-                
-                return;    
-            }
-
-            g_log.add( EVENT_MQTT_CONNECTED );
-            _connected = true;
-            _lastPub = false;
-
-            this->endTask( TASK_SUCCESS );
+            this->checkForConnectAck();
         }
         break;
 
         /* Sending ping request packet */
         case TASK_MQTT_SEND_PING_PACKET: {
 
-            /* Check for incomming packet */
-            this->poll();
-
-            if( this->getTaskRunningTime() > MQTT_BROKER_PING_TIMEOUT ) {
-
-                this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
-                g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
-
-                return;
-            }
-
-            if( _tcp.connected() == 0 ) {
-                this->disconnect( true );
-                return;
-            }
-            
-            /* Check if response has been received */
-            if( _rxState != MQTT_RX_STATE_COMPLETE ) {
-                return;
-            }
-
-            /* Expects a PINGRESP packet type */
-            if( _rxPacketType != MQTT_PACKET_PINGRESP ) {
-                return;
-            }
-
-            /* Ping successful */
-            this->endTask( TASK_SUCCESS );
+            this->checkForPingResponse();
         } 
         break;
 
         /* Sending publish packet */
         case TASK_MQTT_SEND_PUBLISH_PACKET: {
 
-            /* Check for incomming packet */
-            this->poll();
+            /* Check if we received a publish acknowledge packet. */
+            this->checkForPublishAck();
+        }
+        break;
 
-            if( this->getTaskRunningTime() > MQTT_BROKER_PUBLISH_TIMEOUT ) {
+        /* Sending publish packet task */
+        case TASK_MQTT_SEND_SUBSCRIBE_PACKET: {
 
-                this->endTask( ERR_MQTTBROKER_NO_RESPONSE );
-                g_log.add( EVENT_MQTT_BROKER_NO_RESPONSE );
-
-                return;
-            }
-
-            if( _tcp.connected() == 0 ) {
-                this->disconnect( true );
-                return;
-            }
-            
-            /* Check if response has been received */
-            if( _rxState != MQTT_RX_STATE_COMPLETE ) {
-                return;
-            }
-
-            /* Expects a PUBACK packet type */
-            if( _rxPacketType != MQTT_PACKET_PUBACK ) {
-                return;
-            }
-
-            uint16_t packetID;
-            this->readInt16( &packetID );
-            
-            if( _currentPacketID != packetID ) {
-                return;
-            }
-
-            /* Send disconnect packet if it was the final publish 
-               before disconnect request */
-            if( _lastPub == true ) {
-
-                this->sendDisconnectPacket();
-                return;
-            }
-
-            this->endTask( TASK_SUCCESS );
-
+            /* Check if we received a subscribe acknowledge packet. */
+            this->checkForSubscribeAck();
         }
         break;
 
@@ -1223,6 +1476,9 @@ void MqttClient::runTasks() {
                 }
             
             } else {
+
+                /* Check for incoming packets */
+                this->poll();
 
                 /* Send keep-alive packet if connected */    
                 if (( millis() - _lastPacketSent ) / 1000 > _keepAlive ) {

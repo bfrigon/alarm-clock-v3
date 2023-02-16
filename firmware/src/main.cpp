@@ -177,6 +177,7 @@ void setup() {
     /* Initialize WIFI driver */
     g_wifi.begin();
     g_wifi.setSystemTime( g_rtc.now() );
+    delay( 250 );
 
     /* Initialize UI */
     g_screen.activate( &screen_root );
@@ -189,6 +190,7 @@ void setup() {
 
     /* Connect to the mqtt broker if enabled */
     g_mqtt.begin();
+    g_mqtt.setPublishReceiveCallback( handleHassTopicCallback );
 
     /* Enable home assistant client via MQTT */
     g_homeassistant.begin();

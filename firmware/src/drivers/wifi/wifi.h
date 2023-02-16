@@ -110,11 +110,10 @@ class WiFi : public ITask {
 
   private:
     int init();
-    void getConnectionInfo();
 
-    bool _init = false;                   /* Class initialized */
-    bool _dhcp = true;                    /* Automatically get the local IP address from DHCP */
-    bool _autoReconnect = true;           /* Attempt to reconnect when connection is lost */
+    bool _init;                           /* Class initialized */
+    bool _dhcp;                           /* Automatically get the local IP address from DHCP */
+    bool _autoReconnect;                  /* Attempt to reconnect when connection is lost */
     wl_status_t _status;                  /* Current connection status */
     uint32_t _localip;                    /* Local IP address */
     uint32_t _submask;                    /* Local IP address mask */

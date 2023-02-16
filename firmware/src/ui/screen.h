@@ -53,16 +53,14 @@
 
 /* Characters : Root screen */
 #define CHAR_WIFI_ON                    0x00
-#define CHAR_NO_SD                      0x01
-#define CHAR_DEGREE                     0x02
-#define CHAR_BATTERY_LOW                0x03
-#define CHAR_BATTERY_HALF               0x04
-#define CHAR_BATTERY_FULL               0x05
-#define CHAR_BATTERY_CHARGING           0x06
-#define CHAR_NO_BATTERY                 0x07
+#define CHAR_TELNET_SESSION_ACTIVE      0x01
+#define CHAR_BATTERY_LOW                0x02
+#define CHAR_BATTERY_HALF               0x03
+#define CHAR_BATTERY_FULL               0x04
+#define CHAR_NO_BATTERY                 0x05
+#define CHAR_NO_SD                      0x06
 #define CHAR_ALARM                      0x92
-#define CHAR_TELNET_SESSION_ACTIVE      0x94
-#define CHAR_TELNET_SESSION_INNACTIVE   0xCF
+#define CHAR_TELNET_SESSION_INNACTIVE   0x20
 
 
 

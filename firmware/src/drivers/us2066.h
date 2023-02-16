@@ -194,6 +194,8 @@ class US2066 : public IPrint {
     US2066_STATE _state;
 };
 
+void utf8ToLcdCharset( char* buffer, size_t length );
+
 
 /* LCD driver */
 extern US2066 g_lcd ;

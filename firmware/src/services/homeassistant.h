@@ -38,6 +38,8 @@
 #define MAX_PAYLOAD_BATTERY_CHARGE_LENGTH   3   /* Battery charge value (max 3 digits) */
 #define MAX_PAYLOAD_BATTERY_STATUS_LENGTH   11  /* Battery status */
 #define MAX_PAYLOAD_BATTERY_VOLTAGE_LENGTH  5   /* Battery voltage (0.000) */
+#define MAX_PAYLOAD_LCD_MESSAGE_LENGTH      10  
+
 
 /* Sensor maximum update rate */
 #define MAX_UPDATE_RATE_CONN_RSSI           30000   
@@ -49,7 +51,7 @@
 #define MAX_WILL_TOPIC_LENGTH               15 + MAX_HA_DEVICE_ID_LENGTH + MAX_DISCOVERY_PREFIX_LENGTH
 
 /* Maximum number of sensors */
-#define MAX_SENSORS_ID      SENSOR_ID_AVAILABILITY
+#define MAX_SENSORS_ID                    SENSOR_ID_AVAILABILITY
 
 /* Sensors ID's */
 enum HASensorsIDs {
@@ -61,6 +63,8 @@ enum HASensorsIDs {
     SENSOR_ID_BATTERY_CHARGE,
     SENSOR_ID_BATTERY_STATUS,
     SENSOR_ID_BATTERY_VOLT,
+    SENSOR_ID_LCD_MESSAGE,
+    SENSOR_ID_LCD_MESSAGE_SET,
     SENSOR_ID_AVAILABILITY
 };
 
@@ -104,6 +108,8 @@ PROG_STR( S_TOPIC_CONFIG_BATTERY_STATUS,"%s/sensor/%s/clock_battery_status/confi
 PROG_STR( S_TOPIC_STATE_BATTERY_STATUS, "%s/sensor/%s/clock_battery_status/state" );
 PROG_STR( S_TOPIC_CONFIG_BATTERY_VOLT,  "%s/sensor/%s/clock_battery_voltage/config" );
 PROG_STR( S_TOPIC_STATE_BATTERY_VOLT,   "%s/sensor/%s/clock_battery_voltage/state" );
+PROG_STR( S_TOPIC_CONFIG_LCD_MSG,       "%s/text/%s/clock_lcd_msg/config" );
+PROG_STR( S_TOPIC_CMD_LCD_MSG,          "%s/text/%s/clock_lcd_msg/set" );
 PROG_STR( S_TOPIC_AVAILABILITY,         "%s/sensor/%s/status" );
 
 /* Sendor configuration topics payload */
@@ -180,6 +186,20 @@ PROG_STR( S_JSON_CONFIG_BATTERY_VOLT,   "{\"name\":\"Alarm clock Battery voltage
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
+PROG_STR( S_JSON_CONFIG_LCD_MSG,        "{\"name\":\"Alarm clock LCD message\"," \
+                                        "\"uniq_id\":\"clock_%s_lcd_msg\"," \
+                                        "\"cmd_t\":\"%s/text/%s/clock_lcd_msg/set\"," \
+                                        "\"avty_t\": \"%s/sensor/%s/status\"," \
+                                        "\"ent_cat\":\"config\", " \
+                                        "\"retain\":\"true\", " \
+                                        "\"qos\":\"1\", " \
+                                        "\"ic\":\"mdi:message-text\"," \
+                                        "\"max\":\"10\"," \
+                                        "\"dev\":{" \
+                                        "\"ids\":[\"%s\"]" \
+                                        "}}" );
+
+
 
 /*******************************************************************************
  *
@@ -198,6 +218,10 @@ class HomeAssistant : public ITask {
     void runTasks();
     bool updateSensor( uint8_t sensorID, bool force = false );
     bool updateAllSensors( bool force = false );
+    
+    char* getDeviceID() { return _ha_device_id; }
+
+    char lcd_message[ MAX_PAYLOAD_LCD_MESSAGE_LENGTH + 1 ];
 
   private:
 
@@ -205,7 +229,7 @@ class HomeAssistant : public ITask {
     void sendNextSensorConfig();
     void beginSendSensorStates();
     void sendNextSensorState();
-    
+        
     uint8_t _taskCurrentSensorID;                               /* Current sensor ID for the publish config or state task */
     char _will_topic[ MAX_WILL_TOPIC_LENGTH + 1 ];              /* WILL message topic buffer */
     char _will_payload[ MAX_PAYLOAD_AVAILABILITY_LENGTH + 1 ];  /* WILL message payload buffer */
@@ -219,5 +243,7 @@ class HomeAssistant : public ITask {
 };
 
 extern HomeAssistant g_homeassistant;
+
+void handleHassTopicCallback( char* topic, size_t topicLength, char* payload, size_t payloadLength, bool retain );
 
 #endif /* HOMEASSISTANT_H */

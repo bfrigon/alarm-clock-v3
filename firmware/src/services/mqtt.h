@@ -29,9 +29,6 @@
 
 
 
-/* Dump packet buffer content to the console before sending / on receive */
-//#define MQTT_DEBUG_PACKET
-
 /* MQTT protocol version */
 #define MQTT_PROTOCOL_LEVEL_4           4       /* MQTT 3.1.1 */
 
@@ -43,6 +40,7 @@
 
 /* Delays (ms) */
 #define MQTT_BROKER_PUBLISH_TIMEOUT     5000
+#define MQTT_BROKER_SUBSCRIBE_TIMEOUT   5000
 #define MQTT_BROKER_PING_TIMEOUT        5000
 #define MQTT_BROKER_CONNECT_TIMEOUT     5000
 #define MQTT_RECONNECT_ATTEMPT_DELAY    15000
@@ -63,8 +61,18 @@
 #define MQTT_PUB_FLAGS_QOS_2            0x04
 #define MQTT_PUB_FLAGS_DUP              0x08
 
+/* Subscribe flags */
+#define MQTT_SUB_FLAGS                  0x02
+
+/* Quality-of-service levels */
+#define MQTT_QOS_0                      0
+#define MQTT_QOS_1                      1
+#define MQTT_QOS_2                      2
+
+
 
 PROG_STR( S_MQTT_CLIENTID_FORMAT, "clock-v3-%02X%02X%02X%02X%02X%02X" );
+
 
 
 /* Packet types */
@@ -93,6 +101,7 @@ enum MqttTaskIds {
     TASK_MQTT_SEND_CONNECT_PACKET,
     TASK_MQTT_SEND_PING_PACKET,
     TASK_MQTT_SEND_PUBLISH_PACKET,
+    TASK_MQTT_SEND_SUBSCRIBE_PACKET,
     TASK_MQTT_DISCONNECT,
 };
 
@@ -115,6 +124,11 @@ enum MqttConnAckResponses {
 };
 
 
+
+typedef void (*mqttPubRxFunc)( char* topic, size_t topicLength, char* payload, size_t payloadLength, bool retain );
+
+
+
 /*******************************************************************************
  *
  * @brief   MQTT client class
@@ -131,8 +145,10 @@ class MqttClient : public ITask {
     bool enabled();
     bool ping();
     bool publish( char* topic, char* payload, bool retain = false );
+    bool subscribe( char* topic );
     void setWillMessage( char* topic, char *payload, bool retain = false, bool publishBeforeDisconnect = false );
     void runTasks();
+    void setPublishReceiveCallback( mqttPubRxFunc func );
 
   private:
     bool connect();
@@ -140,6 +156,7 @@ class MqttClient : public ITask {
     bool sendPacket();
     bool sendConnectPacket();
     bool sendDisconnectPacket();
+    bool sendPublishAck( uint16_t packetID );
     void* allocBuffer( size_t size );
     void freeBuffer();
     void poll();
@@ -150,10 +167,12 @@ class MqttClient : public ITask {
     size_t writeString( char *value, bool encodeLength = true );
     size_t readInt16( uint16_t* valuePtr );
     size_t readInt( uint8_t* valuePtr );
-
-    #ifdef MQTT_DEBUG_PACKET
-        void dumpBuffer();
-    #endif
+    bool checkForPublishAck();
+    bool checkForConnectAck();
+    bool checkForSubscribeAck();
+    bool checkForPingResponse();
+    uint16_t getNewPacketID();
+    void onReceivePublishMessage();
 
     TCPClient _tcp;                         /* TCP connection instance */
     IPAddress _broker_ip;                   /* MQTT broker IP address */
@@ -176,6 +195,7 @@ class MqttClient : public ITask {
     char* _will_payload;                    /* Pointer to the WILL message payload */
     bool _will_retain;                      /* WILL message retain flag */
     bool _will_pub_on_disconnect;           /* Publish the WILL message when client disconnects */
+    mqttPubRxFunc _pubReceiveCallback;      /* Function to be called when a publish message is received */
 };
 
 extern MqttClient g_mqtt;

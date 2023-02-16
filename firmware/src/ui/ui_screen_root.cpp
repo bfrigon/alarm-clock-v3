@@ -18,7 +18,7 @@
 
 #include <drivers/wifi/wifi.h>
 #include <services/telnet_console.h>
-#include <services/mqtt.h>
+#include <services/homeassistant.h>
 #include "ui.h"
 
 
@@ -90,6 +90,10 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
         g_lcd.print( CHAR_SPACE );
     }
 
+    /* Print LCD message from home-assistant */
+    g_lcd.setPosition( 0, 3 );
+    g_lcd.print( g_homeassistant.lcd_message, MAX_PAYLOAD_LCD_MESSAGE_LENGTH, TEXT_ALIGN_CENTER );
+
     /* Print status icons */
     g_lcd.setPosition( 0, 14 );
     g_lcd.print( ( g_alarm.isSDCardPresent() == false ) ? CHAR_NO_SD : CHAR_SPACE );
@@ -98,10 +102,6 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
     switch( g_battery.getBatteryState() ) {
         case BATTERY_STATE_NOT_PRESENT:
             g_lcd.print( CHAR_NO_BATTERY );
-            break;
-
-        case BATTERY_STATE_CHARGING:
-            g_lcd.print( CHAR_BATTERY_CHARGING );
             break;
 
         case BATTERY_STATE_DISCHARGE_FULL:

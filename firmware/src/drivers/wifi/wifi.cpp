@@ -46,9 +46,7 @@ WiFi::WiFi( int8_t pin_cs, int8_t pin_irq, int8_t pin_rst, int8_t pin_en ) {
     gi8Winc1501IntnPin = pin_irq;
     gi8Winc1501ResetPin = pin_rst;
     gi8Winc1501ChipEnPin = pin_en;
-
-    _lastRssiRequest = millis();
-    _rssi = -120;
+  
 }
 
 
@@ -129,6 +127,12 @@ int WiFi::init() {
     _gateway = 0;
     _dhcp = true;
     _resolve = 0;
+    _autoReconnect = true;
+    _lastRssiRequest = millis();
+    _rssi = -120;
+    _lastConnectAttempt = 0;
+        
+
 
 
     extern uint32 nmdrv_firm_ver;
@@ -160,7 +164,7 @@ int WiFi::init() {
 void WiFi::setAutoReconnect( bool autoReconnect, bool immediate ) {
     _autoReconnect = autoReconnect;
 
-    if( immediate ) {
+    if( immediate == true ) {
         _lastConnectAttempt = millis() - WIFI_RECONNECT_ATTEMPT_DELAY;
     }
 }

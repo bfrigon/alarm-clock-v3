@@ -48,10 +48,6 @@ bool battStatus_onDrawScreen( Screen* screen ) {
             g_lcd.print( CHAR_NO_BATTERY );
             break;
 
-        case BATTERY_STATE_CHARGING:
-            g_lcd.print( CHAR_BATTERY_CHARGING );
-            break;
-
         case BATTERY_STATE_DISCHARGE_FULL:
             g_lcd.print( CHAR_BATTERY_FULL );
             break;

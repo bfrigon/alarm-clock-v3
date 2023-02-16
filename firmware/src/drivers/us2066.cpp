@@ -506,3 +506,159 @@ size_t US2066::_print( char c ) {
 
     return ( Wire.endTransmission() == 0 ? 1 : 0 );
 }
+
+
+/*******************************************************************************
+ *
+ * @brief   Convert a buffer containing UTF-8 formated characters to the
+ *          equivalent characters supported by the LCD module (US2066, Rom A).
+ *
+ * @param   buffer  Pointer to the UTF-8 string to convert.
+ * @param   length  Number of character contained in the buffer.    
+ * 
+ */
+void utf8ToLcdCharset( char* buffer, size_t length ) {
+
+    uint32_t unicode = 0;
+
+    while( length-- ) {
+
+        uint8_t c = *(( uint8_t* )buffer );
+        uint8_t replace = 0;
+
+        /* End of string (NULL character) */
+        if( c == 0 ) {
+            break;
+
+        /* Single byte code point (U+0000 - U+007F) */
+        } else if ( c < 0x80 ) {
+            unicode = c;
+
+        /* Multi-byte code point */
+        } else {
+            unicode <<= 8;
+            unicode += c;
+        }
+            
+        /* Convert unicode characters to LCD characters */
+        switch( unicode ) {
+            case 0xC2B0:    replace = 0x07; break;      /* U+00B0 (Degree symbol) */
+            case 0xC2AB:    replace = 0x14; break;      /* U+00AB (Left-pointing double angle quotation mark) */
+            case 0xC2BB:    replace = 0x15; break;      /* U+00BB (Right-pointing double angle quotation mark) */
+            case 0x5E:      replace = 0x1D; break;      /* U+005E (Circumflex accent) */
+            case 0xC2A4:    replace = 0x24; break;      /* U+00A4 (Currency sign) */
+            case 0xC2A1:    replace = 0x40; break;      /* U+00A1 (Inverted exclamation mark) */
+            case 0xC384:    replace = 0x5B; break;      /* U+00C4 (Latin capital letter A with diaeresis) */
+            case 0xC396:    replace = 0x5C; break;      /* U+00D6 (Latin capital letter O with diaeresis) */
+            case 0xC391:    replace = 0x5D; break;      /* U+00D1 (Latin capital letter N with tilde) */
+            case 0xC39C:    replace = 0x5E; break;      /* U+00DC (Latin capital letter U with diaeresis) */
+            case 0xC2A7:    replace = 0x5F; break;      /* U+00A7 (Section sign)*/
+            case 0xC2BF:    replace = 0x60; break;      /* U+00BF (Inverted question mark) */
+            case 0xC3A4:    replace = 0x7B; break;      /* U+00E4 (Latin small letter A with diaeresis) */
+            case 0xC3B6:    replace = 0x7C; break;      /* U+00F6 (Latin small letter O with diaeresis) */
+            case 0xC3B1:    replace = 0x7D; break;      /* U+00F1 (Latin small letter N with tilde) */
+            case 0xC3BC:    replace = 0x7E; break;      /* U+00FC (Latin small letter U with diaeresis) */
+            case 0xC3A0:    replace = 0x7F; break;      /* U+00E0 (Latin small letter A with grave) */
+            case 0xC2B9:    replace = 0x81; break;      /* U+00B9 (Superscript 1) */
+            case 0xC2B2:    replace = 0x82; break;      /* U+00B2 (Superscript 2) */
+            case 0xC2B3:    replace = 0x83; break;      /* U+00B3 (Superscript 3) */
+            case 0xC2BD:    replace = 0x8A; break;      /* U+00BD (Fraction one half) */
+            case 0xC2BC:    replace = 0x8B; break;      /* U+00BC (Fraction one quarter) */
+            case 0xC2B1:    replace = 0x8C; break;      /* U+00B1 (Plus-minus sign) */
+            case 0xE289A5:  replace = 0x8D; break;      /* U+2265 (Greater-that or equal to) */
+            case 0xE289A4:  replace = 0x8E; break;      /* U+2264 (Less-that or equal to) */
+            case 0xC2B5:    replace = 0x8F; break;      /* U+00B5 (Micro sign) */
+            case 0xE299AA:  replace = 0x90; break;      /* U+266A (Eighth note) */
+            case 0xE299AB:  replace = 0x91; break;      /* U+266B (Beamed eighth notes) */
+            case 0xE299A5:  replace = 0x93; break;      /* U+2665 (Black hearth) */
+            case 0xE299A6:  replace = 0x94; break;      /* U+2666 (Black diamond) */
+            case 0xE2809C:  replace = 0x98; break;      /* U+201C (Left double quotation mark) */
+            case 0xE2809D:  replace = 0x99; break;      /* U+201D (Right double quotation mark) */
+            case 0xCEB1:    replace = 0x9C; break;      /* U+03B1 (Greek small letter alpha) */
+            case 0xCEB5:    replace = 0x9D; break;      /* U+03B5 (Greek small letter epsilon) */
+            case 0x40:      replace = 0xA0; break;      /* U+0040 (Commercial AT) */
+            case 0xC2A3:    replace = 0xA1; break;      /* U+00A3 (Pound sign) */
+            case 0x24:      replace = 0xA2; break;      /* U+0024 (Dollar sign) */
+            case 0xC2A5:    replace = 0xA3; break;      /* U+00A5 (Yen sign) */
+            case 0xC3A8:    replace = 0xA4; break;      /* U+00E8 (Latin small letter E with grave) */
+            case 0xC3A9:    replace = 0xA5; break;      /* U+00E9 (Latin small letter E with acute) */
+            case 0xC3B9:    replace = 0xA6; break;      /* U+00F9 (Latin small letter U with grave) */
+            case 0xC3AC:    replace = 0xA7; break;      /* U+00EC (Latin small letter I with grave) */
+            case 0xC3B2:    replace = 0xA8; break;      /* U+00F2 (Latin small letter O with grave) */
+            case 0xC387:    replace = 0xA9; break;      /* U+00C7 (Latin capital letter C with cedilla) */
+            case 0xC398:    replace = 0xAB; break;      /* U+00D8 (Latin capital letter O with stroke) */
+            case 0xC3B8:    replace = 0xAC; break;      /* U+00F8 (Latin small letter O with stroke) */
+            case 0xC385:    replace = 0xAE; break;      /* U+00C5 (Latin capital letter A with ring above) */
+            case 0xC3A5:    replace = 0xAF; break;      /* U+00E5 (Latin capital letter C with cedilla) */
+            case 0xC2A2:    replace = 0xB1; break;      /* U+00A2 (Cent sign) */
+            case 0xCEBB:    replace = 0xB4; break;      /* U+03BB (Greek small letter lambda) */
+            case 0xCEA9:    replace = 0xB5; break;      /* U+03A9 (Greek capital letter omega) */
+            case 0xCF80:    replace = 0xB6; break;      /* U+03C0 (Greek small letter pi) */
+            case 0xCEA8:    replace = 0xB7; break;      /* U+03A8 (Greek capital letter psi) */
+            case 0xCEA3:    replace = 0xB8; break;      /* U+03A3 (Greek capital letter sigma) */
+            case 0xCEB8:    replace = 0xB9; break;      /* U+03B8 (Greek small letter theta) */
+            case 0xCE9E:    replace = 0xBA; break;      /* U+039E (Greek capital letter xi) */
+            case 0xE2978F:  replace = 0xBB; break;      /* U+25CF (Black circle) */
+            case 0xC386:    replace = 0xBC; break;      /* U+00C6 (Latin capital letter AE) */
+            case 0xC3A6:    replace = 0xBD; break;      /* U+00E6 (Latin small letter AE) */
+            case 0xC39F:    replace = 0xBE; break;      /* U+00DF (Latin small letter sharp S) */
+            case 0xC389:    replace = 0xBF; break;      /* U+00C9 (Latin capital letter E with acute) */
+            case 0xCE93:    replace = 0xC0; break;      /* U+0393 (Greek capital letter gamma) */
+            case 0xCE9B:    replace = 0xC1; break;      /* U+039B (Greek capital letter lambda) */
+            case 0xCEA0:    replace = 0xC2; break;      /* U+03A0 (Greek capital letter pi) */
+            case 0x5F:      replace = 0xC4; break;      /* U+005F (Low line) */
+            case 0xC388:    replace = 0xC5; break;      /* U+00C8 (Latin capital letter E with grave) */
+            case 0xC38A:    replace = 0xC6; break;      /* U+00CA (Latin capital letter E with circumflex) */
+            case 0xC3AA:    replace = 0xC7; break;      /* U+00EA (Latin small letter E with circumflex) */
+            case 0xC3A7:    replace = 0xC8; break;      /* U+00E7 (Latin small letter C with cedilla) */
+            case 0x7E:      replace = 0xCE; break;      /* U+007E (Tilde) */
+            case 0xC2B7:    replace = 0xDD; break;      /* U+00B7 (Middle dot) */
+            case 0xC381:    replace = 0xE2; break;      /* U+00C1 (Latin capital letter A with acute) */
+            case 0xC38D:    replace = 0xE3; break;      /* U+00CD (Latin capital letter I with acute) */
+            case 0xC393:    replace = 0xE4; break;      /* U+00D3 (Latin capital letter O with acute) */
+            case 0xC39A:    replace = 0xE5; break;      /* U+00DA (Latin capital letter U with acute) */
+            case 0xC39D:    replace = 0xE6; break;      /* U+00DD (Latin capital letter Y with acute) */
+            case 0xC3A1:    replace = 0xE7; break;      /* U+00E1 (Latin small letter A with acute) */
+            case 0xC3AD:    replace = 0xE8; break;      /* U+00ED (Latin small letter I with acute) */
+            case 0xC3B3:    replace = 0xE9; break;      /* U+00F3 (Latin small letter O with acute) */
+            case 0xC3BA:    replace = 0xEA; break;      /* U+00FA (Latin small letter U with acute) */
+            case 0xC3BD:    replace = 0xEB; break;      /* U+00FD (Latin small letter Y with acute) */
+            case 0xC394:    replace = 0xEC; break;      /* U+00D4 (Latin capital letter O with circumflex) */
+            case 0xC3B4:    replace = 0xED; break;      /* U+00F4 (Latin small letter O with circumflex) */
+            case 0xC48C:    replace = 0xF0; break;      /* U+010C (Latin capital letter C with caron) */
+            case 0xC49A:    replace = 0xF1; break;      /* U+011A (Latin capital letter E with caron) */
+            case 0xC598:    replace = 0xF2; break;      /* U+0158 (Latin capital letter R with caron) */
+            case 0xC5A0:    replace = 0xF3; break;      /* U+0160 (Latin capital letter S with caron) */
+            case 0xC5BD:    replace = 0xF4; break;      /* U+017D (Latin capital letter Z with caron) */
+            case 0xC48D:    replace = 0xF5; break;      /* U+010D (Latin small letter C with caron) */
+            case 0xC49B:    replace = 0xF6; break;      /* U+011B (Latin small letter E with caron) */
+            case 0xC599:    replace = 0xF7; break;      /* U+0159 (Latin small letter R with caron) */
+            case 0xC5A1:    replace = 0xF8; break;      /* U+0161 (Latin small letter S with caron) */
+            case 0xC5BE:    replace = 0xF9; break;      /* U+017E (Latin small letter Z with caron) */
+            case 0x5B:      replace = 0xFA; break;      /* U+005B (Left square bracket) */
+            case 0x5C:      replace = 0xFB; break;      /* U+005C (Reverse solidus) */
+            case 0x5D:      replace = 0xFC; break;      /* U+005D (Right square bracket) */
+            case 0x7B:      replace = 0xFD; break;      /* U+007B (Left curly bracket) */
+            case 0x7C:      replace = 0xFE; break;      /* U+007C (Vertical line) */
+            case 0xC2A6:    replace = 0xFE; break;      /* U+00A6 (Broken bar) */
+            case 0x7D:      replace = 0xFF; break;      /* U+007D (Right curly bracket) */
+        }
+
+        /* Remove byte if unknown unicode character found at current position */
+        if(( replace == 0 ) && ( unicode >= 0x80 )) {
+
+            memmove( buffer, buffer + 1, length );
+            memset( buffer + length, 0, 1 );
+
+            continue;
+        }
+
+        /* If unicode replacement found, replace the current character */       
+        if( replace > 0 ) {
+            *(( uint8_t* )buffer ) = replace;
+        }
+
+        buffer++;
+        unicode = 0;
+    }
+}
