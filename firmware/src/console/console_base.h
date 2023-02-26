@@ -50,6 +50,7 @@ enum consoleTaskIds {
     TASK_CONSOLE_MQTT_SEND,
     TASK_CONSOLE_MQTT_ENABLE,
     TASK_CONSOLE_MQTT_DISABLE,
+    TASK_CONSOLE_PRINT_JULIETTE_ANSI,
 };
 
 /* Accepted commands */ 
@@ -84,6 +85,7 @@ PROG_STR( S_COMMAND_MQTT_ENABLE,      "mqtt enable");
 PROG_STR( S_COMMAND_MQTT_DISABLE,     "mqtt disable");
 PROG_STR( S_COMMAND_MQTT_STATUS,      "mqtt status");
 PROG_STR( S_COMMAND_MQTT_SEND,        "mqtt send");
+PROG_STR( S_COMMAND_JULIETTE,         "juliette");
 
 /* Command descriptions */ 
 PROG_STR( S_HELP_HELP,                "Display this message." );
@@ -311,6 +313,10 @@ class ConsoleBase : public IPrint, protected ITask {
 
     /* mqtt status */
     void runCommandMqttStatus();
+
+    /* Juliette */
+    bool beginPrintJulietteANSI();
+    void runTaskPrintJulietteANSI();
 };
 
 #endif  /* CONSOLE_H */

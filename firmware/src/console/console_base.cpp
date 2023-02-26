@@ -596,6 +596,10 @@ void ConsoleBase::parseCommand() {
     } else if( this->matchCommandName( S_COMMAND_MQTT_STATUS, false ) == true ) {
         this->runCommandMqttStatus();
 
+    /* 'juliette' command */
+    } else if( this->matchCommandName( S_COMMAND_JULIETTE, false ) == true ) {
+        started = this->beginPrintJulietteANSI();
+
     /* No command entered, display the prompt again. */
     } else if( strlen( _inputBuffer ) == 0 ) {
 
@@ -721,6 +725,10 @@ void ConsoleBase::runTasks() {
 
             case TASK_CONSOLE_MQTT_SEND:
                 this->runTaskMqttSend();
+                break;
+
+            case TASK_CONSOLE_PRINT_JULIETTE_ANSI:
+                this->runTaskPrintJulietteANSI();
                 break;
         }
 
