@@ -36,6 +36,7 @@
 #include "drivers/bq27441.h"
 #include "drivers/power.h"
 #include "drivers/als.h"
+#include "drivers/sdcard.h"
 
 
 

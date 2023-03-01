@@ -68,13 +68,11 @@ bool onDrawItem( Screen* screen, ScreenItem* item, uint16_t index, bool isSelect
         case ID_PROFILE_FILENAME:
 
             if( g_alarm.profile.filename[0] == 0x00 ) {
-                length = g_lcd.print_P( S_PROFILE_DEF_FILENAME );
+                g_lcd.print_P( S_PROFILE_DEF_FILENAME, DISPLAY_WIDTH, TEXT_ALIGN_LEFT );
 
             } else {
-                length = g_lcd.print( g_alarm.profile.filename );
+                g_lcd.print( g_alarm.profile.filename, DISPLAY_WIDTH, TEXT_ALIGN_LEFT );
             }
-
-            g_lcd.fill( CHAR_SPACE, item->getLength() - length );
 
             return false;
 

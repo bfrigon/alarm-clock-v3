@@ -390,6 +390,41 @@ void Logger::printLogEntryMessage( IPrint *output, uint8_t type, uint32_t flags 
 
         output->print_P( S_LOGMSG_MQTT_SOCKET_ERROR );
 
+    /* FTP: Client connect */
+    } else if( type == EVENT_FTP_CLIENT_CONNECT ) {
+        IPAddress ip = flags;
+        output->printf_P( S_LOGMSG_FTP_CLIENT_CONNECT, ip[0], ip[1], ip[2], ip[3] );
+
+    /* FTP: Client disconnect */
+    } else if( type == EVENT_FTP_CLIENT_DISCONNECT ) {
+
+        output->print_P( S_LOGMSG_FTP_CLIENT_DISCONNECT );
+
+    /* FTP: Server enabled */
+    } else if( type == EVENT_FTP_SERVICE_ENABLED ) {
+
+        output->print_P( S_LOGMSG_FTP_SERVICE_ENABLED );
+
+    /* FTP: Server disabled */
+    } else if( type == EVENT_FTP_SERVICE_DISABLED ) {
+
+        output->print_P( S_LOGMSG_FTP_SERVICE_DISABLED );
+
+    /* SD card init failed */
+    } else if( type == EVENT_SD_INIT_FAIL ) {
+
+        output->printf_P( S_LOGMSG_SD_INIT_FAIL, flags );
+
+    /* SD card ready */
+    } else if( type == EVENT_SD_READY ) {
+
+        output->print_P( S_LOGMSG_SD_READY );
+
+    /* SD card removed */
+    } else if( type == EVENT_SD_REMOVED ) {
+
+        output->print_P( S_LOGMSG_SD_REMOVED );
+
     /* Unknown log entry */
     } else {
         output->printf_P( S_LOGMSG_UNKNOWN, type, flags );

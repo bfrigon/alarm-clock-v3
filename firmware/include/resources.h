@@ -74,6 +74,8 @@ PROG_STR( S_PROFILE_DEF_FILENAME,       "*Default*" );
 PROG_STR( S_DEFAULT_HOSTNAME,           "clock-v3" );
 PROG_STR( S_DEFAULT_NTPSERVER,          "pool.ntp.org" );
 PROG_STR( S_DEFAULT_HA_DISCOVERY_PREFIX,"homeassistant");
+PROG_STR( S_DEFAULT_FTP_USERNAME,       "root");
+PROG_STR( S_DEFAULT_FTP_PASSWORD,       "clock");
 
 /* Dialog strings */
 PROG_STR( S_QUESTION_SAVE,              "Apply ?" );
@@ -360,6 +362,11 @@ PROG_STR( S_CONSOLE_MQTT_ENABLED,       "MQTT client enabled");
 PROG_STR( S_CONSOLE_MQTT_DISABLED,      "MQTT client disabled");
 PROG_STR( S_CONSOLE_MQTT_CONNECTING,    "Connecting..." );
 
+PROG_STR( S_CONSOLE_FTP_ENABLED,        "FTP server enabled");
+PROG_STR( S_CONSOLE_FTP_DISABLED,       "FTP server disabled");
+PROG_STR( S_CONSOLE_FTP_SESS_ACTIVE,    "Client connected from %d.%d.%d.%d on port %hu" );
+PROG_STR( S_CONSOLE_FTP_NO_SESS,        "No connected client" );
+
 /* Log item descriptions */
 PROG_STR( S_LOG_REPEAT,                         " <- Occured %d times" );
 PROG_STR( S_LOG_REPEAT_LIMIT,                   " <- Occured more than 250 times!" );
@@ -400,6 +407,13 @@ PROG_STR( S_LOGMSG_MQTT_CONNECTED,              "Connected to MQTT broker" );
 PROG_STR( S_LOGMSG_MQTT_DISCONNECTED,           "Disconnected from MQTT broker" );
 PROG_STR( S_LOGMSG_MQTT_UNEXPECTED_RESPONSE,    "Unexpected response from MQTT broker" );
 PROG_STR( S_LOGMSG_MQTT_SOCKET_ERROR,           "Socket error while connecting to MQTT broker" );
+PROG_STR( S_LOGMSG_FTP_CLIENT_CONNECT,          "FTP server accepted connection from %d.%d.%d.%d" );
+PROG_STR( S_LOGMSG_FTP_CLIENT_DISCONNECT,       "Client disconnected from FTP server" );
+PROG_STR( S_LOGMSG_FTP_SERVICE_ENABLED,         "FTP server enabled" );
+PROG_STR( S_LOGMSG_FTP_SERVICE_DISABLED,        "FTP server disabled" );
+PROG_STR( S_LOGMSG_SD_INIT_FAIL,                "SD card init failed (error %d)" );
+PROG_STR( S_LOGMSG_SD_READY,                    "SD card ready" );
+PROG_STR( S_LOGMSG_SD_REMOVED,                  "SD card removed" );
 
 
 

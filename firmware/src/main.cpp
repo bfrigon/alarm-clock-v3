@@ -28,9 +28,9 @@
 #include "ui/ui.h"
 
 
-
+SDCardManager   g_sdcard( PIN_SD_DETECT, PIN_VS1053_SDCS );
 Alarm           g_alarm( PIN_VS1053_RESET, PIN_VS1053_CS, PIN_VS1053_XDCS, PIN_VS1053_DREQ,
-                         PIN_VS1053_SDCS, PIN_SD_DETECT, PIN_ALARM_SW, PIN_AMP_SHDN );
+                         PIN_ALARM_SW, PIN_AMP_SHDN, &g_sdcard );
 WiFi            g_wifi( PIN_WIFI_CS, PIN_WIFI_IRQ, PIN_WIFI_RESET, PIN_WIFI_ENABLE );
 NeoClock        g_clock( PIN_NEOCLOCK, PIN_PIX_SHDN );
 Lamp            g_lamp( PIN_PIX_LAMP );
@@ -52,7 +52,7 @@ HomeAssistant   g_homeassistant;
 
 bool g_prev_state_wifi = false;
 bool g_prev_state_telnetConsole = false;
-
+bool g_prev_sd_card_present = false;
 
 
 /*******************************************************************************
@@ -214,6 +214,9 @@ void loop() {
     /* Run power management tasks */
     g_power.detectPowerState();
 
+    /* Detect SD card presence */
+    g_sdcard.detectCardPresence();
+
     /* If an RTC interrupt occured, read the current time */
     g_rtc.processEvents();
     
@@ -271,6 +274,14 @@ void loop() {
         if( g_screen.getId() == SCREEN_ID_ROOT ) {
             g_screen.requestScreenUpdate( false );
         }
+
+        if( g_screen.getId() == SCREEN_ID_NET_STATUS ) {
+            g_screen.requestScreenUpdate( true );
+        }
+    }
+
+    if( g_sdcard.isCardPresent() != g_prev_sd_card_present ) {
+        g_prev_sd_card_present = g_sdcard.isCardPresent();
 
         if( g_screen.getId() == SCREEN_ID_NET_STATUS ) {
             g_screen.requestScreenUpdate( true );

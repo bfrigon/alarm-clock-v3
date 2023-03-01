@@ -22,7 +22,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <EEPROM.h>
-#include <SdFat.h>
+#include "drivers/sdcard.h"
 #include <avr/pgmspace.h>
 #include <time.h>
 #include <hardware.h>
@@ -68,8 +68,8 @@ class Alarm : private VS1053 {
 
   public:
 
-    Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect,
-           int8_t pin_alarm_sw, int8_t pin_amp_shdn );
+    Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, 
+           int8_t pin_alarm_sw, int8_t pin_amp_shdn, SDCardManager* sdcard );
 
     void begin();
     void end();
@@ -102,7 +102,8 @@ class Alarm : private VS1053 {
     uint8_t getPlayMode();
     bool isAlarmEnabled();
     struct AlarmProfile profile;
-    FatFile currentFile;
+    FsFile currentFile;
+    
 
 
   private:
@@ -115,8 +116,8 @@ class Alarm : private VS1053 {
     inline void updateVisualStepDelay();
     void initAmplifier();
 
-    uint8_t _pin_sd_detect;
-    uint8_t _pin_sd_cs;
+    
+    
     uint8_t _pin_alarm_sw;
     bool _init = false;
     int8_t _rtcmin = -1;
@@ -132,7 +133,8 @@ class Alarm : private VS1053 {
     uint8_t _playMode = ALARM_MODE_OFF;
     uint8_t _volume = 0;
     uint16_t _pgm_audio_ptr = 0;
-    SdFat _sd;
+    SDCardManager* _sdcard;
+    FsFile _rootDir;
     TPA2016 _amplifier;
 };
 

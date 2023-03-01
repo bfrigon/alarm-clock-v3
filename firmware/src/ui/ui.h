@@ -524,7 +524,7 @@ PROGMEM const ScreenData screen_edit_alarm_lamp {
 // ----------------------------------------
 PROGMEM const struct ScreenItemBase ITEMS_EDIT_PROFILE[] = {
     ITEM_LIST( ID_PROFILE_FILENAME, 0, 0, S_EDIT_PROFILE_FILENAME, NULL,
-               &g_alarm.profile.filename, 0, 0, MAX_LENGTH_ALARM_FILENAME,
+               &g_alarm.profile.filename, 0, 0, DISPLAY_WIDTH,
                ITEM_LIST_SRAM_POINTER | ITEM_EDIT_FULLSCREEN | ITEM_COMPACT ),
 
     ITEM_BAR( ID_PROFILE_VOLUME, 1, 0, S_EDIT_PROFILE_VOLUME, &g_alarm.profile.volume,

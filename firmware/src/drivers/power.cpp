@@ -122,8 +122,7 @@ uint8_t Power::setPowerMode( uint8_t mode ) {
     g_lamp.onPowerStateChange( mode );
     g_alarm.onPowerStateChange( mode );
     g_als.onPowerStateChange( mode );
-    
-
+    g_sdcard.onPowerStateChange( mode );
 
     return mode;
 }

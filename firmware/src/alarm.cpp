@@ -35,19 +35,16 @@ uint8_t vs1053_buffer[VS1053_DATA_BLOCK_SIZE];
  * @param   pin_xdcs         Codec data select pin
  * @param   pin_dreq         Codec data request pin.
  * @param   pin_reset        Codec reset pin.
- * @param   pin_sd_cs        SD card chip select pin.
- * @param   pin_sd_detect    SD card detect pin.
  * @param   pin_alarm_sw     Pin connected to the alarm switch.
  * @param   pin_amp_shdn     Amplifier shutdown pin.
+ * @param   sdcard           SDCard class instance
  * 
  */
-Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_sd_cs, int8_t pin_sd_detect,
-              int8_t pin_alarm_sw, int8_t pin_amp_shdn ) : VS1053( pin_cs, pin_xdcs, pin_dreq, pin_reset ) {
+Alarm::Alarm( int8_t pin_reset, int8_t pin_cs, int8_t pin_xdcs, int8_t pin_dreq, int8_t pin_alarm_sw, 
+              int8_t pin_amp_shdn, SDCardManager* sdcard ) : VS1053( pin_cs, pin_xdcs, pin_dreq, pin_reset ) {
 
-    _pin_sd_cs = pin_sd_cs;
-
-    _pin_sd_detect = pin_sd_detect;
-    pinMode( pin_sd_detect, INPUT );
+    _sdcard = sdcard;
+    _sd_present = false;
 
     _pin_alarm_sw = pin_alarm_sw;
     pinMode( pin_alarm_sw, INPUT );
@@ -149,91 +146,8 @@ void Alarm::onPowerStateChange( uint8_t state ) {
  * 
  */
 bool Alarm::isSDCardPresent() {
+    _sd_present = _sdcard->isCardPresent();
     return _sd_present;
-}
-
-
-/*******************************************************************************
- *
- * @brief   Check the current state of the SD card detect pin. If a card 
- *          is found, initialize the SdFat library.
- *
- * @return  TRUE if detected, FALSE otherwise.
- * 
- */
-bool Alarm::detectSDCard() {
-    if( digitalRead( _pin_sd_detect ) == LOW ) {
-
-        /* Already detected, no need to re-initialize. */
-        if( _sd_present == true ) {
-            return true;
-        }
-
-        if( g_power.getPowerMode() == POWER_MODE_SUSPEND ) {
-            if( _timerStart == 0 ) {
-                /* millis() not usable in suspend mode, debounce using wake-up counter. */
-                _timerStart = 1;
-                return false;
-            }
-
-        } else {
-            /* Start the debouce timer. */
-            if( _timerStart == 0 ) {
-                _timerStart = millis();
-                return false;
-            }
-
-            /* Failed to detect SD card. */
-            if( ( millis() - _timerStart ) < 1000 ) {
-                return false;
-            }
-        }
-
-        /* The card was detected, now we can initialize or re-initalize it. */
-        _sd_present = true;
-
-    } else {
-        /* Already not present, do nothing. */
-        if( _sd_present == false ) {
-            return false;
-        }
-
-        if( _playMode != ALARM_MODE_OFF ) {
-            if( _playMode & ALARM_MODE_TEST ) {
-                this->stop();
-
-            } else {
-                /* If SD card is removed during an alarm, don't stop the alarm.
-                   Fallback sound will be played once the snooze delay is elapsed. */
-                this->snooze();
-            }
-        }
-
-        this->currentFile.close();
-        _timerStart = 0;
-        _sd_present = false;
-        return false;
-    }
-
-    _sd_present = false;
-    _timerStart = 0;
-    //Serial.println( F( "Init SD card... " ) );
-
-    if( _sd.begin( _pin_sd_cs ) == false ) {
-        //Serial.println( F( "SD init failed " ) );
-        return false;
-    }
-
-    /* Open root directory */
-    _sd.vwd()->rewind();
-
-    if( _sd.vwd()->isOpen() == false ) {
-        //Serial.println( F( "Cannot open root directory on SD card" ) );
-        return false;
-    }
-
-    _sd_present = true;
-    return true;
 }
 
 
@@ -257,7 +171,6 @@ bool Alarm::openNextFile() {
     }
 
     if( this->openFile( NULL ) == false ) {
-        this->profile.filename[0] = 0;
         return false;
     }
 
@@ -276,64 +189,75 @@ bool Alarm::openNextFile() {
  * 
  */
 bool Alarm::openFile( char* name ) {
-    if( _sd.vwd()->isOpen() == false ) {
-        return false;
+
+    if( _rootDir.isOpen() == false ) {
+
+        /* Open root directory */
+        if( _rootDir.open("/") == false ) {
+
+            this->profile.filename[0] = '\0';
+            return false;
+        }
     }
 
     /* Close current file if open */
-    if( this->currentFile.isOpen() ) {
+    if( this->currentFile.isOpen() == true ) {
         this->currentFile.close();
     }
+
+    char buffer[ MAX_LENGTH_ALARM_FILENAME + 1 ];
 
     if( name != NULL ) {
 
         /* Open the specified file */
         if( strlen( name ) > 0 ) {
-            this->currentFile.open( _sd.vwd(), name, O_READ );
-
-            this->currentFile.getSFN( this->profile.filename );
+            this->currentFile.open( &_rootDir, name, O_READ );
+            this->currentFile.getName( buffer, MAX_LENGTH_ALARM_FILENAME );
         }
 
     } else {
         /* Open the next file in the root directory */
-        this->currentFile.openNext( _sd.vwd(), O_READ );
+        if( this->currentFile.openNext( &_rootDir, O_READ ) == true ) {
+        
+            this->currentFile.getName( buffer, MAX_LENGTH_ALARM_FILENAME );
 
-        char buffer[ MAX_LENGTH_ALARM_FILENAME + 1 ];
-        this->currentFile.getSFN( buffer );
-
-        /* If the next filename is the same than the currently slected one, go
-           to the next file. */
-        if( strcmp( this->profile.filename, buffer )
-                == 0 ) {
-            this->currentFile.openNext( _sd.vwd(), O_READ );
+            /* If the next filename is the same than the currently slected one, go
+            to the next file. */
+            if( strcmp( this->profile.filename, buffer ) == 0 ) {
+                this->currentFile.openNext( &_rootDir, O_READ );
+            }
         }
-
-        strcpy( this->profile.filename, buffer );
     }
 
-    while( this->currentFile.isOpen() != false ) {
+    while( this->currentFile.isOpen() == true ) {
+
+        this->currentFile.getName( buffer, MAX_LENGTH_ALARM_FILENAME );
 
         /* Validate file extension */
         if( this->currentFile.isFile() == true ) {
-            if( strstr_P( this->profile.filename, PSTR( ".MP3" ) ) != NULL
-                    || strstr_P( this->profile.filename, PSTR( ".MID" ) ) != NULL
-                    || strstr_P( this->profile.filename, PSTR( ".OGG" ) ) != NULL
-                    || strstr_P( this->profile.filename, PSTR( ".AAC" ) ) != NULL
-                    || strstr_P( this->profile.filename, PSTR( ".WAV" ) ) != NULL ) {
+            if( strcasestr_P( buffer, PSTR( ".mp3" )) != NULL
+                || strcasestr_P( buffer, PSTR( ".mid" )) != NULL
+                || strcasestr_P( buffer, PSTR( ".ogg" )) != NULL
+                || strcasestr_P( buffer, PSTR( ".aac" )) != NULL
+                || strcasestr_P( buffer, PSTR( ".wav" )) != NULL ) {
 
                 /* File extention is valid */
+                strcpy( this->profile.filename, buffer );
                 return true;
             }
         }
 
         /* invalid extention, close the file and go for the next one. */
         this->currentFile.close();
-        this->currentFile.openNext( _sd.vwd(), O_READ );
-        this->currentFile.getSFN( this->profile.filename );
+        this->currentFile.openNext( &_rootDir, O_READ );
+        this->currentFile.getName( buffer, MAX_LENGTH_ALARM_FILENAME );
     }
 
     if( this->currentFile.isOpen() == false ) {
-        _sd.vwd()->rewind();
+        _rootDir.rewindDirectory();
+
+        /* If failed to open, set profile to default internal alarm sound */
+        this->profile.filename[0] = '\0';
         return false;
     }
 
@@ -900,9 +824,21 @@ inline void Alarm::visualStop() {
  */
 void Alarm::processEvents() {
 
-    /* Detect if the SD card is present, if so, initialize it */
-    if( _sd_present != this->detectSDCard() ) {
-        g_screen.requestScreenUpdate( false );
+    if( _sd_present != _sdcard->isCardPresent() ) {
+        _sd_present = _sdcard->isCardPresent();
+
+
+        if( _sd_present == false && _playMode != ALARM_MODE_OFF ) {
+            if( _playMode & ALARM_MODE_TEST ) {
+                this->stop();
+
+            } else {
+                
+                /* If SD card is removed during an alarm, don't stop the alarm.
+                   Default internal alarm sound will be played once the snooze delay is elapsed. */
+                this->snooze();
+            }
+        }
     }
 
     /* Detect the alarm switch state. */

@@ -19,6 +19,7 @@
 #include <drivers/wifi/wifi.h>
 #include <services/telnet_console.h>
 #include <services/homeassistant.h>
+#include <drivers/sdcard.h>
 #include "ui.h"
 
 
@@ -96,7 +97,7 @@ bool rootScreen_onDrawScreen( Screen* screen ) {
 
     /* Print status icons */
     g_lcd.setPosition( 0, 14 );
-    g_lcd.print( ( g_alarm.isSDCardPresent() == false ) ? CHAR_NO_SD : CHAR_SPACE );
+    g_lcd.print( ( g_sdcard.isCardPresent() == false ) ? CHAR_NO_SD : CHAR_SPACE );
 
 
     switch( g_battery.getBatteryState() ) {
