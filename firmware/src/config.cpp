@@ -24,8 +24,10 @@
 #include "ui/screen.h"
 #include "drivers/lamp.h"
 #include "drivers/neoclock.h"
+#include "drivers/sdcard.h"
 #include "services/ntpclient.h"
 #include "services/telnet_console.h"
+#include "services/ftpserver.h"
 #include "services/mqtt.h"
 #include "services/logger.h"
 
@@ -137,6 +139,7 @@ void ConfigManager::apply( uint8_t section ) {
         g_wifi.disconnect();
 
         g_telnetConsole.enableServer( g_config.network.telnetEnabled );
+        g_ftpServer.enableServer( g_config.network.ftp_enabled );
         g_mqtt.enableClient( g_config.network.mqtt_enabled );
     }
 }
@@ -151,6 +154,7 @@ void ConfigManager::reset() {
     this->network.ssid[0] = 0;
     this->network.wkey[0] = 0;
     this->network.telnetEnabled = false;
+    this->network.ftp_enabled = false;
     this->network.mqtt_host[0] = 0;
     this->network.mqtt_username[0] = 0;
     this->network.mqtt_password[0] = 0;
@@ -166,6 +170,8 @@ void ConfigManager::reset() {
     strcpy_P( this->network.hostname, S_DEFAULT_HOSTNAME );
     strcpy_P( this->network.ntpserver, S_DEFAULT_NTPSERVER );
     strcpy_P( this->network.discovery_prefix, S_DEFAULT_HA_DISCOVERY_PREFIX );
+    strcpy_P( this->network.ftp_username, S_DEFAULT_FTP_USERNAME );
+    strcpy_P( this->network.ftp_password, S_DEFAULT_FTP_PASSWORD );
 
 
     /* Store default config. */
@@ -284,7 +290,7 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
         return false;
     }
 
-    if( g_alarm.isSDCardPresent() == false ) {
+    if( g_sdcard.isCardPresent() == false ) {
         this->endBackup( ERR_CONFIG_NO_SDCARD );
         return false;
     }
@@ -297,7 +303,7 @@ bool ConfigManager::startBackup( const char *filename, bool overwrite ) {
         _sd_file.close();
     }
 
-    if( _sd_file.openCwd() == false ) {
+    if( _sd_file.openRoot( g_sdcard.vol() ) == false ) {
         this->endBackup( ERR_CONFIG_FILE_CANT_OPEN );
         return false;
     }
@@ -354,8 +360,13 @@ bool ConfigManager::startRestore( const char *filename) {
         return false;
     }
 
-    if( g_alarm.isSDCardPresent() == false ) {
+    if( g_sdcard.isCardPresent() == false ) {
         this->endBackup( ERR_CONFIG_NO_SDCARD );
+        return false;
+    }
+
+    if( _sd_file.openRoot( g_sdcard.vol() ) == false ) {
+        this->endBackup( ERR_CONFIG_FILE_CANT_OPEN );
         return false;
     }
 
@@ -451,6 +462,9 @@ bool ConfigManager::readNextLine() {
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_MQTT ) == 0 ) {
             _currentSectionID = SECTION_ID_MQTT;        
+
+        } else if( strcmp_P( name, SETTING_NAME_SECTION_FTP ) == 0 ) {
+            _currentSectionID = SECTION_ID_FTP;        
 
         } else if( strcmp_P( name, SETTING_NAME_SECTION_HA) == 0 ) {
             _currentSectionID = SECTION_ID_HA;        
@@ -603,10 +617,10 @@ bool ConfigManager::readNextLine() {
     } else if( this->matchSettingName( name, SETTING_NAME_MQTT_HOST, SECTION_ID_MQTT ) == true ) {
         this->parseSettingValue( value, &this->network.mqtt_host, SETTING_TYPE_STRING, 0, MAX_MQTT_HOST_LENGTH );
 
-    } else if( this->matchSettingName( name, SETTING_NAME_MQTT_USERNAME, SECTION_ID_MQTT ) == true ) {
+    } else if( this->matchSettingName( name, SETTING_NAME_USERNAME, SECTION_ID_MQTT ) == true ) {
         this->parseSettingValue( value, &this->network.mqtt_username, SETTING_TYPE_STRING, 0, MAX_MQTT_USERNAME_LENGTH );
 
-    } else if( this->matchSettingName( name, SETTING_NAME_MQTT_PASSWORD, SECTION_ID_MQTT ) == true ) {
+    } else if( this->matchSettingName( name, SETTING_NAME_PASSWORD, SECTION_ID_MQTT ) == true ) {
         this->parseSettingValue( value, &this->network.mqtt_password, SETTING_TYPE_STRING, 0, MAX_MQTT_PASSWORD_LENGTH );
 
     } else if( this->matchSettingName( name, SETTING_NAME_ENABLED, SECTION_ID_MQTT ) == true ) {
@@ -617,6 +631,15 @@ bool ConfigManager::readNextLine() {
 
     } else if( this->matchSettingName( name, SETTING_NAME_HA_DISCOVERY_PREFIX, SECTION_ID_HA ) == true ) {
         this->parseSettingValue( value, &this->network.discovery_prefix, SETTING_TYPE_STRING, 0, MAX_DISCOVERY_PREFIX_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_USERNAME, SECTION_ID_FTP) == true ) {
+        this->parseSettingValue( value, &this->network.ftp_username, SETTING_TYPE_STRING, 0, MAX_FTP_USERNAME_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_PASSWORD, SECTION_ID_FTP ) == true ) {
+        this->parseSettingValue( value, &this->network.ftp_password, SETTING_TYPE_STRING, 0, MAX_FTP_PASSWORD_LENGTH );
+
+    } else if( this->matchSettingName( name, SETTING_NAME_ENABLED, SECTION_ID_FTP ) == true ) {
+        this->parseSettingValue( value, &this->network.ftp_enabled, SETTING_TYPE_BOOL );
 
     }
 
@@ -1039,16 +1062,29 @@ bool ConfigManager::writeNextLine()  {
             break;
 
         case SETTING_ID_MQTT_USERNAME:
-            this->writeConfigLine( SETTING_NAME_MQTT_USERNAME, SETTING_TYPE_STRING, &this->network.mqtt_username );
+            this->writeConfigLine( SETTING_NAME_USERNAME, SETTING_TYPE_STRING, &this->network.mqtt_username );
             break;
         
         case SETTING_ID_MQTT_PASSWORD:
-            this->writeConfigLine( SETTING_NAME_MQTT_PASSWORD, SETTING_TYPE_STRING, &this->network.mqtt_password );
+            this->writeConfigLine( SETTING_NAME_PASSWORD, SETTING_TYPE_STRING, &this->network.mqtt_password );
             break;
 
         case SETTING_ID_HA_DISCOVERY_PREFIX:
             this->writeConfigLine( SETTING_NAME_SECTION_HA, SETTING_TYPE_SECTION, NULL );
             this->writeConfigLine( SETTING_NAME_HA_DISCOVERY_PREFIX, SETTING_TYPE_STRING, &this->network.discovery_prefix );
+            break;
+
+        case SETTING_ID_FTP_ENABLED:
+            this->writeConfigLine( SETTING_NAME_SECTION_FTP, SETTING_TYPE_SECTION, NULL );
+            this->writeConfigLine( SETTING_NAME_ENABLED, SETTING_TYPE_BOOL, &this->network.ftp_enabled );
+            break;
+
+        case SETTING_ID_FTP_USERNAME:
+            this->writeConfigLine( SETTING_NAME_USERNAME, SETTING_TYPE_STRING, &this->network.ftp_username );
+            break;
+        
+        case SETTING_ID_FTP_PASSWORD:
+            this->writeConfigLine( SETTING_NAME_PASSWORD, SETTING_TYPE_STRING, &this->network.ftp_password );
             break;
     }
 

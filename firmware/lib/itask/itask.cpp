@@ -70,6 +70,20 @@ unsigned long ITask::getTaskRunningTime() {
 
 /*******************************************************************************
  *
+ * @brief   Resets the task running timer.
+ * 
+ */
+void ITask::resetTaskTimer() {
+    if( _currentTask == TASK_NONE ) {
+        return;
+    }
+
+    _timerTaskStart = millis();
+}
+
+
+/*******************************************************************************
+ *
  * @brief   Starts a new task.
  *
  * @param   task     Task ID

@@ -25,6 +25,7 @@
 #include "services/mqtt.h"
 #include "services/homeassistant.h"
 #include "services/logger.h"
+#include "services/ftpserver.h"
 #include "ui/ui.h"
 
 
@@ -49,6 +50,7 @@ Screen          g_screen;
 Logger          g_log;
 MqttClient      g_mqtt;
 HomeAssistant   g_homeassistant;
+FTPServer       g_ftpServer( &g_sdcard );
 
 bool g_prev_state_wifi = false;
 bool g_prev_state_telnetConsole = false;
@@ -188,6 +190,9 @@ void setup() {
     /* Start telnet server if enabled */
     g_telnetConsole.enableServer( g_config.network.telnetEnabled );
 
+    /* Start FTP server if enabled */
+    g_ftpServer.enableServer( g_config.network.ftp_enabled );
+
     /* Connect to the mqtt broker if enabled */
     g_mqtt.begin();
     g_mqtt.setPublishReceiveCallback( handleHassTopicCallback );
@@ -252,6 +257,9 @@ void loop() {
 
     /* Process telnet server events */
     g_telnetConsole.runTasks();
+
+    /* Process ftp server events */
+    g_ftpServer.runTasks();
 
     /* Process MQTT client events */
     g_mqtt.runTasks();

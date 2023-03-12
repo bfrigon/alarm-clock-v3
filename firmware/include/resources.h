@@ -110,6 +110,7 @@ PROG_STR( S_MAIN_MENU_SETTINGS,         "Settings" );
 PROG_STR( S_MENU_SERVICE_TIME_AUTOSYNC, "NTP Sync" );
 PROG_STR( S_MENU_SERVICE_TELNET,        "Telnet  " );
 PROG_STR( S_MENU_SERVICE_MQTT,          "MQTT-HA " );
+PROG_STR( S_MENU_SERVICE_FTP,           "FTP     " );
 
 
 /* Network menu srings */

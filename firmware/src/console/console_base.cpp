@@ -19,6 +19,7 @@
 #include <hardware.h>
 #include <task_errors.h>
 #include <services/ntpclient.h>
+#include <services/ftpserver.h>
 #include <freemem.h>
 #include "console_base.h"
 
@@ -599,6 +600,11 @@ void ConsoleBase::parseCommand() {
     /* 'juliette' command */
     } else if( this->matchCommandName( S_COMMAND_JULIETTE, false ) == true ) {
         started = this->beginPrintJulietteANSI();
+
+    /* 'ftp status' command */
+    } else if( this->matchCommandName( S_COMMAND_FTP_STATUS, false ) == true ) {
+        g_ftpServer.printServerStatus( this );
+        this->println();
 
     /* No command entered, display the prompt again. */
     } else if( strlen( _inputBuffer ) == 0 ) {

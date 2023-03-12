@@ -18,6 +18,8 @@
 
 #include "sdcard.h"
 #include <services/logger.h>
+#include <drivers/rtc.h>
+#include <timezone.h>
 
 
 /*******************************************************************************
@@ -38,6 +40,8 @@ SDCardManager::SDCardManager( int8_t pin_sd_detect, int8_t pin_sd_cs ) : SdFat()
 
     pinMode( pin_sd_detect, INPUT );
 
+
+    FsDateTime::setCallback( sdCardDateTimeCallback );
 }
 
 
@@ -139,4 +143,30 @@ bool SDCardManager::detectCardPresence() {
 void SDCardManager::onPowerStateChange( uint8_t state ) {
 
     _powerState = state;
+}
+
+
+/*******************************************************************************
+ *
+ * @brief   Callback function used by the SdFat library to update the timestamp 
+ *          when a file is created or written. Return the current date/time
+ * 
+ * @param   date    Pointer to the variable to store the compacted time value.
+ * @param   time    Pointer to the variable to store the compacted date value.
+ * @param   ms10    Pointer to the variable to store the low time bits in 
+ *                  units of 10ms
+ * 
+ */
+void sdCardDateTimeCallback( uint16_t* date, uint16_t* time, uint8_t* ms10 ) {
+
+    DateTime now = g_rtc.now();
+    
+    /* Return date using FS_DATE macro to format fields. */
+    *date = FS_DATE( now.year(), now.month(), now.day() );
+
+    /* Return time using FS_TIME macro to format fields. */
+    *time = FS_TIME( now.hour(), now.minute(), now.second() );
+
+    /* Return low time bits in units of 10 ms, 0 <= ms10 <= 199. */
+    *ms10 = now.second() & 1 ? 100 : 0;
 }

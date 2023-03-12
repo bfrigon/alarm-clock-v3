@@ -86,6 +86,7 @@ PROG_STR( S_COMMAND_MQTT_DISABLE,     "mqtt disable");
 PROG_STR( S_COMMAND_MQTT_STATUS,      "mqtt status");
 PROG_STR( S_COMMAND_MQTT_SEND,        "mqtt send");
 PROG_STR( S_COMMAND_JULIETTE,         "juliette");
+PROG_STR( S_COMMAND_FTP_STATUS,       "ftp status");
 
 /* Command descriptions */ 
 PROG_STR( S_HELP_HELP,                "Display this message." );
@@ -110,6 +111,7 @@ PROG_STR( S_HELP_MQTT_ENABLE,         "Enable the MQTT client" );
 PROG_STR( S_HELP_MQTT_DISABLE,        "Disable the MQTT client" );
 PROG_STR( S_HELP_MQTT_STATUS,         "Display the client connection status" );
 PROG_STR( S_HELP_MQTT_SEND_TOPIC,     "Send a message" );
+PROG_STR( S_HELP_FTP_STATUS,          "Show FTP server status" );
 
 /* Commands usage */ 
 PROG_STR( S_USAGE_NSLOOKUP,           "nslookup [hostname]" );
@@ -118,7 +120,7 @@ PROG_STR( S_USAGE_SERVICE,            "service [name] (enable|disable|status)" )
 PROG_STR( S_USAGE_MQTT_SEND,          "mqtt send [topic] [payload]" );
 
 /* Commands listed on the help menu */
-#define CONSOLE_HELP_MENU_ITEMS       22
+#define CONSOLE_HELP_MENU_ITEMS       23
 const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_HELP,
     S_COMMAND_DATE,
@@ -142,6 +144,7 @@ const char* const S_COMMANDS[] PROGMEM = {
     S_COMMAND_MQTT_DISABLE,
     S_COMMAND_MQTT_STATUS,
     S_COMMAND_MQTT_SEND,
+    S_COMMAND_FTP_STATUS,
 };
 const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_HELP,
@@ -166,6 +169,7 @@ const char* const S_HELP_COMMANDS[] PROGMEM = {
     S_HELP_MQTT_DISABLE,
     S_HELP_MQTT_STATUS,
     S_HELP_MQTT_SEND_TOPIC,
+    S_HELP_FTP_STATUS,
 };
 
 enum ctrlSequences { 

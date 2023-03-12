@@ -43,7 +43,7 @@
 #define MAX_LENGTH_SETTING_NAME         32
 #define MAX_LENGTH_SETTING_VALUE        96
 #define MAX_NUM_PROFILES                2
-#define MAX_LENGTH_ALARM_FILENAME       12
+#define MAX_LENGTH_ALARM_FILENAME       64
 #define MAX_LENGTH_ALARM_MESSAGE        16
 #define MAX_SSID_LENGTH                 32
 #define MAX_HOSTNAME_LENGTH             32
@@ -72,6 +72,8 @@
 #define MAX_MQTT_USERNAME_LENGTH        32
 #define MAX_MQTT_PASSWORD_LENGTH        32
 #define MAX_DISCOVERY_PREFIX_LENGTH     32
+#define MAX_FTP_USERNAME_LENGTH         32
+#define MAX_FTP_PASSWORD_LENGTH         32
 
 /* EEPROM addresses */
 #define EEPROM_ADDR_MAGIC               0
@@ -116,6 +118,7 @@ PROG_STR( SETTING_NAME_SECTION_LAMP,        "lamp" );
 PROG_STR( SETTING_NAME_SECTION_NETWORK,     "network" );
 PROG_STR( SETTING_NAME_SECTION_ALARM,       "alarm" );
 PROG_STR( SETTING_NAME_SECTION_MQTT,        "mqtt-client" );
+PROG_STR( SETTING_NAME_SECTION_FTP,         "ftp-server" );
 PROG_STR( SETTING_NAME_SECTION_HA,          "home-assistant" );
 PROG_STR( SETTING_NAME_24H,                 "24h" );
 PROG_STR( SETTING_NAME_COLOR,               "color" );
@@ -151,9 +154,9 @@ PROG_STR( SETTING_NAME_LAMP_MODE,           "lamp-mode" );
 PROG_STR( SETTING_NAME_LAMP_SPEED,          "lamp-speed" );
 PROG_STR( SETTING_NAME_LAMP_BRIGHTNESS,     "lamp-brightness" );
 PROG_STR( SETTING_NAME_MQTT_HOST,           "host" );
-PROG_STR( SETTING_NAME_MQTT_USERNAME,       "username" );
-PROG_STR( SETTING_NAME_MQTT_PASSWORD,       "password" );
 PROG_STR( SETTING_NAME_MQTT_PORT,           "port");
+PROG_STR( SETTING_NAME_USERNAME,            "username" );
+PROG_STR( SETTING_NAME_PASSWORD,            "password" );
 PROG_STR( SETTING_NAME_HA_DISCOVERY_PREFIX, "discovery-prefix");
 
 /* Settings ID's */
@@ -195,6 +198,11 @@ enum {
     SETTING_ID_MQTT_USERNAME,
     SETTING_ID_MQTT_PASSWORD,
 
+    /* FTP server section */
+    SETTING_ID_FTP_ENABLED,
+    SETTING_ID_FTP_USERNAME,
+    SETTING_ID_FTP_PASSWORD,
+
     /* Home assistant section */
     SETTING_ID_HA_DISCOVERY_PREFIX,
 
@@ -230,6 +238,7 @@ enum {
     SECTION_ID_NETWORK,
     SECTION_ID_ALARM,
     SECTION_ID_MQTT,
+    SECTION_ID_FTP,
     SECTION_ID_HA,
 };
 
@@ -307,6 +316,10 @@ struct NetworkSettings {
     char mqtt_password[ MAX_MQTT_PASSWORD_LENGTH + 1 ];
     uint16_t mqtt_port = 1883;
     char discovery_prefix[ MAX_DISCOVERY_PREFIX_LENGTH + 1 ];
+
+    bool ftp_enabled = false;
+    char ftp_username[ MAX_FTP_USERNAME_LENGTH + 1 ];
+    char ftp_password[ MAX_FTP_PASSWORD_LENGTH + 1 ];
 };
 
 
@@ -345,7 +358,7 @@ class ConfigManager : public ITask {
     uint8_t _currentSettingID = 0;      /* Current settings ID read or written to config file */
     uint8_t _currentSectionID = 0;      /* Current section ID read or written to config file */
     int8_t _currentAlarmID = -1;        /* Current alarm profile read or written to config file */
-    FatFile _sd_file;                   /* SD file manager instance */
+    FsFile _sd_file;                    /* SD file manager instance */
 };
 
 extern ConfigManager g_config;

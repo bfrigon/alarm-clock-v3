@@ -41,6 +41,8 @@ class SDCardManager : public SdFat {
 
 };
 
+void sdCardDateTimeCallback( uint16_t* date, uint16_t* time, uint8_t* ms10 );
+
 /* SD Card manager */
 extern SDCardManager g_sdcard;
 

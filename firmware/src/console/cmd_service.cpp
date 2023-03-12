@@ -20,23 +20,26 @@
 #include <services/ntpclient.h>
 #include <services/telnet_console.h>
 #include <services/mqtt.h>
+#include <services/ftpserver.h>
 #include "console_base.h"
 
 
 
 /* Commands syntax */
-PROG_STR( S_ACTION_ENABLE, "enable" );
+PROG_STR( S_ACTION_ENABLE,  "enable" );
 PROG_STR( S_ACTION_DISABLE, "disable" );
-PROG_STR( S_ACTION_STATUS, "status" );
+PROG_STR( S_ACTION_STATUS,  "status" );
 PROG_STR( S_SERVICE_TELNET, "telnet" );
-PROG_STR( S_SERVICE_NTP, "ntp" );
-PROG_STR( S_SERVICE_MQTT, "mqtt" );
+PROG_STR( S_SERVICE_NTP,    "ntp" );
+PROG_STR( S_SERVICE_MQTT,   "mqtt" );
+PROG_STR( S_SERVICE_FTP,    "ftp" );
 
 /* Service IDs */
 enum {
     SERVICE_TELNET = 1,
     SERVICE_NTP,
-    SERVICE_MQTT
+    SERVICE_MQTT,
+    SERVICE_FTP
 };
 
 /* Actions */
@@ -112,7 +115,7 @@ void ConsoleBase::runCommandService() {
                 if( g_config.network.telnetEnabled == false ) {    
 
                     g_config.network.telnetEnabled = true;
-                    g_config.save( EEPROM_ADDR_NETWORK_CONFIG );
+                    g_config.save( EEPROM_SECTION_NETWORK );
 
                     g_telnetConsole.enableServer( true );
                 } 
@@ -125,7 +128,7 @@ void ConsoleBase::runCommandService() {
                 if( g_config.network.telnetEnabled == true ) {    
 
                     g_config.network.telnetEnabled = false;
-                    g_config.save( EEPROM_ADDR_NETWORK_CONFIG );
+                    g_config.save( EEPROM_SECTION_NETWORK );
 
                     g_telnetConsole.enableServer( false );
                 } 
@@ -152,7 +155,7 @@ void ConsoleBase::runCommandService() {
                if( g_config.clock.use_ntp == false ) {    
 
                     g_config.clock.use_ntp = true;
-                    g_config.save( EEPROM_ADDR_CLOCK_CONFIG );
+                    g_config.save( EEPROM_SECTION_CLOCK );
 
                     g_ntp.setAutoSync( true );
                 }
@@ -168,7 +171,7 @@ void ConsoleBase::runCommandService() {
                if( g_config.clock.use_ntp == true ) {    
 
                     g_config.clock.use_ntp = false;
-                    g_config.save( EEPROM_ADDR_CLOCK_CONFIG );
+                    g_config.save( EEPROM_SECTION_CLOCK );
 
                     g_ntp.setAutoSync( false );
                 }
@@ -197,7 +200,7 @@ void ConsoleBase::runCommandService() {
                 if( g_config.network.mqtt_enabled == false ) {    
 
                     g_config.network.mqtt_enabled = true;
-                    g_config.save( EEPROM_ADDR_NETWORK_CONFIG );
+                    g_config.save( EEPROM_SECTION_NETWORK );
 
                     g_mqtt.enableClient( true );
                 } 
@@ -210,7 +213,7 @@ void ConsoleBase::runCommandService() {
                 if( g_config.network.mqtt_enabled == true ) {    
 
                     g_config.network.mqtt_enabled = false;
-                    g_config.save( EEPROM_ADDR_NETWORK_CONFIG );
+                    g_config.save( EEPROM_SECTION_NETWORK );
 
                     g_mqtt.enableClient( false );
                 } 
@@ -221,6 +224,46 @@ void ConsoleBase::runCommandService() {
             /* Action : Status */
             case SERVICE_ACTION_STATUS:
                 this->runCommandMqttStatus();
+                break;
+
+        }
+
+        this->println();
+
+    /* FTP server */
+    } else if( strcasecmp_P( param_name, S_SERVICE_FTP ) == 0 ) {
+
+        switch( action ) {
+
+            /* Action : Enable */
+            case SERVICE_ACTION_ENABLE:
+                if( g_config.network.ftp_enabled == false ) {    
+
+                    g_config.network.ftp_enabled = true;
+                    g_config.save( EEPROM_SECTION_NETWORK );
+
+                    g_ftpServer.enableServer( true );
+                } 
+
+                this->println_P( S_CONSOLE_FTP_ENABLED );
+                break;
+
+            /* Action : Disable */
+            case SERVICE_ACTION_DISABLE:
+                if( g_config.network.ftp_enabled == true ) {    
+
+                    g_config.network.ftp_enabled = false;
+                    g_config.save( EEPROM_SECTION_NETWORK );
+
+                    g_ftpServer.enableServer( false );
+                } 
+
+                this->println_P( S_CONSOLE_FTP_DISABLED );
+                break;
+
+            /* Action : Status */
+            case SERVICE_ACTION_STATUS:
+                g_ftpServer.printServerStatus( this );
                 break;
 
         }

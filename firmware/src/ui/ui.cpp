@@ -20,6 +20,7 @@
 #include <services/mqtt.h>
 #include <services/telnet_console.h>
 #include <services/homeassistant.h>
+#include <services/ftpserver.h>
 #include <time.h>
 #include "ui.h"
 
@@ -492,6 +493,7 @@ bool onExitScreen( Screen* screen  ) {
                 g_ntp.setAutoSync( g_config.clock.use_ntp );
                 g_telnetConsole.enableServer( g_config.network.telnetEnabled );
                 g_mqtt.enableClient( g_config.network.mqtt_enabled );
+                g_ftpServer.enableServer( g_config.network.ftp_enabled );
 
             } else {
                 g_config.load( EEPROM_SECTION_ALL );

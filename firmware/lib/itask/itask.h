@@ -42,6 +42,7 @@ class ITask {
     int getTaskError();
     void clearTaskError();
     unsigned long getTaskRunningTime();
+    void resetTaskTimer();
 
 
   private:

@@ -83,11 +83,9 @@ class TelnetConsole : public ConsoleBase {
     void flushSendBuffer();
     void exitConsole( bool timeout );
     void resetConsole();
-    bool requestListen();
     bool checkForClients();
     bool handleNegotiation();
     void queueTelnetCommand( uint8_t op, uint8_t cmd );
-    void processIncommingTelnetCommands( uint8_t op, uint8_t cmd );
 
     SOCKET _socket;
     TCPClient _client;
