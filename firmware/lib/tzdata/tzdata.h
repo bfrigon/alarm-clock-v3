@@ -32,8 +32,8 @@
 #include <avr/pgmspace.h>
 #include <timezone.h>
 
-#define MAX_TIMEZONE_ID                  340
-#define TZ_DB_VERSION                    "2022g"
+#define MAX_TIMEZONE_ID                  339
+#define TZ_DB_VERSION                    "2023c"
 
 #define TZ_REGION_AFRICA_INDEX           0
 #define TZ_REGION_AFRICA_SIZE            19
@@ -58,10 +58,10 @@
 #define TZ_REGION_MIDDLE_EAST_INDEX      205
 #define TZ_REGION_MIDDLE_EAST_SIZE       11
 #define TZ_REGION_NORTH_AMERICA_INDEX    216
-#define TZ_REGION_NORTH_AMERICA_SIZE     54
-#define TZ_REGION_PACIFIC_OCEAN_INDEX    270
+#define TZ_REGION_NORTH_AMERICA_SIZE     53
+#define TZ_REGION_PACIFIC_OCEAN_INDEX    269
 #define TZ_REGION_PACIFIC_OCEAN_SIZE     30
-#define TZ_REGION_SOUTH_AMERICA_INDEX    300
+#define TZ_REGION_SOUTH_AMERICA_INDEX    299
 #define TZ_REGION_SOUTH_AMERICA_SIZE     40
 
 
@@ -105,6 +105,7 @@ const char TZ_KST[] PROGMEM = { "KST" };
 const char TZ_KT[] PROGMEM = { "KT" };
 const char TZ_M01_P00[] PROGMEM = { "-01/+00" };
 const char TZ_M01[] PROGMEM = { "-01" };
+const char TZ_M02_M01[] PROGMEM = { "-02/-01" };
 const char TZ_M02[] PROGMEM = { "-02" };
 const char TZ_M03_M02[] PROGMEM = { "-03/-02" };
 const char TZ_M03[] PROGMEM = { "-03" };
@@ -317,7 +318,6 @@ const char TZ_AMERICA_VANCOUVER[] PROGMEM = { "America/Vancouver" };
 const char TZ_AMERICA_WHITEHORSE[] PROGMEM = { "America/Whitehorse" };
 const char TZ_AMERICA_WINNIPEG[] PROGMEM = { "America/Winnipeg" };
 const char TZ_AMERICA_YAKUTAT[] PROGMEM = { "America/Yakutat" };
-const char TZ_AMERICA_YELLOWKNIFE[] PROGMEM = { "America/Yellowknife" };
 const char TZ_ANTARCTICA_CASEY[] PROGMEM = { "Antarctica/Casey" };
 const char TZ_ANTARCTICA_DAVIS[] PROGMEM = { "Antarctica/Davis" };
 const char TZ_ANTARCTICA_MACQUARIE[] PROGMEM = { "Antarctica/Macquarie" };
@@ -525,10 +525,10 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_AFRICA_ABIDJAN, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
     { TZ_AFRICA_ALGIERS, 60, 0, 0, 0, 0, 0, TZ_CET, 60, 0, 0, 0, 0, 0, TZ_CET },
     { TZ_AFRICA_BISSAU, 0, 0, 0, 0, 0, 0, TZ_GMT, 0, 0, 0, 0, 0, 0, TZ_GMT },
-    { TZ_AFRICA_CAIRO, 120, 0, 0, 0, 0, 0, TZ_EET, 120, 0, 0, 0, 0, 0, TZ_EET },
-    { TZ_AFRICA_CASABLANCA, 60, M_MAR, 19, D_NONE, 3, 0, TZ_P01_P00, 120, M_APR, 30, D_NONE, 2, 0, TZ_P01_P00 },
+    { TZ_AFRICA_CAIRO, 120, M_OCT, 31, D_THU, 24, 0, TZ_EET, 180, M_APR, 31, D_FRI, 0, 0, TZ_EEST },
+    { TZ_AFRICA_CASABLANCA, 60, M_MAR, 19, D_NONE, 3, 0, TZ_P01_P00, 120, M_APR, 23, D_NONE, 2, 0, TZ_P01_P00 },
     { TZ_AFRICA_CEUTA, 60, M_OCT, 31, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 31, D_SUN, 2, 0, TZ_CEST },
-    { TZ_AFRICA_EL_AAIUN, 60, M_MAR, 19, D_NONE, 3, 0, TZ_P01_P00, 120, M_APR, 30, D_NONE, 2, 0, TZ_P01_P00 },
+    { TZ_AFRICA_EL_AAIUN, 60, M_MAR, 19, D_NONE, 3, 0, TZ_P01_P00, 120, M_APR, 23, D_NONE, 2, 0, TZ_P01_P00 },
     { TZ_AFRICA_JOHANNESBURG, 120, 0, 0, 0, 0, 0, TZ_SAST, 120, 0, 0, 0, 0, 0, TZ_SAST },
     { TZ_AFRICA_JUBA, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
     { TZ_AFRICA_KHARTOUM, 120, 0, 0, 0, 0, 0, TZ_CAT, 120, 0, 0, 0, 0, 0, TZ_CAT },
@@ -700,7 +700,7 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_EUROPE_HELSINKI, 120, M_OCT, 31, D_SUN, 4, 0, TZ_EET, 180, M_MAR, 31, D_SUN, 3, 0, TZ_EEST },
     { TZ_EUROPE_ISTANBUL, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_EUROPE_KALININGRAD, 120, 0, 0, 0, 0, 0, TZ_EET, 120, 0, 0, 0, 0, 0, TZ_EET },
-    { TZ_EUROPE_KIROV, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_EUROPE_KIROV, 180, 0, 0, 0, 0, 0, TZ_MSK, 180, 0, 0, 0, 0, 0, TZ_MSK },
     { TZ_EUROPE_KYIV, 120, M_OCT, 31, D_SUN, 4, 0, TZ_EET, 180, M_MAR, 31, D_SUN, 3, 0, TZ_EEST },
     { TZ_EUROPE_LISBON, 0, M_OCT, 31, D_SUN, 2, 0, TZ_WET, 60, M_MAR, 31, D_SUN, 1, 0, TZ_WEST },
     { TZ_EUROPE_LONDON, 0, M_OCT, 31, D_SUN, 2, 0, TZ_GMT_BST, 60, M_MAR, 31, D_SUN, 1, 0, TZ_GMT_BST },
@@ -721,7 +721,7 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_EUROPE_ULYANOVSK, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
     { TZ_EUROPE_VIENNA, 60, M_OCT, 31, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 31, D_SUN, 2, 0, TZ_CEST },
     { TZ_EUROPE_VILNIUS, 120, M_OCT, 31, D_SUN, 4, 0, TZ_EET, 180, M_MAR, 31, D_SUN, 3, 0, TZ_EEST },
-    { TZ_EUROPE_VOLGOGRAD, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
+    { TZ_EUROPE_VOLGOGRAD, 180, 0, 0, 0, 0, 0, TZ_MSK, 180, 0, 0, 0, 0, 0, TZ_MSK },
     { TZ_EUROPE_WARSAW, 60, M_OCT, 31, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 31, D_SUN, 2, 0, TZ_CEST },
     { TZ_EUROPE_ZURICH, 60, M_OCT, 31, D_SUN, 3, 0, TZ_CET, 120, M_MAR, 31, D_SUN, 2, 0, TZ_CEST },
     { TZ_INDIAN_CHAGOS, 360, 0, 0, 0, 0, 0, TZ_P06, 360, 0, 0, 0, 0, 0, TZ_P06 },
@@ -732,8 +732,8 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_ASIA_BEIRUT, 120, M_OCT, 31, D_SUN, 0, 0, TZ_EET, 180, M_MAR, 31, D_SUN, 0, 0, TZ_EEST },
     { TZ_ASIA_DAMASCUS, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_DUBAI, 240, 0, 0, 0, 0, 0, TZ_P04, 240, 0, 0, 0, 0, 0, TZ_P04 },
-    { TZ_ASIA_GAZA, 120, M_OCT, DOW_BEFORE | 30, D_SAT, 2, 0, TZ_EET, 180, M_MAR, DOW_BEFORE | 30, D_SAT, 2, 0, TZ_EEST },
-    { TZ_ASIA_HEBRON, 120, M_OCT, DOW_BEFORE | 30, D_SAT, 2, 0, TZ_EET, 180, M_MAR, DOW_BEFORE | 30, D_SAT, 2, 0, TZ_EEST },
+    { TZ_ASIA_GAZA, 120, M_OCT, DOW_BEFORE | 30, D_SAT, 2, 0, TZ_EET, 180, M_APR, 29, D_NONE, 2, 0, TZ_EEST },
+    { TZ_ASIA_HEBRON, 120, M_OCT, DOW_BEFORE | 30, D_SAT, 2, 0, TZ_EET, 180, M_APR, 29, D_NONE, 2, 0, TZ_EEST },
     { TZ_ASIA_JERUSALEM, 120, M_OCT, 31, D_SUN, 2, 0, TZ_IST, 180, M_MAR, 23, D_FRI, 2, 0, TZ_IDT },
     { TZ_ASIA_QATAR, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
     { TZ_ASIA_RIYADH, 180, 0, 0, 0, 0, 0, TZ_P03, 180, 0, 0, 0, 0, 0, TZ_P03 },
@@ -771,7 +771,7 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_AMERICA_NORTH_DAKOTA_NEW_SALEM, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 8, D_SUN, 2, 0, TZ_CDT },
     { TZ_AMERICA_NEW_YORK, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 8, D_SUN, 2, 0, TZ_EDT },
     { TZ_AMERICA_NOME, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 8, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_NUUK, -120, 0, 0, 0, 0, 0, TZ_M02, -120, 0, 0, 0, 0, 0, TZ_M02 },
+    { TZ_AMERICA_NUUK, -120, M_OCT, 31, D_SUN, 0, 0, TZ_M02_M01, -60, M_MAR, 31, D_SUN, -1, 0, TZ_M02_M01 },
     { TZ_AMERICA_INDIANA_PETERSBURG, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 8, D_SUN, 2, 0, TZ_EDT },
     { TZ_AMERICA_PHOENIX, -420, 0, 0, 0, 0, 0, TZ_MST, -420, 0, 0, 0, 0, 0, TZ_MST },
     { TZ_AMERICA_RANKIN_INLET, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 8, D_SUN, 2, 0, TZ_CDT },
@@ -791,7 +791,6 @@ const TimeZoneRules TimeZonesTable[] PROGMEM = {
     { TZ_AMERICA_INDIANA_WINAMAC, -300, M_NOV, 1, D_SUN, 2, 0, TZ_EST, -240, M_MAR, 8, D_SUN, 2, 0, TZ_EDT },
     { TZ_AMERICA_WINNIPEG, -360, M_NOV, 1, D_SUN, 2, 0, TZ_CST, -300, M_MAR, 8, D_SUN, 2, 0, TZ_CDT },
     { TZ_AMERICA_YAKUTAT, -540, M_NOV, 1, D_SUN, 2, 0, TZ_AKST, -480, M_MAR, 8, D_SUN, 2, 0, TZ_AKDT },
-    { TZ_AMERICA_YELLOWKNIFE, -420, M_NOV, 1, D_SUN, 2, 0, TZ_MST, -360, M_MAR, 8, D_SUN, 2, 0, TZ_MDT },
     { TZ_PACIFIC_APIA, 780, 0, 0, 0, 0, 0, TZ_P13_P14, 780, 0, 0, 0, 0, 0, TZ_P13_P14 },
     { TZ_PACIFIC_AUCKLAND, 720, M_APR, 1, D_SUN, 3, 0, TZ_NZST, 780, M_SEP, 31, D_SUN, 2, 0, TZ_NZDT },
     { TZ_PACIFIC_BOUGAINVILLE, 660, 0, 0, 0, 0, 0, TZ_P11, 660, 0, 0, 0, 0, 0, TZ_P11 },
