@@ -113,7 +113,7 @@ PROG_STR( S_TOPIC_CMD_LCD_MSG,          "%s/text/%s/clock_lcd_msg/set" );
 PROG_STR( S_TOPIC_AVAILABILITY,         "%s/sensor/%s/status" );
 
 /* Sendor configuration topics payload */
-PROG_STR( S_JSON_CONFIG_ALARM_SWITCH,   "{\"name\":\"Alarm clock Alarm switch\"," \
+PROG_STR( S_JSON_CONFIG_ALARM_SWITCH,   "{\"name\":\"Alarm switch\"," \
                                         "\"uniq_id\":\"clock_%s_alarm_switch\"," \
                                         "\"stat_t\":\"%s/binary_sensor/%s/clock_alarm_switch/state\"," \
                                         "\"avty_t\": \"%s/sensor/%s/status\"," \
@@ -126,7 +126,7 @@ PROG_STR( S_JSON_CONFIG_ALARM_SWITCH,   "{\"name\":\"Alarm clock Alarm switch\",
                                         "\"sw\":\"" FIRMWARE_VERSION "\"" \
                                         "}}" );
 
-PROG_STR( S_JSON_CONFIG_NEXT_ALARM,     "{\"name\":\"Alarm clock Next alarm\"," \
+PROG_STR( S_JSON_CONFIG_NEXT_ALARM,     "{\"name\":\"Next alarm\"," \
                                         "\"uniq_id\":\"clock_%s_next_alarm\"," \
                                         "\"dev_cla\":\"timestamp\"," \
                                         "\"stat_t\":\"%s/sensor/%s/clock_next_alarm/state\"," \
@@ -139,7 +139,7 @@ PROG_STR( S_JSON_CONFIG_NEXT_ALARM,     "{\"name\":\"Alarm clock Next alarm\"," 
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
-PROG_STR( S_JSON_CONFIG_CONN_RSSI,      "{\"name\":\"Alarm clock Signal strength\"," \
+PROG_STR( S_JSON_CONFIG_CONN_RSSI,      "{\"name\":\"Signal strength\"," \
                                         "\"uniq_id\":\"clock_%s_rssi\"," \
                                         "\"dev_cla\":\"signal_strength\"," \
                                         "\"unit_of_meas\":\"dBm\"," \
@@ -151,7 +151,7 @@ PROG_STR( S_JSON_CONFIG_CONN_RSSI,      "{\"name\":\"Alarm clock Signal strength
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
-PROG_STR( S_JSON_CONFIG_BATTERY_CHARGE, "{\"name\":\"Alarm clock Battery charge\"," \
+PROG_STR( S_JSON_CONFIG_BATTERY_CHARGE, "{\"name\":\"Battery charge\"," \
                                         "\"uniq_id\":\"clock_%s_battery\"," \
                                         "\"dev_cla\":\"battery\"," \
                                         "\"unit_of_meas\":\"%%\"," \
@@ -163,7 +163,7 @@ PROG_STR( S_JSON_CONFIG_BATTERY_CHARGE, "{\"name\":\"Alarm clock Battery charge\
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
-PROG_STR( S_JSON_CONFIG_BATTERY_STATUS, "{\"name\":\"Alarm clock Battery status\"," \
+PROG_STR( S_JSON_CONFIG_BATTERY_STATUS, "{\"name\":\"Battery status\"," \
                                         "\"uniq_id\":\"clock_%s_battery_status\"," \
                                         "\"dev_cla\":\"enum\"," \
                                         "\"ent_cat\":\"diagnostic\", " \
@@ -174,7 +174,7 @@ PROG_STR( S_JSON_CONFIG_BATTERY_STATUS, "{\"name\":\"Alarm clock Battery status\
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
-PROG_STR( S_JSON_CONFIG_BATTERY_VOLT,   "{\"name\":\"Alarm clock Battery voltage\"," \
+PROG_STR( S_JSON_CONFIG_BATTERY_VOLT,   "{\"name\":\"Battery voltage\"," \
                                         "\"uniq_id\":\"clock_%s_battery_voltage\"," \
                                         "\"dev_cla\":\"voltage\"," \
                                         "\"ent_cat\":\"diagnostic\", " \
@@ -186,7 +186,7 @@ PROG_STR( S_JSON_CONFIG_BATTERY_VOLT,   "{\"name\":\"Alarm clock Battery voltage
                                         "\"ids\":[\"%s\"]" \
                                         "}}" );
 
-PROG_STR( S_JSON_CONFIG_LCD_MSG,        "{\"name\":\"Alarm clock LCD message\"," \
+PROG_STR( S_JSON_CONFIG_LCD_MSG,        "{\"name\":\"LCD message\"," \
                                         "\"uniq_id\":\"clock_%s_lcd_msg\"," \
                                         "\"cmd_t\":\"%s/text/%s/clock_lcd_msg/set\"," \
                                         "\"avty_t\": \"%s/sensor/%s/status\"," \
